@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "../components/common/container";
 import {
   Box,
@@ -76,6 +76,14 @@ const Profile = () => {
     removed.splice(removed.indexOf(idx), 1);
     setEditing(removed);
   };
+
+  useEffect(() => {
+    editing.length
+      ? (window.onbeforeunload = function () {
+          return true;
+        })
+      : (window.onbeforeunload = null);
+  }, [editing]);
 
   return (
     <>
