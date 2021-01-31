@@ -26,20 +26,32 @@ import {
   CheckboxGroup,
   HStack,
   useDisclosure,
+  Menu,
+  MenuList,
+  MenuButton,
+  IconButton,
+  MenuItem,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import ContentEditable from "react-contenteditable";
-import { MoreHorizontal } from "react-feather";
+import { MoreHorizontal, Trash2 } from "react-feather";
 
 const Profile = () => {
   const initMenuItem = { name: "", price: "", description: "" };
+  const [menu, setMenu] = useState([{ ...initMenuItem }]);
+  const [sections, setSections] = useState([{}]);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
+  const [editing, setEditing] = useState([]);
+
   const addMenuItem = () => {
-    setMenu([...menu].concat({ ...initMenuItem }));
+    const added = [...menu].concat({ ...initMenuItem });
+    setMenu(added);
+
+    handleAddEditing(added.length - 1);
   };
 
   const updateMenuItem = (idx, key, value) => {
@@ -54,9 +66,16 @@ const Profile = () => {
     setMenu(removed);
   };
 
-  const [menu, setMenu] = useState([{ ...initMenuItem }]);
+  const handleAddEditing = (idx) => {
+    const added = [...editing].concat(idx);
+    setEditing(added);
+  };
 
-  const [sections, setSections] = useState([{}]);
+  const handleRemoveEditing = (idx) => {
+    const removed = [...editing];
+    removed.splice(removed.indexOf(idx), 1);
+    setEditing(removed);
+  };
 
   return (
     <>
@@ -124,11 +143,14 @@ const Profile = () => {
               ))}
               <Box ml="16">
                 {menu.map((item, idx) => (
-                  <MenuItem
+                  <FoodMenuItem
                     key={idx}
-                    item={item}
                     idx={idx}
+                    item={item}
                     updateMenuItem={updateMenuItem}
+                    editing={editing}
+                    handleAddEditing={handleAddEditing}
+                    handleRemoveEditing={handleRemoveEditing}
                   />
                 ))}
                 <Button onClick={addMenuItem}>Add Item</Button>
@@ -179,13 +201,23 @@ const Profile = () => {
   );
 };
 
-const MenuItem = ({ item, idx, updateMenuItem }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const FoodMenuItem = ({
+  item,
+  idx,
+  updateMenuItem,
+  editing,
+  handleAddEditing,
+  handleRemoveEditing,
+}) => {
+  const saveMenuItem = () => {
+    console.log("saved");
+    handleRemoveEditing(idx);
+  };
 
   const formatPrice = (val) => `$` + val;
   const parsePrice = (val) => parseFloat(val).toFixed(2).replace(/^\$/, "");
 
-  return isOpen ? (
+  return editing.includes(idx) ? (
     <Grid mb="12" templateColumns="auto min-content" gap="6">
       <GridItem>
         <Flex flexGrow="1">
@@ -214,14 +246,25 @@ const MenuItem = ({ item, idx, updateMenuItem }) => {
           </FormControl>
         </Flex>
       </GridItem>
-      <GridItem alignSelf="end">
+      <GridItem alignSelf="" justifySelf="end">
         <Flex>
-          <Button colorScheme="green" onClick={onClose}>
+          <Button colorScheme="green" onClick={saveMenuItem}>
             Save
           </Button>
-          <Button ml="2">
-            <MoreHorizontal />
-          </Button>
+          <Menu>
+            <MenuButton as={IconButton} icon={<MoreHorizontal />} ml="2" />
+            <MenuList>
+              <MenuItem
+                color="red.600"
+                fontWeight="semibold"
+                icon={<Trash2 />}
+                _hover={{ bg: "red.50" }}
+                _focus={{ bg: "red.50" }}
+              >
+                Delete
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
       </GridItem>
       <GridItem colSpan="1">
@@ -280,7 +323,7 @@ const MenuItem = ({ item, idx, updateMenuItem }) => {
     </Grid>
   ) : (
     <Grid mb="12" templateColumns="auto min-content" gap="6">
-      <GridItem py="2">
+      <GridItem>
         <Box>
           <Flex fontWeight="semibold" fontSize="lg">
             <Box flexGrow="1">
@@ -299,12 +342,27 @@ const MenuItem = ({ item, idx, updateMenuItem }) => {
       </GridItem>
       <GridItem>
         <Flex>
-          <Button colorScheme="blue" variant="outline" onClick={onOpen}>
+          <Button
+            colorScheme="blue"
+            variant="outline"
+            onClick={() => handleAddEditing(idx)}
+          >
             Edit
           </Button>
-          <Button ml="2">
-            <MoreHorizontal />
-          </Button>
+          <Menu>
+            <MenuButton as={IconButton} icon={<MoreHorizontal />} ml="2" />
+            <MenuList>
+              <MenuItem
+                color="red.600"
+                fontWeight="semibold"
+                icon={<Trash2 />}
+                _hover={{ bg: "red.50" }}
+                _focus={{ bg: "red.50" }}
+              >
+                Delete
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
       </GridItem>
     </Grid>
