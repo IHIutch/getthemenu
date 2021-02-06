@@ -1,3 +1,5 @@
+import connectToDatabase from "../util/mongodb";
+import { ObjectId } from "mongodb";
 import axios from "redaxios";
 import React, { useState, useCallback } from "react";
 import debounce from "lodash/debounce";
@@ -562,9 +564,16 @@ const SectionItem = ({
 };
 
 export async function getServerSideProps(context) {
-  const restaurant = await axios
-    .get(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/profile`)
-    .then((res) => res.data);
+  const { db } = await connectToDatabase();
+
+  const restaurant = await db.collection("restaurants").findOne({
+    _id: ObjectId("6016ed478483c52d79d9eaec"),
+  });
+  // res.json(restaurant);
+
+  // const restaurant = await axios
+  //   .get(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/profile`)
+  //   .then((res) => res.data);
 
   if (!restaurant) {
     return {
@@ -574,7 +583,7 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      restaurant,
+      restaurant: JSON.parse(JSON.stringify(restaurant)),
     },
   };
 }
