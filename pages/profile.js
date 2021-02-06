@@ -28,10 +28,12 @@ import {
   MenuButton,
   IconButton,
   MenuItem,
+  VStack,
+  StackDivider,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import ContentEditable from "react-contenteditable";
-import { MoreHorizontal, Trash2 } from "react-feather";
+import { MoreVertical, Trash2 } from "react-feather";
 
 const Profile = ({ restaurant }) => {
   const initMenuItem = { name: "", price: "", description: "" };
@@ -117,50 +119,97 @@ const Profile = ({ restaurant }) => {
       <Container>
         <Navbar />
         <Box py="12">
+          <Heading
+            fontSize="md"
+            fontWeight="semibold"
+            textTransform="uppercase"
+            color="gray.500"
+            letterSpacing="0.025rem"
+          >
+            Menu
+          </Heading>
           <Flex mb="8">
-            <Heading as="h1">{restaurant.menu.name}</Heading>
-            <Button colorScheme="blue" onClick={() => saveMenu()} ml="auto">
+            <Heading as="h1" size="2xl">
+              {restaurant.menu.name}
+            </Heading>
+            {/* <Button colorScheme="blue" onClick={() => saveMenu()} ml="auto">
               Save Menu
-            </Button>
+            </Button> */}
           </Flex>
           <Grid templateColumns="repeat(12, 1fr)" gap="6">
-            <GridItem colSpan="8">
-              <Box>
+            <GridItem colSpan={{ base: "12", lg: "8" }}>
+              <VStack
+                // divider={<StackDivider borderColor="gray.200" />}
+                spacing="24"
+                align="stretch"
+              >
                 {menu &&
                   menu.sections.map((section, sectionIdx) => (
-                    <MenuSection
-                      updateMenuSection={updateMenuSection}
-                      removeMenuSection={removeMenuSection}
-                      details={section}
-                      idx={sectionIdx}
-                      key={sectionIdx}
-                    >
-                      <Box>
-                        {section.items.map((item, itemIdx) => (
-                          <SectionItem
-                            key={itemIdx}
-                            idx={itemIdx}
-                            sectionIdx={sectionIdx}
-                            item={item}
-                            updateMenuItem={updateMenuItem}
-                            removeMenuItem={removeMenuItem}
-                            editing={editing}
-                            handleAddEditing={handleAddEditing}
-                            handleRemoveEditing={handleRemoveEditing}
-                          />
-                        ))}
-                        <Box mx="8">
-                          <Button onClick={() => addMenuItem(sectionIdx)}>
-                            Add Item
-                          </Button>
+                    <Box key={sectionIdx}>
+                      <Heading
+                        mb="4"
+                        fontSize="md"
+                        fontWeight="semibold"
+                        textTransform="uppercase"
+                        color="gray.500"
+                        letterSpacing="0.025rem"
+                      >
+                        Section
+                      </Heading>
+                      <MenuSection
+                        updateMenuSection={updateMenuSection}
+                        removeMenuSection={removeMenuSection}
+                        details={section}
+                        idx={sectionIdx}
+                        key={sectionIdx}
+                      >
+                        <Box>
+                          <Heading
+                            mb="4"
+                            fontSize="md"
+                            fontWeight="semibold"
+                            textTransform="uppercase"
+                            color="gray.500"
+                            letterSpacing="0.025rem"
+                          >
+                            Items
+                          </Heading>
+                          <VStack
+                            divider={<StackDivider borderColor="gray.200" />}
+                            spacing="6"
+                            align="stretch"
+                          >
+                            {section.items.map((item, itemIdx) => (
+                              <SectionItem
+                                key={itemIdx}
+                                idx={itemIdx}
+                                sectionIdx={sectionIdx}
+                                item={item}
+                                updateMenuItem={updateMenuItem}
+                                removeMenuItem={removeMenuItem}
+                                editing={editing}
+                                handleAddEditing={handleAddEditing}
+                                handleRemoveEditing={handleRemoveEditing}
+                              />
+                            ))}
+                            <Box>
+                              <Button onClick={() => addMenuItem(sectionIdx)}>
+                                Add Item
+                              </Button>
+                            </Box>
+                          </VStack>
                         </Box>
-                      </Box>
-                    </MenuSection>
+                      </MenuSection>
+                    </Box>
                   ))}
-                <Button onClick={addMenuSection}>Add Section</Button>
+              </VStack>
+              <Box mt="16" pt="4" borderTop="1px" borderColor="gray.200">
+                <Button w="100%" onClick={addMenuSection}>
+                  Add Section
+                </Button>
               </Box>
             </GridItem>
-            <GridItem colSpan="4">
+            {/* <GridItem colSpan="4">
               <Box bg="gray.50" p="8">
                 <Heading as="h1" fontSize="xl" mb="4">
                   Restaurant Details
@@ -172,7 +221,6 @@ const Profile = ({ restaurant }) => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
-                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
                   </FormControl>
                 </Box>
                 <Box>
@@ -182,7 +230,6 @@ const Profile = ({ restaurant }) => {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                     />
-                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
                   </FormControl>
                 </Box>
                 <Box>
@@ -193,11 +240,10 @@ const Profile = ({ restaurant }) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
-                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
                   </FormControl>
                 </Box>
               </Box>
-            </GridItem>
+            </GridItem> */}
           </Grid>
         </Box>
       </Container>
@@ -214,10 +260,10 @@ const MenuSection = ({
 }) => {
   return (
     <Box>
-      <Flex borderBottom="1px" borderColor="gray.200" pb="4" mb="6">
+      <Flex pb="4" mb="2">
         <Box flexGrow="1">
           <FormControl id="sectionName">
-            <FormLabel>Section Name</FormLabel>
+            <FormLabel as={VisuallyHidden}>Section Name</FormLabel>
             <Input
               as={ContentEditable}
               html={details.name || "Untitled Section"}
@@ -233,7 +279,7 @@ const MenuSection = ({
             {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
           </FormControl>
         </Box>
-        <Box flexShrink="0" ml="8">
+        <Box flexShrink="0" ml="8" d="none">
           <Box as="fieldset">
             <FormLabel as="legend">Availability</FormLabel>
             <Flex alignItems="center">
@@ -282,6 +328,7 @@ const SectionItem = ({
   const parsePrice = (val) => parseFloat(val).toFixed(2).replace(/^\$/, "");
 
   return editing.includes(idx) ? (
+    // Editing
     <Grid mb="12" templateColumns="auto min-content" gap="6">
       <GridItem>
         <Flex flexGrow="1">
@@ -323,7 +370,13 @@ const SectionItem = ({
             Save
           </Button>
           <Menu placement="bottom-end">
-            <MenuButton as={IconButton} icon={<MoreHorizontal />} ml="2" />
+            <MenuButton
+              size="xs"
+              variant="outline"
+              as={IconButton}
+              icon={<MoreVertical />}
+              ml="2"
+            />
             <MenuList>
               <MenuItem
                 color="red.600"
@@ -393,36 +446,66 @@ const SectionItem = ({
       </GridItem>
     </Grid>
   ) : (
-    <Grid mb="12" templateColumns="auto min-content" gap="6">
+    // Not Editing
+    <Grid templateColumns="auto min-content" gap={{ base: "4", lg: "6" }}>
       <GridItem>
         <Box>
           <Flex fontWeight="semibold" fontSize="lg">
             <Box flexGrow="1">
-              <Text as="span">{item.name}</Text>
+              <Text
+                as="span"
+                fontStyle={item.name ? "" : "italic"}
+                color={item.name ? "gray.700" : "gray.500"}
+              >
+                {item.name || "Untitled Item"}
+              </Text>
             </Box>
             <Box flexShrink="1" ml="4">
-              <Text as="span">${item.price}</Text>
+              <Text
+                as="span"
+                fontStyle={item.price ? "" : "italic"}
+                color={item.price ? "gray.700" : "gray.500"}
+              >
+                ${item.price || "0.00"}
+              </Text>
             </Box>
           </Flex>
-          {item.description && (
-            <Box mt="2">
-              <Text color="gray.700">{item.description}</Text>
-            </Box>
-          )}
+          <Box mt="2">
+            <Text
+              fontStyle={item.description ? "" : "italic"}
+              color={item.description ? "gray.700" : "gray.500"}
+            >
+              {item.description || "No description..."}
+            </Text>
+          </Box>
         </Box>
       </GridItem>
       <GridItem>
         <Flex>
           <Button
+            d={{ base: "none", lg: "inline-block" }}
+            mr="2"
             colorScheme="blue"
             variant="outline"
             onClick={() => handleAddEditing(idx)}
           >
             Edit
           </Button>
-          <Menu placement="bottom-end">
-            <MenuButton as={IconButton} icon={<MoreHorizontal />} ml="2" />
+          <Menu placement="bottom-end" size="sm">
+            <MenuButton
+              as={IconButton}
+              size="sm"
+              variant="outline"
+              icon={<MoreVertical />}
+            />
             <MenuList>
+              <MenuItem
+                fontWeight="semibold"
+                icon={<Trash2 />}
+                onClick={() => handleAddEditing(idx)}
+              >
+                Edit
+              </MenuItem>
               <MenuItem
                 color="red.600"
                 fontWeight="semibold"
