@@ -12,7 +12,8 @@ import Head from "next/head";
 import React from "react";
 import Container from "../components/common/container";
 
-const menu = () => {
+const menu = ({ menu }) => {
+  console.log(menu);
   const restaurant = {
     name: "Red Pepper Chinese And Vietnamese Restaurant",
     phone: "716-831-3878",
@@ -268,5 +269,25 @@ const menu = () => {
     </Box>
   );
 };
+
+export async function getServerSideProps(context) {
+  const { db } = await connectToDatabase();
+
+  const restaurant = await db.collection("restaurants").findOne({
+    _id: ObjectId("6016ed478483c52d79d9eaec"),
+  });
+
+  if (!restaurant) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      menu: JSON.parse(JSON.stringify(restaurant)),
+    },
+  };
+}
 
 export default menu;
