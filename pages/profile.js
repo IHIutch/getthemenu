@@ -49,7 +49,7 @@ const Profile = ({ restaurant }) => {
   // const [email, setEmail] = useState("");
 
   const saveMenu = () => {
-    axios.put(`${window.location.origin}/api/profile`, { menu });
+    axios.put(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/profile`, { menu });
   };
 
   const debounceSaveMenu = useCallback(
@@ -563,7 +563,7 @@ const SectionItem = ({
 
 export async function getServerSideProps(context) {
   const restaurant = await axios
-    .get(`${window.location.origin}/api/profile`)
+    .get(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/profile`)
     .then((res) => res.data);
 
   if (!restaurant) {
