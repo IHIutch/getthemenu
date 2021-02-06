@@ -46,16 +46,16 @@ const Profile = ({ restaurant }) => {
   const [editing, setEditing] = useState([]);
 
   const addMenuSection = () => {
-    const added = {
-      ...menu,
-      sections: { ...menu }.sections.concat({ ...initMenuSection }),
-    };
-    console.log(added);
-    setMenu(added);
+    const added = { ...menu };
+    (added.sections = { ...menu }.sections.concat({ ...initMenuSection })),
+      setMenu(added);
   };
 
-  const addMenuItem = () => {
-    const added = [...menu].concat({ ...initMenuItem });
+  const addMenuItem = (idx) => {
+    const added = { ...menu };
+    added.sections[idx].items = { ...menu }.sections[idx].items.concat({
+      ...initMenuItem,
+    });
     setMenu(added);
     handleAddEditing(added.length - 1);
   };
@@ -137,7 +137,9 @@ const Profile = ({ restaurant }) => {
                           />
                         ))}
                         <Box mx="8">
-                          <Button onClick={addMenuItem}>Add Item</Button>
+                          <Button onClick={() => addMenuItem(sectionIdx)}>
+                            Add Item
+                          </Button>
                         </Box>
                       </Box>
                     </MenuSection>
@@ -413,36 +415,19 @@ const SectionItem = ({
 };
 
 export async function getServerSideProps(context) {
-  // const restaurant = await axios
-  //   .get(`${process.env.BASE_URL}/api/profile`)
-  //   .then((res) => res.data);
+  const restaurant = await axios
+    .get(`${process.env.BASE_URL}/api/profile`)
+    .then((res) => res.data);
 
-  // console.log(restaurant);
+  if (!restaurant) {
+    return {
+      notFound: true,
+    };
+  }
 
-  // if (!restaurant) {
-  //   return {
-  //     notFound: true,
-  //   };
-  // }
   return {
     props: {
-      restaurant: {
-        menu: {
-          name: "Dinner",
-          sections: [
-            {
-              name: "Entrees",
-              items: [
-                {
-                  name: "Steak",
-                  price: 9.99,
-                  description: "A really great steak",
-                },
-              ],
-            },
-          ],
-        },
-      },
+      restaurant,
     },
   };
 }
