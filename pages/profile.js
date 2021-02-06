@@ -40,7 +40,6 @@ import ContentEditable from "react-contenteditable";
 import { MoreVertical, Trash2, ChevronDown, Edit } from "react-feather";
 
 const Profile = ({ restaurant }) => {
-  console.log(process.env.BASE_URL);
   const initMenuItem = { name: "", price: "", description: "" };
   const initMenuSection = { name: "", items: [{ ...initMenuItem }] };
   const [menu, setMenu] = useState(restaurant.menu);
@@ -50,7 +49,7 @@ const Profile = ({ restaurant }) => {
   // const [email, setEmail] = useState("");
 
   const saveMenu = () => {
-    axios.put(`${process.env.BASE_URL}/api/profile`, { menu });
+    axios.put(`${window.location.origin}/api/profile`, { menu });
   };
 
   const debounceSaveMenu = useCallback(
@@ -564,7 +563,7 @@ const SectionItem = ({
 
 export async function getServerSideProps(context) {
   const restaurant = await axios
-    .get(`${process.env.BASE_URL}/api/profile`)
+    .get(`${window.location.origin}/api/profile`)
     .then((res) => res.data);
 
   if (!restaurant) {
