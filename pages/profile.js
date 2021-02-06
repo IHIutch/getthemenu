@@ -60,15 +60,27 @@ const Profile = ({ restaurant }) => {
     handleAddEditing(added.length - 1);
   };
 
-  const updateMenuItem = (idx, key, value) => {
-    const updated = [...menu];
-    updated[idx] = { ...updated[idx], [key]: value };
+  const updateMenuItem = (idx, sectionIdx, key, value) => {
+    const updated = { ...menu };
+    updated.sections[sectionIdx].items[idx][key] = value;
     setMenu(updated);
   };
 
-  const removeMenuItem = (idx) => {
-    const removed = [...menu];
-    removed.splice(idx, 1);
+  const updateMenuSection = (idx, key, value) => {
+    const updated = { ...menu };
+    updated.sections[idx][key] = value;
+    setMenu(updated);
+  };
+
+  const removeMenuItem = (idx, sectionIdx) => {
+    const removed = { ...menu };
+    removed.sections[sectionIdx].items.splice(idx, 1);
+    setMenu(removed);
+  };
+
+  const removeMenuSection = (idx) => {
+    const removed = { ...menu };
+    removed.sections.splice(idx, 1);
     setMenu(removed);
   };
 
@@ -117,8 +129,8 @@ const Profile = ({ restaurant }) => {
                 {menu &&
                   menu.sections.map((section, sectionIdx) => (
                     <MenuSection
-                      updateSection={() => {}}
-                      removeSection={() => {}}
+                      updateMenuSection={updateMenuSection}
+                      removeMenuSection={removeMenuSection}
                       details={section}
                       idx={sectionIdx}
                       key={sectionIdx}
@@ -131,6 +143,7 @@ const Profile = ({ restaurant }) => {
                             sectionIdx={sectionIdx}
                             item={item}
                             updateMenuItem={updateMenuItem}
+                            removeMenuItem={removeMenuItem}
                             editing={editing}
                             handleAddEditing={handleAddEditing}
                             handleRemoveEditing={handleRemoveEditing}
@@ -192,7 +205,13 @@ const Profile = ({ restaurant }) => {
   );
 };
 
-const MenuSection = ({ details, children }) => {
+const MenuSection = ({
+  idx,
+  details,
+  children,
+  updateMenuSection,
+  removeMenuSection,
+}) => {
   return (
     <Box>
       <Flex borderBottom="1px" borderColor="gray.200" pb="4" mb="6">
@@ -209,9 +228,7 @@ const MenuSection = ({ details, children }) => {
               fontSize="2xl"
               fontWeight="semibold"
               // value={item.name}
-              // onChange={(e) =>
-              //   updateMenuItem(idx, "name", e.target.value)
-              // }
+              onChange={(e) => updateMenuSection(idx, "name", e.target.value)}
             />
             {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
           </FormControl>
@@ -249,7 +266,9 @@ const MenuSection = ({ details, children }) => {
 const SectionItem = ({
   item,
   idx,
+  sectionIdx,
   updateMenuItem,
+  removeMenuItem,
   editing,
   handleAddEditing,
   handleRemoveEditing,
@@ -270,14 +289,21 @@ const SectionItem = ({
             <FormLabel>Item Name</FormLabel>
             <Input
               value={item.name}
-              onChange={(e) => updateMenuItem(idx, "name", e.target.value)}
+              onChange={(e) =>
+                updateMenuItem(idx, sectionIdx, "name", e.target.value)
+              }
             />
           </FormControl>
           <FormControl id="itemPrice" ml="4">
             <FormLabel>Item Price</FormLabel>
             <NumberInput
               onChange={(valueString) =>
-                updateMenuItem(idx, "price", parsePrice(valueString))
+                updateMenuItem(
+                  idx,
+                  sectionIdx,
+                  "price",
+                  parsePrice(valueString)
+                )
               }
               value={formatPrice(item.price)}
               step={0.01}
@@ -296,7 +322,7 @@ const SectionItem = ({
           <Button colorScheme="green" onClick={saveMenuItem}>
             Save
           </Button>
-          <Menu>
+          <Menu placement="bottom-end">
             <MenuButton as={IconButton} icon={<MoreHorizontal />} ml="2" />
             <MenuList>
               <MenuItem
@@ -319,7 +345,7 @@ const SectionItem = ({
             <Textarea
               value={item.description}
               onChange={(e) =>
-                updateMenuItem(idx, "description", e.target.value)
+                updateMenuItem(idx, sectionIdx, "description", e.target.value)
               }
               rows="4"
             />
@@ -394,7 +420,7 @@ const SectionItem = ({
           >
             Edit
           </Button>
-          <Menu>
+          <Menu placement="bottom-end">
             <MenuButton as={IconButton} icon={<MoreHorizontal />} ml="2" />
             <MenuList>
               <MenuItem
