@@ -40,6 +40,7 @@ import ContentEditable from "react-contenteditable";
 import { MoreVertical, Trash2, ChevronDown, Edit } from "react-feather";
 
 const Profile = ({ restaurant }) => {
+  console.log(process.env.BASE_URL);
   const initMenuItem = { name: "", price: "", description: "" };
   const initMenuSection = { name: "", items: [{ ...initMenuItem }] };
   const [menu, setMenu] = useState(restaurant.menu);
