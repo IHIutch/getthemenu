@@ -1,5 +1,7 @@
+import axios from "redaxios";
 import React, { useEffect, useState } from "react";
 import Container from "../components/common/container";
+import Navbar from "../components/common/navbar";
 import {
   Box,
   Button,
@@ -12,9 +14,6 @@ import {
   Textarea,
   Heading,
   Flex,
-  Editable,
-  EditableInput,
-  EditablePreview,
   VisuallyHidden,
   NumberInput,
   NumberInputField,
@@ -23,9 +22,7 @@ import {
   NumberIncrementStepper,
   Text,
   Checkbox,
-  CheckboxGroup,
   HStack,
-  useDisclosure,
   Menu,
   MenuList,
   MenuButton,
@@ -36,9 +33,9 @@ import Head from "next/head";
 import ContentEditable from "react-contenteditable";
 import { MoreHorizontal, Trash2 } from "react-feather";
 
-const Profile = () => {
+const Profile = ({ restaurant }) => {
   const initMenuItem = { name: "", price: "", description: "" };
-  const [menu, setMenu] = useState([{ ...initMenuItem }]);
+  const [menu, setMenu] = useState(restaurant.menu.sections[0].items);
   const [sections, setSections] = useState([{}]);
 
   const [name, setName] = useState("");
@@ -77,6 +74,11 @@ const Profile = () => {
     setEditing(removed);
   };
 
+  const saveMenu = () => {
+    // console.log(menu);
+    axios.put(`${process.env.BASE_URL}/api/profile`, { menu });
+  };
+
   useEffect(() => {
     editing.length
       ? (window.onbeforeunload = function () {
@@ -92,118 +94,132 @@ const Profile = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container>
-        <Grid templateColumns="repeat(12, 1fr)" gap="6">
-          <GridItem colSpan="8">
-            <Box>
-              {sections.map((section, idx) => (
-                <React.Fragment key={idx}>
-                  <Flex>
-                    <Box flexGrow="1">
-                      <FormControl id="sectionName">
-                        <FormLabel>Section Name</FormLabel>
-                        <Input
-                          as={ContentEditable}
-                          html="Untitled Section"
-                          size="lg"
-                          w="auto"
-                          d="inline-flex"
-                          alignItems="center"
-                          fontSize="2xl"
-                          fontWeight="semibold"
-                          // value={item.name}
-                          // onChange={(e) =>
-                          //   updateMenuItem(idx, "name", e.target.value)
-                          // }
-                        />
-                        {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                      </FormControl>
-                    </Box>
-                    <Box flexShrink="0" ml="8">
-                      <Box as="fieldset">
-                        <FormLabel as="legend">Availability</FormLabel>
-                        <Flex alignItems="center">
-                          <FormControl id="availabilityStart">
-                            <FormLabel as={VisuallyHidden}>
-                              Availability Start
-                            </FormLabel>
-                            <NumberInput max={23} min={0} w="20">
-                              <NumberInputField textAlign="right" />
-                            </NumberInput>
-                            <FormHelperText mt="1">Hours</FormHelperText>
-                          </FormControl>
-                          <Text as="span" px="2" mb="6">
-                            :
-                          </Text>
-                          <FormControl id="availabilityEnd">
-                            <FormLabel as={VisuallyHidden}>
-                              Availability End
-                            </FormLabel>
-                            <NumberInput step={15} max={45} min={0} w="20">
-                              <NumberInputField textAlign="right" />
-                            </NumberInput>
-                            <FormHelperText mt="1">Minutes</FormHelperText>
-                          </FormControl>
-                        </Flex>
+        <Navbar />
+        <Box py="12">
+          <Flex mb="8">
+            <Heading as="h1">{restaurant.menu.name}</Heading>
+            <Button colorScheme="blue" onClick={() => saveMenu()} ml="auto">
+              Save Menu
+            </Button>
+          </Flex>
+          <Grid templateColumns="repeat(12, 1fr)" gap="6">
+            <GridItem colSpan="8">
+              <Box>
+                {sections.map((section, idx) => (
+                  <React.Fragment key={idx}>
+                    <Flex
+                      borderBottom="1px"
+                      borderColor="gray.200"
+                      pb="4"
+                      mb="6"
+                    >
+                      <Box flexGrow="1">
+                        <FormControl id="sectionName">
+                          <FormLabel>Section Name</FormLabel>
+                          <Input
+                            as={ContentEditable}
+                            html="Untitled Section"
+                            size="lg"
+                            w="auto"
+                            d="inline-flex"
+                            alignItems="center"
+                            fontSize="2xl"
+                            fontWeight="semibold"
+                            // value={item.name}
+                            // onChange={(e) =>
+                            //   updateMenuItem(idx, "name", e.target.value)
+                            // }
+                          />
+                          {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                        </FormControl>
                       </Box>
-                    </Box>
-                  </Flex>
-                </React.Fragment>
-              ))}
-              <Box ml="16">
-                {menu.map((item, idx) => (
-                  <FoodMenuItem
-                    key={idx}
-                    idx={idx}
-                    item={item}
-                    updateMenuItem={updateMenuItem}
-                    editing={editing}
-                    handleAddEditing={handleAddEditing}
-                    handleRemoveEditing={handleRemoveEditing}
-                  />
+                      <Box flexShrink="0" ml="8">
+                        <Box as="fieldset">
+                          <FormLabel as="legend">Availability</FormLabel>
+                          <Flex alignItems="center">
+                            <FormControl id="availabilityStart">
+                              <FormLabel as={VisuallyHidden}>
+                                Availability Start
+                              </FormLabel>
+                              <NumberInput max={23} min={0} w="20">
+                                <NumberInputField textAlign="right" />
+                              </NumberInput>
+                              <FormHelperText mt="1">Hours</FormHelperText>
+                            </FormControl>
+                            <Text as="span" px="2" mb="6">
+                              :
+                            </Text>
+                            <FormControl id="availabilityEnd">
+                              <FormLabel as={VisuallyHidden}>
+                                Availability End
+                              </FormLabel>
+                              <NumberInput step={15} max={45} min={0} w="20">
+                                <NumberInputField textAlign="right" />
+                              </NumberInput>
+                              <FormHelperText mt="1">Minutes</FormHelperText>
+                            </FormControl>
+                          </Flex>
+                        </Box>
+                      </Box>
+                    </Flex>
+                  </React.Fragment>
                 ))}
-                <Button onClick={addMenuItem}>Add Item</Button>
+                <Box mx="8">
+                  {menu.map((item, idx) => (
+                    <FoodMenuItem
+                      key={idx}
+                      idx={idx}
+                      item={item}
+                      updateMenuItem={updateMenuItem}
+                      editing={editing}
+                      handleAddEditing={handleAddEditing}
+                      handleRemoveEditing={handleRemoveEditing}
+                    />
+                  ))}
+                  <Button onClick={addMenuItem}>Add Item</Button>
+                </Box>
               </Box>
-            </Box>
-          </GridItem>
-          <GridItem colSpan="4">
-            <Box bg="gray.50" p="8">
-              <Heading as="h1" fontSize="xl" mb="4">
-                Restaurant Details
-              </Heading>
-              <Box>
-                <FormControl id="name">
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
+            </GridItem>
+            <GridItem colSpan="4">
+              <Box bg="gray.50" p="8">
+                <Heading as="h1" fontSize="xl" mb="4">
+                  Restaurant Details
+                </Heading>
+                <Box>
+                  <FormControl id="name">
+                    <FormLabel>Name</FormLabel>
+                    <Input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                  </FormControl>
+                </Box>
+                <Box>
+                  <FormControl id="phone">
+                    <FormLabel>Phone</FormLabel>
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                  </FormControl>
+                </Box>
+                <Box>
+                  <FormControl id="email">
+                    <FormLabel>Email</FormLabel>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                  </FormControl>
+                </Box>
               </Box>
-              <Box>
-                <FormControl id="phone">
-                  <FormLabel>Phone</FormLabel>
-                  <Input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
-              </Box>
-              <Box>
-                <FormControl id="email">
-                  <FormLabel>Email</FormLabel>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
-              </Box>
-            </Box>
-          </GridItem>
-        </Grid>
+            </GridItem>
+          </Grid>
+        </Box>
       </Container>
     </>
   );
@@ -376,5 +392,24 @@ const FoodMenuItem = ({
     </Grid>
   );
 };
+
+export async function getServerSideProps(context) {
+  const restaurant = await axios
+    .get(`${process.env.BASE_URL}/api/profile`)
+    .then((res) => res.data);
+
+  console.log(restaurant);
+
+  if (!restaurant) {
+    return {
+      notFound: true,
+    };
+  }
+  return {
+    props: {
+      restaurant,
+    },
+  };
+}
 
 export default Profile;
