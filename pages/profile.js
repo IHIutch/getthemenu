@@ -1,5 +1,6 @@
 import axios from "redaxios";
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
+import debounce from "lodash/debounce";
 import Container from "../components/common/container";
 import Navbar from "../components/common/navbar";
 import {
@@ -36,24 +37,33 @@ import {
 } from "@chakra-ui/react";
 import Head from "next/head";
 import ContentEditable from "react-contenteditable";
-import { MoreVertical, Trash2 } from "react-feather";
+import { MoreVertical, Trash2, ChevronDown, Edit } from "react-feather";
 
 const Profile = ({ restaurant }) => {
   const initMenuItem = { name: "", price: "", description: "" };
   const initMenuSection = { name: "", items: [{ ...initMenuItem }] };
   const [menu, setMenu] = useState(restaurant.menu);
-  const [sections, setSections] = useState([{}]);
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  // const [name, setName] = useState("");
+  // const [phone, setPhone] = useState("");
+  // const [email, setEmail] = useState("");
 
-  const [editing, setEditing] = useState([]);
+  const saveMenu = () => {
+    axios.put(`${process.env.BASE_URL}/api/profile`, { menu });
+  };
+
+  const debounceSaveMenu = useCallback(
+    debounce(() => {
+      saveMenu();
+    }, 500),
+    []
+  );
 
   const addMenuSection = () => {
     const added = { ...menu };
-    (added.sections = { ...menu }.sections.concat({ ...initMenuSection })),
-      setMenu(added);
+    added.sections = { ...menu }.sections.concat({ ...initMenuSection });
+    setMenu(added);
+    saveMenu();
   };
 
   const addMenuItem = (idx) => {
@@ -62,56 +72,36 @@ const Profile = ({ restaurant }) => {
       ...initMenuItem,
     });
     setMenu(added);
-    handleAddEditing(added.length - 1);
+    saveMenu();
   };
 
-  const updateMenuItem = (idx, sectionIdx, key, value) => {
+  const updateMenuItem = (idx, sectionIdx, obj) => {
     const updated = { ...menu };
-    updated.sections[sectionIdx].items[idx][key] = value;
+    updated.sections[sectionIdx].items[idx] = obj;
     setMenu(updated);
+    saveMenu();
   };
 
   const updateMenuSection = (idx, key, value) => {
     const updated = { ...menu };
     updated.sections[idx][key] = value;
     setMenu(updated);
+    debounceSaveMenu(updated);
   };
 
   const removeMenuItem = (idx, sectionIdx) => {
     const removed = { ...menu };
     removed.sections[sectionIdx].items.splice(idx, 1);
     setMenu(removed);
+    saveMenu();
   };
 
   const removeMenuSection = (idx) => {
     const removed = { ...menu };
     removed.sections.splice(idx, 1);
     setMenu(removed);
+    saveMenu();
   };
-
-  const handleAddEditing = (idx) => {
-    const added = [...editing].concat(idx);
-    setEditing(added);
-  };
-
-  const handleRemoveEditing = (idx) => {
-    const removed = [...editing];
-    removed.splice(removed.indexOf(idx), 1);
-    setEditing(removed);
-  };
-
-  const saveMenu = () => {
-    // console.log(menu);
-    axios.put(`${process.env.BASE_URL}/api/profile`, { menu });
-  };
-
-  useEffect(() => {
-    editing.length
-      ? (window.onbeforeunload = function () {
-          return true;
-        })
-      : (window.onbeforeunload = null);
-  }, [editing]);
 
   return (
     <>
@@ -119,6 +109,7 @@ const Profile = ({ restaurant }) => {
         <title>Profile</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <Container>
         <Navbar />
         <Box py="12">
@@ -135,17 +126,10 @@ const Profile = ({ restaurant }) => {
             <Heading as="h1" size="2xl">
               {restaurant.menu.name}
             </Heading>
-            {/* <Button colorScheme="blue" onClick={() => saveMenu()} ml="auto">
-              Save Menu
-            </Button> */}
           </Flex>
           <Grid templateColumns="repeat(12, 1fr)" gap="6">
             <GridItem colSpan={{ base: "12", lg: "8" }}>
-              <VStack
-                // divider={<StackDivider borderColor="gray.200" />}
-                spacing="24"
-                align="stretch"
-              >
+              <VStack spacing="24" align="stretch">
                 {menu &&
                   menu.sections.map((section, sectionIdx) => (
                     <Box key={sectionIdx}>
@@ -190,9 +174,6 @@ const Profile = ({ restaurant }) => {
                                 item={item}
                                 updateMenuItem={updateMenuItem}
                                 removeMenuItem={removeMenuItem}
-                                editing={editing}
-                                handleAddEditing={handleAddEditing}
-                                handleRemoveEditing={handleRemoveEditing}
                               />
                             ))}
                             <Box>
@@ -276,7 +257,6 @@ const MenuSection = ({
               alignItems="center"
               fontSize="2xl"
               fontWeight="semibold"
-              // value={item.name}
               onChange={(e) => updateMenuSection(idx, "name", e.target.value)}
             />
             {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
@@ -318,25 +298,46 @@ const SectionItem = ({
   sectionIdx,
   updateMenuItem,
   removeMenuItem,
-  editing,
-  handleAddEditing,
-  handleRemoveEditing,
 }) => {
+  const {
+    isOpen: isAdvancedOpen,
+    onOpen: onAdvancedOpen,
+    onClose: onAdvancedClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditingOpen,
+    onOpen: onEditingOpen,
+    onClose: onEditingClose,
+  } = useDisclosure();
+  const [localItem, setLocalItem] = useState(item);
+
   const saveMenuItem = () => {
-    console.log("saved");
-    handleRemoveEditing(idx);
+    updateMenuItem(idx, sectionIdx, localItem);
+    onEditingClose();
+    onAdvancedClose();
+  };
+
+  const cancelMenuItem = () => {
+    setLocalItem(item);
+    onEditingClose();
+    onAdvancedClose();
+  };
+
+  const updateLocalItem = (key, value) => {
+    setLocalItem({
+      ...localItem,
+      [key]: value,
+    });
   };
 
   const formatPrice = (val) => `$` + val;
   const parsePrice = (val) => parseFloat(val).toFixed(2).replace(/^\$/, "");
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   const handleToggle = () => {
-    isOpen ? onClose() : onOpen();
+    isAdvancedOpen ? onAdvancedClose() : onAdvancedOpen();
   };
 
-  return editing.includes(idx) ? (
+  return isEditingOpen ? (
     // Editing
     <Grid
       mb="12"
@@ -368,6 +369,7 @@ const SectionItem = ({
                 icon={<Trash2 />}
                 _hover={{ bg: "red.50" }}
                 _focus={{ bg: "red.50" }}
+                onClick={() => handleSemoveMenuItem(idx, sectionIdx)}
               >
                 Delete
               </MenuItem>
@@ -377,23 +379,21 @@ const SectionItem = ({
       </GridItem>
       <GridItem colSpan="8">
         <FormControl id="itemName">
-          <FormLabel>Item Name</FormLabel>
+          <FormLabel>Name</FormLabel>
           <Input
-            value={item.name}
-            onChange={(e) =>
-              updateMenuItem(idx, sectionIdx, "name", e.target.value)
-            }
+            value={localItem.name}
+            onChange={(e) => updateLocalItem("name", e.target.value)}
           />
         </FormControl>
       </GridItem>
       <GridItem colSpan="4">
         <FormControl id="itemPrice">
-          <FormLabel>Item Price</FormLabel>
+          <FormLabel>Price</FormLabel>
           <NumberInput
             onChange={(valueString) =>
-              updateMenuItem(idx, sectionIdx, "price", parsePrice(valueString))
+              updateLocalItem("price", parsePrice(valueString))
             }
-            value={formatPrice(item.price)}
+            value={formatPrice(localItem.price)}
             step={0.01}
           >
             <NumberInputField />
@@ -407,12 +407,10 @@ const SectionItem = ({
       <GridItem colSpan="12">
         <Box>
           <FormControl id="itemDescription">
-            <FormLabel>Item Description</FormLabel>
+            <FormLabel>Description</FormLabel>
             <Textarea
-              value={item.description}
-              onChange={(e) =>
-                updateMenuItem(idx, sectionIdx, "description", e.target.value)
-              }
+              value={localItem.description}
+              onChange={(e) => setLocalItem("description", e.target.value)}
               rows="4"
             />
           </FormControl>
@@ -421,12 +419,25 @@ const SectionItem = ({
       <GridItem colSpan="12">
         <Flex alignItems="center">
           <Box>
-            <Button colorScheme="green" variant="link" onClick={handleToggle}>
+            <Button
+              rightIcon={
+                <Icon
+                  transition="transform 0.2s ease"
+                  transform={
+                    isAdvancedOpen ? "rotateZ(180deg)" : "rotateZ(0deg)"
+                  }
+                  as={ChevronDown}
+                />
+              }
+              colorScheme="green"
+              variant="link"
+              onClick={handleToggle}
+            >
               Advanced
             </Button>
           </Box>
           <Box ml="auto">
-            <Button variant="outline" onClick={saveMenuItem}>
+            <Button variant="outline" onClick={cancelMenuItem}>
               Cancel
             </Button>
             <Button ml="2" colorScheme="green" onClick={saveMenuItem}>
@@ -435,7 +446,7 @@ const SectionItem = ({
           </Box>
         </Flex>
         <Box>
-          <Collapse in={isOpen}>
+          <Collapse in={isAdvancedOpen}>
             <Box mt="4">
               <FormControl as="fieldset">
                 <FormLabel as="legend">Dietary Restrictions</FormLabel>
@@ -450,8 +461,8 @@ const SectionItem = ({
           </Collapse>
         </Box>
       </GridItem>
-      {/* <GridItem> */}
-      {/* <Box as="fieldset">
+      {/* <GridItem>
+        <Box as="fieldset">
           <FormLabel as="legend">Availability</FormLabel>
           <Flex alignItems="center">
             <FormControl id="availabilityStart">
@@ -472,8 +483,8 @@ const SectionItem = ({
               <FormHelperText mt="1">Minutes</FormHelperText>
             </FormControl>
           </Flex>
-        </Box> */}
-      {/* </GridItem> */}
+        </Box>
+      </GridItem> */}
     </Grid>
   ) : (
     // Not Editing
@@ -514,7 +525,7 @@ const SectionItem = ({
           mr="2"
           colorScheme="blue"
           variant="outline"
-          onClick={() => handleAddEditing(idx)}
+          onClick={onEditingOpen}
         >
           Edit
         </Button>
@@ -528,8 +539,8 @@ const SectionItem = ({
           <MenuList>
             <MenuItem
               fontWeight="semibold"
-              icon={<Trash2 />}
-              onClick={() => handleAddEditing(idx)}
+              icon={<Edit />}
+              onClick={onEditingOpen}
             >
               Edit
             </MenuItem>
@@ -539,6 +550,7 @@ const SectionItem = ({
               icon={<Trash2 />}
               _hover={{ bg: "red.50" }}
               _focus={{ bg: "red.50" }}
+              onClick={() => removeMenuItem(idx, sectionIdx)}
             >
               Delete
             </MenuItem>
