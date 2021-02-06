@@ -105,77 +105,27 @@ const Profile = ({ restaurant }) => {
           <Grid templateColumns="repeat(12, 1fr)" gap="6">
             <GridItem colSpan="8">
               <Box>
-                {sections.map((section, idx) => (
-                  <React.Fragment key={idx}>
-                    <Flex
-                      borderBottom="1px"
-                      borderColor="gray.200"
-                      pb="4"
-                      mb="6"
-                    >
-                      <Box flexGrow="1">
-                        <FormControl id="sectionName">
-                          <FormLabel>Section Name</FormLabel>
-                          <Input
-                            as={ContentEditable}
-                            html="Untitled Section"
-                            size="lg"
-                            w="auto"
-                            d="inline-flex"
-                            alignItems="center"
-                            fontSize="2xl"
-                            fontWeight="semibold"
-                            // value={item.name}
-                            // onChange={(e) =>
-                            //   updateMenuItem(idx, "name", e.target.value)
-                            // }
-                          />
-                          {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                        </FormControl>
-                      </Box>
-                      <Box flexShrink="0" ml="8">
-                        <Box as="fieldset">
-                          <FormLabel as="legend">Availability</FormLabel>
-                          <Flex alignItems="center">
-                            <FormControl id="availabilityStart">
-                              <FormLabel as={VisuallyHidden}>
-                                Availability Start
-                              </FormLabel>
-                              <NumberInput max={23} min={0} w="20">
-                                <NumberInputField textAlign="right" />
-                              </NumberInput>
-                              <FormHelperText mt="1">Hours</FormHelperText>
-                            </FormControl>
-                            <Text as="span" px="2" mb="6">
-                              :
-                            </Text>
-                            <FormControl id="availabilityEnd">
-                              <FormLabel as={VisuallyHidden}>
-                                Availability End
-                              </FormLabel>
-                              <NumberInput step={15} max={45} min={0} w="20">
-                                <NumberInputField textAlign="right" />
-                              </NumberInput>
-                              <FormHelperText mt="1">Minutes</FormHelperText>
-                            </FormControl>
-                          </Flex>
-                        </Box>
-                      </Box>
-                    </Flex>
-                  </React.Fragment>
+                {restaurant.menu.sections.map((section, sectionIdx) => (
+                  <MenuSection
+                    details={section}
+                    idx={sectionIdx}
+                    key={sectionIdx}
+                  >
+                    {section.items.map((item, itemIdx) => (
+                      <SectionItem
+                        key={itemIdx}
+                        idx={itemIdx}
+                        sectionIdx={sectionIdx}
+                        item={item}
+                        updateMenuItem={updateMenuItem}
+                        editing={editing}
+                        handleAddEditing={handleAddEditing}
+                        handleRemoveEditing={handleRemoveEditing}
+                      />
+                    ))}
+                  </MenuSection>
                 ))}
                 <Box mx="8">
-                  {menu.map((item, idx) => (
-                    <FoodMenuItem
-                      key={idx}
-                      idx={idx}
-                      item={item}
-                      updateMenuItem={updateMenuItem}
-                      editing={editing}
-                      handleAddEditing={handleAddEditing}
-                      handleRemoveEditing={handleRemoveEditing}
-                    />
-                  ))}
                   <Button onClick={addMenuItem}>Add Item</Button>
                 </Box>
               </Box>
@@ -225,7 +175,61 @@ const Profile = ({ restaurant }) => {
   );
 };
 
-const FoodMenuItem = ({
+const MenuSection = ({ details, idx, children }) => {
+  return (
+    <Box>
+      <Flex borderBottom="1px" borderColor="gray.200" pb="4" mb="6">
+        <Box flexGrow="1">
+          <FormControl id="sectionName">
+            <FormLabel>Section Name</FormLabel>
+            <Input
+              as={ContentEditable}
+              html="Untitled Section"
+              size="lg"
+              w="auto"
+              d="inline-flex"
+              alignItems="center"
+              fontSize="2xl"
+              fontWeight="semibold"
+              // value={item.name}
+              // onChange={(e) =>
+              //   updateMenuItem(idx, "name", e.target.value)
+              // }
+            />
+            {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+          </FormControl>
+        </Box>
+        <Box flexShrink="0" ml="8">
+          <Box as="fieldset">
+            <FormLabel as="legend">Availability</FormLabel>
+            <Flex alignItems="center">
+              <FormControl id="availabilityStart">
+                <FormLabel as={VisuallyHidden}>Availability Start</FormLabel>
+                <NumberInput max={23} min={0} w="20">
+                  <NumberInputField textAlign="right" />
+                </NumberInput>
+                <FormHelperText mt="1">Hours</FormHelperText>
+              </FormControl>
+              <Text as="span" px="2" mb="6">
+                :
+              </Text>
+              <FormControl id="availabilityEnd">
+                <FormLabel as={VisuallyHidden}>Availability End</FormLabel>
+                <NumberInput step={15} max={45} min={0} w="20">
+                  <NumberInputField textAlign="right" />
+                </NumberInput>
+                <FormHelperText mt="1">Minutes</FormHelperText>
+              </FormControl>
+            </Flex>
+          </Box>
+        </Box>
+      </Flex>
+      {children}
+    </Box>
+  );
+};
+
+const SectionItem = ({
   item,
   idx,
   updateMenuItem,
@@ -394,20 +398,36 @@ const FoodMenuItem = ({
 };
 
 export async function getServerSideProps(context) {
-  const restaurant = await axios
-    .get(`${process.env.BASE_URL}/api/profile`)
-    .then((res) => res.data);
+  // const restaurant = await axios
+  //   .get(`${process.env.BASE_URL}/api/profile`)
+  //   .then((res) => res.data);
 
-  console.log(restaurant);
+  // console.log(restaurant);
 
-  if (!restaurant) {
-    return {
-      notFound: true,
-    };
-  }
+  // if (!restaurant) {
+  //   return {
+  //     notFound: true,
+  //   };
+  // }
   return {
     props: {
-      restaurant,
+      restaurant: {
+        menu: {
+          name: "Dinner",
+          sections: [
+            {
+              name: "Entrees",
+              items: [
+                {
+                  name: "Steak",
+                  price: 9.99,
+                  description: "A really great steak",
+                },
+              ],
+            },
+          ],
+        },
+      },
     },
   };
 }
