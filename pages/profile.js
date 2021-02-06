@@ -35,7 +35,8 @@ import { MoreHorizontal, Trash2 } from "react-feather";
 
 const Profile = ({ restaurant }) => {
   const initMenuItem = { name: "", price: "", description: "" };
-  const [menu, setMenu] = useState(restaurant.menu.sections[0].items);
+  const initMenuSection = { name: "", items: [{ ...initMenuItem }] };
+  const [menu, setMenu] = useState(restaurant.menu);
   const [sections, setSections] = useState([{}]);
 
   const [name, setName] = useState("");
@@ -44,10 +45,18 @@ const Profile = ({ restaurant }) => {
 
   const [editing, setEditing] = useState([]);
 
+  const addMenuSection = () => {
+    const added = {
+      ...menu,
+      sections: { ...menu }.sections.concat({ ...initMenuSection }),
+    };
+    console.log(added);
+    setMenu(added);
+  };
+
   const addMenuItem = () => {
     const added = [...menu].concat({ ...initMenuItem });
     setMenu(added);
-
     handleAddEditing(added.length - 1);
   };
 
@@ -105,29 +114,35 @@ const Profile = ({ restaurant }) => {
           <Grid templateColumns="repeat(12, 1fr)" gap="6">
             <GridItem colSpan="8">
               <Box>
-                {restaurant.menu.sections.map((section, sectionIdx) => (
-                  <MenuSection
-                    details={section}
-                    idx={sectionIdx}
-                    key={sectionIdx}
-                  >
-                    {section.items.map((item, itemIdx) => (
-                      <SectionItem
-                        key={itemIdx}
-                        idx={itemIdx}
-                        sectionIdx={sectionIdx}
-                        item={item}
-                        updateMenuItem={updateMenuItem}
-                        editing={editing}
-                        handleAddEditing={handleAddEditing}
-                        handleRemoveEditing={handleRemoveEditing}
-                      />
-                    ))}
-                  </MenuSection>
-                ))}
-                <Box mx="8">
-                  <Button onClick={addMenuItem}>Add Item</Button>
-                </Box>
+                {menu &&
+                  menu.sections.map((section, sectionIdx) => (
+                    <MenuSection
+                      updateSection={() => {}}
+                      removeSection={() => {}}
+                      details={section}
+                      idx={sectionIdx}
+                      key={sectionIdx}
+                    >
+                      <Box>
+                        {section.items.map((item, itemIdx) => (
+                          <SectionItem
+                            key={itemIdx}
+                            idx={itemIdx}
+                            sectionIdx={sectionIdx}
+                            item={item}
+                            updateMenuItem={updateMenuItem}
+                            editing={editing}
+                            handleAddEditing={handleAddEditing}
+                            handleRemoveEditing={handleRemoveEditing}
+                          />
+                        ))}
+                        <Box mx="8">
+                          <Button onClick={addMenuItem}>Add Item</Button>
+                        </Box>
+                      </Box>
+                    </MenuSection>
+                  ))}
+                <Button onClick={addMenuSection}>Add Section</Button>
               </Box>
             </GridItem>
             <GridItem colSpan="4">
@@ -175,7 +190,7 @@ const Profile = ({ restaurant }) => {
   );
 };
 
-const MenuSection = ({ details, idx, children }) => {
+const MenuSection = ({ details, children }) => {
   return (
     <Box>
       <Flex borderBottom="1px" borderColor="gray.200" pb="4" mb="6">
@@ -184,7 +199,7 @@ const MenuSection = ({ details, idx, children }) => {
             <FormLabel>Section Name</FormLabel>
             <Input
               as={ContentEditable}
-              html="Untitled Section"
+              html={details.name || "Untitled Section"}
               size="lg"
               w="auto"
               d="inline-flex"
