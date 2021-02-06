@@ -22,7 +22,6 @@ import {
   NumberIncrementStepper,
   Text,
   Checkbox,
-  HStack,
   Menu,
   MenuList,
   MenuButton,
@@ -30,6 +29,10 @@ import {
   MenuItem,
   VStack,
   StackDivider,
+  Icon,
+  Collapse,
+  useDisclosure,
+  HStack,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import ContentEditable from "react-contenteditable";
@@ -120,8 +123,8 @@ const Profile = ({ restaurant }) => {
         <Navbar />
         <Box py="12">
           <Heading
-            fontSize="md"
-            fontWeight="semibold"
+            fontSize="sm"
+            fontWeight="bold"
             textTransform="uppercase"
             color="gray.500"
             letterSpacing="0.025rem"
@@ -147,9 +150,9 @@ const Profile = ({ restaurant }) => {
                   menu.sections.map((section, sectionIdx) => (
                     <Box key={sectionIdx}>
                       <Heading
-                        mb="4"
-                        fontSize="md"
-                        fontWeight="semibold"
+                        mb="2"
+                        fontSize="sm"
+                        fontWeight="bold"
                         textTransform="uppercase"
                         color="gray.500"
                         letterSpacing="0.025rem"
@@ -166,8 +169,8 @@ const Profile = ({ restaurant }) => {
                         <Box>
                           <Heading
                             mb="4"
-                            fontSize="md"
-                            fontWeight="semibold"
+                            fontSize="sm"
+                            fontWeight="bold"
                             textTransform="uppercase"
                             color="gray.500"
                             letterSpacing="0.025rem"
@@ -260,7 +263,7 @@ const MenuSection = ({
 }) => {
   return (
     <Box>
-      <Flex pb="4" mb="2">
+      <Flex pb="4" mb="4">
         <Box flexGrow="1">
           <FormControl id="sectionName">
             <FormLabel as={VisuallyHidden}>Section Name</FormLabel>
@@ -327,55 +330,36 @@ const SectionItem = ({
   const formatPrice = (val) => `$` + val;
   const parsePrice = (val) => parseFloat(val).toFixed(2).replace(/^\$/, "");
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleToggle = () => {
+    isOpen ? onClose() : onOpen();
+  };
+
   return editing.includes(idx) ? (
     // Editing
-    <Grid mb="12" templateColumns="auto min-content" gap="6">
-      <GridItem>
-        <Flex flexGrow="1">
-          <FormControl id="itemName">
-            <FormLabel>Item Name</FormLabel>
-            <Input
-              value={item.name}
-              onChange={(e) =>
-                updateMenuItem(idx, sectionIdx, "name", e.target.value)
-              }
-            />
-          </FormControl>
-          <FormControl id="itemPrice" ml="4">
-            <FormLabel>Item Price</FormLabel>
-            <NumberInput
-              onChange={(valueString) =>
-                updateMenuItem(
-                  idx,
-                  sectionIdx,
-                  "price",
-                  parsePrice(valueString)
-                )
-              }
-              value={formatPrice(item.price)}
-              step={0.01}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </FormControl>
-        </Flex>
-      </GridItem>
-      <GridItem alignSelf="" justifySelf="end">
-        <Flex>
-          <Button colorScheme="green" onClick={saveMenuItem}>
-            Save
-          </Button>
+    <Grid
+      mb="12"
+      templateColumns="repeat(12, 1fr)"
+      gap="4"
+      p="4"
+      bg="gray.50"
+      border="1px"
+      borderColor="gray.200"
+      rounded="md"
+    >
+      <GridItem colSpan="12">
+        <Flex alignItems="center" mb="2">
+          <Heading fontSize="lg" fontWeight="bold" color="gray.600">
+            Editing Item
+          </Heading>
           <Menu placement="bottom-end">
             <MenuButton
-              size="xs"
+              size="sm"
               variant="outline"
               as={IconButton}
-              icon={<MoreVertical />}
-              ml="2"
+              icon={<Icon as={MoreVertical} h="5" w="5" />}
+              ml="auto"
             />
             <MenuList>
               <MenuItem
@@ -391,7 +375,36 @@ const SectionItem = ({
           </Menu>
         </Flex>
       </GridItem>
-      <GridItem colSpan="1">
+      <GridItem colSpan="8">
+        <FormControl id="itemName">
+          <FormLabel>Item Name</FormLabel>
+          <Input
+            value={item.name}
+            onChange={(e) =>
+              updateMenuItem(idx, sectionIdx, "name", e.target.value)
+            }
+          />
+        </FormControl>
+      </GridItem>
+      <GridItem colSpan="4">
+        <FormControl id="itemPrice">
+          <FormLabel>Item Price</FormLabel>
+          <NumberInput
+            onChange={(valueString) =>
+              updateMenuItem(idx, sectionIdx, "price", parsePrice(valueString))
+            }
+            value={formatPrice(item.price)}
+            step={0.01}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </FormControl>
+      </GridItem>
+      <GridItem colSpan="12">
         <Box>
           <FormControl id="itemDescription">
             <FormLabel>Item Description</FormLabel>
@@ -405,23 +418,40 @@ const SectionItem = ({
           </FormControl>
         </Box>
       </GridItem>
-      <GridItem colStart="1">
-        <Flex>
+      <GridItem colSpan="12">
+        <Flex alignItems="center">
           <Box>
-            <FormControl as="fieldset">
-              <FormLabel as="legend">Dietary Restrictions</FormLabel>
-              <HStack spacing="24px">
-                <Checkbox>Gluten Free</Checkbox>
-                <Checkbox>Diary Free</Checkbox>
-                <Checkbox>Vegan</Checkbox>
-                <Checkbox>Vegetarian</Checkbox>
-              </HStack>
-            </FormControl>
+            <Button colorScheme="green" variant="link" onClick={handleToggle}>
+              Advanced
+            </Button>
+          </Box>
+          <Box ml="auto">
+            <Button variant="outline" onClick={saveMenuItem}>
+              Cancel
+            </Button>
+            <Button ml="2" colorScheme="green" onClick={saveMenuItem}>
+              Save
+            </Button>
           </Box>
         </Flex>
+        <Box>
+          <Collapse in={isOpen}>
+            <Box mt="4">
+              <FormControl as="fieldset">
+                <FormLabel as="legend">Dietary Restrictions</FormLabel>
+                <Flex flexWrap="wrap">
+                  <Checkbox p="2">Gluten Free</Checkbox>
+                  <Checkbox p="2">Diary Free</Checkbox>
+                  <Checkbox p="2">Vegan</Checkbox>
+                  <Checkbox p="2">Vegetarian</Checkbox>
+                </Flex>
+              </FormControl>
+            </Box>
+          </Collapse>
+        </Box>
       </GridItem>
-      <GridItem>
-        <Box as="fieldset">
+      {/* <GridItem> */}
+      {/* <Box as="fieldset">
           <FormLabel as="legend">Availability</FormLabel>
           <Flex alignItems="center">
             <FormControl id="availabilityStart">
@@ -442,84 +472,80 @@ const SectionItem = ({
               <FormHelperText mt="1">Minutes</FormHelperText>
             </FormControl>
           </Flex>
-        </Box>
-      </GridItem>
+        </Box> */}
+      {/* </GridItem> */}
     </Grid>
   ) : (
     // Not Editing
-    <Grid templateColumns="auto min-content" gap={{ base: "4", lg: "6" }}>
-      <GridItem>
-        <Box>
-          <Flex fontWeight="semibold" fontSize="lg">
-            <Box flexGrow="1">
-              <Text
-                as="span"
-                fontStyle={item.name ? "" : "italic"}
-                color={item.name ? "gray.700" : "gray.500"}
-              >
-                {item.name || "Untitled Item"}
-              </Text>
-            </Box>
-            <Box flexShrink="1" ml="4">
-              <Text
-                as="span"
-                fontStyle={item.price ? "" : "italic"}
-                color={item.price ? "gray.700" : "gray.500"}
-              >
-                ${item.price || "0.00"}
-              </Text>
-            </Box>
-          </Flex>
-          <Box mt="2">
+    <HStack spacing={{ base: "4", lg: "6" }} alignItems="flex-start">
+      <Box mt="1" flexGrow="1">
+        <Flex fontWeight="semibold" fontSize="lg">
+          <Box flexGrow="1">
             <Text
-              fontStyle={item.description ? "" : "italic"}
-              color={item.description ? "gray.700" : "gray.500"}
+              as="span"
+              fontStyle={item.name ? "" : "italic"}
+              color={item.name ? "gray.700" : "gray.500"}
             >
-              {item.description || "No description..."}
+              {item.name || "Untitled Item"}
             </Text>
           </Box>
-        </Box>
-      </GridItem>
-      <GridItem>
-        <Flex>
-          <Button
-            d={{ base: "none", lg: "inline-block" }}
-            mr="2"
-            colorScheme="blue"
-            variant="outline"
-            onClick={() => handleAddEditing(idx)}
-          >
-            Edit
-          </Button>
-          <Menu placement="bottom-end" size="sm">
-            <MenuButton
-              as={IconButton}
-              size="sm"
-              variant="outline"
-              icon={<MoreVertical />}
-            />
-            <MenuList>
-              <MenuItem
-                fontWeight="semibold"
-                icon={<Trash2 />}
-                onClick={() => handleAddEditing(idx)}
-              >
-                Edit
-              </MenuItem>
-              <MenuItem
-                color="red.600"
-                fontWeight="semibold"
-                icon={<Trash2 />}
-                _hover={{ bg: "red.50" }}
-                _focus={{ bg: "red.50" }}
-              >
-                Delete
-              </MenuItem>
-            </MenuList>
-          </Menu>
+          <Box flexShrink="1" ml="4">
+            <Text
+              as="span"
+              fontStyle={item.price ? "" : "italic"}
+              color={item.price ? "gray.700" : "gray.500"}
+            >
+              ${item.price || "0.00"}
+            </Text>
+          </Box>
         </Flex>
-      </GridItem>
-    </Grid>
+        <Box mt="2">
+          <Text
+            fontStyle={item.description ? "" : "italic"}
+            color={item.description ? "gray.700" : "gray.500"}
+          >
+            {item.description || "No description..."}
+          </Text>
+        </Box>
+      </Box>
+      <Flex>
+        <Button
+          d={{ base: "none", lg: "inline-block" }}
+          mr="2"
+          colorScheme="blue"
+          variant="outline"
+          onClick={() => handleAddEditing(idx)}
+        >
+          Edit
+        </Button>
+        <Menu placement="bottom-end" size="sm">
+          <MenuButton
+            as={IconButton}
+            size="sm"
+            variant="outline"
+            icon={<Icon as={MoreVertical} h="5" w="5" />}
+          />
+          <MenuList>
+            <MenuItem
+              fontWeight="semibold"
+              icon={<Trash2 />}
+              onClick={() => handleAddEditing(idx)}
+            >
+              Edit
+            </MenuItem>
+            <MenuItem
+              color="red.600"
+              fontWeight="semibold"
+              icon={<Trash2 />}
+              _hover={{ bg: "red.50" }}
+              _focus={{ bg: "red.50" }}
+            >
+              Delete
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      </Flex>
+    </HStack>
   );
 };
 
