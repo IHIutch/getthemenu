@@ -11,13 +11,13 @@ export default async (req, res) => {
   const { menu } = req.body;
 
   switch (method) {
-    case "GET":
-      // Get data from your database
-      const restaurant = await db.collection("restaurants").findOne({
-        _id: ObjectId("6016ed478483c52d79d9eaec"),
-      });
-      res.json(restaurant);
-      break;
+    // case "GET":
+    //   // Get data from your database
+    //   const restaurant = await db.collection("restaurants").findOne({
+    //     _id: ObjectId("6016ed478483c52d79d9eaec"),
+    //   });
+    //   res.json(restaurant);
+    //   break;
     case "PUT":
       // Update or create data in your database
       const update = await db.collection("restaurants").updateOne(
@@ -37,7 +37,7 @@ export default async (req, res) => {
       res.status(200).json(create);
       break;
     default:
-      res.setHeader("Allow", ["GET", "PUT"]);
+      res.setHeader("Allow", ["GET", "PUT", "POST"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 };
