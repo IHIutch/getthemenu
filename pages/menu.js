@@ -182,7 +182,7 @@ const menu = ({ restaurant, menus }) => {
   );
 };
 
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
 
   const restaurant = await db.collection("restaurants").findOne({
