@@ -41,10 +41,10 @@ import Head from "next/head";
 import ContentEditable from "react-contenteditable";
 import { MoreVertical, Trash2, ChevronDown, Edit } from "react-feather";
 
-const Profile = ({ restaurant }) => {
+const Profile = ({ restaurant, menus }) => {
   const initMenuItem = { name: "", price: "", description: "" };
   const initMenuSection = { name: "", items: [{ ...initMenuItem }] };
-  const [menu, setMenu] = useState(restaurant.menu);
+  const [menu, setMenu] = useState(menus[0]);
 
   // const [name, setName] = useState("");
   // const [phone, setPhone] = useState("");
@@ -126,7 +126,7 @@ const Profile = ({ restaurant }) => {
           </Heading>
           <Flex mb="8">
             <Heading as="h1" size="2xl">
-              {restaurant.menu.name}
+              {menu && menu.name}
             </Heading>
           </Flex>
           <Grid templateColumns="repeat(12, 1fr)" gap="6">
@@ -569,11 +569,11 @@ export async function getServerSideProps(context) {
   const restaurant = await db.collection("restaurants").findOne({
     _id: ObjectId("6016ed478483c52d79d9eaec"),
   });
-  // res.json(restaurant);
 
-  // const restaurant = await axios
-  //   .get(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/profile`)
-  //   .then((res) => res.data);
+  const menus = await db
+    .collection("menus")
+    .find({ _id: { $in: restaurant.menus } })
+    .toArray();
 
   if (!restaurant) {
     return {
@@ -584,6 +584,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       restaurant: JSON.parse(JSON.stringify(restaurant)),
+      menus: JSON.parse(JSON.stringify(menus)),
     },
   };
 }

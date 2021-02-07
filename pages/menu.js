@@ -15,7 +15,6 @@ import React from "react";
 import Container from "../components/common/container";
 
 const menu = ({ menu }) => {
-  console.log(menu);
   const restaurant = {
     name: "Red Pepper Chinese And Vietnamese Restaurant",
     phone: "716-831-3878",
