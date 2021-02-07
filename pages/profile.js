@@ -51,7 +51,7 @@ const Profile = ({ restaurant, menus }) => {
   // const [email, setEmail] = useState("");
 
   const saveMenu = () => {
-    axios.put(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/profile`, { menu });
+    axios.put(`${process.env.NEXT_PUBLIC_VERCEL_URL}api/profile`, { menu });
   };
 
   const debounceSaveMenu = useCallback(
