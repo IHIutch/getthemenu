@@ -14,97 +14,8 @@ import Head from "next/head";
 import React from "react";
 import Container from "../components/common/container";
 
-const menu = ({ menu }) => {
-  const restaurant = {
-    name: "Red Pepper Chinese And Vietnamese Restaurant",
-    phone: "716-831-3878",
-    address: {
-      street: "3910 Maple Road",
-      city: "Amherst",
-      state: "NY",
-      zip: "14226",
-    },
-    hours: {},
-    image: "https://picsum.photos/2000/3000/",
-    menus: [
-      {
-        name: "Vietnamese Cuisine",
-        sections: [
-          {
-            name: "Appetizers",
-            items: [
-              {
-                name: "Vietnamese Egg Roll",
-                price: "3.95",
-                description: "",
-              },
-              {
-                name: "Fresh Spring Roll w. Shredded Pork & Veg (2)",
-                price: "4.45",
-                description:
-                  "Slow cooked chicken with green curry paste mixed with coconut milk served with white jasmine rice.",
-              },
-              {
-                name: "fresh spring roll w. to-fu & veg (2)",
-                price: "4.45",
-                description: "",
-              },
-            ],
-          },
-          {
-            name: "Pho Noodle Soup",
-            items: [
-              {
-                name: "chicken rice noodle soup",
-                price: "10.45",
-                description: "",
-              },
-              {
-                name: "beef rice noodle soup (rare beef)",
-                price: "4.45",
-                description:
-                  "Slow cooked chicken with green curry paste mixed with coconut milk served with white jasmine rice.",
-              },
-              {
-                name:
-                  "HOUSE SPECIAL BEEF RICE NOODLE SOUP (RARE BEEF, TRIPE, TENDON, BEEF BALL)",
-                price: "11.45",
-                description: "",
-              },
-            ],
-          },
-          {
-            name: "BUN VERMICELLI",
-            items: [
-              {
-                name: "SPICY BEEF VERMICELLI SOUP",
-                price: "10.45",
-                description: "",
-              },
-              {
-                name: "RICE VERMICELLI W. GRILLED PORK",
-                price: "11.45",
-                description:
-                  "Slow cooked chicken with green curry paste mixed with coconut milk served with white jasmine rice.",
-              },
-              {
-                name: "RICE VERMICELLI W. EGG ROLL & SHREDDED PORK",
-                price: "11.45",
-                description: "",
-              },
-              {
-                name: "RICE VERMICELLI W. SHRIMP & PORK",
-                price: "13.45",
-                description: "",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
-
-  const structuredData = (restaurant) => {
+const menu = ({ restaurant, menus }) => {
+  const structuredData = () => {
     return {
       "@context": "http://schema.org",
       "@type": "Restaurant",
@@ -122,7 +33,7 @@ const menu = ({ menu }) => {
         postalCode: restaurant.address.zip,
       },
       servesCuisine: ["American cuisine"],
-      hasMenu: restaurant.menus.map((menu) => ({
+      hasMenu: menus.map((menu) => ({
         "@type": "Menu",
         name: menu.name,
         // description: "Menu for in-restaurant dining only.",
@@ -159,7 +70,7 @@ const menu = ({ menu }) => {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData(restaurant)),
+            __html: JSON.stringify(structuredData()),
           }}
         />
       </Head>
@@ -209,10 +120,10 @@ const menu = ({ menu }) => {
       <Box>
         <Container>
           <Heading as="h2" fontSize="3xl">
-            {restaurant.menus[0].name}
+            {menus[0].name}
           </Heading>
         </Container>
-        {restaurant.menus[0].sections.map((section, idx) => (
+        {menus[0].sections.map((section, idx) => (
           <Box key={idx} py="8" bg={idx % 2 ? "gray.50" : "white"}>
             {/* <Box position="sticky" top="0" bg="inherit"> */}
             <Container>
@@ -278,6 +189,11 @@ export async function getStaticProps(context) {
     _id: ObjectId("6016ed478483c52d79d9eaec"),
   });
 
+  const menus = await db
+    .collection("menus")
+    .find({ _id: { $in: restaurant.menus } })
+    .toArray();
+
   if (!restaurant) {
     return {
       notFound: true,
@@ -286,7 +202,8 @@ export async function getStaticProps(context) {
 
   return {
     props: {
-      menu: JSON.parse(JSON.stringify(restaurant)),
+      restaurant: JSON.parse(JSON.stringify(restaurant)),
+      menus: JSON.parse(JSON.stringify(menus)),
     },
   };
 }
