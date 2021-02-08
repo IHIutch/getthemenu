@@ -412,7 +412,7 @@ const SectionItem = ({
             <FormLabel>Description</FormLabel>
             <Textarea
               value={localItem.description}
-              onChange={(e) => setLocalItem("description", e.target.value)}
+              onChange={(e) => updateLocalItem("description", e.target.value)}
               rows="4"
             />
           </FormControl>
