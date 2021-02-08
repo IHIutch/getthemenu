@@ -371,7 +371,7 @@ const SectionItem = ({
                 icon={<Trash2 />}
                 _hover={{ bg: "red.50" }}
                 _focus={{ bg: "red.50" }}
-                onClick={() => handleSemoveMenuItem(idx, sectionIdx)}
+                onClick={() => removeMenuItem(idx, sectionIdx)}
               >
                 Delete
               </MenuItem>
