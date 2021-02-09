@@ -1,10 +1,10 @@
-import connectToDatabase from "../util/mongodb";
-import { ObjectId } from "mongodb";
 import axios from "redaxios";
 import React, { useState, useCallback } from "react";
 import debounce from "lodash/debounce";
 import Container from "../components/common/container";
 import Navbar from "../components/common/navbar";
+import supabase from "../util/supabase";
+
 import {
   Box,
   Button,
@@ -564,18 +564,17 @@ const SectionItem = ({
 };
 
 export async function getServerSideProps(context) {
-  const { db } = await connectToDatabase();
+const { data, error } = await supabase
+  .from('restaurants')
+  .select(`
+    *,
+    menus( * )
+  `)
+  .eq('id', '1aaf08dd-e5db-4f33-925d-6553998fdddd')
 
-  const restaurant = await db.collection("restaurants").findOne({
-    _id: ObjectId("6016ed478483c52d79d9eaec"),
-  });
+  const {menus, ...restaurant} = data[0];
 
-  const menus = await db
-    .collection("menus")
-    .find({ _id: { $in: restaurant.menus } })
-    .toArray();
-
-  if (!restaurant) {
+  if (error) {
     return {
       notFound: true,
     };
@@ -583,8 +582,8 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      restaurant: JSON.parse(JSON.stringify(restaurant)),
-      menus: JSON.parse(JSON.stringify(menus)),
+      restaurant,
+      menus: menus.map(menu => menu.details),
     },
   };
 }
