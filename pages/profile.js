@@ -564,15 +564,12 @@ const SectionItem = ({
 };
 
 export async function getServerSideProps(context) {
-const { data, error } = await supabase
-  .from('restaurants')
-  .select(`
-    *,
-    menus( * )
-  `)
-  .eq('id', '1aaf08dd-e5db-4f33-925d-6553998fdddd')
+  const { data, error } = await supabase
+    .from("restaurants")
+    .select(`*, menus(*)`)
+    .eq("id", "1aaf08dd-e5db-4f33-925d-6553998fdddd");
 
-  const {menus, ...restaurant} = data[0];
+  const { menus, ...restaurant } = data[0];
 
   if (error) {
     return {
@@ -583,7 +580,12 @@ const { data, error } = await supabase
   return {
     props: {
       restaurant,
-      menus: menus.map(menu => menu.details),
+      menus: menus.map((menu) => {
+        return {
+          id: menu.id,
+          ...menu.details,
+        };
+      }),
     },
   };
 }

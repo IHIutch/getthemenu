@@ -1,34 +1,52 @@
-import connectToDatabase from "../../util/mongodb";
-import { ObjectId } from "mongodb";
+import dayjs from "dayjs";
+import supabase from "../../util/supabase";
 
 export default async (req, res) => {
-  const { db } = await connectToDatabase();
   const {
     // query: { id, name },
     method,
   } = req;
 
   const { menu } = req.body;
+  const { id, ...details } = menu;
 
   switch (method) {
     // Update
     case "PUT":
-      const { _id, ...details } = menu;
-      const update = await db
-        .collection("menus")
-        .replaceOne({ _id: ObjectId(_id) }, { ...details });
-      res.status(200).json(update);
+      try {
+        const { data, error } = await supabase
+          .from("menus")
+          .update({
+            details: details,
+            updatedAt: dayjs(),
+          })
+          .eq("id", id);
+        if (error) {
+          throw new Error(error);
+        }
+        res.status(200).json(data);
+      } catch (error) {
+        res.status(400).json(error);
+      }
       break;
 
     // Create
     case "POST":
-      const create = await db
-        .collection("restaurants")
-        .updateOne(
-          { _id: ObjectId("6016ed478483c52d79d9eaec") },
-          { $set: { menu } }
-        );
-      res.status(200).json(create);
+      try {
+        const { data, error } = await supabase
+          .from("menus")
+          .update({
+            details: details,
+            updatedAt: dayjs(),
+          })
+          .eq("id", id);
+        if (error) {
+          throw new Error(error);
+        }
+        res.status(200).json(data);
+      } catch (error) {
+        res.status(400).json(error);
+      }
       break;
     default:
       res.setHeader("Allow", ["PUT", "POST"]);
