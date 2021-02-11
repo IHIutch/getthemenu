@@ -112,8 +112,8 @@ const Profile = ({ restaurant, menus }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Navbar />
       <Container>
-        <Navbar />
         <Box py="12">
           <Heading
             fontSize="sm"
