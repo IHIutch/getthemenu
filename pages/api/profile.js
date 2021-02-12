@@ -7,13 +7,12 @@ export default async (req, res) => {
     method,
   } = req;
 
-  const { menu } = req.body;
-  const { id, ...details } = menu;
-
   switch (method) {
     // Update
     case "PUT":
       try {
+        const { menu } = req.body;
+        const { id, ...details } = menu;
         const { data, error } = await supabase
           .from("menus")
           .update({
@@ -33,13 +32,26 @@ export default async (req, res) => {
     // Create
     case "POST":
       try {
-        const { data, error } = await supabase
-          .from("menus")
-          .update({
-            details: details,
-            updatedAt: dayjs(),
-          })
-          .eq("id", id);
+        const { data, error } = await supabase.from("menus").insert([
+          {
+            restaurantId: "1aaf08dd-e5db-4f33-925d-6553998fdddd",
+            details: {
+              name: "",
+              sections: [
+                {
+                  name: "",
+                  items: [
+                    {
+                      name: "",
+                      price: "",
+                      description: "",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ]);
         if (error) {
           throw new Error(error);
         }

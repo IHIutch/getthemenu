@@ -14,30 +14,15 @@ import {
   Icon,
   Stack,
   Link,
+  IconButton,
+  Text,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
 import { Menu } from "react-feather";
 import Container from "../common/container";
 
-const navbar = ({ sx }) => {
-  const router = useRouter();
+const navbar = ({ sx, menus, active, handleCreateMenu }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const isPathMatch = (path) => {
-    return router.pathname === path;
-  };
-
-  const menuItems = [
-    {
-      name: "Menus",
-      path: "/profile",
-    },
-    {
-      name: "Settings",
-      path: "/settings",
-    },
-  ];
 
   return (
     <>
@@ -55,9 +40,11 @@ const navbar = ({ sx }) => {
                 Red Pepper
               </Heading>
             </Flex>
-            <Button onClick={onOpen} px="2" ml="auto">
-              <Icon as={Menu} h="6" w="6" />
-            </Button>
+            <IconButton
+              ml="auto"
+              icon={<Icon as={Menu} h="6" w="6" />}
+              onClick={onOpen}
+            />
           </Flex>
         </Container>
       </Box>
@@ -67,29 +54,50 @@ const navbar = ({ sx }) => {
             <DrawerCloseButton />
             <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
             <DrawerBody px="6" py="5">
-              <Stack as="ul">
-                {menuItems &&
-                  menuItems.map((item, idx) => (
-                    <Box
-                      as="li"
-                      d="flex"
-                      alignItems="center"
-                      lineHeight="1.5rem"
-                      key={idx}
-                    >
-                      <NextLink href={item.path} passHref>
-                        <Link
-                          fontWeight="semibold"
-                          color="blue.500"
-                          py="1"
-                          w="100%"
-                        >
-                          {item.name}
-                        </Link>
-                      </NextLink>
-                    </Box>
-                  ))}
-              </Stack>
+              <Box mb="2">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  textTransform="uppercase"
+                  color="gray.500"
+                  letterSpacing="0.025rem"
+                >
+                  Your Menus
+                </Text>
+              </Box>
+              <Box borderBottomWidth="1px" pb="4" mb="4">
+                <Stack as="ul" spacing="4">
+                  {menus &&
+                    menus.map((item, idx) => (
+                      <Box
+                        as="li"
+                        d="flex"
+                        alignItems="center"
+                        lineHeight="1.5rem"
+                        key={idx}
+                      >
+                        <NextLink href={`/menu/${idx}`} passHref>
+                          <Button
+                            as={Link}
+                            fontWeight="semibold"
+                            colorScheme="blue"
+                            py="1"
+                            w="100%"
+                            justifyContent="flex-start"
+                            variant={Number(active) === idx ? "solid" : "ghost"}
+                          >
+                            {item.name || "Untitled Menu"}
+                          </Button>
+                        </NextLink>
+                      </Box>
+                    ))}
+                </Stack>
+              </Box>
+              <Box>
+                <Button w="100%" onClick={() => handleCreateMenu()}>
+                  Add New Menu
+                </Button>
+              </Box>
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>
