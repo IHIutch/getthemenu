@@ -1,29 +1,28 @@
 import dayjs from "dayjs";
-import supabase from "../../util/supabase";
+import connectToDatabase from "../../util/mongodb";
+import { ObjectId } from "mongodb";
 
 export default async (req, res) => {
-  const {
-    // query: { id, name },
-    method,
-  } = req;
+  const { db } = await connectToDatabase();
+  const { method } = req;
 
   switch (method) {
     // Update
     case "PUT":
       try {
-        const { menu } = req.body;
-        const { id, ...details } = menu;
-        const { data, error } = await supabase
-          .from("menus")
-          .update({
-            details: details,
-            updatedAt: dayjs(),
-          })
-          .eq("id", id);
-        if (error) {
-          throw new Error(error);
-        }
-        res.status(200).json(data);
+        const {
+          menu: { _id, restaurantId, ...details },
+        } = req.body;
+        const { value } = await db.collection("menus").findOneAndUpdate(
+          { _id: ObjectId(_id) },
+          {
+            $set: { ...details },
+          },
+          {
+            returnOriginal: false,
+          }
+        );
+        res.status(200).json(value);
       } catch (error) {
         res.status(400).json(error);
       }
@@ -32,30 +31,11 @@ export default async (req, res) => {
     // Create
     case "POST":
       try {
-        const { data, error } = await supabase.from("menus").insert([
-          {
-            restaurantId: "1aaf08dd-e5db-4f33-925d-6553998fdddd",
-            details: {
-              name: "",
-              sections: [
-                {
-                  name: "",
-                  items: [
-                    {
-                      name: "",
-                      price: "",
-                      description: "",
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-        ]);
-        if (error) {
-          throw new Error(error);
-        }
-        res.status(200).json(data);
+        const { ops } = await db.collection("menus").insertOne({
+          updatedAt: dayjs().toDate(),
+          createdAt: dayjs().toDate(),
+        });
+        res.status(200).json(ops[0]);
       } catch (error) {
         res.status(400).json(error);
       }

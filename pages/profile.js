@@ -55,6 +55,15 @@ const Profile = ({ restaurant, menus }) => {
     axios.put(`${process.env.NEXT_PUBLIC_VERCEL_URL}api/profile`, { menu });
   };
 
+  const createMenu = () => {
+    axios
+      .post(`${process.env.NEXT_PUBLIC_VERCEL_URL}api/profile`)
+      .then((res) => {
+        const addMenu = [...editingMenus].concat([...res.data]);
+        setEditingMenus(addMenu);
+      });
+  };
+
   const debounceSaveMenu = useCallback(
     debounce(() => {
       saveMenu();
@@ -113,7 +122,7 @@ const Profile = ({ restaurant, menus }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
+      <Navbar handleCreateMenu={createMenu} />
       <Container>
         <Box py="12">
           <Heading

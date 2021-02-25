@@ -94,7 +94,7 @@ const navbar = ({ sx, menus, active, handleCreateMenu }) => {
                 </Stack>
               </Box>
               <Box>
-                <Button w="100%" onClick={() => handleCreateMenu()}>
+                <Button w="100%" onClick={handleCreateMenu}>
                   Add New Menu
                 </Button>
               </Box>
