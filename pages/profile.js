@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
-import supabase from "../util/supabase";
+import connectToDatabase from "../util/mongodb";
+import { ObjectId } from "mongodb";
 import axios from "redaxios";
 import debounce from "lodash/debounce";
 import Container from "../components/common/container";
@@ -564,28 +565,28 @@ const SectionItem = ({
 };
 
 export async function getServerSideProps(context) {
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select(`*, menus(*)`)
-    .eq("id", "1aaf08dd-e5db-4f33-925d-6553998fdddd");
+  const { db } = await connectToDatabase();
+  const restaurant = await db
+    .collection("restaurants")
+    .aggregate([
+      { $match: { _id: ObjectId("6016ed478483c52d79d9eaec") } },
+      {
+        $lookup: {
+          from: "menus",
+          localField: "_id",
+          foreignField: "restaurantId",
+          as: "menus",
+        },
+      },
+    ])
+    .toArray();
 
-  const { menus, ...restaurant } = data[0];
-
-  if (error) {
-    return {
-      notFound: true,
-    };
-  }
+  const { menus, ...rest } = JSON.parse(JSON.stringify(restaurant[0]));
 
   return {
     props: {
-      restaurant,
-      menus: menus.map((menu) => {
-        return {
-          id: menu.id,
-          ...menu.details,
-        };
-      }),
+      restaurant: rest,
+      menus,
     },
   };
 }
