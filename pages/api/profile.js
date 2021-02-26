@@ -1,9 +1,8 @@
-import dayjs from "dayjs";
-import connectToDatabase from "../../util/mongodb";
-import { ObjectId } from "mongodb";
+import connectToDatabase from "@/util/mongoose";
+import { Menu, Restaurant } from "models";
 
 export default async (req, res) => {
-  const { db } = await connectToDatabase();
+  await connectToDatabase();
   const { method } = req;
 
   switch (method) {
@@ -31,11 +30,13 @@ export default async (req, res) => {
     // Create
     case "POST":
       try {
-        const { ops } = await db.collection("menus").insertOne({
-          updatedAt: dayjs().toDate(),
-          createdAt: dayjs().toDate(),
+        const newMenu = await Menu.create({});
+        await Restaurant.findByIdAndUpdate("6016ed478483c52d79d9eaec", {
+          $push: {
+            menus: newMenu._id,
+          },
         });
-        res.status(200).json(ops[0]);
+        res.status(200).json(newMenu);
       } catch (error) {
         res.status(400).json(error);
       }
