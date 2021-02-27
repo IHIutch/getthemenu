@@ -1,42 +1,33 @@
 import connectToDatabase from "@/util/mongoose";
-import { Menu, Restaurant } from "models";
+import { updateMenuById, createMenu } from "@/controllers/menuController";
+import { pushMenuToRestaurant } from "@/controllers/restaurantController";
 
 export default async (req, res) => {
   await connectToDatabase();
-  const { method } = req;
+  const { method, body } = req;
 
   switch (method) {
     // Update
     case "PUT":
       try {
-        const {
-          menu: { _id, restaurantId, ...details },
-        } = req.body;
-        const { value } = await db.collection("menus").findOneAndUpdate(
-          { _id: ObjectId(_id) },
-          {
-            $set: { ...details },
-          },
-          {
-            returnOriginal: false,
-          }
-        );
-        res.status(200).json(value);
+        const { _id, ...rest } = body;
+        const menu = await updateMenuById(_id, rest);
+        if (!menu) throw Error(`ERROR_UPDATING_MENU`);
+        res.status(201).json(menu);
       } catch (error) {
         res.status(400).json(error);
       }
       break;
-
     // Create
     case "POST":
       try {
-        const newMenu = await Menu.create({});
-        await Restaurant.findByIdAndUpdate("6016ed478483c52d79d9eaec", {
-          $push: {
-            menus: newMenu._id,
-          },
-        });
-        res.status(200).json(newMenu);
+        const menu = await createMenu({});
+        const restaurant = await pushMenuToRestaurant(
+          "6016ed478483c52d79d9eaec",
+          menu._id
+        );
+        if (!menu || !restaurant) throw Error(`ERROR_CREATING_MENU`);
+        res.status(201).json(menu);
       } catch (error) {
         res.status(400).json(error);
       }
