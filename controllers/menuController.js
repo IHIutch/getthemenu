@@ -20,4 +20,47 @@ const createMenu = async (data) => {
   return menu || null;
 };
 
-export { findMenuById, findMenuBySlug, updateMenuById, createMenu };
+const pushMenuItemToMenu = async (menuId, menuItemId) => {
+  const menu = await Menu.findByIdAndUpdate(
+    menuId,
+    {
+      $push: { menuItems: menuItemId },
+    },
+    { new: true }
+  );
+  return menu || null;
+};
+
+const updateSectionByMenuId = async (menuId, data) => {
+  const menu = await Menu.findOneAndUpdate(
+    { _id: menuId, "sections._id": data._id },
+    {
+      $set: {
+        "sections.$": { ...data },
+      },
+    },
+    { new: true }
+  );
+  return menu || null;
+};
+
+const pushSectionToMenu = async (menuId, data) => {
+  const menu = await Menu.findByIdAndUpdate(
+    menuId,
+    {
+      $push: { sections: { ...data } },
+    },
+    { new: true }
+  );
+  return menu || null;
+};
+
+export {
+  findMenuById,
+  findMenuBySlug,
+  updateMenuById,
+  createMenu,
+  pushMenuItemToMenu,
+  updateSectionByMenuId,
+  pushSectionToMenu,
+};

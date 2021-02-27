@@ -17,7 +17,12 @@ const RestaurantSchema = new Schema(
       url: String,
       blurHash: String,
     },
-    menus: [{ type: Schema.Types.ObjectId, ref: "Menu" }],
+    menus: [
+      {
+        type: Schema.Types.ObjectIdypes.ObjectId,
+        ref: "Menu",
+      },
+    ],
   },
   { timestamps: true }
 );

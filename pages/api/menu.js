@@ -21,11 +21,9 @@ export default async (req, res) => {
     // Create
     case "POST":
       try {
+        const { restaurantId } = body;
         const menu = await createMenu({});
-        const restaurant = await pushMenuToRestaurant(
-          "6016ed478483c52d79d9eaec",
-          menu._id
-        );
+        const restaurant = await pushMenuToRestaurant(restaurantId, menu._id);
         if (!menu || !restaurant) throw Error(`ERROR_CREATING_MENU`);
         res.status(201).json(menu);
       } catch (error) {
