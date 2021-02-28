@@ -1,32 +1,39 @@
-import connectToDatabase from "@/util/mongoose";
-import { Menu, Restaurant } from "models";
+import { Restaurant } from "models";
 
-const findRestaurantById = async (db, id) => {
-  const restaurant = await db.collection("restaurants").findOne({
-    _id: id,
-  });
+const findRestaurantById = async (id) => {
+  const restaurant = await Restaurant.findById(id).exec();
   return restaurant || null;
 };
 
-const findRestaurantBySlug = async (db, slug) => {
-  const restaurant = await db.collection("restaurants").findOne({
-    slug,
-  });
+const findRestaurantByIdAndPopulate = async (id) => {
+  const restaurant = await Restaurant.findById(id)
+    .populate({
+      path: "menus",
+      options: {
+        sort: { createdAt: "asc" },
+      },
+    })
+    .exec();
   return restaurant || null;
 };
 
-const updateRestaurantById = async (db, id, update) => {
-  const { value } = await db
-    .collection("restaurants")
-    .findOneAndUpdate({ _id: id }, { $set: update }, { returnOriginal: false });
-  return value;
+const findRestaurantBySlug = async (slug) => {
+  const restaurant = await Restaurant.findOne({ slug }).exec();
+  return restaurant || null;
 };
 
-const insertRestaurant = async (db, { someData }) => {
-  const { ops } = db.collection("restaurants").insertOne({
-    someData,
-  });
-  return ops[0];
+const updateRestaurantById = async (id, data) => {
+  const restaurant = await Restaurant.findByIdAndUpdate(
+    id,
+    { ...data },
+    { new: true }
+  );
+  return restaurant || null;
+};
+
+const createRestaurant = async (data) => {
+  const restaurant = await Restaurant.create({ ...data });
+  return restaurant || null;
 };
 
 const pushMenuToRestaurant = async (restaurantId, menuId) => {
@@ -42,8 +49,9 @@ const pushMenuToRestaurant = async (restaurantId, menuId) => {
 
 export {
   findRestaurantById,
+  findRestaurantByIdAndPopulate,
   findRestaurantBySlug,
   updateRestaurantById,
-  insertRestaurant,
+  createRestaurant,
   pushMenuToRestaurant,
 };

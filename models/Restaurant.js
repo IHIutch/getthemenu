@@ -19,7 +19,7 @@ const RestaurantSchema = new Schema(
     },
     menus: [
       {
-        type: Schema.Types.ObjectIdypes.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Menu",
       },
     ],

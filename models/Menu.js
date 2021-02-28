@@ -1,4 +1,4 @@
-import { Schema, model, modelsongoose";
+import { Schema, model, models } from "mongoose";
 
 const MenuSchema = new Schema(
   {
@@ -9,12 +9,12 @@ const MenuSchema = new Schema(
       },
     ],
     restaurantId: {
-      type: Schema.Types.ObjectIdypes.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Restaurant",
     },
     menuItems: [
       {
-        type: Schema.Types.ObjectIdypes.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "MenuItem",
       },
     ],
