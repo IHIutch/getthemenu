@@ -47,7 +47,7 @@ const Profile = ({ restaurant, menus }) => {
   const initMenuItem = { name: "", price: "", description: "" };
   const initMenuSection = { name: "", items: [{ ...initMenuItem }] };
   const [editingMenus, setEditingMenus] = useState(menus);
-  const [activeMenu, setActiveMenu] = useState(menus[0]);
+  const [activeMenu, setActiveMenu] = useState(0);
 
   // const [name, setName] = useState("");
   // const [phone, setPhone] = useState("");
@@ -71,6 +71,23 @@ const Profile = ({ restaurant, menus }) => {
     }
   };
 
+  const createMenuItem = async (sectionId) => {
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_VERCEL_URL}api/menuItem`,
+        {
+          menuId: editingMenus[activeMenu]._id,
+          sectionId,
+        }
+      );
+      const created = [...editingMenus];
+      created[activeMenu].menuItems.concat(data);
+      setEditingMenus(created);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const debounceSaveMenu = useCallback(
     debounce(() => {
       saveMenu();
@@ -78,20 +95,20 @@ const Profile = ({ restaurant, menus }) => {
     []
   );
 
-  const addMenuSection = () => {
-    const added = { ...menu };
-    added.sections = { ...menu }.sections.concat({ ...initMenuSection });
-    setMenu(added);
-    saveMenu();
-  };
-
-  const addMenuItem = (idx) => {
-    const added = { ...menu };
-    added.sections[idx].items = { ...menu }.sections[idx].items.concat({
-      ...initMenuItem,
-    });
-    setMenu(added);
-    saveMenu();
+  const createSection = async () => {
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_VERCEL_URL}api/section`,
+        {
+          menuId: editingMenus[activeMenu]._id,
+        }
+      );
+      const created = [...editingMenus];
+      created[activeMenu] = data;
+      setEditingMenus(created);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const updateMenuItem = (idx, sectionIdx, obj) => {
@@ -143,71 +160,79 @@ const Profile = ({ restaurant, menus }) => {
           </Heading>
           <Flex mb="8">
             <Heading as="h1" size="2xl">
-              {activeMenu && activeMenu.name}
+              {editingMenus[activeMenu] && editingMenus[activeMenu].name}
             </Heading>
           </Flex>
           <Grid templateColumns="repeat(12, 1fr)" gap="6">
             <GridItem colSpan={{ base: "12", lg: "8" }}>
               <VStack spacing="24" align="stretch">
-                {activeMenu &&
-                  activeMenu.sections.map((section, sectionIdx) => (
-                    <Box key={sectionIdx}>
-                      <Heading
-                        mb="2"
-                        fontSize="sm"
-                        fontWeight="bold"
-                        textTransform="uppercase"
-                        color="gray.500"
-                        letterSpacing="0.025rem"
-                      >
-                        Section
-                      </Heading>
-                      <MenuSection
-                        updateMenuSection={updateMenuSection}
-                        removeMenuSection={removeMenuSection}
-                        details={section}
-                        idx={sectionIdx}
-                        key={sectionIdx}
-                      >
-                        <Box>
-                          <Heading
-                            mb="4"
-                            fontSize="sm"
-                            fontWeight="bold"
-                            textTransform="uppercase"
-                            color="gray.500"
-                            letterSpacing="0.025rem"
-                          >
-                            Items
-                          </Heading>
-                          <VStack
-                            divider={<StackDivider borderColor="gray.200" />}
-                            spacing="6"
-                            align="stretch"
-                          >
-                            {section.items.map((item, itemIdx) => (
-                              <SectionItem
-                                key={itemIdx}
-                                idx={itemIdx}
-                                sectionIdx={sectionIdx}
-                                item={item}
-                                updateMenuItem={updateMenuItem}
-                                removeMenuItem={removeMenuItem}
-                              />
-                            ))}
-                            <Box>
-                              <Button onClick={() => addMenuItem(sectionIdx)}>
-                                Add Item
-                              </Button>
-                            </Box>
-                          </VStack>
-                        </Box>
-                      </MenuSection>
-                    </Box>
-                  ))}
+                {editingMenus[activeMenu] &&
+                  editingMenus[activeMenu].sections.map(
+                    (section, sectionIdx) => (
+                      <Box key={sectionIdx}>
+                        <Heading
+                          mb="2"
+                          fontSize="sm"
+                          fontWeight="bold"
+                          textTransform="uppercase"
+                          color="gray.500"
+                          letterSpacing="0.025rem"
+                        >
+                          Section
+                        </Heading>
+                        <MenuSection
+                          updateMenuSection={updateMenuSection}
+                          removeMenuSection={removeMenuSection}
+                          details={section}
+                          idx={sectionIdx}
+                          key={sectionIdx}
+                        >
+                          <Box>
+                            <Heading
+                              mb="4"
+                              fontSize="sm"
+                              fontWeight="bold"
+                              textTransform="uppercase"
+                              color="gray.500"
+                              letterSpacing="0.025rem"
+                            >
+                              Items
+                            </Heading>
+                            <VStack
+                              divider={<StackDivider borderColor="gray.200" />}
+                              spacing="6"
+                              align="stretch"
+                            >
+                              {editingMenus[activeMenu].menuItems
+                                .filter((i) => {
+                                  return i.sectionId === section._id;
+                                })
+                                .map((item, itemIdx) => (
+                                  <SectionItem
+                                    key={itemIdx}
+                                    idx={itemIdx}
+                                    sectionIdx={sectionIdx}
+                                    item={item}
+                                    updateMenuItem={updateMenuItem}
+                                    removeMenuItem={removeMenuItem}
+                                  />
+                                ))}
+                              <Box>
+                                <Button
+                                  onClick={() => createMenuItem(section._id)}
+                                >
+                                  Add Item
+                                </Button>
+                              </Box>
+                            </VStack>
+                          </Box>
+                        </MenuSection>
+                      </Box>
+                    )
+                  )}
               </VStack>
               <Box mt="16" pt="4" borderTop="1px" borderColor="gray.200">
-                <Button w="100%" onClick={addMenuSection}>
+                <Button w="100%" onClick={createSection}>
                   Add Section
                 </Button>
               </Box>

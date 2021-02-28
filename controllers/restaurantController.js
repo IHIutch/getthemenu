@@ -12,6 +12,10 @@ const findRestaurantByIdAndPopulate = async (id) => {
       options: {
         sort: { createdAt: "asc" },
       },
+      populate: {
+        path: "menuItems",
+        model: "MenuItem",
+      },
     })
     .exec();
   return restaurant || null;
