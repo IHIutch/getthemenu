@@ -204,9 +204,7 @@ const Profile = ({ restaurant, menus }) => {
                               align="stretch"
                             >
                               {editingMenus[activeMenu].menuItems
-                                .filter((i) => {
-                                  return i.sectionId === section._id;
-                                })
+                                .filter((i) => i.sectionId === section._id)
                                 .map((item, itemIdx) => (
                                   <SectionItem
                                     key={itemIdx}
@@ -609,6 +607,12 @@ export async function getServerSideProps() {
   await connectToDatabase();
   const data = await findRestaurantByIdAndPopulate("6016ed478483c52d79d9eaec");
   const { menus, ...restaurant } = JSON.parse(JSON.stringify(data));
+
+  if (!menus || !restaurant) {
+    return {
+      notFound: true,
+    };
+  }
 
   return {
     props: {

@@ -26,6 +26,22 @@ const findRestaurantBySlug = async (slug) => {
   return restaurant || null;
 };
 
+const findRestaurantBySlugAndPopulate = async (slug) => {
+  const restaurant = await Restaurant.findOne({ slug })
+    .populate({
+      path: "menus",
+      options: {
+        sort: { createdAt: "asc" },
+      },
+      populate: {
+        path: "menuItems",
+        model: "MenuItem",
+      },
+    })
+    .exec();
+  return restaurant || null;
+};
+
 const updateRestaurantById = async (id, data) => {
   const restaurant = await Restaurant.findByIdAndUpdate(
     id,
@@ -55,6 +71,7 @@ export {
   findRestaurantById,
   findRestaurantByIdAndPopulate,
   findRestaurantBySlug,
+  findRestaurantBySlugAndPopulate,
   updateRestaurantById,
   createRestaurant,
   pushMenuToRestaurant,
