@@ -81,7 +81,7 @@ const Profile = ({ restaurant, menus }) => {
         }
       );
       const created = [...editingMenus];
-      created[activeMenu].menuItems.concat(data);
+      created[activeMenu].menuItems.push(data);
       setEditingMenus(created);
     } catch (error) {
       console.error(error);
