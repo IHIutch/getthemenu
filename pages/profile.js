@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
-import connectToDatabase from "../util/mongodb";
-import { ObjectId } from "mongodb";
+import connectToDatabase from "@/util/mongoose";
+
 import axios from "redaxios";
 import debounce from "lodash/debounce";
 import Container from "../components/common/container";
@@ -41,11 +41,13 @@ import {
 import Head from "next/head";
 import ContentEditable from "react-contenteditable";
 import { MoreVertical, Trash2, ChevronDown, Edit } from "react-feather";
+import { findRestaurantByIdAndPopulate } from "@/controllers/restaurantController";
 
 const Profile = ({ restaurant, menus }) => {
   const initMenuItem = { name: "", price: "", description: "" };
   const initMenuSection = { name: "", items: [{ ...initMenuItem }] };
-  const [menu, setMenu] = useState(menus[0]);
+  const [editingMenus, setEditingMenus] = useState(menus);
+  const [activeMenu, setActiveMenu] = useState(menus[0]);
 
   // const [name, setName] = useState("");
   // const [phone, setPhone] = useState("");
@@ -55,13 +57,18 @@ const Profile = ({ restaurant, menus }) => {
     axios.put(`${process.env.NEXT_PUBLIC_VERCEL_URL}api/profile`, { menu });
   };
 
-  const createMenu = () => {
-    axios
-      .post(`${process.env.NEXT_PUBLIC_VERCEL_URL}api/profile`)
-      .then((res) => {
-        const addMenu = [...editingMenus].concat([...res.data]);
-        setEditingMenus(addMenu);
-      });
+  const createMenu = async () => {
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_VERCEL_URL}api/menu`,
+        {
+          restaurantId: restaurant._id,
+        }
+      );
+      setEditingMenus([...editingMenus].concat(data));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const debounceSaveMenu = useCallback(
@@ -122,7 +129,7 @@ const Profile = ({ restaurant, menus }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar handleCreateMenu={createMenu} />
+      <Navbar handleCreateMenu={createMenu} menus={editingMenus} />
       <Container>
         <Box py="12">
           <Heading
@@ -136,14 +143,14 @@ const Profile = ({ restaurant, menus }) => {
           </Heading>
           <Flex mb="8">
             <Heading as="h1" size="2xl">
-              {menu && menu.name}
+              {activeMenu && activeMenu.name}
             </Heading>
           </Flex>
           <Grid templateColumns="repeat(12, 1fr)" gap="6">
             <GridItem colSpan={{ base: "12", lg: "8" }}>
               <VStack spacing="24" align="stretch">
-                {menu &&
-                  menu.sections.map((section, sectionIdx) => (
+                {activeMenu &&
+                  activeMenu.sections.map((section, sectionIdx) => (
                     <Box key={sectionIdx}>
                       <Heading
                         mb="2"
@@ -573,28 +580,14 @@ const SectionItem = ({
   );
 };
 
-export async function getServerSideProps(context) {
-  const { db } = await connectToDatabase();
-  const restaurant = await db
-    .collection("restaurants")
-    .aggregate([
-      { $match: { _id: ObjectId("6016ed478483c52d79d9eaec") } },
-      {
-        $lookup: {
-          from: "menus",
-          localField: "_id",
-          foreignField: "restaurantId",
-          as: "menus",
-        },
-      },
-    ])
-    .toArray();
-
-  const { menus, ...rest } = JSON.parse(JSON.stringify(restaurant[0]));
+export async function getServerSideProps() {
+  await connectToDatabase();
+  const data = await findRestaurantByIdAndPopulate("6016ed478483c52d79d9eaec");
+  const { menus, ...restaurant } = JSON.parse(JSON.stringify(data));
 
   return {
     props: {
-      restaurant: rest,
+      restaurant,
       menus,
     },
   };
