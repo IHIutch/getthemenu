@@ -19,9 +19,9 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { Menu } from "react-feather";
-import Container from "../common/container";
+import Container from "./Container";
 
-const navbar = ({ sx, menus, active, handleCreateMenu }) => {
+export default function Navbar({ sx, menus, active, handleCreateMenu }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -104,6 +104,4 @@ const navbar = ({ sx, menus, active, handleCreateMenu }) => {
       </Drawer>
     </>
   );
-};
-
-export default navbar;
+}

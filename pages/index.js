@@ -1,6 +1,8 @@
 import Head from "next/head";
 
-const Home = () => {
+import React from "react";
+
+export default function Home() {
   return (
     <div>
       <Head>
@@ -9,6 +11,4 @@ const Home = () => {
       </Head>
     </div>
   );
-};
-
-export default Home;
+}
