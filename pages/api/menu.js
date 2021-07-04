@@ -1,25 +1,27 @@
-export default async (req, res) => {
-  const { method, body } = req;
+const handler = (res, req) => {
+  const { method, body } = req
 
   switch (method) {
     // Create
-    case "POST":
+    case 'POST':
       try {
-        res.status(201).json(menu);
+        res.status(201).json()
       } catch (error) {
-        res.status(400).json(error);
+        res.status(400).json(error)
       }
-      break;
+      break
     // Update
-    case "PUT":
+    case 'PUT':
       try {
-        res.status(201).json(menu);
+        res.status(201).json()
       } catch (error) {
-        res.status(400).json(error);
+        res.status(400).json(error)
       }
-      break;
+      break
     default:
-      res.setHeader("Allow", ["PUT", "POST"]);
-      res.status(405).end(`Method ${method} Not Allowed`);
+      res.setHeader('Allow', ['PUT', 'POST'])
+      res.status(405).end(`Method ${method} Not Allowed`)
   }
-};
+}
+
+export default handler

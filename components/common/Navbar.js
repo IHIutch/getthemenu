@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import {
   Box,
   Flex,
@@ -16,13 +16,13 @@ import {
   Link,
   IconButton,
   Text,
-} from "@chakra-ui/react";
-import NextLink from "next/link";
-import { Menu } from "react-feather";
-import Container from "./Container";
+} from '@chakra-ui/react'
+import NextLink from 'next/link'
+import { Menu } from 'react-feather'
+import Container from './Container'
 
 export default function Navbar({ sx, menus, active, handleCreateMenu }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <>
@@ -84,9 +84,9 @@ export default function Navbar({ sx, menus, active, handleCreateMenu }) {
                             py="1"
                             w="100%"
                             justifyContent="flex-start"
-                            variant={Number(active) === idx ? "solid" : "ghost"}
+                            variant={Number(active) === idx ? 'solid' : 'ghost'}
                           >
-                            {item.name || "Untitled Menu"}
+                            {item.name || 'Untitled Menu'}
                           </Button>
                         </NextLink>
                       </Box>
@@ -103,5 +103,5 @@ export default function Navbar({ sx, menus, active, handleCreateMenu }) {
         </DrawerOverlay>
       </Drawer>
     </>
-  );
+  )
 }

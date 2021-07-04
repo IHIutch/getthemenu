@@ -1,7 +1,7 @@
-import React from "react";
-import { useRouter } from "next/router";
-import Container from "@/components/common/Container";
-import Navbar from "@/components/common/Navbar";
+import React from 'react'
+import { useRouter } from 'next/router'
+import Container from '@/components/common/Container'
+import Navbar from '@/components/common/Navbar'
 
 import {
   Box,
@@ -34,13 +34,13 @@ import {
   Collapse,
   useDisclosure,
   HStack,
-} from "@chakra-ui/react";
-import Head from "next/head";
-import ContentEditable from "react-contenteditable";
-import { MoreVertical, Trash2, ChevronDown, Edit } from "react-feather";
+} from '@chakra-ui/react'
+import Head from 'next/head'
+import ContentEditable from 'react-contenteditable'
+import { MoreVertical, Trash2, ChevronDown, Edit } from 'react-feather'
 
 export default function SingleMenu() {
-  return <div></div>;
+  return <div></div>
 }
 
 export async function getServerSideProps(context) {}

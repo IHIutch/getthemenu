@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from 'react'
 import {
   AspectRatio,
   Box,
@@ -8,18 +8,16 @@ import {
   Grid,
   GridItem,
   Text,
-} from "@chakra-ui/react";
-import Head from "next/head";
-import Container from "../components/common/Container";
+} from '@chakra-ui/react'
+import Head from 'next/head'
+import Container from '../components/common/Container'
 
-import { handleStructuredData } from "@/util/functions";
-
+import { handleStructuredData } from '@/util/functions'
 
 export default function SingleRestaurant({ restaurant, menus }) {
   const structuredData = useMemo(() => {
-    return handleStructuredData({restaurant, menus})
+    return handleStructuredData({ restaurant, menus })
   }, [restaurant, menus])
-
 
   return (
     <Box>
@@ -67,7 +65,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
                     <Text as="span" fontWeight="semibold" mr="2">
                       Address:
                     </Text>
-                    {restaurant.address.street} {restaurant.address.city},{" "}
+                    {restaurant.address.street} {restaurant.address.city},{' '}
                     {restaurant.address.state} {restaurant.address.zip}
                   </Text>
                 </Box>
@@ -84,7 +82,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
         </Container>
         {menus[0] &&
           menus[0].sections.map((section, idx) => (
-            <Box key={idx} py="8" bg={idx % 2 ? "gray.50" : "white"}>
+            <Box key={idx} py="8" bg={idx % 2 ? 'gray.50' : 'white'}>
               <Container>
                 <Heading as="h2" fontSize="2xl">
                   {section.name}
@@ -97,7 +95,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
               >
                 <Grid
                   templateColumns="repeat(12, 1fr)"
-                  gap={{ base: "0", lg: "12", xl: "16" }}
+                  gap={{ base: '0', lg: '12', xl: '16' }}
                 >
                   {menus[0] &&
                     menus[0].menuItems
@@ -106,7 +104,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
                         <GridItem
                           key={idx}
                           py="2"
-                          colSpan={{ base: "12", lg: "6", xl: "4" }}
+                          colSpan={{ base: '12', lg: '6', xl: '4' }}
                         >
                           <Box>
                             <Flex fontWeight="semibold" fontSize="lg">
@@ -131,11 +129,11 @@ export default function SingleRestaurant({ restaurant, menus }) {
           ))}
       </Box>
     </Box>
-  );
-};
+  )
+}
 
 export async function getServerSideProps(context) {
-  // const { restaurant, menus } = 
+  // const { restaurant, menus } =
   // return {
   //   props: {
   //     restaurant,
@@ -143,5 +141,3 @@ export async function getServerSideProps(context) {
   //   },
   // };
 }
-
-export default menu;
