@@ -34,21 +34,21 @@ export default function Navbar({ sx, menus, active, handleCreateMenu }) {
         sx={sx}
       >
         <Container>
-          <Flex wrap="wrap" align="center">
-            <Flex align="center" h="14">
+          <Flex align="center">
+            <IconButton
+              variant="outline"
+              icon={<Icon as={Menu} h="6" w="6" />}
+              onClick={onOpen}
+            />
+            <Flex align="center" h="14" ml="2">
               <Heading as="h1" size="lg">
                 Red Pepper
               </Heading>
             </Flex>
-            <IconButton
-              ml="auto"
-              icon={<Icon as={Menu} h="6" w="6" />}
-              onClick={onOpen}
-            />
           </Flex>
         </Container>
       </Box>
-      <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay>
           <DrawerContent>
             <DrawerCloseButton />
