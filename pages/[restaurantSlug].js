@@ -27,7 +27,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData()),
+            __html: JSON.stringify(structuredData),
           }}
         />
       </Head>
