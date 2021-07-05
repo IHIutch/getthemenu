@@ -4,7 +4,6 @@ import {
   Flex,
   Heading,
   useDisclosure,
-  Button,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -12,10 +11,10 @@ import {
   DrawerOverlay,
   DrawerHeader,
   Icon,
-  Stack,
   Link,
   IconButton,
   Text,
+  Avatar,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { Menu } from 'react-feather'
@@ -23,6 +22,18 @@ import Container from './Container'
 
 export default function Navbar({ sx, menus, active, handleCreateMenu }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const linkItems = [
+    {
+      label: 'Menus',
+      to: '/menus',
+      children: [
+        { label: 'Dinner', to: '/menus/dinner' },
+        { label: 'Add Menu', to: '/menus/create' },
+      ],
+    },
+    { label: 'Restaurant Details', to: '/details' },
+  ]
 
   return (
     <>
@@ -42,7 +53,7 @@ export default function Navbar({ sx, menus, active, handleCreateMenu }) {
             />
             <Flex align="center" h="14" ml="2">
               <Heading as="h1" size="lg">
-                Red Pepper
+                Dinner
               </Heading>
             </Flex>
           </Flex>
@@ -52,52 +63,78 @@ export default function Navbar({ sx, menus, active, handleCreateMenu }) {
         <DrawerOverlay>
           <DrawerContent>
             <DrawerCloseButton />
-            <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
-            <DrawerBody px="6" py="5">
-              <Box mb="2">
-                <Text
-                  fontSize="sm"
-                  fontWeight="bold"
-                  textTransform="uppercase"
-                  color="gray.500"
-                  letterSpacing="0.025rem"
-                >
-                  Your Menus
-                </Text>
-              </Box>
-              <Box borderBottomWidth="1px" pb="4" mb="4">
-                <Stack as="ul" spacing="4">
-                  {menus &&
-                    menus.map((item, idx) => (
-                      <Box
-                        as="li"
-                        d="flex"
-                        alignItems="center"
-                        lineHeight="1.5rem"
-                        key={idx}
-                      >
-                        <NextLink href={`/menu/${idx}`} passHref>
-                          <Button
-                            as={Link}
-                            fontWeight="semibold"
-                            colorScheme="blue"
-                            py="1"
-                            w="100%"
-                            justifyContent="flex-start"
-                            variant={Number(active) === idx ? 'solid' : 'ghost'}
-                          >
-                            {item.name || 'Untitled Menu'}
-                          </Button>
-                        </NextLink>
-                      </Box>
-                    ))}
-                </Stack>
-              </Box>
-              <Box>
-                <Button w="100%" onClick={handleCreateMenu}>
-                  Add New Menu
-                </Button>
-              </Box>
+            <DrawerHeader p="4" borderBottomWidth="1px">
+              GetTheMenu
+            </DrawerHeader>
+            <DrawerBody p="4">
+              <Flex h="100%" direction="column">
+                <Box as="ul">
+                  {linkItems.map((item, idx) => (
+                    <Box
+                      key={idx}
+                      as="li"
+                      lineHeight="1.5rem"
+                      textAlign="left"
+                      listStyleType="none"
+                      _notFirst={{ mt: '2' }}
+                    >
+                      <NextLink href={`/menu/${idx}`} passHref>
+                        <Link
+                          fontWeight="semibold"
+                          colorScheme={parseInt(active) === idx && 'blue'}
+                          py="2"
+                          d="block"
+                        >
+                          {item.label || 'Untitled Menu'}
+                        </Link>
+                      </NextLink>
+                      {item.children && (
+                        <Box as="ul" my="2">
+                          {item.children.map((child, cIdx) => (
+                            <Box
+                              key={cIdx}
+                              as="li"
+                              lineHeight="1.5rem"
+                              textAlign="left"
+                              listStyleType="none"
+                              ml="4"
+                              _notFirst={{ mt: '4' }}
+                            >
+                              <NextLink href={`/menu/${child.to}`} passHref>
+                                <Link
+                                  d="block"
+                                  fontWeight="semibold"
+                                  colorScheme={
+                                    parseInt(active) === idx && 'blue'
+                                  }
+                                  py="1"
+                                >
+                                  {child.label || 'Untitled Menu'}
+                                </Link>
+                              </NextLink>
+                            </Box>
+                          ))}
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+                <Box mt="auto">
+                  <NextLink href={`/profile/details}`} passHref>
+                    <Link
+                      d="flex"
+                      alignItems="center"
+                      fontWeight="semibold"
+                      py="1"
+                    >
+                      <Avatar size="sm" name="Kola Tioluwani" />
+                      <Text as="span" ml="2">
+                        Profile Settings
+                      </Text>
+                    </Link>
+                  </NextLink>
+                </Box>
+              </Flex>
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>

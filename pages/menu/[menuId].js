@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useRouter } from 'next/router'
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 
@@ -32,7 +31,7 @@ import {
   VisuallyHidden,
 } from '@chakra-ui/react'
 import Head from 'next/head'
-import { MoreVertical, Trash2, ChevronDown, Edit } from 'react-feather'
+import { MoreVertical, Trash2, Edit } from 'react-feather'
 
 export default function SingleMenu() {
   const drawerState = useDisclosure()
@@ -159,7 +158,7 @@ const EditItemDrawer = ({ handleDrawerClose }) => {
       <DrawerBody px="4">
         <Stack spacing="6">
           <Box>
-            <FormLabel>Item Image</FormLabel>
+            <FormLabel as="span">Item Image</FormLabel>
             <VisuallyHidden
               id="image"
               as="input"
@@ -168,14 +167,11 @@ const EditItemDrawer = ({ handleDrawerClose }) => {
               aria-describedby="photo-helptext"
               // onChange={onFileChange}
             />
-            <Button as="label" htmlFor="image">
-              Add Image
-            </Button>
-            {/* <Box position="relative">
-              <AspectRatio ratio={4 / 3}>
-                <Image src={p.base64String} objectFit="cover" />
-              </AspectRatio>
-            </Box> */}
+            <AspectRatio as="label" htmlFor="image" ratio={16 / 9} d="block">
+              <Button as={Box} h="100%">
+                Add Image
+              </Button>
+            </AspectRatio>
           </Box>
           <FormControl id="title">
             <FormLabel>Item Name</FormLabel>
