@@ -29,6 +29,7 @@ import {
   ButtonGroup,
   AspectRatio,
   Image,
+  VisuallyHidden,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, ChevronDown, Edit } from 'react-feather'
@@ -157,6 +158,25 @@ const EditItemDrawer = ({ handleDrawerClose }) => {
 
       <DrawerBody px="4">
         <Stack spacing="6">
+          <Box>
+            <FormLabel>Item Image</FormLabel>
+            <VisuallyHidden
+              id="image"
+              as="input"
+              type="file"
+              accept="image"
+              aria-describedby="photo-helptext"
+              // onChange={onFileChange}
+            />
+            <Button as="label" htmlFor="image">
+              Add Image
+            </Button>
+            {/* <Box position="relative">
+              <AspectRatio ratio={4 / 3}>
+                <Image src={p.base64String} objectFit="cover" />
+              </AspectRatio>
+            </Box> */}
+          </Box>
           <FormControl id="title">
             <FormLabel>Item Name</FormLabel>
             <Input />
