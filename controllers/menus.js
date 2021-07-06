@@ -1,0 +1,58 @@
+import supabase from '@/util/supabase'
+
+export const apiGetMenus = async (params) => {
+  const { data, error } = await supabase
+    .from('menus')
+    .select('*')
+    .match(params)
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
+
+export const apiGetMenu = async (id) => {
+  const { data, error } = await supabase
+    .from('menus')
+    .select('*')
+    .match({ id })
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
+
+export const apiPostMenu = async (payload) => {
+  const { data, error } = await supabase.from('menus').insert([payload])
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
+
+export const apiPutMenu = async (id, payload) => {
+  const { data, error } = await supabase
+    .from('menus')
+    .update(payload)
+    .match({ id })
+    .select('*')
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
+
+export const apiDeleteMenu = async (id) => {
+  const { data, error } = await supabase.from('menus').delete().match({ id })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
