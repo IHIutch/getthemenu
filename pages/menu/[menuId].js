@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 
@@ -32,6 +32,7 @@ import {
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Edit } from 'react-feather'
+import { useDropzone } from 'react-dropzone'
 
 export default function SingleMenu() {
   const drawerState = useDisclosure()
@@ -158,20 +159,12 @@ const EditItemDrawer = ({ handleDrawerClose }) => {
       <DrawerBody px="4">
         <Stack spacing="6">
           <Box>
-            <FormLabel as="span">Item Image</FormLabel>
-            <VisuallyHidden
-              id="image"
-              as="input"
-              type="file"
-              accept="image"
-              aria-describedby="photo-helptext"
-              // onChange={onFileChange}
-            />
-            <AspectRatio as="label" htmlFor="image" ratio={16 / 9} d="block">
-              <Button as={Box} h="100%">
-                Add Image
-              </Button>
-            </AspectRatio>
+            <FormControl id="image">
+              <FormLabel>Item Image</FormLabel>
+              <AspectRatio ratio={16 / 9} d="block">
+                <Dropzone />
+              </AspectRatio>
+            </FormControl>
           </Box>
           <FormControl id="title">
             <FormLabel>Item Name</FormLabel>
@@ -208,5 +201,35 @@ const EditItemDrawer = ({ handleDrawerClose }) => {
         </ButtonGroup>
       </DrawerFooter>
     </>
+  )
+}
+
+const Dropzone = ({ handleDrawerClose }) => {
+  const onDrop = useCallback((acceptedFiles) => {
+    // Do something with the files
+  }, [])
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+
+  return (
+    <Flex
+      bg={isDragActive ? 'blue.100' : 'gray.100'}
+      rounded="md"
+      borderColor={isDragActive ? 'blue.200' : 'gray.200'}
+      borderWidth="1px"
+      align="center"
+      justify="center"
+      textAlign="center"
+      fontWeight="semibold"
+      transition="all 0.2s ease"
+      cursor="pointer"
+      {...getRootProps()}
+    >
+      <Input {...getInputProps()} />
+      {isDragActive ? (
+        <Text>Drop the files here ...</Text>
+      ) : (
+        <Text>Upload an Image</Text>
+      )}
+    </Flex>
   )
 }
