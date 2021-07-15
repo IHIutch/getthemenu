@@ -11,6 +11,7 @@ import {
   Link,
   HStack,
   useToken,
+  Button,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -46,13 +47,14 @@ export default function Navbar(props) {
                   <MenuButton>
                     <Avatar size="sm" name="Kola Tioluwani" />
                   </MenuButton>
-                  <MenuList>
+                  <MenuList boxShadow="lg">
                     <NextLink href="/dashboard" passHref>
                       <MenuItem as={Link}>Dashboard</MenuItem>
                     </NextLink>
                     <NextLink href="/settings" passHref>
                       <MenuItem as={Link}>Account Settings</MenuItem>
                     </NextLink>
+                    <MenuItem as="button">Feedback</MenuItem>
                     <NextLink href="/logout" passHref>
                       <MenuItem as={Link}>Log Out</MenuItem>
                     </NextLink>

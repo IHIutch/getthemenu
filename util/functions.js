@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 export const handleStructuredData = ({ restaurant, menus }) => {
   return {
     '@context': 'http://schema.org',
@@ -46,4 +48,8 @@ export const handleStructuredData = ({ restaurant, menus }) => {
       })),
     })),
   }
+}
+
+export const formatDate = (val, format = 'MM/DD/YYYY') => {
+  return dayjs(val).format(format)
 }

@@ -2,16 +2,20 @@ import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 
 import { apiGetMenus } from '@/controllers/menus'
+import { formatDate } from '@/util/functions'
 import {
   Box,
   Button,
   ButtonGroup,
+  Circle,
   Flex,
   FormControl,
   FormLabel,
   Heading,
   Input,
   Link,
+  LinkBox,
+  LinkOverlay,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -20,6 +24,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
+  Text,
   useDisclosure,
 } from '@chakra-ui/react'
 import Head from 'next/head'
@@ -47,13 +52,41 @@ export default function Profile({ menus }) {
             </Box>
           </Flex>
           {menus && (
-            <Stack borderTopWidth="1px" borderBottomWidth="1px">
+            <Stack>
               {menus.map((menu, idx) => (
-                <NextLink passHref href={`/menu/${menu.id}`}>
-                  <Link py="2" fontWeight="medium">
-                    {menu.name}
-                  </Link>
-                </NextLink>
+                <LinkBox key={idx} bg="white" rounded="md" shadow="base">
+                  <Box p="3" borderBottomWidth="1px">
+                    <NextLink passHref href={`/menu/${menu.id}`}>
+                      <LinkOverlay fontWeight="medium" fontSize="2xl">
+                        {menu.name}
+                      </LinkOverlay>
+                    </NextLink>
+                  </Box>
+                  <Flex p="3" justify="space-between">
+                    <Flex align="center">
+                      <Circle boxSize="4" bg="green.100">
+                        <Circle boxSize="2" bg="green.400" />
+                      </Circle>
+                      <Text
+                        ml="2"
+                        lineHeight="1.2"
+                        fontWeight="semibold"
+                        color="green.600"
+                      >
+                        Live
+                      </Text>
+                    </Flex>
+                    <Box>
+                      <Text
+                        fontWeight="semibold"
+                        color="gray.600"
+                        fontSize="sm"
+                      >
+                        Published: {formatDate(menu.createdAt)}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </LinkBox>
               ))}
             </Stack>
           )}
