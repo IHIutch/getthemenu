@@ -11,19 +11,14 @@ import {
   Link,
   HStack,
   useToken,
-  Button,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import Container from './Container'
 
 export default function Navbar(props) {
-  const router = useRouter()
-  const [blue500] = useToken('colors', ['blue.500'])
-
-  const isPathMatch = (path) => {
-    return router.asPath === path
-  }
+  const { query } = useRouter()
+  const { menuId } = query
 
   return (
     <>
@@ -62,33 +57,40 @@ export default function Navbar(props) {
                 </Menu>
               </Box>
             </Flex>
+            {/* <HStack spacing="6">
+              <NavMenuItem href="/dashboard">Dashboard</NavMenuItem>
+              <NavMenuItem href="/restaurant">Restaurant</NavMenuItem>
+              <NavMenuItem href="/menus">Menus</NavMenuItem>
+            </HStack> */}
             <HStack spacing="6">
-              <NextLink href="/dashboard" passHref>
-                <Link
-                  fontWeight="semibold"
-                  py="2"
-                  boxShadow={
-                    isPathMatch('/dashboard') && `inset 0 -3px ${blue500}`
-                  }
-                  color={isPathMatch('/dashboard') && 'blue.500'}
-                >
-                  Dashboard
-                </Link>
-              </NextLink>
-              <NextLink href="/menus" passHref>
-                <Link fontWeight="semibold" py="2">
-                  Menus
-                </Link>
-              </NextLink>
-              <NextLink href="/restaurant" passHref>
-                <Link fontWeight="semibold" py="2">
-                  Restaurant
-                </Link>
-              </NextLink>
+              <NavMenuItem href={`/menu/${menuId}`}>Overview</NavMenuItem>
+              <NavMenuItem href={`/menu/${menuId}/edit`}>Edit</NavMenuItem>
             </HStack>
           </Box>
         </Container>
       </Box>
     </>
+  )
+}
+
+const NavMenuItem = ({ href, children }) => {
+  const isPathMatch = (path) => {
+    return asPath === path
+  }
+
+  const { asPath } = useRouter()
+  const [blue500] = useToken('colors', ['blue.500'])
+
+  return (
+    <NextLink href={href} passHref>
+      <Link
+        fontWeight="semibold"
+        py="2"
+        boxShadow={isPathMatch(href) && `inset 0 -3px ${blue500}`}
+        color={isPathMatch(href) && 'blue.500'}
+      >
+        {children}
+      </Link>
+    </NextLink>
   )
 }
