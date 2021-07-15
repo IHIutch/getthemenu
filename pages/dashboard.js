@@ -9,14 +9,13 @@ import NextLink from 'next/link'
 import React from 'react'
 
 export default function Profile({ menus }) {
-  console.log(menus)
   return (
     <>
       <Head>
         <title>Single Menu</title>
       </Head>
       <Navbar />
-      <Container>
+      <Container py="8">
         <Box>
           <Flex mb="4" align="center">
             <Heading fontSize="xl">Your Menus</Heading>
