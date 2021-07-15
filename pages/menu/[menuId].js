@@ -28,7 +28,6 @@ import {
   ButtonGroup,
   AspectRatio,
   Image,
-  VisuallyHidden,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Edit } from 'react-feather'
@@ -65,7 +64,7 @@ export default function SingleMenu() {
           <Heading>This is a menu title</Heading>
         </Box>
         <Grid mx="-4">
-          {[...Array(3)].map((idx) => (
+          {[...Array(3)].map((_, idx) => (
             <GridItem
               key={idx}
               p="4"

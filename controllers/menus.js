@@ -1,11 +1,7 @@
 import supabase from '@/util/supabase'
 
-export const apiGetMenus = async (params) => {
-  const { data, error } = await supabase
-    .from('menus')
-    .select('*')
-    .match(params)
-    .single()
+export const apiGetMenus = async (params = {}) => {
+  const { data, error } = await supabase.from('menus').select('*').match(params)
 
   if (error) {
     throw new Error(error.message)

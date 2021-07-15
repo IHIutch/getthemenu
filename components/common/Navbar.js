@@ -3,37 +3,26 @@ import {
   Box,
   Flex,
   Heading,
-  useDisclosure,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerOverlay,
-  DrawerHeader,
-  Icon,
-  Link,
-  IconButton,
-  Text,
   Avatar,
+  MenuButton,
+  Menu,
+  MenuList,
+  MenuItem,
+  Link,
+  HStack,
+  useToken,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
-import { Menu } from 'react-feather'
+import { useRouter } from 'next/router'
 import Container from './Container'
 
-export default function Navbar({ sx, menus, active, handleCreateMenu }) {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+export default function Navbar(props) {
+  const router = useRouter()
+  const [blue500] = useToken('colors', ['blue.500'])
 
-  const linkItems = [
-    {
-      label: 'Menus',
-      to: '/menus',
-      children: [
-        { label: 'Dinner', to: '/menus/dinner' },
-        { label: 'Add Menu', to: '/menus/create' },
-      ],
-    },
-    { label: 'Restaurant Details', to: '/details' },
-  ]
+  const isPathMatch = (path) => {
+    return router.asPath === path
+  }
 
   return (
     <>
@@ -42,103 +31,62 @@ export default function Navbar({ sx, menus, active, handleCreateMenu }) {
         bg="white"
         borderBottom="1px"
         borderColor="gray.200"
-        sx={sx}
+        {...props}
       >
         <Container>
-          <Flex align="center">
-            <IconButton
-              variant="outline"
-              icon={<Icon as={Menu} h="6" w="6" />}
-              onClick={onOpen}
-            />
-            <Flex align="center" h="14" ml="2">
-              <Heading as="h1" size="lg">
-                Dinner
-              </Heading>
+          <Box>
+            <Flex align="center">
+              <Flex align="center" h="14">
+                <Heading as="h1" fontSize="lg">
+                  GetTheMenu
+                </Heading>
+              </Flex>
+              <Box ml="auto">
+                <Menu>
+                  <MenuButton>
+                    <Avatar size="sm" name="Kola Tioluwani" />
+                  </MenuButton>
+                  <MenuList>
+                    <NextLink href="/dashboard" passHref>
+                      <MenuItem as={Link}>Dashboard</MenuItem>
+                    </NextLink>
+                    <NextLink href="/settings" passHref>
+                      <MenuItem as={Link}>Account Settings</MenuItem>
+                    </NextLink>
+                    <NextLink href="/logout" passHref>
+                      <MenuItem as={Link}>Log Out</MenuItem>
+                    </NextLink>
+                  </MenuList>
+                </Menu>
+              </Box>
             </Flex>
-          </Flex>
+            <HStack spacing="6">
+              <NextLink href="/dashboard" passHref>
+                <Link
+                  fontWeight="semibold"
+                  py="2"
+                  boxShadow={
+                    isPathMatch('/dashboard') && `inset 0 -3px ${blue500}`
+                  }
+                  color={isPathMatch('/dashboard') && 'blue.500'}
+                >
+                  Dashboard
+                </Link>
+              </NextLink>
+              <NextLink href="/menus" passHref>
+                <Link fontWeight="semibold" py="2">
+                  Menus
+                </Link>
+              </NextLink>
+              <NextLink href="/restaurant" passHref>
+                <Link fontWeight="semibold" py="2">
+                  Restaurant
+                </Link>
+              </NextLink>
+            </HStack>
+          </Box>
         </Container>
       </Box>
-      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
-        <DrawerOverlay>
-          <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerHeader p="4" borderBottomWidth="1px">
-              GetTheMenu
-            </DrawerHeader>
-            <DrawerBody p="4">
-              <Flex h="100%" direction="column">
-                <Box as="ul">
-                  {linkItems.map((item, idx) => (
-                    <Box
-                      key={idx}
-                      as="li"
-                      lineHeight="1.5rem"
-                      textAlign="left"
-                      listStyleType="none"
-                      _notFirst={{ mt: '2' }}
-                    >
-                      <NextLink href={`/menu/${idx}`} passHref>
-                        <Link
-                          fontWeight="semibold"
-                          colorScheme={parseInt(active) === idx && 'blue'}
-                          py="2"
-                          d="block"
-                        >
-                          {item.label || 'Untitled Menu'}
-                        </Link>
-                      </NextLink>
-                      {item.children && (
-                        <Box as="ul" my="2">
-                          {item.children.map((child, cIdx) => (
-                            <Box
-                              key={cIdx}
-                              as="li"
-                              lineHeight="1.5rem"
-                              textAlign="left"
-                              listStyleType="none"
-                              ml="4"
-                              _notFirst={{ mt: '4' }}
-                            >
-                              <NextLink href={`/menu/${child.to}`} passHref>
-                                <Link
-                                  d="block"
-                                  fontWeight="semibold"
-                                  colorScheme={
-                                    parseInt(active) === idx && 'blue'
-                                  }
-                                  py="1"
-                                >
-                                  {child.label || 'Untitled Menu'}
-                                </Link>
-                              </NextLink>
-                            </Box>
-                          ))}
-                        </Box>
-                      )}
-                    </Box>
-                  ))}
-                </Box>
-                <Box mt="auto">
-                  <NextLink href={`/profile/details}`} passHref>
-                    <Link
-                      d="flex"
-                      alignItems="center"
-                      fontWeight="semibold"
-                      py="1"
-                    >
-                      <Avatar size="sm" name="Kola Tioluwani" />
-                      <Text as="span" ml="2">
-                        Profile Settings
-                      </Text>
-                    </Link>
-                  </NextLink>
-                </Box>
-              </Flex>
-            </DrawerBody>
-          </DrawerContent>
-        </DrawerOverlay>
-      </Drawer>
     </>
   )
 }
