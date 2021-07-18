@@ -1,5 +1,5 @@
-import { supabase } from '@/utils/supabase'
 import useSWR from 'swr'
+import supabase from '@/utils/supabase'
 
 export const useAuthUser = ({ initialData = null }) => {
   const user = supabase.auth.user()

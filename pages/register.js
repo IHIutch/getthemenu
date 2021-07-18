@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import supabase from '@/utils/supabase'
@@ -14,26 +14,33 @@ import {
   Heading,
   Input,
 } from '@chakra-ui/react'
-import { Formik, useFormikContext } from 'formik'
+import { useForm } from 'react-hook-form'
 import Container from '@/components/common/Container'
 import { useAuthUser } from '@/utils/swr/user'
 
 export default function Register() {
   const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const {
-    values: { email, password },
-  } = useFormikContext()
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm()
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // const [email, password] = getValues(['email', 'new-password'])
         await axios.post(`/api/auth/register`, {
           event,
           session,
-          userData: {
-            email,
-            password,
-          },
+          // Any additional user data
+          // userData: {
+          // email,
+          // password,
+          // },
         })
       }
     )
@@ -41,15 +48,17 @@ export default function Register() {
     return () => {
       authListener.unsubscribe()
     }
-  }, [email, password])
+  }, [getValues])
 
-  const handleSubmit = async ({ email, password }) => {
+  const onSubmit = async (form) => {
     try {
+      setIsSubmitting(true)
       await supabase.auth.signUp({
-        email: email,
-        password: password,
+        email: form.email,
+        password: form['new-password'],
       })
     } catch (error) {
+      setIsSubmitting(false)
       alert(error.message)
     }
   }
@@ -82,79 +91,48 @@ export default function Register() {
               <Box mb="8">
                 <Heading as="h1">Create Account</Heading>
               </Box>
-              <Formik
-                initialValues={{ email: '', password: '' }}
-                validate={(values) => {
-                  const errors = {}
-                  if (!values.email) errors.email = 'Required'
-                  if (!values.password) errors.password = 'Required'
-                  return errors
-                }}
-                onSubmit={(values, { setSubmitting }) => {
-                  handleSubmit(values)
-                  setSubmitting(false)
-                }}
-              >
-                {({
-                  values,
-                  errors,
-                  touched,
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  isSubmitting,
-                }) => (
-                  <form onSubmit={handleSubmit}>
-                    <Grid gap="6">
-                      <GridItem>
-                        <FormControl
-                          id="email"
-                          isInvalid={errors.email && touched.email}
-                        >
-                          <FormLabel>Email</FormLabel>
-                          <Input
-                            type="email"
-                            name="email"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.email}
-                            isRequired
-                          />
-                          <FormErrorMessage>{errors.email}</FormErrorMessage>
-                        </FormControl>
-                      </GridItem>
-                      <GridItem>
-                        <FormControl
-                          id="password"
-                          isInvalid={errors.password && touched.password}
-                        >
-                          <FormLabel>Password</FormLabel>
-                          <Input
-                            type="password"
-                            name="password"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.password}
-                            isRequired
-                          />
-                          <FormErrorMessage>{errors.password}</FormErrorMessage>
-                        </FormControl>
-                      </GridItem>
-                      <GridItem>
-                        <Button
-                          ml="auto"
-                          type="submit"
-                          colorScheme="blue"
-                          loadingText="Registering..."
-                          isLoading={isSubmitting}
-                        >
-                          Register
-                        </Button>
-                      </GridItem>
-                    </Grid>
-                  </form>
-                )}
-              </Formik>
+
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Grid gap="6">
+                  <GridItem>
+                    <FormControl id="email" isInvalid={errors.email}>
+                      <FormLabel>Email</FormLabel>
+                      <Input
+                        {...register('email', {
+                          required: 'This field is required',
+                        })}
+                        type="email"
+                        autoComplete="email"
+                      />
+                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl id="password" isInvalid={errors.password}>
+                      <FormLabel>Password</FormLabel>
+                      <Input
+                        {...register('new-password', {
+                          required: 'This field is required',
+                        })}
+                        type="password"
+                        autoComplete="new-password"
+                      />
+                      <FormErrorMessage>{errors.password}</FormErrorMessage>
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <Button
+                      ml="auto"
+                      type="submit"
+                      colorScheme="blue"
+                      loadingText="Registering..."
+                      isLoading={isSubmitting}
+                    >
+                      Register
+                    </Button>
+                  </GridItem>
+                </Grid>
+              </form>
             </Box>
           </GridItem>
         </Grid>
