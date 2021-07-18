@@ -1,5 +1,6 @@
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
+import SubnavItem from '@/components/common/SubnavItem'
 
 import { apiGetMenus } from '@/controllers/menus'
 import { formatDate } from '@/util/functions'
@@ -12,8 +13,8 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  HStack,
   Input,
-  Link,
   LinkBox,
   LinkOverlay,
   Modal,
@@ -40,7 +41,13 @@ export default function Profile({ menus }) {
       <Head>
         <title>Single Menu</title>
       </Head>
-      <Navbar />
+      <Navbar>
+        <HStack spacing="6">
+          <SubnavItem href="/dashboard">Dashboard</SubnavItem>
+          <SubnavItem href="/restaurant">Restaurant</SubnavItem>
+          <SubnavItem href="/menus">Menus</SubnavItem>
+        </HStack>
+      </Navbar>
       <Container py="8">
         <Box>
           <Flex mb="4" align="center">
@@ -65,7 +72,7 @@ export default function Profile({ menus }) {
                   <Flex p="3" justify="space-between">
                     <Flex align="center">
                       <Circle boxSize="4" bg="green.100">
-                        <Circle boxSize="2" bg="green.400" />
+                        <Circle boxSize="2" bg="green.500" />
                       </Circle>
                       <Text
                         ml="2"

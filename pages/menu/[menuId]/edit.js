@@ -28,10 +28,13 @@ import {
   ButtonGroup,
   AspectRatio,
   Image,
+  HStack,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Edit } from 'react-feather'
 import { useDropzone } from 'react-dropzone'
+import SubnavItem from '@/components/common/SubnavItem'
+import { useRouter } from 'next/router'
 
 export default function SingleMenu() {
   const drawerState = useDisclosure()
@@ -41,12 +44,20 @@ export default function SingleMenu() {
     drawerState.onOpen()
   }
 
+  const { query } = useRouter()
+  const { menuId } = query
+
   return (
     <>
       <Head>
         <title>Single Menu</title>
       </Head>
-      <Navbar />
+      <Navbar>
+        <HStack spacing="6">
+          <SubnavItem href={`/menu/${menuId}`}>Overview</SubnavItem>
+          <SubnavItem href={`/menu/${menuId}/edit`}>Edit</SubnavItem>
+        </HStack>
+      </Navbar>
       <Container>
         <Box my="8">
           <Button

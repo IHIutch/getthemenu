@@ -9,17 +9,11 @@ import {
   MenuList,
   MenuItem,
   Link,
-  HStack,
-  useToken,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
-import { useRouter } from 'next/router'
 import Container from './Container'
 
-export default function Navbar(props) {
-  const { query } = useRouter()
-  const { menuId } = query
-
+export default function Navbar({ children, ...props }) {
   return (
     <>
       <Box
@@ -57,40 +51,10 @@ export default function Navbar(props) {
                 </Menu>
               </Box>
             </Flex>
-            {/* <HStack spacing="6">
-              <NavMenuItem href="/dashboard">Dashboard</NavMenuItem>
-              <NavMenuItem href="/restaurant">Restaurant</NavMenuItem>
-              <NavMenuItem href="/menus">Menus</NavMenuItem>
-            </HStack> */}
-            <HStack spacing="6">
-              <NavMenuItem href={`/menu/${menuId}`}>Overview</NavMenuItem>
-              <NavMenuItem href={`/menu/${menuId}/edit`}>Edit</NavMenuItem>
-            </HStack>
+            {children}
           </Box>
         </Container>
       </Box>
     </>
-  )
-}
-
-const NavMenuItem = ({ href, children }) => {
-  const isPathMatch = (path) => {
-    return asPath === path
-  }
-
-  const { asPath } = useRouter()
-  const [blue500] = useToken('colors', ['blue.500'])
-
-  return (
-    <NextLink href={href} passHref>
-      <Link
-        fontWeight="semibold"
-        py="2"
-        boxShadow={isPathMatch(href) && `inset 0 -3px ${blue500}`}
-        color={isPathMatch(href) && 'blue.500'}
-      >
-        {children}
-      </Link>
-    </NextLink>
   )
 }
