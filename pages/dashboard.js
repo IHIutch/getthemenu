@@ -3,7 +3,7 @@ import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
 
 import { apiGetMenus } from '@/controllers/menus'
-import { formatDate } from '@/util/functions'
+import { formatDate } from '@/utils/functions'
 import {
   Box,
   Button,

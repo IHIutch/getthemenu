@@ -3,7 +3,7 @@ import {
   apiGetMenuItem,
   apiPutMenuItem,
 } from '@/controllers/menuItems'
-import { resStatusType } from '@/util/types'
+import { resStatusType } from '@/utils/types'
 
 const handler = async (res, req) => {
   const { method } = req

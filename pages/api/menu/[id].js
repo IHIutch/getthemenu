@@ -1,5 +1,5 @@
 import { apiDeleteMenu, apiGetMenu, apiPutMenu } from '@/controllers/menus'
-import { resStatusType } from '@/util/types'
+import { resStatusType } from '@/utils/types'
 
 const handler = async (res, req) => {
   const { method } = req

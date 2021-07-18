@@ -3,7 +3,7 @@ import {
   apiGetRestaurant,
   apiPutRestaurant,
 } from '@/controllers/restaurants'
-import { resStatusType } from '@/util/types'
+import { resStatusType } from '@/utils/types'
 
 const handler = async (res, req) => {
   const { method } = req

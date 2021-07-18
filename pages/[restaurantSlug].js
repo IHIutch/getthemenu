@@ -12,7 +12,7 @@ import {
 import Head from 'next/head'
 import Container from '../components/common/Container'
 
-import { handleStructuredData } from '@/util/functions'
+import { handleStructuredData } from '@/utils/functions'
 
 export default function SingleRestaurant({ restaurant, menus }) {
   const structuredData = useMemo(() => {
