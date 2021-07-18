@@ -1,4 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import supabase from '@/utils/supabase'
+import axios from 'redaxios'
 import {
   Box,
   Button,
@@ -10,11 +14,58 @@ import {
   Heading,
   Input,
 } from '@chakra-ui/react'
-import { Formik } from 'formik'
+import { Formik, useFormikContext } from 'formik'
 import Container from '@/components/common/Container'
-import Head from 'next/head'
+import { useAuthUser } from '@/utils/swr/user'
 
 export default function Register() {
+  const router = useRouter()
+  const {
+    values: { email, password },
+  } = useFormikContext()
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        await axios.post(`/api/auth/register`, {
+          event,
+          session,
+          userData: {
+            email,
+            password,
+          },
+        })
+      }
+    )
+
+    return () => {
+      authListener.unsubscribe()
+    }
+  }, [email, password])
+
+  const handleSubmit = async ({ email, password }) => {
+    try {
+      await supabase.auth.signUp({
+        email: email,
+        password: password,
+      })
+    } catch (error) {
+      alert(error.message)
+    }
+  }
+
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    isError: isUserError,
+  } = useAuthUser({})
+
+  useEffect(() => {
+    if (user) {
+      router.replace('/profile')
+    }
+  }, [router, user])
+
   return (
     <>
       <Head>
@@ -40,10 +91,8 @@ export default function Register() {
                   return errors
                 }}
                 onSubmit={(values, { setSubmitting }) => {
-                  setTimeout(() => {
-                    alert(JSON.stringify(values, null, 2))
-                    setSubmitting(false)
-                  }, 400)
+                  handleSubmit(values)
+                  setSubmitting(false)
                 }}
               >
                 {({
