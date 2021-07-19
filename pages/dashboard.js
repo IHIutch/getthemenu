@@ -3,7 +3,9 @@ import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
 
 import { apiGetMenus } from '@/controllers/menus'
+import { postMenu } from '@/utils/axios/menus'
 import { formatDate } from '@/utils/functions'
+import { useGetMenus } from '@/utils/swr/menus'
 import {
   Box,
   Button,
@@ -30,11 +32,37 @@ import {
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 
-import React from 'react'
+import React, { useState } from 'react'
 
-export default function Profile({ menus }) {
+export default function Profile(props) {
+  const router = useRouter()
   const modalState = useDisclosure()
+  const [menuName, setMenuName] = useState('')
+  const [isCreating, setIsCreating] = useState('')
+
+  const { data: menus } = useGetMenus({
+    params: {
+      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+    },
+    initialData: props.menus,
+  })
+
+  const handleCreateMenu = async () => {
+    try {
+      setIsCreating(true)
+      const data = await postMenu({
+        name: menuName,
+        restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+      })
+      if (data.error) throw new Error(data.error)
+      router.replace(`/menu/${data.id}/edit`)
+    } catch (error) {
+      setIsCreating(false)
+      alert(error)
+    }
+  }
 
   return (
     <>
@@ -107,13 +135,23 @@ export default function Profile({ menus }) {
           <ModalBody>
             <FormControl>
               <FormLabel>Menu Name</FormLabel>
-              <Input type="text" />
+              <Input
+                onChange={(e) => setMenuName(e.target.value)}
+                type="text"
+              />
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <ButtonGroup>
               <Button onClick={modalState.onClose}>Cancel</Button>
-              <Button colorScheme="blue">Create</Button>
+              <Button
+                isLoading={isCreating}
+                loadingText="Creating..."
+                colorScheme="blue"
+                onClick={handleCreateMenu}
+              >
+                Create
+              </Button>
             </ButtonGroup>
           </ModalFooter>
         </ModalContent>
