@@ -1,7 +1,11 @@
-import { apiDeleteMenu, apiGetMenu, apiPutMenu } from '@/controllers/menus'
+import {
+  apiDeleteRestaurant,
+  apiGetRestaurant,
+  apiPutRestaurant,
+} from '@/controllers/restaurants'
 import { resStatusType } from '@/utils/types'
 
-const handler = async (res, req) => {
+const handler = async (req, res) => {
   const { method } = req
 
   switch (method) {
@@ -9,7 +13,7 @@ const handler = async (res, req) => {
     case 'GET':
       try {
         const { id } = req.body
-        const data = await apiGetMenu(id)
+        const data = await apiGetRestaurant(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
@@ -19,7 +23,7 @@ const handler = async (res, req) => {
     case 'PUT':
       try {
         const { id, payload } = req.body
-        const data = await apiPutMenu(id, payload)
+        const data = await apiPutRestaurant(id, payload)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
@@ -29,7 +33,7 @@ const handler = async (res, req) => {
     case 'DELETE':
       try {
         const { id } = req.body
-        const data = await apiDeleteMenu(id)
+        const data = apiDeleteRestaurant(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)

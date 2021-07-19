@@ -1,7 +1,7 @@
 import { apiGetMenus, apiPostMenu } from '@/controllers/menus'
 import { resStatusType } from '@/utils/types'
 
-const handler = async (res, req) => {
+const handler = async (req, res) => {
   const { method } = req
 
   switch (method) {
@@ -18,8 +18,8 @@ const handler = async (res, req) => {
     // Create
     case 'POST':
       try {
-        const { payload } = req.body
-        const data = await apiPostMenu(payload)
+        const { restaurantId, name } = req.body
+        const data = await apiPostMenu({ restaurantId, name })
         res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)

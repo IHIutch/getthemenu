@@ -1,11 +1,7 @@
-import {
-  apiDeleteMenuItem,
-  apiGetMenuItem,
-  apiPutMenuItem,
-} from '@/controllers/menuItems'
+import { apiDeleteMenu, apiGetMenu, apiPutMenu } from '@/controllers/menus'
 import { resStatusType } from '@/utils/types'
 
-const handler = async (res, req) => {
+const handler = async (req, res) => {
   const { method } = req
 
   switch (method) {
@@ -13,7 +9,7 @@ const handler = async (res, req) => {
     case 'GET':
       try {
         const { id } = req.body
-        const data = await apiGetMenuItem(id)
+        const data = await apiGetMenu(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
@@ -23,7 +19,7 @@ const handler = async (res, req) => {
     case 'PUT':
       try {
         const { id, payload } = req.body
-        const data = await apiPutMenuItem(id, payload)
+        const data = await apiPutMenu(id, payload)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
@@ -33,7 +29,7 @@ const handler = async (res, req) => {
     case 'DELETE':
       try {
         const { id } = req.body
-        const data = await apiDeleteMenuItem(id)
+        const data = await apiDeleteMenu(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)

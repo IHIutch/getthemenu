@@ -3,7 +3,7 @@ import useSWR, { mutate } from 'swr'
 
 export const useGetMenuItems = ({ params = null, initialData = null }) => {
   const { data, error, mutate } = useSWR(
-    `/api/menuItem?${QueryString.stringify(params)}`,
+    `/api/menuItems?${QueryString.stringify(params)}`,
     { initialData }
   )
 
@@ -16,11 +16,11 @@ export const useGetMenuItems = ({ params = null, initialData = null }) => {
 }
 
 // export const usePostMenuItem = (payload, { params = null }) => {
-//   mutate(`/api/menuItem?${QueryString.stringify(params)}`, payload)
+//   mutate(`/api/menuItems?${QueryString.stringify(params)}`, payload)
 // }
 
 export const useGetMenuItem = async (id, { initialData = null }) => {
-  const { data, error } = useSWR(`/api/menuItem/${id}`, { initialData })
+  const { data, error } = useSWR(`/api/menuItems/${id}`, { initialData })
 
   return {
     data,

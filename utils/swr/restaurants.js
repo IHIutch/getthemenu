@@ -3,7 +3,7 @@ import useSWR, { mutate } from 'swr'
 
 export const useGetRestaurants = ({ params = null, initialData = null }) => {
   const { data, error, mutate } = useSWR(
-    `/api/restaurant?${QueryString.stringify(params)}`,
+    `/api/restaurants?${QueryString.stringify(params)}`,
     { initialData }
   )
 
@@ -16,11 +16,11 @@ export const useGetRestaurants = ({ params = null, initialData = null }) => {
 }
 
 // export const usePostRestaurant = (payload, { params = null }) => {
-//   mutate(`/api/restaurant?${QueryString.stringify(params)}`, payload)
+//   mutate(`/api/restaurants?${QueryString.stringify(params)}`, payload)
 // }
 
 export const useGetRestaurant = async (id, { initialData = null }) => {
-  const { data, error } = useSWR(`/api/restaurant/${id}`, { initialData })
+  const { data, error } = useSWR(`/api/restaurants/${id}`, { initialData })
 
   return {
     data,
