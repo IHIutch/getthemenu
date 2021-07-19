@@ -5,7 +5,7 @@ export const handleStructuredData = ({ restaurant, menus }) => {
     '@context': 'http://schema.org',
     '@type': 'Restaurant',
     url: 'http://www.thisisarestaurant.com',
-    name: restaurant.name,
+    name: restaurant.title,
     image: restaurant.image,
     telephone: restaurant.phone,
     priceRange: '$100 - $200',
@@ -20,11 +20,11 @@ export const handleStructuredData = ({ restaurant, menus }) => {
     servesCuisine: ['American cuisine'],
     hasMenu: menus.map((menu) => ({
       '@type': 'Menu',
-      name: menu.name,
+      name: menu.title,
       // description: "Menu for in-restaurant dining only.",
       hasMenuSection: menu.sections.map((section) => ({
         '@type': 'MenuSection',
-        name: section.name,
+        name: section.title,
         // description: "Appetizers and such",
         // image: "https://thisisarestaurant.com/starter_dishes.jpg",
         // offers: {
@@ -36,7 +36,7 @@ export const handleStructuredData = ({ restaurant, menus }) => {
           .filter((i) => i.sectionId === section._id)
           .map((item) => ({
             '@type': 'MenuItem',
-            name: item.name,
+            name: item.title,
             description: item.description,
             offers: {
               '@type': 'Offer',

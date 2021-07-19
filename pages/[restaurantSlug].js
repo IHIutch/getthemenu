@@ -22,7 +22,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
   return (
     <Box>
       <Head>
-        <title>{restaurant.name}</title>
+        <title>{restaurant.title}</title>
         <link rel="icon" href="/favicon.ico" />
         <script
           type="application/ld+json"
@@ -49,7 +49,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
           >
             <Container>
               <Heading as="h1" textShadow="0 2px 1px black" mb="1">
-                {restaurant.name}
+                {restaurant.title}
               </Heading>
               <Flex>
                 <Box>
@@ -77,7 +77,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
       <Box>
         <Container>
           <Heading as="h2" fontSize="3xl">
-            {menus[0].name}
+            {menus[0].title}
           </Heading>
         </Container>
         {menus[0] &&
@@ -85,7 +85,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
             <Box key={idx} py="8" bg={idx % 2 ? 'gray.50' : 'white'}>
               <Container>
                 <Heading as="h2" fontSize="2xl">
-                  {section.name}
+                  {section.title}
                 </Heading>
               </Container>
               <Container
@@ -109,7 +109,7 @@ export default function SingleRestaurant({ restaurant, menus }) {
                           <Box>
                             <Flex fontWeight="semibold" fontSize="lg">
                               <Box flexGrow="1">
-                                <Text as="span">{item.name}</Text>
+                                <Text as="span">{item.title}</Text>
                               </Box>
                               <Box flexShrink="1" ml="4">
                                 <Text as="span">${item.price}</Text>

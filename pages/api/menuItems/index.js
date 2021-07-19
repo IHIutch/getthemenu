@@ -18,8 +18,14 @@ const handler = async (req, res) => {
     // Create
     case 'POST':
       try {
-        const { payload } = req.body
-        const data = await apiPostMenuItem(payload)
+        const { title, price, description, menuId, restaurantId } = req.body
+        const data = await apiPostMenuItem({
+          title,
+          price,
+          description,
+          menuId,
+          restaurantId,
+        })
         res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)

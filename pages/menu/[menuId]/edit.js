@@ -35,6 +35,8 @@ import { MoreVertical, Trash2, Edit } from 'react-feather'
 import { useDropzone } from 'react-dropzone'
 import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
+import { useGetMenuItems } from '@/utils/swr/menuItems'
+import { postMenuItem } from '@/utils/axios/menuItems'
 
 export default function SingleMenu() {
   const drawerState = useDisclosure()
@@ -102,7 +104,8 @@ export default function SingleMenu() {
                           as={MoreVertical}
                           onClick={() =>
                             handleDrawerOpen(
-                              <EditItemDrawer
+                              <MenuItemDrawer
+                                menuItem={_}
                                 handleDrawerClose={drawerState.onClose}
                               />
                             )
@@ -118,6 +121,16 @@ export default function SingleMenu() {
             </GridItem>
           ))}
         </Grid>
+        <Button
+          colorScheme="blue"
+          onClick={() =>
+            handleDrawerOpen(
+              <MenuItemDrawer handleDrawerClose={drawerState.onClose} />
+            )
+          }
+        >
+          Add Item
+        </Button>
       </Container>
       <Drawer
         isOpen={drawerState.isOpen}
@@ -160,7 +173,47 @@ const EditTitleDrawer = ({ handleDrawerClose }) => {
   )
 }
 
-const EditItemDrawer = ({ handleDrawerClose }) => {
+const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
+  const router = useRouter()
+  const { menuId } = router.query
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [editingItem, setEditingItem] = useState(
+    menuItem ?? {
+      title: '',
+      description: '',
+      price: '',
+    }
+  )
+
+  const { data: menuItems, mutate } = useGetMenuItems({
+    params: {
+      menuId,
+      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+    },
+  })
+
+  const handleCreateItem = async () => {
+    try {
+      setIsSubmitting(true)
+      const data = await postMenuItem({
+        ...editingItem,
+        menuId,
+        restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+      })
+      if (data.error) throw new Error(data.error)
+      mutate(menuItems.concat(data))
+      setEditingItem({
+        title: '',
+        description: '',
+        price: '',
+      })
+      setIsSubmitting(false)
+    } catch (error) {
+      setIsSubmitting(false)
+      alert(error)
+    }
+  }
+
   return (
     <>
       <DrawerCloseButton />
@@ -178,25 +231,50 @@ const EditItemDrawer = ({ handleDrawerClose }) => {
           </Box>
           <FormControl id="title">
             <FormLabel>Item Name</FormLabel>
-            <Input />
+            <Input
+              onChange={(e) =>
+                setEditingItem({
+                  ...editingItem,
+                  title: e.target.value,
+                })
+              }
+            />
           </FormControl>
           <FormControl id="price">
             <FormLabel>Item Price</FormLabel>
-            <Input type="number" />
+            <Input
+              onChange={(e) =>
+                setEditingItem({
+                  ...editingItem,
+                  price: e.target.value,
+                })
+              }
+              type="number"
+            />
           </FormControl>
           <FormControl id="desctription">
             <FormLabel>Item Description</FormLabel>
-            <Textarea style={{ resize: 'none' }} />
+            <Textarea
+              onChange={(e) =>
+                setEditingItem({
+                  ...editingItem,
+                  description: e.target.value,
+                })
+              }
+              style={{ resize: 'none' }}
+            />
           </FormControl>
-          <Box>
-            <Button
-              colorScheme="red"
-              variant="link"
-              leftIcon={<Icon as={Trash2} />}
-            >
-              Delete Item
-            </Button>
-          </Box>
+          {menuItem && (
+            <Box>
+              <Button
+                colorScheme="red"
+                variant="link"
+                leftIcon={<Icon as={Trash2} />}
+              >
+                Delete Item
+              </Button>
+            </Box>
+          )}
         </Stack>
       </DrawerBody>
 
@@ -205,8 +283,14 @@ const EditItemDrawer = ({ handleDrawerClose }) => {
           <Button variant="outline" onClick={handleDrawerClose} isFullWidth>
             Cancel
           </Button>
-          <Button colorScheme="blue" onClick={handleDrawerClose} isFullWidth>
-            Save
+          <Button
+            loadingText={menuItem ? 'Updating...' : 'Creating...'}
+            isLoading={isSubmitting}
+            colorScheme="blue"
+            onClick={handleCreateItem}
+            isFullWidth
+          >
+            {menuItem ? 'Update' : 'Create'}
           </Button>
         </ButtonGroup>
       </DrawerFooter>

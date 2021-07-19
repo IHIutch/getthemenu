@@ -39,7 +39,7 @@ import React, { useState } from 'react'
 export default function Profile(props) {
   const router = useRouter()
   const modalState = useDisclosure()
-  const [menuName, setMenuName] = useState('')
+  const [menuTitle, setMenuTitle] = useState('')
   const [isCreating, setIsCreating] = useState('')
 
   const { data: menus } = useGetMenus({
@@ -53,7 +53,7 @@ export default function Profile(props) {
     try {
       setIsCreating(true)
       const data = await postMenu({
-        name: menuName,
+        title: menuTitle,
         restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
       })
       if (data.error) throw new Error(data.error)
@@ -93,7 +93,7 @@ export default function Profile(props) {
                   <Box p="3" borderBottomWidth="1px">
                     <NextLink passHref href={`/menu/${menu.id}`}>
                       <LinkOverlay fontWeight="medium" fontSize="2xl">
-                        {menu.name}
+                        {menu.title}
                       </LinkOverlay>
                     </NextLink>
                   </Box>
@@ -136,7 +136,7 @@ export default function Profile(props) {
             <FormControl>
               <FormLabel>Menu Name</FormLabel>
               <Input
-                onChange={(e) => setMenuName(e.target.value)}
+                onChange={(e) => setMenuTitle(e.target.value)}
                 type="text"
               />
             </FormControl>
