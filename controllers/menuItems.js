@@ -1,6 +1,6 @@
 import supabase from '@/utils/supabase'
 
-export const apiGetMenuItems = async (params = null) => {
+export const apiGetMenuItems = async (params = {}) => {
   const { data, error } = await supabase
     .from('menuItems')
     .select('*')

@@ -1,6 +1,6 @@
 import supabase from '@/utils/supabase'
 
-export const apiGetRestaurants = async (params = null) => {
+export const apiGetRestaurants = async (params = {}) => {
   const { data, error } = await supabase
     .from('restaurants')
     .select('*')
