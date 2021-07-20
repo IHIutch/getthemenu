@@ -37,8 +37,11 @@ import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
 import { useGetMenuItems } from '@/utils/swr/menuItems'
 import { postMenuItem } from '@/utils/axios/menuItems'
+import { apiGetMenuItems } from '@/controllers/menuItems'
 
-export default function SingleMenu() {
+export default function SingleMenu(props) {
+  const { query } = useRouter()
+  const { menuId } = query
   const drawerState = useDisclosure()
   const [drawerType, setDrawerType] = useState(null)
   const handleDrawerOpen = (content) => {
@@ -46,8 +49,13 @@ export default function SingleMenu() {
     drawerState.onOpen()
   }
 
-  const { query } = useRouter()
-  const { menuId } = query
+  const { data: menuItems } = useGetMenuItems({
+    params: {
+      menuId,
+      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+    },
+    initialData: props.menuItems,
+  })
 
   return (
     <>
@@ -77,7 +85,7 @@ export default function SingleMenu() {
           <Heading>This is a menu title</Heading>
         </Box>
         <Grid mx="-4">
-          {[...Array(3)].map((_, idx) => (
+          {menuItems.map((menuItem, idx) => (
             <GridItem
               key={idx}
               p="4"
@@ -93,7 +101,9 @@ export default function SingleMenu() {
                 <Box ml="4">
                   <Flex>
                     <Box flexGrow="1">
-                      <Heading size="md">Single Menu</Heading>
+                      <Text as="span" fontSize="lg" fontWeight="medium">
+                        {menuItem.title}
+                      </Text>
                     </Box>
                     <IconButton
                       size="xs"
@@ -105,7 +115,7 @@ export default function SingleMenu() {
                           onClick={() =>
                             handleDrawerOpen(
                               <MenuItemDrawer
-                                menuItem={_}
+                                menuItem={menuItem}
                                 handleDrawerClose={drawerState.onClose}
                               />
                             )
@@ -114,8 +124,8 @@ export default function SingleMenu() {
                       }
                     />
                   </Flex>
-                  <Text fontWeight="semibold">$2.99</Text>
-                  <Text>This is a single menu. It has a single menu item.</Text>
+                  <Text fontWeight="semibold">{menuItem.price}</Text>
+                  <Text>{menuItem.description}</Text>
                 </Box>
               </Flex>
             </GridItem>
@@ -326,4 +336,16 @@ const Dropzone = ({ handleDrawerClose }) => {
       )}
     </Flex>
   )
+}
+
+export async function getServerSideProps({ params: { menuId } }) {
+  const menuItems = await apiGetMenuItems({
+    menuId,
+    restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+  })
+  return {
+    props: {
+      menuItems,
+    },
+  }
 }

@@ -5,7 +5,6 @@ export const apiGetRestaurants = async (params = {}) => {
     .from('restaurants')
     .select('*')
     .match(params)
-    .single()
 
   if (error) {
     throw new Error(error.message)
