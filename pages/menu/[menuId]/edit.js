@@ -36,7 +36,7 @@ import { useDropzone } from 'react-dropzone'
 import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
 import { useGetMenuItems } from '@/utils/swr/menuItems'
-import { postMenuItem } from '@/utils/axios/menuItems'
+import { postMenuItem, putMenuItem } from '@/utils/axios/menuItems'
 import { apiGetMenuItems } from '@/controllers/menuItems'
 
 export default function SingleMenu(props) {
@@ -203,15 +203,33 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
   })
 
   const handleCreateItem = async () => {
+    const data = await postMenuItem({
+      ...editingItem,
+      menuId,
+      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+    })
+    if (data.error) throw new Error(data.error)
+    return await mutate(menuItems.concat(data))
+  }
+
+  const handleUpdateItem = async () => {
+    const data = await putMenuItem(menuItem.id, {
+      ...menuItem,
+      ...editingItem,
+    })
+    if (data.error) throw new Error(data.error)
+    return await mutate(
+      menuItems.map((mi) => {
+        if (mi.id === menuItem.id) return data
+        return mi
+      })
+    )
+  }
+
+  const handleSubmit = async () => {
     try {
       setIsSubmitting(true)
-      const data = await postMenuItem({
-        ...editingItem,
-        menuId,
-        restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-      })
-      if (data.error) throw new Error(data.error)
-      await mutate(menuItems.concat(data))
+      menuItem ? await handleUpdateItem() : await handleCreateItem()
       handleDrawerClose()
       setIsSubmitting(false)
     } catch (error) {
@@ -300,7 +318,7 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
             loadingText={menuItem ? 'Updating...' : 'Creating...'}
             isLoading={isSubmitting}
             colorScheme="blue"
-            onClick={handleCreateItem}
+            onClick={handleSubmit}
             isFullWidth
           >
             {menuItem ? 'Update' : 'Create'}

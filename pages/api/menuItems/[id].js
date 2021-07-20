@@ -22,8 +22,12 @@ const handler = async (req, res) => {
     // Update
     case 'PUT':
       try {
-        const { id, payload } = req.body
-        const data = await apiPutMenuItem(id, payload)
+        const { id, title, price, description } = req.body
+        const data = await apiPutMenuItem(id, {
+          title,
+          price,
+          description,
+        })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
