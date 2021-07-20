@@ -211,12 +211,8 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
         restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
       })
       if (data.error) throw new Error(data.error)
-      mutate(menuItems.concat(data))
-      setEditingItem({
-        title: '',
-        description: '',
-        price: '',
-      })
+      await mutate(menuItems.concat(data))
+      handleDrawerClose()
       setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
@@ -242,6 +238,8 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
           <FormControl id="title">
             <FormLabel>Item Name</FormLabel>
             <Input
+              autoComplete="off"
+              value={editingItem.title}
               onChange={(e) =>
                 setEditingItem({
                   ...editingItem,
@@ -253,6 +251,8 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
           <FormControl id="price">
             <FormLabel>Item Price</FormLabel>
             <Input
+              autoComplete="off"
+              value={editingItem.price}
               onChange={(e) =>
                 setEditingItem({
                   ...editingItem,
@@ -265,6 +265,8 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
           <FormControl id="desctription">
             <FormLabel>Item Description</FormLabel>
             <Textarea
+              autoComplete="off"
+              value={editingItem.description}
               onChange={(e) =>
                 setEditingItem({
                   ...editingItem,
@@ -272,6 +274,7 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
                 })
               }
               style={{ resize: 'none' }}
+              rows="6"
             />
           </FormControl>
           {menuItem && (
