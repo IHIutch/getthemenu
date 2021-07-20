@@ -85,51 +85,52 @@ export default function SingleMenu(props) {
           <Heading>This is a menu title</Heading>
         </Box>
         <Grid mx="-4">
-          {menuItems.map((menuItem, idx) => (
-            <GridItem
-              key={idx}
-              p="4"
-              _notFirst={{
-                borderTopWidth: '1px',
-                borderTopColor: 'gray.200',
-              }}
-            >
-              <Flex alignItems="flex-start">
-                <AspectRatio w="16" ratio="1">
-                  <Image src="https://picsum.photos/200" objectFit="cover" />
-                </AspectRatio>
-                <Box ml="4">
-                  <Flex>
-                    <Box flexGrow="1">
-                      <Text as="span" fontSize="lg" fontWeight="medium">
-                        {menuItem.title}
-                      </Text>
-                    </Box>
-                    <IconButton
-                      size="xs"
-                      variant="outline"
-                      icon={
-                        <Icon
-                          boxSize="5"
-                          as={MoreVertical}
-                          onClick={() =>
-                            handleDrawerOpen(
-                              <MenuItemDrawer
-                                menuItem={menuItem}
-                                handleDrawerClose={drawerState.onClose}
-                              />
-                            )
-                          }
-                        />
-                      }
-                    />
-                  </Flex>
-                  <Text fontWeight="semibold">{menuItem.price}</Text>
-                  <Text>{menuItem.description}</Text>
-                </Box>
-              </Flex>
-            </GridItem>
-          ))}
+          {menuItems &&
+            menuItems.map((menuItem, idx) => (
+              <GridItem
+                key={idx}
+                p="4"
+                _notFirst={{
+                  borderTopWidth: '1px',
+                  borderTopColor: 'gray.200',
+                }}
+              >
+                <Flex alignItems="flex-start">
+                  <AspectRatio w="16" ratio="1">
+                    <Image src="https://picsum.photos/200" objectFit="cover" />
+                  </AspectRatio>
+                  <Box ml="4">
+                    <Flex>
+                      <Box flexGrow="1">
+                        <Text as="span" fontSize="lg" fontWeight="medium">
+                          {menuItem.title}
+                        </Text>
+                      </Box>
+                      <IconButton
+                        size="xs"
+                        variant="outline"
+                        icon={
+                          <Icon
+                            boxSize="5"
+                            as={MoreVertical}
+                            onClick={() =>
+                              handleDrawerOpen(
+                                <MenuItemDrawer
+                                  menuItem={menuItem}
+                                  handleDrawerClose={drawerState.onClose}
+                                />
+                              )
+                            }
+                          />
+                        }
+                      />
+                    </Flex>
+                    <Text fontWeight="semibold">{menuItem.price}</Text>
+                    <Text>{menuItem.description}</Text>
+                  </Box>
+                </Flex>
+              </GridItem>
+            ))}
         </Grid>
         <Button
           colorScheme="blue"
@@ -200,6 +201,7 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
       menuId,
       restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
     },
+    initialData: [],
   })
 
   const handleCreateItem = async () => {
