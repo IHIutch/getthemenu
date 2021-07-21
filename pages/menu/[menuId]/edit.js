@@ -35,7 +35,11 @@ import { MoreVertical, Trash2, Edit } from 'react-feather'
 import { useDropzone } from 'react-dropzone'
 import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
-import { useGetMenuItems } from '@/utils/swr/menuItems'
+import {
+  handlePutMenuItem,
+  useGetMenuItems,
+  usePatchMenuItem,
+} from '@/utils/swr/menuItems'
 import { postMenuItem, putMenuItem } from '@/utils/axios/menuItems'
 import { apiGetMenuItems } from '@/controllers/menuItems'
 
@@ -204,6 +208,8 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
     initialData: [],
   })
 
+  console.log(1, menuItems)
+
   const handleCreateItem = async () => {
     const data = await postMenuItem({
       ...editingItem,
@@ -215,17 +221,12 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
   }
 
   const handleUpdateItem = async () => {
-    const data = await putMenuItem(menuItem.id, {
-      ...menuItem,
-      ...editingItem,
+    return await handlePutMenuItem(menuItem.id, editingItem, {
+      params: {
+        menuId,
+        restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+      },
     })
-    if (data.error) throw new Error(data.error)
-    return await mutate(
-      menuItems.map((mi) => {
-        if (mi.id === menuItem.id) return data
-        return mi
-      })
-    )
   }
 
   const handleSubmit = async () => {
