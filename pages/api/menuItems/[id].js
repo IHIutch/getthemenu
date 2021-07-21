@@ -28,7 +28,7 @@ const handler = async (req, res) => {
           price,
           description,
         })
-        res.status(resStatusType.SUCCESS).json(data)
+        res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
       }

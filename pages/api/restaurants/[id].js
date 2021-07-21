@@ -24,7 +24,7 @@ const handler = async (req, res) => {
       try {
         const { id, payload } = req.body
         const data = await apiPutRestaurant(id, payload)
-        res.status(resStatusType.SUCCESS).json(data)
+        res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
       }
