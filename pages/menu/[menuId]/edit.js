@@ -36,11 +36,10 @@ import { useDropzone } from 'react-dropzone'
 import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
 import {
+  handlePostMenuItem,
   handlePutMenuItem,
   useGetMenuItems,
-  usePatchMenuItem,
 } from '@/utils/swr/menuItems'
-import { postMenuItem, putMenuItem } from '@/utils/axios/menuItems'
 import { apiGetMenuItems } from '@/controllers/menuItems'
 
 export default function SingleMenu(props) {
@@ -191,6 +190,7 @@ const EditTitleDrawer = ({ handleDrawerClose }) => {
 const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingItem, setEditingItem] = useState(
     menuItem ?? {
@@ -200,39 +200,28 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
     }
   )
 
-  const { data: menuItems, mutate } = useGetMenuItems({
-    params: {
-      menuId,
-      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-    },
-    initialData: [],
-  })
-
-  console.log(1, menuItems)
-
-  const handleCreateItem = async () => {
-    const data = await postMenuItem({
-      ...editingItem,
-      menuId,
-      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-    })
-    if (data.error) throw new Error(data.error)
-    return await mutate(menuItems.concat(data))
-  }
-
-  const handleUpdateItem = async () => {
-    return await handlePutMenuItem(menuItem.id, editingItem, {
-      params: {
-        menuId,
-        restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-      },
-    })
-  }
-
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true)
-      menuItem ? await handleUpdateItem() : await handleCreateItem()
+      menuItem
+        ? await handlePutMenuItem({
+            payload: editingItem,
+            params: {
+              menuId,
+              restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+            },
+          })
+        : await handlePostMenuItem({
+            payload: {
+              ...editingItem,
+              menuId,
+              restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+            },
+            params: {
+              menuId,
+              restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+            },
+          })
       handleDrawerClose()
       setIsSubmitting(false)
     } catch (error) {
