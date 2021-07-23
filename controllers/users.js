@@ -1,5 +1,4 @@
 import supabase from '@/utils/supabase'
-import { userType } from '@/utils/types'
 
 export const apiPostRegisterUser = async (
   req,
@@ -9,7 +8,6 @@ export const apiPostRegisterUser = async (
   const { error } = await supabase.from('users').insert([
     {
       id: user.id,
-      type: userType.USER,
       ...userData,
     },
   ])
