@@ -52,7 +52,7 @@ export default function LogIn() {
         email: form.email,
         password: form.password,
       })
-      router.push('/profile')
+      router.push('/dashboard')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -67,7 +67,7 @@ export default function LogIn() {
 
   useEffect(() => {
     if (user) {
-      router.replace('/profile')
+      router.replace('/dashboard')
     }
   }, [router, user])
 

@@ -32,15 +32,14 @@ export default function Register() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // const [email, password] = getValues(['email', 'new-password'])
+        const [fullName] = getValues(['fullName'])
         await axios.post(`/api/auth/register`, {
           event,
           session,
           // Any additional user data
-          // userData: {
-          // email,
-          // password,
-          // },
+          userData: {
+            fullName,
+          },
         })
       }
     )
@@ -70,8 +69,9 @@ export default function Register() {
   } = useAuthUser({})
 
   useEffect(() => {
+    console.log(user)
     if (user) {
-      router.replace('/profile')
+      router.replace('/dashboard')
     }
   }, [router, user])
 
@@ -95,6 +95,19 @@ export default function Register() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
+                    <FormControl id="fullName" isInvalid={errors.email}>
+                      <FormLabel>Full Name</FormLabel>
+                      <Input
+                        {...register('fullName', {
+                          required: 'This field is required',
+                        })}
+                        type="text"
+                        autoComplete="name"
+                      />
+                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
                     <FormControl id="email" isInvalid={errors.email}>
                       <FormLabel>Email</FormLabel>
                       <Input
@@ -108,10 +121,29 @@ export default function Register() {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="password" isInvalid={errors.password}>
+                    <FormControl
+                      id="password"
+                      isInvalid={errors['new0-password']}
+                    >
                       <FormLabel>Password</FormLabel>
                       <Input
                         {...register('new-password', {
+                          required: 'This field is required',
+                        })}
+                        type="password"
+                        autoComplete="new-password"
+                      />
+                      <FormErrorMessage>{errors.password}</FormErrorMessage>
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl
+                      id="confirmPassword"
+                      isInvalid={errors['confirm-password']}
+                    >
+                      <FormLabel>Confirm Password</FormLabel>
+                      <Input
+                        {...register('confirm-password', {
                           required: 'This field is required',
                         })}
                         type="password"
