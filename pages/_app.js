@@ -1,12 +1,18 @@
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
 import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import customTheme from '@/customTheme'
 
+const queryClient = new QueryClient()
 const theme = extendTheme(customTheme)
 
 const App = ({ Component, pageProps }) => (
-  <ChakraProvider theme={theme}>
-    <Component {...pageProps} />
-  </ChakraProvider>
+  <QueryClientProvider client={queryClient}>
+    <ChakraProvider theme={theme}>
+      <Component {...pageProps} />
+    </ChakraProvider>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>
 )
 
 export default App
