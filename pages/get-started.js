@@ -23,11 +23,21 @@ import { useForm } from 'react-hook-form'
 import Container from '@/components/common/Container'
 import slugify from 'slugify'
 import { debounce } from 'lodash'
+import { postRestaurant } from '@/utils/axios/restaurants'
+import { useAuthUser } from '@/utils/react-query/user'
+import { useRouter } from 'next/router'
 
 export default function GetStarted() {
+  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCheckingSlug, setIsCheckingSlug] = useState(false)
   const [slugMessage, setSlugMessage] = useState(null)
+
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
 
   const {
     register,
@@ -108,9 +118,14 @@ export default function GetStarted() {
 
   const onSubmit = async (form) => {
     try {
+      const [name, subdomain] = getValues(['restaurantName', 'subdomain'])
       setIsSubmitting(true)
-      console.log(form)
-      setIsSubmitting(false)
+      await postRestaurant({
+        userId: user.id,
+        name,
+        subdomain,
+      })
+      router.replace('/dashboard')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -202,15 +217,14 @@ export default function GetStarted() {
                       <FormErrorMessage>{errors.domain}</FormErrorMessage>
                     </FormControl>
                   </GridItem> */}
-                  <GridItem>
+                  <GridItem textAlign="right">
                     <Button
-                      ml="auto"
                       type="submit"
                       colorScheme="blue"
                       loadingText="Submitting..."
                       isLoading={isSubmitting}
                     >
-                      Create
+                      Create Restaurant
                     </Button>
                   </GridItem>
                 </Grid>

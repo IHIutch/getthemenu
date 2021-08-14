@@ -18,7 +18,7 @@ const handler = async (req, res) => {
     // Create
     case 'POST':
       try {
-        const { payload } = req.body
+        const payload = req.body
         const data = await apiPostRestaurant(payload)
         res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {

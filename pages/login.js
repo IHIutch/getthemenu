@@ -15,11 +15,11 @@ import {
 import Container from '@/components/common/Container'
 import Head from 'next/head'
 import supabase from '@/utils/supabase'
-import { useAuthUser } from '@/utils/swr/user'
 import { useForm } from 'react-hook-form'
 import axios from 'redaxios'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
+import { useAuthUser } from '@/utils/react-query/user'
 
 export default function LogIn() {
   const router = useRouter()
@@ -52,7 +52,7 @@ export default function LogIn() {
         email: form.email,
         password: form.password,
       })
-      router.push('/profile')
+      router.replace('/dashboard')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -61,13 +61,13 @@ export default function LogIn() {
 
   const {
     data: user,
-    isLoading: isUserLoading,
-    isError: isUserError,
-  } = useAuthUser({})
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
 
   useEffect(() => {
     if (user) {
-      router.replace('/profile')
+      router.replace('/dashboard')
     }
   }, [router, user])
 

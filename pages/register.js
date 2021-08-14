@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import Container from '@/components/common/Container'
-import { useAuthUser } from '@/utils/swr/user'
+import { useAuthUser } from '@/utils/react-query/user'
 
 export default function Register() {
   const router = useRouter()
@@ -64,8 +64,8 @@ export default function Register() {
 
   const {
     data: user,
-    isLoading: isUserLoading,
-    isError: isUserError,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
   } = useAuthUser({})
 
   useEffect(() => {

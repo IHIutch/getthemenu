@@ -12,8 +12,15 @@ import {
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import Container from './Container'
+import { useAuthUser } from '@/utils/react-query/user'
 
 export default function Navbar({ children, ...props }) {
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
   return (
     <>
       <Box
@@ -34,7 +41,7 @@ export default function Navbar({ children, ...props }) {
               <Box ml="auto">
                 <Menu>
                   <MenuButton>
-                    <Avatar size="sm" name="Kola Tioluwani" />
+                    <Avatar size="sm" name={`${user && user.fullName}`} />
                   </MenuButton>
                   <MenuList boxShadow="lg">
                     <NextLink href="/dashboard" passHref>

@@ -3,11 +3,9 @@ import supabase from '@/utils/supabase'
 export const apiGetRestaurants = async (params = {}) => {
   const { similar, ...rest } = params
 
-  console.log(rest)
-
   const query = supabase.from('restaurants')
   const { data, error } = similar
-    ? await query.select('slug').ilike('slug', `%${similar}%`)
+    ? await query.select('subdomain').ilike('subdomain', `%${similar}%`)
     : await query.select('*').match(rest)
 
   if (error) {
