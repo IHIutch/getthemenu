@@ -19,7 +19,11 @@ export const apiPostRegisterUser = async (
 export const apiGetUser = async (id) => {
   const { data, error } = await supabase
     .from('users')
-    .select('*')
+    .select(
+      `*, restaurants (
+        id
+      ) `
+    )
     .match({ id })
     .single()
 

@@ -5,11 +5,13 @@ import SubnavItem from '@/components/common/SubnavItem'
 import { apiGetMenus } from '@/controllers/menus'
 import { postMenu } from '@/utils/axios/menus'
 import { formatDate } from '@/utils/functions'
-import { useGetMenus } from '@/utils/swr/menus'
+import { useGetMenus } from '@/utils/react-query/menus'
+import { useAuthUser } from '@/utils/react-query/user'
 import {
   Box,
   Button,
   ButtonGroup,
+  Center,
   Circle,
   Flex,
   FormControl,
@@ -42,11 +44,14 @@ export default function Profile(props) {
   const [menuTitle, setMenuTitle] = useState('')
   const [isCreating, setIsCreating] = useState('')
 
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
   const { data: menus } = useGetMenus({
-    params: {
-      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-    },
-    initialData: props.menus,
+    restaurantId: user?.restaurants && user.restaurants[0].id,
   })
 
   const handleCreateMenu = async () => {
@@ -54,7 +59,7 @@ export default function Profile(props) {
       setIsCreating(true)
       const data = await postMenu({
         title: menuTitle,
-        restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
+        restaurantId: user?.restaurants && user.restaurants[0].id,
       })
       if (data.error) throw new Error(data.error)
       router.replace(`/menu/${data.id}/edit`)
@@ -86,7 +91,7 @@ export default function Profile(props) {
               </Button>
             </Box>
           </Flex>
-          {menus && (
+          {!menus?.length ? (
             <Stack>
               {menus.map((menu, idx) => (
                 <LinkBox key={idx} bg="white" rounded="md" shadow="base">
@@ -124,6 +129,18 @@ export default function Profile(props) {
                 </LinkBox>
               ))}
             </Stack>
+          ) : (
+            <Center
+              borderWidth="2px"
+              borderColor="gray.200"
+              bg="gray.100"
+              py="8"
+              rounded="lg"
+            >
+              <Text fontSize="xl" fontWeight="medium" color="gray.600">
+                Get started by creating your first menu.
+              </Text>
+            </Center>
           )}
         </Box>
       </Container>
