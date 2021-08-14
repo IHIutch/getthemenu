@@ -52,7 +52,7 @@ export default function LogIn() {
         email: form.email,
         password: form.password,
       })
-      router.push('/dashboard')
+      router.push('/profile')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -67,7 +67,7 @@ export default function LogIn() {
 
   useEffect(() => {
     if (user) {
-      router.replace('/dashboard')
+      router.replace('/profile')
     }
   }, [router, user])
 
@@ -93,20 +93,28 @@ export default function LogIn() {
                     <FormControl id="email" isInvalid={errors.email}>
                       <FormLabel>Email address</FormLabel>
                       <Input
-                        {...register('email', { required: true })}
+                        {...register('email', {
+                          required: 'This field is required',
+                        })}
                         type="email"
                       />
-                      <FormErrorMessage>Email is required</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors.email?.message}
+                      </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
                     <FormControl id="password" isInvalid={errors.password}>
                       <FormLabel>Password</FormLabel>
                       <Input
-                        {...register('password', { required: true })}
+                        {...register('password', {
+                          required: 'This field is required',
+                        })}
                         type="password"
                       />
-                      <FormErrorMessage>Password is required</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors.password?.message}
+                      </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem d="flex">

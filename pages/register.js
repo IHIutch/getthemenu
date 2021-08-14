@@ -69,9 +69,8 @@ export default function Register() {
   } = useAuthUser({})
 
   useEffect(() => {
-    console.log(user)
     if (user) {
-      router.replace('/dashboard')
+      router.replace('/get-started')
     }
   }, [router, user])
 
@@ -104,7 +103,9 @@ export default function Register() {
                         type="text"
                         autoComplete="name"
                       />
-                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors.email?.message}
+                      </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
@@ -123,7 +124,7 @@ export default function Register() {
                   <GridItem>
                     <FormControl
                       id="password"
-                      isInvalid={errors['new0-password']}
+                      isInvalid={errors['new-password']}
                     >
                       <FormLabel>Password</FormLabel>
                       <Input
@@ -133,7 +134,9 @@ export default function Register() {
                         type="password"
                         autoComplete="new-password"
                       />
-                      <FormErrorMessage>{errors.password}</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors['new-password']?.message}
+                      </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
@@ -149,7 +152,9 @@ export default function Register() {
                         type="password"
                         autoComplete="new-password"
                       />
-                      <FormErrorMessage>{errors.password}</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors['confirm-password']?.message}
+                      </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
