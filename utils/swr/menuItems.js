@@ -1,12 +1,11 @@
-import QueryString from 'qs'
+import qs from 'qs'
 import useSWR, { mutate } from 'swr'
 import axios from 'redaxios'
 
 export const useGetMenuItems = ({ params = {}, initialData = null }) => {
-  const { data, error } = useSWR(
-    `/api/menuItems?${QueryString.stringify(params)}`,
-    { initialData }
-  )
+  const { data, error } = useSWR(`/api/menuItems?${qs.stringify(params)}`, {
+    initialData,
+  })
 
   return {
     data,
@@ -27,7 +26,7 @@ export const useGetMenuItem = async (id, { initialData = null }) => {
 
 export const handlePostMenuItem = async ({ payload, params = {} }) => {
   return await mutate(
-    `/api/menuItems?${QueryString.stringify(params)}`,
+    `/api/menuItems?${qs.stringify(params)}`,
     async (menuItems) => {
       const { data } = await axios.post(`/api/menuItems/`, payload)
       return menuItems.push(data)
@@ -37,7 +36,7 @@ export const handlePostMenuItem = async ({ payload, params = {} }) => {
 
 export const handlePutMenuItem = async ({ payload, params = {} }) => {
   return await mutate(
-    `/api/menuItems?${QueryString.stringify(params)}`,
+    `/api/menuItems?${qs.stringify(params)}`,
     async (menuItems) => {
       const { data } = await axios.put(`/api/menuItems/${payload.id}`, payload)
 

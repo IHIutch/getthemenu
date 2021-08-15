@@ -1,11 +1,9 @@
-import QueryString from 'qs'
+import qs from 'qs'
 import axios from 'redaxios'
 
 export const getUsers = async (params = null) => {
   try {
-    const { data } = await axios.get(
-      `/api/users?` + QueryString.stringify(params)
-    )
+    const { data } = await axios.get(`/api/users?` + qs.stringify(params))
     return data
   } catch (err) {
     throw new Error(err)

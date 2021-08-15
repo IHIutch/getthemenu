@@ -1,11 +1,9 @@
-import QueryString from 'qs'
+import qs from 'qs'
 import axios from 'redaxios'
 
 export const getMenuItems = async (params = null) => {
   try {
-    const { data } = await axios.get(
-      `/api/menuItems?` + QueryString.stringify(params)
-    )
+    const { data } = await axios.get(`/api/menuItems?` + qs.stringify(params))
     return data
   } catch (err) {
     throw new Error(err)
