@@ -87,7 +87,7 @@ export default function LogIn() {
               <Box mb="8">
                 <Heading as="h1">Log In</Heading>
               </Box>
-              <form onSubmit={handleSubmit(onSubmit)}>
+              <form onSubmit={() => handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
                     <FormControl id="email" isInvalid={errors.email}>

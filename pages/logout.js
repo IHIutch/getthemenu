@@ -2,9 +2,11 @@ import React, { useEffect } from 'react'
 import supabase from '@/utils/supabase'
 import axios from 'redaxios'
 import { useRouter } from 'next/router'
+import { useQueryClient } from 'react-query'
 
 export default function SignOut() {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -13,6 +15,7 @@ export default function SignOut() {
           event,
           session,
         })
+        queryClient.invalidateQueries(['user'])
         router.replace('/')
       }
     )
@@ -20,7 +23,7 @@ export default function SignOut() {
     return () => {
       authListener.unsubscribe()
     }
-  }, [router])
+  }, [queryClient, router])
 
   useEffect(() => {
     supabase.auth.signOut()

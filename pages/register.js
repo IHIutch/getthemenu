@@ -91,7 +91,7 @@ export default function Register() {
                 <Heading as="h1">Create Account</Heading>
               </Box>
 
-              <form onSubmit={handleSubmit(onSubmit)}>
+              <form onSubmit={() => handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
                     <FormControl id="fullName" isInvalid={errors.email}>

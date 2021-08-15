@@ -18,7 +18,7 @@ export default function Home() {
             Register
           </Button>
         </NextLink>
-        <NextLink href="/log-in" passHref>
+        <NextLink href="/login" passHref>
           <Button as={Link}>Log In</Button>
         </NextLink>
       </Box>

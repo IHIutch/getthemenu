@@ -139,16 +139,28 @@ export default function SingleMenu(props) {
               </GridItem>
             ))}
         </Grid>
-        <Button
-          colorScheme="blue"
-          onClick={() =>
-            handleDrawerOpen(
-              <MenuItemDrawer handleDrawerClose={drawerState.onClose} />
-            )
-          }
-        >
-          Add Item
-        </Button>
+        <ButtonGroup>
+          <Button
+            colorScheme="blue"
+            onClick={() =>
+              handleDrawerOpen(
+                <MenuItemDrawer handleDrawerClose={drawerState.onClose} />
+              )
+            }
+          >
+            Add Item
+          </Button>
+          <Button
+            onClick={
+              () => console.log('Add Section')
+              // handleDrawerOpen(
+              //   <MenuItemDrawer handleDrawerClose={drawerState.onClose} />
+              // )
+            }
+          >
+            Add Section
+          </Button>
+        </ButtonGroup>
       </Container>
       <Drawer
         isOpen={drawerState.isOpen}
