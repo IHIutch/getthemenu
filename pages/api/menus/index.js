@@ -11,7 +11,7 @@ const handler = async (req, res) => {
         const data = await apiGetMenus(req.query)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
 
