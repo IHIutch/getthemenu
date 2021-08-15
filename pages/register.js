@@ -57,6 +57,7 @@ export default function Register() {
         password: form['new-password'],
       })
       if (error) throw new Error(error.message)
+      router.replace('/get-started')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)

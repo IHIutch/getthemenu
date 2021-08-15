@@ -69,9 +69,12 @@ export default function GetStarted() {
   const checkUniqueSubdomain = async (subdomain) => {
     if (subdomain) {
       try {
-        const { data } = await axios.get(`/api/restaurants?slug=${subdomain}`, {
-          subdomain,
-        })
+        const { data } = await axios.get(
+          `/api/restaurants?subdomain=${subdomain}`,
+          {
+            subdomain,
+          }
+        )
         setIsCheckingSlug(false)
         if (data.length) {
           setSlugMessage({
@@ -85,6 +88,7 @@ export default function GetStarted() {
           })
         }
       } catch (error) {
+        console.log(error)
         setIsCheckingSlug(false)
         alert(error)
       }

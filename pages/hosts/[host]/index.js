@@ -44,7 +44,7 @@ export default function RestaurantHome({ host, restaurant, menus, menuItems }) {
 }
 
 export async function getServerSideProps(context) {
-  console.log('getServerSideProps', context)
+  // console.log('getServerSideProps', context)
   const host = context.params.host.split('.')[0]
 
   const restaurants = await apiGetRestaurants({

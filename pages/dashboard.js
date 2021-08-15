@@ -51,7 +51,7 @@ export default function Profile(props) {
   } = useAuthUser()
 
   const { data: menus } = useGetMenus({
-    restaurantId: user?.restaurants && user.restaurants[0].id,
+    restaurantId: user?.restaurants.length && user.restaurants[0].id,
   })
 
   const handleCreateMenu = async () => {
@@ -59,7 +59,7 @@ export default function Profile(props) {
       setIsCreating(true)
       const data = await postMenu({
         title: menuTitle,
-        restaurantId: user?.restaurants && user.restaurants[0].id,
+        restaurantId: user.restaurants[0].id,
       })
       if (data.error) throw new Error(data.error)
       router.replace(`/menu/${data.id}/edit`)
