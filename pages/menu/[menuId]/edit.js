@@ -41,6 +41,7 @@ import {
   useUpdateMenuItems,
 } from '@/utils/react-query/menuItems'
 import { useGetMenu } from '@/utils/react-query/menus'
+import { useAuthUser } from '@/utils/react-query/user'
 
 export default function SingleMenu() {
   const {
@@ -223,6 +224,12 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
     }
   )
 
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
   const { mutate: handleUpdateMenuItem } = useUpdateMenuItems({
     menuId,
   })
@@ -242,6 +249,7 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
         : await handleCreateMenuItem({
             ...editingItem,
             menuId,
+            restaurantId: user.restaurants[0].id,
           })
       handleDrawerClose()
       setIsSubmitting(false)
