@@ -36,15 +36,19 @@ import { useDropzone } from 'react-dropzone'
 import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
 import {
-  handlePostMenuItem,
-  handlePutMenuItem,
+  useCreateMenuItem,
   useGetMenuItems,
-} from '@/utils/swr/menuItems'
-import { apiGetMenuItems } from '@/controllers/menuItems'
+  useUpdateMenuItems,
+} from '@/utils/react-query/menuItems'
+import { useGetMenu } from '@/utils/react-query/menus'
+import { postMenuItem } from '@/utils/axios/menuItems'
+import { useQueryClient } from 'react-query'
+import { useAuthUser } from '@/utils/react-query/user'
 
 export default function SingleMenu(props) {
-  const { query } = useRouter()
-  const { menuId } = query
+  const {
+    query: { menuId },
+  } = useRouter()
   const drawerState = useDisclosure()
   const [drawerType, setDrawerType] = useState(null)
   const handleDrawerOpen = (content) => {
@@ -52,18 +56,15 @@ export default function SingleMenu(props) {
     drawerState.onOpen()
   }
 
+  const { data: menu } = useGetMenu(props.menuId)
   const { data: menuItems } = useGetMenuItems({
-    params: {
-      menuId,
-      restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-    },
-    initialData: props.menuItems,
+    menuId: props.menuId,
   })
 
   return (
     <>
       <Head>
-        <title>Single Menu</title>
+        <title>{menu?.title}</title>
       </Head>
       <Navbar>
         <HStack spacing="6">
@@ -85,7 +86,7 @@ export default function SingleMenu(props) {
           >
             Edit
           </Button>
-          <Heading>This is a menu title</Heading>
+          <Heading>{menu?.title}</Heading>
         </Box>
         <Grid mx="-4">
           {menuItems &&
@@ -102,34 +103,37 @@ export default function SingleMenu(props) {
                   <AspectRatio w="16" ratio="1">
                     <Image src="https://picsum.photos/200" objectFit="cover" />
                   </AspectRatio>
-                  <Box ml="4">
+                  <Box flexGrow="1" ml="4">
                     <Flex>
                       <Box flexGrow="1">
                         <Text as="span" fontSize="lg" fontWeight="medium">
                           {menuItem.title}
                         </Text>
+                        <Text fontWeight="semibold">{menuItem.price}</Text>
+                        <Text>{menuItem.description}</Text>
                       </Box>
-                      <IconButton
-                        size="xs"
-                        variant="outline"
-                        icon={
-                          <Icon
-                            boxSize="5"
-                            as={MoreVertical}
-                            onClick={() =>
-                              handleDrawerOpen(
-                                <MenuItemDrawer
-                                  menuItem={menuItem}
-                                  handleDrawerClose={drawerState.onClose}
-                                />
-                              )
-                            }
-                          />
-                        }
-                      />
+                      <Box>
+                        <IconButton
+                          ml="2"
+                          size="xs"
+                          variant="outline"
+                          icon={
+                            <Icon
+                              boxSize="5"
+                              as={MoreVertical}
+                              onClick={() =>
+                                handleDrawerOpen(
+                                  <MenuItemDrawer
+                                    menuItem={menuItem}
+                                    handleDrawerClose={drawerState.onClose}
+                                  />
+                                )
+                              }
+                            />
+                          }
+                        />
+                      </Box>
                     </Flex>
-                    <Text fontWeight="semibold">{menuItem.price}</Text>
-                    <Text>{menuItem.description}</Text>
                   </Box>
                 </Flex>
               </GridItem>
@@ -200,27 +204,32 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
     }
   )
 
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
+  const { mutate: handleUpdateMenuItem } = useUpdateMenuItems({
+    menuId,
+  })
+
+  const { mutate: handleCreateMenuItem } = useCreateMenuItem({
+    menuId,
+  })
+
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true)
       menuItem
-        ? await handlePutMenuItem({
+        ? await handleUpdateMenuItem({
+            id: editingItem.id,
             payload: editingItem,
-            params: {
-              menuId,
-              restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-            },
           })
-        : await handlePostMenuItem({
-            payload: {
-              ...editingItem,
-              menuId,
-              restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-            },
-            params: {
-              menuId,
-              restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-            },
+        : await handleCreateMenuItem({
+            ...editingItem,
+            menuId,
+            restaurantId: user.restaurants[0].id,
           })
       handleDrawerClose()
       setIsSubmitting(false)
@@ -298,30 +307,30 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
               </Button>
             </Box>
           )}
+          <ButtonGroup w="100%">
+            <Button variant="outline" onClick={handleDrawerClose} isFullWidth>
+              Cancel
+            </Button>
+            <Button
+              loadingText={menuItem ? 'Updating...' : 'Creating...'}
+              isLoading={isSubmitting}
+              colorScheme="blue"
+              onClick={handleSubmit}
+              isFullWidth
+            >
+              {menuItem ? 'Update' : 'Create'}
+            </Button>
+          </ButtonGroup>
         </Stack>
       </DrawerBody>
 
-      <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
-        <ButtonGroup w="100%">
-          <Button variant="outline" onClick={handleDrawerClose} isFullWidth>
-            Cancel
-          </Button>
-          <Button
-            loadingText={menuItem ? 'Updating...' : 'Creating...'}
-            isLoading={isSubmitting}
-            colorScheme="blue"
-            onClick={handleSubmit}
-            isFullWidth
-          >
-            {menuItem ? 'Update' : 'Create'}
-          </Button>
-        </ButtonGroup>
-      </DrawerFooter>
+      {/* <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
+      </DrawerFooter> */}
     </>
   )
 }
 
-const Dropzone = ({ handleDrawerClose }) => {
+const Dropzone = () => {
   const onDrop = useCallback((acceptedFiles) => {
     // Do something with the files
   }, [])
@@ -352,13 +361,9 @@ const Dropzone = ({ handleDrawerClose }) => {
 }
 
 export async function getServerSideProps({ params: { menuId } }) {
-  const menuItems = await apiGetMenuItems({
-    menuId,
-    restaurantId: '1aaf08dd-e5db-4f33-925d-6553998fdddd',
-  })
   return {
     props: {
-      menuItems,
+      menuId,
     },
   }
 }

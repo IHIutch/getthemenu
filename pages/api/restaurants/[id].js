@@ -12,7 +12,7 @@ const handler = async (req, res) => {
     // Get
     case 'GET':
       try {
-        const { id } = req.body
+        const { id } = req.query
         const data = await apiGetRestaurant(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
@@ -22,7 +22,8 @@ const handler = async (req, res) => {
     // Update
     case 'PUT':
       try {
-        const { id, payload } = req.body
+        const { id } = req.query
+        const payload = req.body
         const data = await apiPutRestaurant(id, payload)
         res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
@@ -32,7 +33,7 @@ const handler = async (req, res) => {
     // Delete
     case 'DELETE':
       try {
-        const { id } = req.body
+        const { id } = req.query
         const data = apiDeleteRestaurant(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {

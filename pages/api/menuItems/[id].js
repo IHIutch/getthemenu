@@ -12,7 +12,7 @@ const handler = async (req, res) => {
     // Get
     case 'GET':
       try {
-        const { id } = req.body
+        const { id } = req.query
         const data = await apiGetMenuItem(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
@@ -22,12 +22,9 @@ const handler = async (req, res) => {
     // Update
     case 'PUT':
       try {
-        const { id, title, price, description } = req.body
-        const data = await apiPutMenuItem(id, {
-          title,
-          price,
-          description,
-        })
+        const { id } = req.query
+        const payload = req.body
+        const data = await apiPutMenuItem(id, payload)
         res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
@@ -36,7 +33,7 @@ const handler = async (req, res) => {
     // Delete
     case 'DELETE':
       try {
-        const { id } = req.body
+        const { id } = req.query
         const data = await apiDeleteMenuItem(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
