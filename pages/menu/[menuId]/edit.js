@@ -41,11 +41,8 @@ import {
   useUpdateMenuItems,
 } from '@/utils/react-query/menuItems'
 import { useGetMenu } from '@/utils/react-query/menus'
-import { postMenuItem } from '@/utils/axios/menuItems'
-import { useQueryClient } from 'react-query'
-import { useAuthUser } from '@/utils/react-query/user'
 
-export default function SingleMenu(props) {
+export default function SingleMenu() {
   const {
     query: { menuId },
   } = useRouter()
@@ -56,9 +53,9 @@ export default function SingleMenu(props) {
     drawerState.onOpen()
   }
 
-  const { data: menu } = useGetMenu(props.menuId)
+  const { data: menu } = useGetMenu(menuId)
   const { data: menuItems } = useGetMenuItems({
-    menuId: props.menuId,
+    menuId,
   })
 
   return (
@@ -99,43 +96,11 @@ export default function SingleMenu(props) {
                   borderTopColor: 'gray.200',
                 }}
               >
-                <Flex alignItems="flex-start">
-                  <AspectRatio w="16" ratio="1">
-                    <Image src="https://picsum.photos/200" objectFit="cover" />
-                  </AspectRatio>
-                  <Box flexGrow="1" ml="4">
-                    <Flex>
-                      <Box flexGrow="1">
-                        <Text as="span" fontSize="lg" fontWeight="medium">
-                          {menuItem.title}
-                        </Text>
-                        <Text fontWeight="semibold">{menuItem.price}</Text>
-                        <Text>{menuItem.description}</Text>
-                      </Box>
-                      <Box>
-                        <IconButton
-                          ml="2"
-                          size="xs"
-                          variant="outline"
-                          icon={
-                            <Icon
-                              boxSize="5"
-                              as={MoreVertical}
-                              onClick={() =>
-                                handleDrawerOpen(
-                                  <MenuItemDrawer
-                                    menuItem={menuItem}
-                                    handleDrawerClose={drawerState.onClose}
-                                  />
-                                )
-                              }
-                            />
-                          }
-                        />
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Flex>
+                <MenuItem
+                  menuItem={menuItem}
+                  handleDrawerOpen={handleDrawerOpen}
+                  drawerState={drawerState}
+                />
               </GridItem>
             ))}
         </Grid>
@@ -171,6 +136,48 @@ export default function SingleMenu(props) {
         <DrawerContent>{drawerType}</DrawerContent>
       </Drawer>
     </>
+  )
+}
+
+const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
+  return (
+    <Flex alignItems="flex-start">
+      <AspectRatio w="16" ratio="1">
+        <Image src="https://picsum.photos/200" objectFit="cover" />
+      </AspectRatio>
+      <Box flexGrow="1" ml="4">
+        <Flex>
+          <Box flexGrow="1">
+            <Text as="span" fontSize="lg" fontWeight="medium">
+              {menuItem.title}
+            </Text>
+            <Text fontWeight="semibold">{menuItem.price}</Text>
+            <Text>{menuItem.description}</Text>
+          </Box>
+          <Box>
+            <IconButton
+              ml="2"
+              size="xs"
+              variant="outline"
+              icon={
+                <Icon
+                  boxSize="5"
+                  as={MoreVertical}
+                  onClick={() =>
+                    handleDrawerOpen(
+                      <MenuItemDrawer
+                        menuItem={menuItem}
+                        handleDrawerClose={drawerState.onClose}
+                      />
+                    )
+                  }
+                />
+              }
+            />
+          </Box>
+        </Flex>
+      </Box>
+    </Flex>
   )
 }
 
@@ -216,12 +223,6 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
     }
   )
 
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
   const { mutate: handleUpdateMenuItem } = useUpdateMenuItems({
     menuId,
   })
@@ -241,7 +242,6 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
         : await handleCreateMenuItem({
             ...editingItem,
             menuId,
-            restaurantId: user.restaurants[0].id,
           })
       handleDrawerClose()
       setIsSubmitting(false)
@@ -370,12 +370,4 @@ const Dropzone = () => {
       )}
     </Flex>
   )
-}
-
-export async function getServerSideProps({ params: { menuId } }) {
-  return {
-    props: {
-      menuId,
-    },
-  }
 }
