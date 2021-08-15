@@ -43,8 +43,8 @@ export default function RestaurantHome({ host, restaurant, menus, menuItems }) {
   )
 }
 
-export async function getStaticProps(context) {
-  console.log('getStaticProps', context)
+export async function getServerSideProps(context) {
+  console.log('getServerSideProps', context)
   const host = context.params.host.split('.')[0]
 
   const restaurants = await apiGetRestaurants({
@@ -69,16 +69,16 @@ export async function getStaticProps(context) {
   }
 }
 
-export async function getStaticPaths() {
-  const restaurants = await apiGetRestaurants()
-  const paths = restaurants.map((restaurant) => ({
-    params: {
-      host: `${restaurant.subdomain}.getthemenu.io`,
-    },
-  }))
+// export async function getStaticPaths() {
+//   const restaurants = await apiGetRestaurants()
+//   const paths = restaurants.map((restaurant) => ({
+//     params: {
+//       host: `${restaurant.subdomain}.getthemenu.io`,
+//     },
+//   }))
 
-  return {
-    paths,
-    fallback: 'blocking',
-  }
-}
+//   return {
+//     paths,
+//     fallback: 'blocking',
+//   }
+// }
