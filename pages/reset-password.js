@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Button,
@@ -12,70 +12,42 @@ import {
   Input,
   Link,
 } from '@chakra-ui/react'
-import Container from '@/components/common/Container'
 import Head from 'next/head'
-import supabase from '@/utils/supabase'
-import { useForm } from 'react-hook-form'
-import axios from 'redaxios'
-import { useRouter } from 'next/router'
 import NextLink from 'next/link'
-import { useAuthUser } from '@/utils/react-query/user'
+import Container from '@/components/common/Container'
+import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/router'
+import supabase from '@/utils/supabase'
 
-export default function LogIn() {
-  const router = useRouter()
+export default function ResetPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { query } = useRouter()
+  const { access_token } = query
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm()
 
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        axios.post(`/api/auth/signin`, {
-          event,
-          session,
-        })
-      }
-    )
-
-    return () => {
-      authListener.unsubscribe()
-    }
-  }, [])
-
   const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
-      const { error } = await supabase.auth.signIn({
-        email: form.email,
-        password: form.password,
+      const { error } = await supabase.auth.api.updateUser(access_token, {
+        password: form['new-password'],
       })
       if (error) throw new Error(error.message)
-      router.replace('/dashboard')
+      setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
     }
   }
 
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  useEffect(() => {
-    if (user) {
-      router.replace('/dashboard')
-    }
-  }, [router, user])
-
   return (
     <>
       <Head>
-        <title>Log In</title>
+        <title>Reset Password</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container py="24">
@@ -86,13 +58,13 @@ export default function LogIn() {
           >
             <Box bg="white" borderWidth="1px" rounded="md" p="8">
               <Box mb="8">
-                <Heading as="h1">Log In</Heading>
+                <Heading as="h1">Reset Password</Heading>
               </Box>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
-                  <GridItem>
+                  {/* <GridItem>
                     <FormControl id="email" isInvalid={errors.email}>
-                      <FormLabel>Email address</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <Input
                         {...register('email', {
                           required: 'This field is required',
@@ -103,31 +75,35 @@ export default function LogIn() {
                         {errors.email?.message}
                       </FormErrorMessage>
                     </FormControl>
-                  </GridItem>
+                  </GridItem> */}
                   <GridItem>
-                    <FormControl id="password" isInvalid={errors.password}>
-                      <FormLabel>Password</FormLabel>
+                    <FormControl
+                      id="password"
+                      isInvalid={errors['new-password']}
+                    >
+                      <FormLabel>New Password</FormLabel>
                       <Input
-                        {...register('password', {
+                        {...register('new-password', {
                           required: 'This field is required',
                         })}
                         type="password"
+                        autoComplete="new-password"
                       />
                       <FormErrorMessage>
-                        {errors.password?.message}
+                        {errors['new-password']?.message}
                       </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem d="flex">
                     <Flex align="center">
-                      <NextLink href={'/forgot-password'} passHref>
+                      <NextLink href={'/login'} passHref>
                         <Button
                           as={Link}
                           variant="link"
                           fontWeight="semibold"
                           colorScheme="blue"
                         >
-                          Forgot Password?
+                          Back to Login
                         </Button>
                       </NextLink>
                     </Flex>
@@ -137,7 +113,7 @@ export default function LogIn() {
                       colorScheme="blue"
                       type="submit"
                     >
-                      Sign In
+                      Reset Password
                     </Button>
                   </GridItem>
                 </Grid>

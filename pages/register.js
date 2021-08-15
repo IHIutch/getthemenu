@@ -52,10 +52,11 @@ export default function Register() {
   const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
-      await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: form.email,
         password: form['new-password'],
       })
+      if (error) throw new Error(error.message)
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -66,7 +67,7 @@ export default function Register() {
     data: user,
     // isLoading: isUserLoading,
     // isError: isUserError,
-  } = useAuthUser({})
+  } = useAuthUser()
 
   useEffect(() => {
     if (user) {
@@ -91,7 +92,7 @@ export default function Register() {
                 <Heading as="h1">Create Account</Heading>
               </Box>
 
-              <form onSubmit={() => handleSubmit(onSubmit)}>
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
                     <FormControl id="fullName" isInvalid={errors.email}>
