@@ -91,7 +91,7 @@ export default function Profile(props) {
               </Button>
             </Box>
           </Flex>
-          {!menus?.length ? (
+          {menus?.length ? (
             <Stack>
               {menus.map((menu, idx) => (
                 <LinkBox key={idx} bg="white" rounded="md" shadow="base">
