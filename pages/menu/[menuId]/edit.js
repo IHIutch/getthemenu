@@ -307,25 +307,25 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
               </Button>
             </Box>
           )}
-          <ButtonGroup w="100%">
-            <Button variant="outline" onClick={handleDrawerClose} isFullWidth>
-              Cancel
-            </Button>
-            <Button
-              loadingText={menuItem ? 'Updating...' : 'Creating...'}
-              isLoading={isSubmitting}
-              colorScheme="blue"
-              onClick={handleSubmit}
-              isFullWidth
-            >
-              {menuItem ? 'Update' : 'Create'}
-            </Button>
-          </ButtonGroup>
         </Stack>
       </DrawerBody>
 
-      {/* <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
-      </DrawerFooter> */}
+      <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
+        <ButtonGroup w="100%">
+          <Button variant="outline" onClick={handleDrawerClose} isFullWidth>
+            Cancel
+          </Button>
+          <Button
+            loadingText={menuItem ? 'Updating...' : 'Creating...'}
+            isLoading={isSubmitting}
+            colorScheme="blue"
+            onClick={handleSubmit}
+            isFullWidth
+          >
+            {menuItem ? 'Update' : 'Create'}
+          </Button>
+        </ButtonGroup>
+      </DrawerFooter>
     </>
   )
 }
