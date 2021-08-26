@@ -4,6 +4,7 @@ import {
   getMenuItems,
   postMenuItem,
   putMenuItem,
+  putMenuItemsReorder,
 } from '../axios/menuItems'
 
 export const useGetMenuItems = (params) => {
@@ -69,7 +70,7 @@ export const useCreateMenuItem = (params) => {
   }
 }
 
-export const useUpdateMenuItems = (params) => {
+export const useUpdateMenuItem = (params) => {
   const queryClient = useQueryClient()
   const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
     async ({ id, payload }) => {
@@ -87,6 +88,45 @@ export const useUpdateMenuItems = (params) => {
               return payload
             }
             return o
+          })
+        })
+        return { previous, payload }
+      },
+      // If the mutation fails, use the context we returned above
+      onError: (err, updated, context) => {
+        queryClient.setQueryData(['menuItems', params], context.previous)
+      },
+      // Always refetch after error or success:
+      onSettled: (updated) => {
+        queryClient.invalidateQueries(['menuItems', params])
+      },
+    }
+  )
+  return {
+    mutate,
+    data,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  }
+}
+
+export const useReorderMenuItems = (params) => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+    async (payload) => {
+      await putMenuItemsReorder(payload)
+    },
+    {
+      // When mutate is called:
+      onMutate: async (payload) => {
+        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await queryClient.cancelQueries(['menuItems', params])
+        const previous = queryClient.getQueryData(['menuItems', params])
+        queryClient.setQueryData(['menuItems', params], (old) => {
+          return old.map((o) => {
+            return payload.find((p) => p.id === o.id) || o
           })
         })
         return { previous, payload }

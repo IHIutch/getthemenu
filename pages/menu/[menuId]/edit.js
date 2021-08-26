@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 
@@ -38,10 +38,12 @@ import { useRouter } from 'next/router'
 import {
   useCreateMenuItem,
   useGetMenuItems,
-  useUpdateMenuItems,
+  useReorderMenuItems,
+  useUpdateMenuItem,
 } from '@/utils/react-query/menuItems'
 import { useGetMenu } from '@/utils/react-query/menus'
 import { useAuthUser } from '@/utils/react-query/user'
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
 export default function SingleMenu() {
   const {
@@ -55,9 +57,29 @@ export default function SingleMenu() {
   }
 
   const { data: menu } = useGetMenu(menuId)
-  const { data: menuItems } = useGetMenuItems({
-    menuId,
-  })
+  const { data: menuItems } = useGetMenuItems({ menuId })
+  const { mutate } = useReorderMenuItems({ menuId })
+
+  const reorder = (startIndex, endIndex) => {
+    const temp = menuItems.map((m) => ({ ...m }))
+
+    const [removed] = temp.splice(startIndex, 1)
+    temp.splice(endIndex, 0, removed)
+
+    return temp
+  }
+
+  const handleDragEnd = (result) => {
+    // dropped outside the list
+    if (!result.destination) return
+    const items = reorder(result.source.index, result.destination.index)
+    // console.log(items)
+    mutate(items.map((i, idx) => ({ ...i, order: idx })))
+  }
+
+  const sortedItems = useMemo(() => {
+    return menuItems ? menuItems.sort((a, b) => a.order - b.order) : []
+  }, [menuItems])
 
   return (
     <>
@@ -86,25 +108,45 @@ export default function SingleMenu() {
           </Button>
           <Heading>{menu?.title}</Heading>
         </Box>
-        <Grid mx="-4">
-          {menuItems &&
-            menuItems.map((menuItem, idx) => (
-              <GridItem
-                key={idx}
-                p="4"
-                _notFirst={{
-                  borderTopWidth: '1px',
-                  borderTopColor: 'gray.200',
-                }}
-              >
-                <MenuItem
-                  menuItem={menuItem}
-                  handleDrawerOpen={handleDrawerOpen}
-                  drawerState={drawerState}
-                />
-              </GridItem>
-            ))}
-        </Grid>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Box>
+            <Grid mx="-4">
+              <Droppable droppableId="droppable">
+                {(drop) => (
+                  <Box ref={drop.innerRef} {...drop.droppableProps}>
+                    {sortedItems.map((menuItem, idx) => (
+                      <Draggable
+                        key={menuItem.id}
+                        index={idx}
+                        draggableId={`draggable-${menuItem.id}`}
+                      >
+                        {(drag) => (
+                          <GridItem
+                            ref={drag.innerRef}
+                            {...drag.draggableProps}
+                            {...drag.dragHandleProps}
+                            p="4"
+                            _notFirst={{
+                              borderTopWidth: '1px',
+                              borderTopColor: 'gray.200',
+                            }}
+                          >
+                            <MenuItem
+                              menuItem={menuItem}
+                              handleDrawerOpen={handleDrawerOpen}
+                              drawerState={drawerState}
+                            />
+                          </GridItem>
+                        )}
+                      </Draggable>
+                    ))}
+                    {drop.placeholder}
+                  </Box>
+                )}
+              </Droppable>
+            </Grid>
+          </Box>
+        </DragDropContext>
         <ButtonGroup>
           <Button
             colorScheme="blue"
@@ -230,7 +272,7 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
     // isError: isUserError,
   } = useAuthUser()
 
-  const { mutate: handleUpdateMenuItem } = useUpdateMenuItems({
+  const { mutate: handleUpdateMenuItem } = useUpdateMenuItem({
     menuId,
   })
 
