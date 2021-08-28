@@ -56,30 +56,42 @@ export default function SingleMenu() {
     drawerState.onOpen()
   }
 
+  const [sections, setSections] = useState(['section1', 'section2', 'section3'])
+
   const { data: menu } = useGetMenu(menuId)
   const { data: menuItems } = useGetMenuItems({ menuId })
   const { mutate } = useReorderMenuItems({ menuId })
 
-  const reorder = (startIndex, endIndex) => {
-    const temp = menuItems.map((m) => ({ ...m }))
-
+  const reorder = (list, startIndex, endIndex) => {
+    const temp = [...list]
     const [removed] = temp.splice(startIndex, 1)
     temp.splice(endIndex, 0, removed)
-
     return temp
   }
 
   const handleDragEnd = (result) => {
     // dropped outside the list
     if (!result.destination) return
-    const items = reorder(result.source.index, result.destination.index)
-    // console.log(items)
-    mutate(items.map((i, idx) => ({ ...i, order: idx })))
+    if (result.type === 'ITEMS') {
+      const items = reorder(
+        menuItems,
+        result.source.index,
+        result.destination.index
+      )
+      console.log(items)
+    } else if (result.type === 'SECTIONS') {
+      const items = reorder(
+        sections,
+        result.source.index,
+        result.destination.index
+      )
+      console.log(items)
+      setSections(items)
+    }
+    console.log(result)
+    // setSections()
+    // mutate(items.map((i, idx) => ({ ...i, order: idx })))
   }
-
-  const sortedItems = useMemo(() => {
-    return menuItems ? menuItems.sort((a, b) => a.order - b.order) : []
-  }, [menuItems])
 
   return (
     <>
@@ -109,43 +121,38 @@ export default function SingleMenu() {
           <Heading>{menu?.title}</Heading>
         </Box>
         <DragDropContext onDragEnd={handleDragEnd}>
-          <Box>
-            <Grid mx="-4">
-              <Droppable droppableId="droppable">
-                {(drop) => (
-                  <Box ref={drop.innerRef} {...drop.droppableProps}>
-                    {sortedItems.map((menuItem, idx) => (
-                      <Draggable
-                        key={menuItem.id}
-                        index={idx}
-                        draggableId={`draggable-${menuItem.id}`}
+          <Droppable droppableId="droppable-outer" type="SECTIONS">
+            {(drop) => (
+              <Box ref={drop.innerRef} {...drop.droppableProps}>
+                {sections.map((s, idx) => (
+                  <Draggable
+                    key={s}
+                    index={idx}
+                    draggableId={`draggable-outer-${s}`}
+                  >
+                    {(drag) => (
+                      <Box
+                        ref={drag.innerRef}
+                        {...drag.draggableProps}
+                        {...drag.dragHandleProps}
                       >
-                        {(drag) => (
-                          <GridItem
-                            ref={drag.innerRef}
-                            {...drag.draggableProps}
-                            {...drag.dragHandleProps}
-                            p="4"
-                            _notFirst={{
-                              borderTopWidth: '1px',
-                              borderTopColor: 'gray.200',
-                            }}
-                          >
-                            <MenuItem
-                              menuItem={menuItem}
-                              handleDrawerOpen={handleDrawerOpen}
-                              drawerState={drawerState}
-                            />
-                          </GridItem>
-                        )}
-                      </Draggable>
-                    ))}
-                    {drop.placeholder}
-                  </Box>
-                )}
-              </Droppable>
-            </Grid>
-          </Box>
+                        <Heading>{s}</Heading>
+                        <Grid mx="-4">
+                          <MenuItemsContainer
+                            sectionId={idx}
+                            items={menuItems}
+                            handleDrawerOpen={handleDrawerOpen}
+                            drawerState={drawerState}
+                          />
+                        </Grid>
+                      </Box>
+                    )}
+                  </Draggable>
+                ))}
+                {drop.placeholder}
+              </Box>
+            )}
+          </Droppable>
         </DragDropContext>
         <ButtonGroup>
           <Button
@@ -179,6 +186,53 @@ export default function SingleMenu() {
         <DrawerContent>{drawerType}</DrawerContent>
       </Drawer>
     </>
+  )
+}
+
+const MenuItemsContainer = ({
+  items,
+  handleDrawerOpen,
+  drawerState,
+  sectionId,
+}) => {
+  const sortedItems = useMemo(() => {
+    return items ? items.sort((a, b) => a.order - b.order) : []
+  }, [items])
+
+  return (
+    <Droppable droppableId={`droppable-${sectionId}`} type="ITEMS">
+      {(drop) => (
+        <Box ref={drop.innerRef} {...drop.droppableProps}>
+          {sortedItems.map((menuItem, idx) => (
+            <Draggable
+              key={`${sectionId}${menuItem.id}`}
+              draggableId={`${sectionId}${menuItem.id}`}
+              index={idx}
+            >
+              {(drag) => (
+                <GridItem
+                  ref={drag.innerRef}
+                  {...drag.draggableProps}
+                  {...drag.dragHandleProps}
+                  p="4"
+                  _notFirst={{
+                    borderTopWidth: '1px',
+                    borderTopColor: 'gray.200',
+                  }}
+                >
+                  <MenuItem
+                    menuItem={menuItem}
+                    handleDrawerOpen={handleDrawerOpen}
+                    drawerState={drawerState}
+                  />
+                </GridItem>
+              )}
+            </Draggable>
+          ))}
+          {drop.placeholder}
+        </Box>
+      )}
+    </Droppable>
   )
 }
 
