@@ -85,6 +85,7 @@ export async function getServerSideProps(context) {
 
   let restaurants, restaurant, menus, menuItems
   if (host) {
+    console.log(host)
     restaurants = await apiGetRestaurants({
       subdomain: host,
     })
