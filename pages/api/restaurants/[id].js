@@ -1,6 +1,6 @@
 import {
   apiDeleteRestaurant,
-  apiGetRestaurant,
+  apiGetRestaurants,
   apiPutRestaurant,
 } from '@/controllers/restaurants'
 import { resStatusType } from '@/utils/types'
@@ -13,8 +13,8 @@ const handler = async (req, res) => {
     case 'GET':
       try {
         const { id } = req.query
-        const data = await apiGetRestaurant(id)
-        res.status(resStatusType.SUCCESS).json(data)
+        const data = await apiGetRestaurants(id)
+        res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
       }
