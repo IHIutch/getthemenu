@@ -69,6 +69,12 @@ export default function SingleMenu() {
     return temp
   }
 
+  const handleDragStart = () => {
+    if (navigator.vibrate) {
+      navigator.vibrate(100)
+    }
+  }
+
   const handleDragEnd = (result) => {
     // dropped outside the list
     if (!result.destination) return
@@ -120,40 +126,50 @@ export default function SingleMenu() {
           </Button>
           <Heading>{menu?.title}</Heading>
         </Box>
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="droppable-outer" type="SECTIONS">
-            {(drop) => (
-              <Box ref={drop.innerRef} {...drop.droppableProps}>
-                {sections.map((s, idx) => (
-                  <Draggable
-                    key={s}
-                    index={idx}
-                    draggableId={`draggable-outer-${s}`}
-                  >
-                    {(drag) => (
-                      <Box
-                        ref={drag.innerRef}
-                        {...drag.draggableProps}
-                        {...drag.dragHandleProps}
-                      >
-                        <Heading>{s}</Heading>
-                        <Grid mx="-4">
-                          <MenuItemsContainer
-                            sectionId={idx}
-                            items={menuItems}
-                            handleDrawerOpen={handleDrawerOpen}
-                            drawerState={drawerState}
-                          />
-                        </Grid>
-                      </Box>
-                    )}
-                  </Draggable>
-                ))}
-                {drop.placeholder}
-              </Box>
-            )}
-          </Droppable>
-        </DragDropContext>
+        {sections && menuItems && (
+          <DragDropContext
+            onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+          >
+            <Droppable droppableId="droppable-outer" type="SECTIONS">
+              {(drop) => (
+                <Box ref={drop.innerRef} {...drop.droppableProps}>
+                  {sections.map((s, idx) => (
+                    <Draggable
+                      key={s}
+                      index={idx}
+                      draggableId={`draggable-outer-${s}`}
+                    >
+                      {(drag, snapshot) => (
+                        <Box
+                          sx={
+                            snapshot.isDragging && {
+                              bg: 'gray.200',
+                            }
+                          }
+                          ref={drag.innerRef}
+                          {...drag.draggableProps}
+                          {...drag.dragHandleProps}
+                        >
+                          <Heading>{s}</Heading>
+                          <Grid mx="-4">
+                            <MenuItemsContainer
+                              sectionId={idx}
+                              items={menuItems}
+                              handleDrawerOpen={handleDrawerOpen}
+                              drawerState={drawerState}
+                            />
+                          </Grid>
+                        </Box>
+                      )}
+                    </Draggable>
+                  ))}
+                  {drop.placeholder}
+                </Box>
+              )}
+            </Droppable>
+          </DragDropContext>
+        )}
         <ButtonGroup>
           <Button
             colorScheme="blue"
@@ -209,8 +225,13 @@ const MenuItemsContainer = ({
               draggableId={`${sectionId}${menuItem.id}`}
               index={idx}
             >
-              {(drag) => (
+              {(drag, snapshot) => (
                 <GridItem
+                  sx={
+                    snapshot.isDragging && {
+                      bg: 'gray.200',
+                    }
+                  }
                   ref={drag.innerRef}
                   {...drag.draggableProps}
                   {...drag.dragHandleProps}
