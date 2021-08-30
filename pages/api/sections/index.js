@@ -1,4 +1,4 @@
-import { apiGetMenuItems, apiPostMenuItem } from '@/controllers/menuItems'
+import { apiGetSections, apiPostSection } from '@/controllers/sections'
 import { resStatusType } from '@/utils/types'
 
 const handler = async (req, res) => {
@@ -8,20 +8,20 @@ const handler = async (req, res) => {
     // Get
     case 'GET':
       try {
-        const data = await apiGetMenuItems(req.query)
+        const data = await apiGetSections(req.query)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
 
     // Create
     case 'POST':
       try {
-        const data = await apiPostMenuItem(req.body)
+        const data = await apiPostSection(req.body)
         res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
 

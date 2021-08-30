@@ -4,6 +4,7 @@ import {
   getSections,
   postSection,
   putSection,
+  putSectionsReorder,
 } from '../axios/sections'
 
 export const useGetSections = (params) => {
@@ -45,6 +46,7 @@ export const useCreateSection = (params) => {
         await queryClient.cancelQueries(['sections', params])
         const previous = queryClient.getQueryData(['sections', params])
         queryClient.setQueryData(['sections', params], (old) => {
+          console.log(old)
           return [...old, updated]
         })
         return { previous, updated }
@@ -69,7 +71,7 @@ export const useCreateSection = (params) => {
   }
 }
 
-export const useUpdateSections = (params) => {
+export const useUpdateSection = (params) => {
   const queryClient = useQueryClient()
   const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
     async ({ id, payload }) => {
@@ -87,6 +89,45 @@ export const useUpdateSections = (params) => {
               return payload
             }
             return o
+          })
+        })
+        return { previous, payload }
+      },
+      // If the mutation fails, use the context we returned above
+      onError: (err, updated, context) => {
+        queryClient.setQueryData(['sections', params], context.previous)
+      },
+      // Always refetch after error or success:
+      onSettled: (updated) => {
+        queryClient.invalidateQueries(['sections', params])
+      },
+    }
+  )
+  return {
+    mutate,
+    data,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  }
+}
+
+export const useReorderSections = (params) => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+    async (payload) => {
+      await putSectionsReorder(payload)
+    },
+    {
+      // When mutate is called:
+      onMutate: async (payload) => {
+        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await queryClient.cancelQueries(['sections', params])
+        const previous = queryClient.getQueryData(['sections', params])
+        queryClient.setQueryData(['sections', params], (old) => {
+          return old.map((o) => {
+            return payload.find((p) => p.id === o.id) || o
           })
         })
         return { previous, payload }

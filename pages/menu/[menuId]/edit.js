@@ -45,6 +45,12 @@ import {
 import { useGetMenu } from '@/utils/react-query/menus'
 import { useAuthUser } from '@/utils/react-query/user'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import {
+  useCreateSection,
+  useGetSections,
+  useReorderSections,
+  useUpdateSection,
+} from '@/utils/react-query/sections'
 
 export default function SingleMenu() {
   const {
@@ -57,11 +63,17 @@ export default function SingleMenu() {
     drawerState.onOpen()
   }
 
-  const [sections, setSections] = useState(['section1', 'section2', 'section3'])
+  const [sectionsTest, setSectionsTest] = useState([
+    'section1',
+    'section2',
+    'section3',
+  ])
 
   const { data: menu } = useGetMenu(menuId)
   const { data: menuItems } = useGetMenuItems({ menuId })
-  const { mutate } = useReorderMenuItems({ menuId })
+  const { data: sections } = useGetSections({ menuId })
+  const { mutate: reorderMenuItems } = useReorderMenuItems({ menuId })
+  const { mutate: reorderSections } = useReorderSections({ menuId })
 
   const reorder = (list, startIndex, endIndex) => {
     const temp = [...list]
@@ -90,10 +102,10 @@ export default function SingleMenu() {
         result.source.index,
         result.destination.index
       )
-      setSections(items)
+      setSectionsTest(items)
     }
     // setSections()
-    // mutate(items.map((i, idx) => ({ ...i, order: idx })))
+    // reorderMenuItems(items.map((i, idx) => ({ ...i, order: idx })))
   }
 
   return (
@@ -123,7 +135,7 @@ export default function SingleMenu() {
           </Button>
           <Heading>{menu?.title}</Heading>
         </Box>
-        {sections && menuItems && (
+        {sectionsTest && menuItems && (
           <DragDropContext
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
@@ -135,7 +147,7 @@ export default function SingleMenu() {
                   ref={drop.innerRef}
                   {...drop.droppableProps}
                 >
-                  {sections.map((s, idx) => (
+                  {sectionsTest.map((s, idx) => (
                     <Draggable
                       key={s}
                       index={idx}
@@ -193,11 +205,10 @@ export default function SingleMenu() {
           <Button
             variant="outline"
             colorScheme="blue"
-            onClick={
-              () => console.log('Add Section')
-              // handleDrawerOpen(
-              //   <MenuItemDrawer handleDrawerClose={drawerState.onClose} />
-              // )
+            onClick={() =>
+              handleDrawerOpen(
+                <SectionDrawer handleDrawerClose={drawerState.onClose} />
+              )
             }
           >
             Add Section
@@ -332,6 +343,95 @@ const EditTitleDrawer = ({ handleDrawerClose }) => {
           </Button>
           <Button colorScheme="blue" onClick={handleDrawerClose} isFullWidth>
             Save
+          </Button>
+        </ButtonGroup>
+      </DrawerFooter>
+    </>
+  )
+}
+
+const SectionDrawer = ({ section = null, handleDrawerClose }) => {
+  const router = useRouter()
+  const { menuId } = router.query
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [editingSection, setEditingSection] = useState(
+    section ?? {
+      title: '',
+    }
+  )
+
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
+  const { mutate: handleUpdateSection } = useUpdateSection({
+    menuId,
+  })
+
+  const { mutate: handleCreateSection } = useCreateSection({
+    menuId,
+  })
+
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true)
+      section
+        ? await handleUpdateSection({
+            id: editingSection.id,
+            payload: editingSection,
+          })
+        : await handleCreateSection({
+            ...editingSection,
+            menuId,
+            restaurantId: user.restaurants[0].id,
+          })
+      handleDrawerClose()
+      setIsSubmitting(false)
+    } catch (error) {
+      setIsSubmitting(false)
+      alert(error)
+    }
+  }
+
+  return (
+    <>
+      <DrawerCloseButton />
+      <DrawerHeader px="4">Edit Section</DrawerHeader>
+
+      <DrawerBody px="4">
+        <Stack spacing="6">
+          <FormControl id="title">
+            <FormLabel>Section Name</FormLabel>
+            <Input
+              autoComplete="off"
+              value={editingSection.title}
+              onChange={(e) =>
+                setEditingSection({
+                  ...editingSection,
+                  title: e.target.value,
+                })
+              }
+            />
+          </FormControl>
+        </Stack>
+      </DrawerBody>
+
+      <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
+        <ButtonGroup w="100%">
+          <Button variant="outline" onClick={handleDrawerClose} isFullWidth>
+            Cancel
+          </Button>
+          <Button
+            loadingText={section ? 'Updating...' : 'Creating...'}
+            isLoading={isSubmitting}
+            colorScheme="blue"
+            onClick={handleSubmit}
+            isFullWidth
+          >
+            {section ? 'Update' : 'Create'}
           </Button>
         </ButtonGroup>
       </DrawerFooter>
