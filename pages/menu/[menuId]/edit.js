@@ -105,7 +105,7 @@ export default function SingleMenu() {
       setSectionsTest(items)
     }
     // setSections()
-    // reorderMenuItems(items.map((i, idx) => ({ ...i, order: idx })))
+    // reorderMenuItems(items.map((i, idx) => ({ ...i, position: idx })))
   }
 
   return (
@@ -234,7 +234,7 @@ const MenuItemsContainer = ({
   sectionId,
 }) => {
   const sortedItems = useMemo(() => {
-    return items ? items.sort((a, b) => a.order - b.order) : []
+    return items ? items.sort((a, b) => a.position - b.position) : []
   }, [items])
 
   return (
