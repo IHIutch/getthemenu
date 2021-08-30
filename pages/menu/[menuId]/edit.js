@@ -29,6 +29,7 @@ import {
   AspectRatio,
   Image,
   HStack,
+  VStack,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Edit } from 'react-feather'
@@ -76,25 +77,21 @@ export default function SingleMenu() {
   }
 
   const handleDragEnd = (result) => {
-    // dropped outside the list
-    if (!result.destination) return
+    if (!result.destination) return // dropped outside the list
     if (result.type === 'ITEMS') {
       const items = reorder(
         menuItems,
         result.source.index,
         result.destination.index
       )
-      console.log(items)
     } else if (result.type === 'SECTIONS') {
       const items = reorder(
         sections,
         result.source.index,
         result.destination.index
       )
-      console.log(items)
       setSections(items)
     }
-    console.log(result)
     // setSections()
     // mutate(items.map((i, idx) => ({ ...i, order: idx })))
   }
@@ -133,7 +130,11 @@ export default function SingleMenu() {
           >
             <Droppable droppableId="droppable-outer" type="SECTIONS">
               {(drop) => (
-                <Box ref={drop.innerRef} {...drop.droppableProps}>
+                <VStack
+                  spacing="8"
+                  ref={drop.innerRef}
+                  {...drop.droppableProps}
+                >
                   {sections.map((s, idx) => (
                     <Draggable
                       key={s}
@@ -142,6 +143,10 @@ export default function SingleMenu() {
                     >
                       {(drag, snapshot) => (
                         <Box
+                          p="4"
+                          shadow="base"
+                          bg="white"
+                          w="100%"
                           sx={
                             snapshot.isDragging && {
                               bg: 'gray.200',
@@ -160,28 +165,34 @@ export default function SingleMenu() {
                               drawerState={drawerState}
                             />
                           </Grid>
+                          <Box>
+                            <Button
+                              colorScheme="blue"
+                              onClick={() =>
+                                handleDrawerOpen(
+                                  <MenuItemDrawer
+                                    handleDrawerClose={drawerState.onClose}
+                                  />
+                                )
+                              }
+                            >
+                              Add Item
+                            </Button>
+                          </Box>
                         </Box>
                       )}
                     </Draggable>
                   ))}
                   {drop.placeholder}
-                </Box>
+                </VStack>
               )}
             </Droppable>
           </DragDropContext>
         )}
-        <ButtonGroup>
+        <Box py="8">
           <Button
+            variant="outline"
             colorScheme="blue"
-            onClick={() =>
-              handleDrawerOpen(
-                <MenuItemDrawer handleDrawerClose={drawerState.onClose} />
-              )
-            }
-          >
-            Add Item
-          </Button>
-          <Button
             onClick={
               () => console.log('Add Section')
               // handleDrawerOpen(
@@ -191,7 +202,7 @@ export default function SingleMenu() {
           >
             Add Section
           </Button>
-        </ButtonGroup>
+        </Box>
       </Container>
       <Drawer
         isOpen={drawerState.isOpen}
