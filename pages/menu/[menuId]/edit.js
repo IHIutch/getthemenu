@@ -51,6 +51,7 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
+import { getMenuItems } from '@/utils/axios/menuItems'
 
 export default function SingleMenu() {
   const {
@@ -62,12 +63,6 @@ export default function SingleMenu() {
     setDrawerType(content)
     drawerState.onOpen()
   }
-
-  const [sectionsTest, setSectionsTest] = useState([
-    'section1',
-    'section2',
-    'section3',
-  ])
 
   const { data: menu } = useGetMenu(menuId)
   const { data: menuItems } = useGetMenuItems({ menuId })
@@ -96,16 +91,21 @@ export default function SingleMenu() {
         result.source.index,
         result.destination.index
       )
+      console.log(items)
     } else if (result.type === 'SECTIONS') {
       const items = reorder(
         sections,
         result.source.index,
         result.destination.index
       )
-      setSectionsTest(items)
+      console.log(items)
     }
     // setSections()
     // reorderMenuItems(items.map((i, idx) => ({ ...i, position: idx })))
+  }
+
+  const getSectionItems = (sectionId) => {
+    return menuItems.filter((mi) => mi.sectionId === sectionId)
   }
 
   return (
@@ -135,23 +135,23 @@ export default function SingleMenu() {
           </Button>
           <Heading>{menu?.title}</Heading>
         </Box>
-        {sectionsTest && menuItems && (
+        {sections && menuItems && (
           <DragDropContext
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
           >
-            <Droppable droppableId="droppable-outer" type="SECTIONS">
+            <Droppable droppableId="sectionWrapper" type="SECTIONS">
               {(drop) => (
                 <VStack
                   spacing="8"
                   ref={drop.innerRef}
                   {...drop.droppableProps}
                 >
-                  {sectionsTest.map((s, idx) => (
+                  {sections.map((s, idx) => (
                     <Draggable
-                      key={s}
+                      key={`${s.id}`}
+                      draggableId={`${s.id}`}
                       index={idx}
-                      draggableId={`draggable-outer-${s}`}
                     >
                       {(drag, snapshot) => (
                         <Box
@@ -168,11 +168,11 @@ export default function SingleMenu() {
                           {...drag.draggableProps}
                           {...drag.dragHandleProps}
                         >
-                          <Heading>{s}</Heading>
+                          <Heading>{s.title}</Heading>
                           <Grid mx="-4">
                             <MenuItemsContainer
-                              sectionId={idx}
-                              items={menuItems}
+                              sectionId={s.id}
+                              items={getSectionItems(s.id)}
                               handleDrawerOpen={handleDrawerOpen}
                               drawerState={drawerState}
                             />
@@ -238,13 +238,13 @@ const MenuItemsContainer = ({
   }, [items])
 
   return (
-    <Droppable droppableId={`droppable-${sectionId}`} type="ITEMS">
+    <Droppable droppableId={`section-${sectionId}`} type="ITEMS">
       {(drop) => (
         <Box ref={drop.innerRef} {...drop.droppableProps}>
           {sortedItems.map((menuItem, idx) => (
             <Draggable
-              key={`${sectionId}${menuItem.id}`}
-              draggableId={`${sectionId}${menuItem.id}`}
+              key={`${sectionId}-${menuItem.id}`}
+              draggableId={`${sectionId}-${menuItem.id}`}
               index={idx}
             >
               {(drag, snapshot) => (

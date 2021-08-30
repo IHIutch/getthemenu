@@ -46,7 +46,6 @@ export const useCreateSection = (params) => {
         await queryClient.cancelQueries(['sections', params])
         const previous = queryClient.getQueryData(['sections', params])
         queryClient.setQueryData(['sections', params], (old) => {
-          console.log(old)
           return [...old, updated]
         })
         return { previous, updated }
