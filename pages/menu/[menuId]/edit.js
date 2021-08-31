@@ -390,11 +390,13 @@ const EditTitleDrawer = ({ handleDrawerClose }) => {
 const SectionDrawer = ({ section = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
+  const { data: sections } = useGetSections({ menuId })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingSection, setEditingSection] = useState(
     section ?? {
       title: '',
+      position: sections.length,
     }
   )
 
