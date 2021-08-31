@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 
@@ -120,7 +120,7 @@ export default function SingleMenu() {
     } else if (type === 'ITEMS') {
       if (source.droppableId === destination.droppableId) {
         const reorderedItems = reorder(
-          sections.sort((a, b) => a.position - b.position),
+          getSectionItems(parseInt(source.droppableId)),
           source.index,
           destination.index
         )
@@ -136,10 +136,13 @@ export default function SingleMenu() {
         )
 
         const newSource = movedItems[source.droppableId]
-        const newDestination = movedItems[destination.droppableId].map((i) => ({
-          ...i,
-          sectionId: parseInt(destination.droppableId),
-        }))
+        const newDestination = movedItems[destination.droppableId].map(
+          (i, idx) => ({
+            ...i,
+            position: idx,
+            sectionId: parseInt(destination.droppableId),
+          })
+        )
         reorderMenuItems([...newSource, ...newDestination])
       }
     }
