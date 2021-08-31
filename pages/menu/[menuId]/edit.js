@@ -51,7 +51,6 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
-import { getMenuItems } from '@/utils/axios/menuItems'
 
 export default function SingleMenu() {
   const {
@@ -70,11 +69,23 @@ export default function SingleMenu() {
   const { mutate: reorderMenuItems } = useReorderMenuItems({ menuId })
   const { mutate: reorderSections } = useReorderSections({ menuId })
 
-  const reorder = (list, startIndex, endIndex) => {
+  const reorder = (list = [], startIndex, endIndex) => {
     const temp = [...list]
     const [removed] = temp.splice(startIndex, 1)
     temp.splice(endIndex, 0, removed)
     return temp
+  }
+
+  const move = (sourceList = [], destinationList = [], source, destination) => {
+    console.log({ source, destination })
+
+    const [removed] = sourceList.splice(source.index, 1)
+    destinationList.splice(destination.index, 0, removed)
+
+    return {
+      [source.droppableId]: sourceList,
+      [destination.droppableId]: destinationList,
+    }
   }
 
   const handleDragStart = () => {
@@ -83,29 +94,55 @@ export default function SingleMenu() {
     }
   }
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return // dropped outside the list
-    if (result.type === 'ITEMS') {
-      const items = reorder(
-        menuItems,
-        result.source.index,
-        result.destination.index
-      )
-      console.log(items)
-    } else if (result.type === 'SECTIONS') {
-      const items = reorder(
-        sections,
-        result.source.index,
-        result.destination.index
-      )
-      console.log(items)
-    }
-    // setSections()
-    // reorderMenuItems(items.map((i, idx) => ({ ...i, position: idx })))
+  const getSectionItems = (sectionId) => {
+    return menuItems
+      .filter((mi) => mi.sectionId === sectionId)
+      .sort((a, b) => a.position - b.position)
   }
 
-  const getSectionItems = (sectionId) => {
-    return menuItems.filter((mi) => mi.sectionId === sectionId)
+  const sortedSections = useMemo(() => {
+    return sections ? sections.sort((a, b) => a.position - b.position) : []
+  }, [sections])
+
+  const handleDragEnd = (result) => {
+    const { source, destination, type } = result
+    if (!destination) return // dropped outside the list
+
+    if (type === 'SECTIONS') {
+      const reorderedSections = reorder(
+        sections.sort((a, b) => a.position - b.position),
+        source.index,
+        destination.index
+      )
+      reorderSections(
+        reorderedSections.map((s, idx) => ({ ...s, position: idx }))
+      )
+    } else if (type === 'ITEMS') {
+      if (source.droppableId === destination.droppableId) {
+        const reorderedItems = reorder(
+          sections.sort((a, b) => a.position - b.position),
+          source.index,
+          destination.index
+        )
+        reorderMenuItems(
+          reorderedItems.map((i, idx) => ({ ...i, position: idx }))
+        )
+      } else {
+        const movedItems = move(
+          getSectionItems(parseInt(source.droppableId)),
+          getSectionItems(parseInt(destination.droppableId)),
+          source,
+          destination
+        )
+
+        const newSource = movedItems[source.droppableId]
+        const newDestination = movedItems[destination.droppableId].map((i) => ({
+          ...i,
+          sectionId: parseInt(destination.droppableId),
+        }))
+        reorderMenuItems([...newSource, ...newDestination])
+      }
+    }
   }
 
   return (
@@ -147,7 +184,7 @@ export default function SingleMenu() {
                   ref={drop.innerRef}
                   {...drop.droppableProps}
                 >
-                  {sections.map((s, idx) => (
+                  {sortedSections.map((s, idx) => (
                     <Draggable
                       key={`${s.id}`}
                       draggableId={`${s.id}`}
@@ -233,15 +270,11 @@ const MenuItemsContainer = ({
   drawerState,
   sectionId,
 }) => {
-  const sortedItems = useMemo(() => {
-    return items ? items.sort((a, b) => a.position - b.position) : []
-  }, [items])
-
   return (
-    <Droppable droppableId={`section-${sectionId}`} type="ITEMS">
+    <Droppable droppableId={`${sectionId}`} type="ITEMS">
       {(drop) => (
         <Box ref={drop.innerRef} {...drop.droppableProps}>
-          {sortedItems.map((menuItem, idx) => (
+          {items.map((menuItem, idx) => (
             <Draggable
               key={`${sectionId}-${menuItem.id}`}
               draggableId={`${sectionId}-${menuItem.id}`}

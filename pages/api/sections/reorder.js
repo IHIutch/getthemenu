@@ -1,4 +1,4 @@
-import { apiPutSections } from '@/controllers/menuItems'
+import { apiPutSections } from '@/controllers/sections'
 import { resStatusType } from '@/utils/types'
 
 const handler = async (req, res) => {
