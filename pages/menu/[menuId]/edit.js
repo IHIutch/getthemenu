@@ -223,6 +223,7 @@ export default function SingleMenu() {
                               onClick={() =>
                                 handleDrawerOpen(
                                   <MenuItemDrawer
+                                    sectionId={s.id}
                                     handleDrawerClose={drawerState.onClose}
                                   />
                                 )
@@ -475,9 +476,10 @@ const SectionDrawer = ({ section = null, handleDrawerClose }) => {
   )
 }
 
-const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
+const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
+  const { data: menuItems } = useGetMenuItems({ menuId })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingItem, setEditingItem] = useState(
@@ -485,6 +487,8 @@ const MenuItemDrawer = ({ menuItem = null, handleDrawerClose }) => {
       title: '',
       description: '',
       price: '',
+      sectionId,
+      position: menuItems.filter((mi) => mi.sectionId === sectionId).length,
     }
   )
 
