@@ -38,7 +38,7 @@ import { useRouter } from 'next/router'
 
 import React, { useState } from 'react'
 
-export default function Profile(props) {
+export default function Profile() {
   const router = useRouter()
   const modalState = useDisclosure()
   const [menuTitle, setMenuTitle] = useState('')
@@ -50,9 +50,13 @@ export default function Profile(props) {
     // isError: isUserError,
   } = useAuthUser()
 
-  const { data: menus } = useGetMenus({
-    restaurantId: user?.restaurants.length && user.restaurants[0].id,
-  })
+  const { data: menus } = useGetMenus(
+    user
+      ? {
+          restaurantId: user.restaurants[0].id,
+        }
+      : null
+  )
 
   const handleCreateMenu = async () => {
     try {
