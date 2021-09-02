@@ -114,6 +114,7 @@ export default function GetStarted() {
       // 63 is the max length of a subdomain
       const newSubdomain = slugify(name.slice(0, 63), {
         lower: true,
+        strict: true,
       })
       const uniqueSubdomain = await checkSimilarSubdomain(newSubdomain)
       setValue('subdomain', uniqueSubdomain, { shouldValidate: true })
@@ -129,6 +130,7 @@ export default function GetStarted() {
         name,
         subdomain,
       })
+      // TODO: Mutate user object to include newly created restaurant. Or on the dashboard, fetch restaurant by ID
       router.replace('/dashboard')
     } catch (error) {
       setIsSubmitting(false)
