@@ -6,6 +6,7 @@ import { apiGetMenus } from '@/controllers/menus'
 import { postMenu } from '@/utils/axios/menus'
 import { formatDate } from '@/utils/functions'
 import { useGetMenus } from '@/utils/react-query/menus'
+import { useGetRestaurant } from '@/utils/react-query/restaurants'
 import { useAuthUser } from '@/utils/react-query/user'
 import {
   Box,
@@ -50,10 +51,14 @@ export default function Profile() {
     // isError: isUserError,
   } = useAuthUser()
 
+  const { data: restaurant } = useGetRestaurant(
+    user?.restaurants?.length ? user.restaurants[0].id : null
+  )
+
   const { data: menus } = useGetMenus(
-    user
+    restaurant
       ? {
-          restaurantId: user.restaurants[0].id,
+          restaurantId: restaurant.id,
         }
       : null
   )

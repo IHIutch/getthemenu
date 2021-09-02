@@ -130,7 +130,6 @@ export default function GetStarted() {
         name,
         subdomain,
       })
-      // TODO: Mutate user object to include newly created restaurant. Or on the dashboard, fetch restaurant by ID
       router.replace('/dashboard')
     } catch (error) {
       setIsSubmitting(false)

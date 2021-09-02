@@ -10,7 +10,10 @@ import {
 export const useGetSections = (params) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['sections', params],
-    async () => await getSections(params)
+    async () => await getSections(params),
+    {
+      enabled: !!params,
+    }
   )
   return {
     data,
@@ -24,7 +27,10 @@ export const useGetSections = (params) => {
 export const useGetSection = (id) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['sections', id],
-    async () => await getSection(id)
+    async () => await getSection(id),
+    {
+      enabled: !!id,
+    }
   )
   return {
     data,

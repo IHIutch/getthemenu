@@ -8,7 +8,10 @@ import {
 export const useGetRestaurants = (params) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['restaurants', params],
-    async () => await getRestaurants(params)
+    async () => await getRestaurants(params),
+    {
+      enabled: !!params,
+    }
   )
   return {
     data,
@@ -22,7 +25,10 @@ export const useGetRestaurants = (params) => {
 export const useGetRestaurant = (id) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['restaurants', id],
-    async () => await getRestaurant(id)
+    async () => await getRestaurant(id),
+    {
+      enabled: !!id,
+    }
   )
   return {
     data,

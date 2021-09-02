@@ -14,6 +14,19 @@ export const apiGetRestaurants = async (params = {}) => {
   return data
 }
 
+export const apiGetRestaurant = async (id) => {
+  const { data, error } = await supabase
+    .from('restaurants')
+    .select('*')
+    .match({ id })
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
+
 export const apiPostRestaurant = async (payload) => {
   const { data, error } = await supabase.from('restaurants').insert([payload])
 

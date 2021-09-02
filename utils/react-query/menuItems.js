@@ -10,7 +10,10 @@ import {
 export const useGetMenuItems = (params) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['menuItems', params],
-    async () => await getMenuItems(params)
+    async () => await getMenuItems(params),
+    {
+      enabled: !!params,
+    }
   )
   return {
     data,
@@ -24,7 +27,10 @@ export const useGetMenuItems = (params) => {
 export const useGetMenuItem = (id) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['menuItems', id],
-    async () => await getMenuItem(id)
+    async () => await getMenuItem(id),
+    {
+      enabled: !!id,
+    }
   )
   return {
     data,

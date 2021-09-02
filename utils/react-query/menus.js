@@ -4,7 +4,10 @@ import { getMenu, getMenus } from '../axios/menus'
 export const useGetMenus = (params) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['menus', params],
-    async () => await getMenus(params)
+    async () => await getMenus(params),
+    {
+      enabled: !!params,
+    }
   )
   return {
     data,
@@ -18,7 +21,10 @@ export const useGetMenus = (params) => {
 export const useGetMenu = (id) => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['menus', id],
-    async () => await getMenu(id)
+    async () => await getMenu(id),
+    {
+      enabled: !!id,
+    }
   )
   return {
     data,
