@@ -15,8 +15,15 @@ import {
 } from '@chakra-ui/react'
 import { apiGetMenus } from '@/controllers/menus'
 import { apiGetMenuItems } from '@/controllers/menuItems'
+import { apiGetSections } from '@/controllers/sections'
 
-export default function RestaurantHome({ host, restaurant, menus, menuItems }) {
+export default function RestaurantHome({
+  host,
+  restaurant,
+  menus,
+  menuItems,
+  sections,
+}) {
   const router = useRouter()
   const { query } = router
   console.log({ host, query })
@@ -35,6 +42,12 @@ export default function RestaurantHome({ host, restaurant, menus, menuItems }) {
             Restaurant
           </Heading>
           <Text as="pre">{JSON.stringify(restaurant, null, 2)}</Text>
+        </Box>
+        <Box>
+          <Heading as="h2" fontSize="2xl">
+            Sections
+          </Heading>
+          <Text as="pre">{JSON.stringify(sections, null, 2)}</Text>
         </Box>
         <Box>
           <Heading as="h2" fontSize="2xl">
@@ -83,7 +96,7 @@ export async function getServerSideProps(context) {
       ? context.params.host.split('.')[0]
       : ''
 
-  let restaurants, restaurant, menus, menuItems
+  let restaurants, restaurant, menus, menuItems, sections
   if (host) {
     console.log(host)
     restaurants = await apiGetRestaurants({
@@ -96,6 +109,9 @@ export async function getServerSideProps(context) {
     menuItems = await apiGetMenuItems({
       restaurantId: restaurant.id,
     })
+    sections = await apiGetSections({
+      restaurantId: restaurant.id,
+    })
   }
 
   return {
@@ -104,6 +120,7 @@ export async function getServerSideProps(context) {
       restaurant: restaurant || '',
       menus: menus || '',
       menuItems: menuItems || '',
+      sections: sections || '',
     },
     // revalidate: 10,
   }
