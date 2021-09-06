@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
@@ -36,8 +37,6 @@ import {
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-
-import React, { useState } from 'react'
 
 export default function Profile() {
   const router = useRouter()
