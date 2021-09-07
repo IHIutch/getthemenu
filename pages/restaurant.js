@@ -281,13 +281,13 @@ const Address = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
-            <GridItem colSpan={{ md: '12' }}>
+            <GridItem colSpan={{ sm: '12' }}>
               <FormControl>
                 <FormLabel>Street Address</FormLabel>
                 <Input {...register('streetAddress')} type="text" />
               </FormControl>
             </GridItem>
-            <GridItem colSpan={{ md: '6' }}>
+            <GridItem colSpan={{ sm: '12', md: '6' }}>
               <FormControl>
                 <FormLabel>City</FormLabel>
                 <Input {...register('city')} type="text" />
@@ -396,7 +396,7 @@ const Contact = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
-            <GridItem colSpan={{ md: '6' }}>
+            <GridItem colSpan={{ sm: '6' }}>
               <VStack>
                 <FormControl>
                   <FormLabel>Phone Number</FormLabel>
@@ -404,7 +404,7 @@ const Contact = () => {
                 </FormControl>
               </VStack>
             </GridItem>
-            <GridItem colSpan={{ md: '6' }}>
+            <GridItem colSpan={{ sm: '6' }}>
               <VStack>
                 <FormControl>
                   <FormLabel>Email</FormLabel>
