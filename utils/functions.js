@@ -53,3 +53,25 @@ export const handleStructuredData = ({ restaurant, menus }) => {
 export const formatDate = (val, format = 'MM/DD/YYYY') => {
   return dayjs(val).format(format)
 }
+
+export const isTimeInputSupported = () => {
+  if (typeof window == 'undefined') return false
+
+  var input = document.createElement('input')
+  var value = 'a'
+  input.setAttribute('type', 'time')
+  input.setAttribute('value', value)
+  console.log('time', input.value, value)
+  return input.value !== value
+}
+
+export const isDateInputSupported = () => {
+  if (typeof window == 'undefined') return false
+
+  var input = document.createElement('input')
+  var value = 'a'
+  input.setAttribute('type', 'date')
+  input.setAttribute('value', value)
+  console.log('date', input.value, value)
+  return input.value !== value
+}

@@ -583,6 +583,7 @@ const Hours = () => {
                           // defaultValue={field.openTime}
                           isRequired
                           type="time"
+                          // TODO: Add support for browsers that don't support time inputs
                         />
                       </FormControl>
                       <Text as="span">to</Text>
@@ -593,6 +594,7 @@ const Hours = () => {
                           // defaultValue={field.closeTime}
                           isRequired
                           type="time"
+                          // TODO: Add support for browsers that don't support time inputs
                         />
                       </FormControl>
                     </HStack>
