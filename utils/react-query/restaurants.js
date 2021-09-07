@@ -41,19 +41,21 @@ export const useGetRestaurant = (id) => {
 
 export const useUpdateRestaurant = (params) => {
   const queryClient = useQueryClient()
-  const { isLoading, isError, isSuccess, data, error } = useMutation(
-    putRestaurant,
+  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+    async ({ id, payload }) => {
+      await putRestaurant(id, payload)
+    },
     {
       // When mutate is called:
-      onMutate: async (updated) => {
+      onMutate: async ({ payload }) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await queryClient.cancelQueries(['restaurants', params])
         const previous = queryClient.getQueryData(['restaurants', params])
-        queryClient.setQueryData(['restaurants', params], (old) => [
+        queryClient.setQueryData(['restaurants', params], (old) => ({
           ...old,
-          updated,
-        ])
-        return { previous, updated }
+          ...payload,
+        }))
+        return { previous, payload }
       },
       // If the mutation fails, use the context we returned above
       onError: (err, updated, context) => {
@@ -66,6 +68,7 @@ export const useUpdateRestaurant = (params) => {
     }
   )
   return {
+    mutate,
     data,
     error,
     isLoading,

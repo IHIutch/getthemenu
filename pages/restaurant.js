@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Head from 'next/head'
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
@@ -15,16 +15,18 @@ import {
   InputRightAddon,
   Switch,
   Flex,
-  Select,
   Text,
   VStack,
   ButtonGroup,
   Button,
 } from '@chakra-ui/react'
 import SubnavItem from '@/components/common/SubnavItem'
-import { useGetRestaurant } from '@/utils/react-query/restaurants'
+import {
+  useGetRestaurant,
+  useUpdateRestaurant,
+} from '@/utils/react-query/restaurants'
 import { useAuthUser } from '@/utils/react-query/user'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useFormState } from 'react-hook-form'
 
 export default function Restaurant() {
   return (
@@ -92,29 +94,48 @@ const Details = () => {
     user?.restaurants?.length ? user.restaurants[0].id : null
   )
 
+  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
+    user?.restaurants[0].id || null
+  )
+
+  const defaultValues = useMemo(() => {
+    return {
+      restaurantName: restaurant?.name || '',
+      subdomain: restaurant?.subdomain || '',
+    }
+  }, [restaurant])
+
   const {
     register,
     handleSubmit,
     getValues,
-    setValue,
+    reset,
+    control,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues,
+  })
+  const { isDirty } = useFormState({
+    control,
+  })
 
   useEffect(() => {
-    setValue('restaurantName', restaurant?.name || '')
-    setValue('subdomain', restaurant?.subdomain || '')
-  }, [restaurant, setValue])
+    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
+    reset(defaultValues)
+  }, [defaultValues, reset, restaurant])
 
-  const onSubmit = async (form) => {
+  const onSubmit = async () => {
     try {
       const [name, subdomain] = getValues(['restaurantName', 'subdomain'])
       setIsSubmitting(true)
-      console.log({ name, subdomain })
-      // await postRestaurant({
-      //   userId: user.id,
-      //   name,
-      //   subdomain,
-      // })
+      await handleUpdateRestaurant({
+        id: user.restaurants[0].id,
+        payload: {
+          name,
+          subdomain,
+        },
+      })
+      setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -162,7 +183,13 @@ const Details = () => {
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
             {/* <Button>Reset</Button> */}
-            <Button colorScheme="blue" type="submit">
+            <Button
+              colorScheme="blue"
+              type="submit"
+              isDisabled={!isDirty}
+              isLoading={isSubmitting}
+              loadingText="Saving..."
+            >
               Save
             </Button>
           </ButtonGroup>
@@ -185,23 +212,39 @@ const Address = () => {
     user?.restaurants?.length ? user.restaurants[0].id : null
   )
 
+  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
+    user?.restaurants[0].id || null
+  )
+
+  const defaultValues = useMemo(() => {
+    return {
+      streetAddress: restaurant?.address?.streetAddress || '',
+      city: restaurant?.address?.city || '',
+      state: restaurant?.address?.state || '',
+      zip: restaurant?.address?.zip || '',
+    }
+  }, [restaurant])
+
   const {
     register,
     handleSubmit,
     getValues,
-    setValue,
+    reset,
+    control,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues,
+  })
+  const { isDirty } = useFormState({
+    control,
+  })
 
   useEffect(() => {
-    const address = restaurant?.address || {}
-    setValue('streetAddress', address?.streetAddress || '')
-    setValue('city', address?.city || '')
-    setValue('state', address?.state || '')
-    setValue('zip', address?.zip || '')
-  }, [restaurant, setValue])
+    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
+    reset(defaultValues)
+  }, [defaultValues, reset, restaurant])
 
-  const onSubmit = async (form) => {
+  const onSubmit = async () => {
     try {
       const [streetAddress, city, state, zip] = getValues([
         'streetAddress',
@@ -210,12 +253,18 @@ const Address = () => {
         'zip',
       ])
       setIsSubmitting(true)
-      console.log({ streetAddress, city, state, zip })
-      // await postRestaurant({
-      //   userId: user.id,
-      //   name,
-      //   subdomain,
-      // })
+      await handleUpdateRestaurant({
+        id: user.restaurants[0].id,
+        payload: {
+          address: {
+            streetAddress,
+            city,
+            state,
+            zip,
+          },
+        },
+      })
+      setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -261,7 +310,13 @@ const Address = () => {
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
             {/* <Button>Reset</Button> */}
-            <Button colorScheme="blue" type="submit">
+            <Button
+              colorScheme="blue"
+              type="submit"
+              isDisabled={!isDirty}
+              isLoading={isSubmitting}
+              loadingText="Saving..."
+            >
               Save
             </Button>
           </ButtonGroup>
@@ -284,29 +339,48 @@ const Contact = () => {
     user?.restaurants?.length ? user.restaurants[0].id : null
   )
 
+  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
+    user?.restaurants[0].id || null
+  )
+
+  const defaultValues = useMemo(() => {
+    return {
+      phone: restaurant?.phone[0] || '',
+      email: restaurant?.email[0] || '',
+    }
+  }, [restaurant])
+
   const {
     register,
     handleSubmit,
     getValues,
-    setValue,
+    control,
+    reset,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues,
+  })
+  const { isDirty } = useFormState({
+    control,
+  })
 
   useEffect(() => {
-    setValue('phone', restaurant?.phone ? restaurant.phone[0] : '')
-    setValue('email', restaurant?.email ? restaurant.email[0] : '')
-  }, [restaurant, setValue])
+    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
+    reset(defaultValues)
+  }, [defaultValues, reset, restaurant])
 
-  const onSubmit = async (form) => {
+  const onSubmit = async () => {
     try {
       const [phone, email] = getValues(['phone', 'email'])
       setIsSubmitting(true)
-      console.log({ phone, email })
-      // await postRestaurant({
-      //   userId: user.id,
-      //   name,
-      //   subdomain,
-      // })
+      await handleUpdateRestaurant({
+        id: user.restaurants[0].id,
+        payload: {
+          phone: [phone],
+          email: [email],
+        },
+      })
+      setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -343,7 +417,13 @@ const Contact = () => {
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
             {/* <Button>Reset</Button> */}
-            <Button colorScheme="blue" type="submit">
+            <Button
+              colorScheme="blue"
+              type="submit"
+              isDisabled={!isDirty}
+              isLoading={isSubmitting}
+              loadingText="Saving..."
+            >
               Save
             </Button>
           </ButtonGroup>
@@ -366,62 +446,78 @@ const Hours = () => {
     user?.restaurants?.length ? user.restaurants[0].id : null
   )
 
-  const daysOfWeek = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ]
+  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
+    user?.restaurants[0].id || null
+  )
 
-  const standardHours = daysOfWeek.reduce((acc, day) => {
+  const defaultValues = useMemo(() => {
+    const daysOfWeek = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ]
     return {
-      ...acc,
-      [day]: {
-        isOpen: restaurant?.hours ? restaurant.hours[day].isOpen : false,
-        openTime: restaurant?.hours ? restaurant.hours[day].openTime : '',
-        closeTime: restaurant?.hours ? restaurant.hours[day].closeTime : '',
-      },
+      standardHours: daysOfWeek.map((day) => {
+        return {
+          label: day,
+          isOpen: restaurant?.hours[day]?.isOpen || false,
+          openTime: restaurant?.hours[day]?.openTime || '',
+          closeTime: restaurant?.hours[day]?.closeTime || '',
+        }
+      }),
     }
-  }, {})
-
-  const defaultValues = {
-    standardHours: Object.keys(standardHours).map((k) => ({
-      ...standardHours[k],
-      label: k,
-    })),
-  }
+  }, [restaurant])
 
   const {
     register,
     handleSubmit,
     getValues,
-    setValue,
+    reset,
     control,
     watch,
     formState: { errors },
   } = useForm({
     defaultValues,
   })
+  const { isDirty } = useFormState({
+    control,
+  })
 
   const { fields } = useFieldArray({
     control,
     name: 'standardHours',
-    // keyName: "id", default to "id", you can change the key name
   })
 
-  const onSubmit = async (form) => {
+  useEffect(() => {
+    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
+    reset(defaultValues)
+  }, [defaultValues, reset, restaurant])
+
+  const onSubmit = async () => {
     try {
       const [standardHours] = getValues(['standardHours'])
       setIsSubmitting(true)
-      console.log({ standardHours })
-      // await postRestaurant({
-      //   userId: user.id,
-      //   name,
-      //   subdomain,
-      // })
+      const hours = standardHours.reduce((acc, day) => {
+        return {
+          ...acc,
+          [day.label]: {
+            isOpen: day.isOpen,
+            openTime: day.openTime,
+            closeTime: day.closeTime,
+          },
+        }
+      }, {})
+      await handleUpdateRestaurant({
+        id: user.restaurants[0].id,
+        payload: {
+          hours,
+        },
+      })
+      setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -468,34 +564,40 @@ const Hours = () => {
                   h={{ lg: '10' }}
                 >
                   <FormControl d="flex" alignItems="center">
-                    <Switch {...register(`standardHours.${idx}.isOpen`)} />
+                    <Switch
+                      {...register(`standardHours.${idx}.isOpen`)}
+                      // defaultValue={field.isOpen}
+                    />
                     <FormLabel ml="2" mb="0">
                       {watchField(idx) ? 'Open' : 'Closed'}
                     </FormLabel>
                   </FormControl>
                 </GridItem>
-                <GridItem
-                  colSpan={{ base: '12', lg: '6' }}
-                  d={watchField(idx) ? 'block' : 'none'}
-                >
-                  <HStack align="center">
-                    <FormControl>
-                      <FormLabel hidden>{field.label} Open Time</FormLabel>
-                      <Input
-                        {...register(`standardHours.${idx}.openTime`)}
-                        type="time"
-                      />
-                    </FormControl>
-                    <Text as="span">to</Text>
-                    <FormControl>
-                      <FormLabel hidden>{field.label} Close Time</FormLabel>
-                      <Input
-                        {...register(`standardHours.${idx}.closeTime`)}
-                        type="time"
-                      />
-                    </FormControl>
-                  </HStack>
-                </GridItem>
+                {watchField(idx) && (
+                  <GridItem colSpan={{ base: '12', lg: '6' }}>
+                    <HStack align="center">
+                      <FormControl>
+                        <FormLabel hidden>{field.label} Open Time</FormLabel>
+                        <Input
+                          {...register(`standardHours.${idx}.openTime`)}
+                          // defaultValue={field.openTime}
+                          isRequired
+                          type="time"
+                        />
+                      </FormControl>
+                      <Text as="span">to</Text>
+                      <FormControl>
+                        <FormLabel hidden>{field.label} Close Time</FormLabel>
+                        <Input
+                          {...register(`standardHours.${idx}.closeTime`)}
+                          // defaultValue={field.closeTime}
+                          isRequired
+                          type="time"
+                        />
+                      </FormControl>
+                    </HStack>
+                  </GridItem>
+                )}
               </Grid>
             ))}
           </VStack>
@@ -503,7 +605,13 @@ const Hours = () => {
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
             {/* <Button>Reset</Button> */}
-            <Button colorScheme="blue" type="submit">
+            <Button
+              colorScheme="blue"
+              type="submit"
+              isDisabled={!isDirty}
+              isLoading={isSubmitting}
+              loadingText="Saving..."
+            >
               Save
             </Button>
           </ButtonGroup>
