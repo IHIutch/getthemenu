@@ -51,6 +51,7 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
+import { blurhashEncode } from '@/utils/functions'
 
 export default function SingleMenu() {
   const {
@@ -494,6 +495,8 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
     }
   )
 
+  const [itemImage, setItemImage] = useState(null)
+
   const {
     data: user,
     // isLoading: isUserLoading,
@@ -529,6 +532,23 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
     }
   }
 
+  const handleImageChange = (image) => {
+    let reader = new FileReader()
+    reader.onload = async (e) => {
+      const blurhash = await blurhashEncode(image)
+      setItemImage({
+        image,
+        fileType: image.type,
+        fileName: image.name,
+        base64String: e.target.result,
+        blurhash,
+      })
+    }
+    reader.readAsDataURL(image)
+  }
+
+  console.log({ itemImage })
+
   return (
     <>
       <DrawerCloseButton />
@@ -540,7 +560,7 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
             <FormControl id="image">
               <FormLabel>Item Image</FormLabel>
               <AspectRatio ratio={16 / 9} d="block">
-                <Dropzone />
+                <Dropzone value={itemImage} onChange={handleImageChange} />
               </AspectRatio>
             </FormControl>
           </Box>
@@ -620,11 +640,22 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
   )
 }
 
-const Dropzone = () => {
-  const onDrop = useCallback((acceptedFiles) => {
-    // Do something with the files
-  }, [])
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+const Dropzone = ({ onChange, value }) => {
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      onChange(acceptedFiles[0])
+    },
+    [onChange]
+  )
+
+  console.log({ value })
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({ onDrop })
 
   return (
     <Flex
