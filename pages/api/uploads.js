@@ -10,24 +10,20 @@ const handler = async (req, res) => {
   switch (method) {
     case 'POST':
       try {
-        const getFileName = async () => {
-          const form = new formidable.IncomingForm()
-          form.uploadDir = './'
-          form.keepExtensions = true
+        const form = new formidable.IncomingForm()
+
+        const parseFile = async () => {
           return await new Promise((resolve, reject) => {
             form.parse(req, (err, fields, files) => {
               if (err) reject(err)
               resolve({
                 name: files.file.name,
-                path: files.file.path,
                 file: fs.readFileSync(files.file.path),
               })
             })
           })
         }
-        const { name, path, file } = await getFileName()
-
-        // console.log({ name, path, file })
+        const { name, file } = await parseFile()
 
         const fileExt = name.split('.').pop()
         const filePath = `${uuidv4()}.${fileExt}`
