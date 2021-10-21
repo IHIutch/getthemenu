@@ -1,5 +1,6 @@
 import { encode } from 'blurhash'
 import dayjs from 'dayjs'
+import supabase from './supabase'
 
 export const handleStructuredData = ({ restaurant, menus }) => {
   return {
@@ -119,4 +120,17 @@ export const blurhashEncode = async (image) => {
     4
   )
   return blurhash
+}
+
+export const getPublicURL = (path) => {
+  try {
+    const { publicURL, error } = supabase.storage
+      .from('public')
+      .getPublicUrl(path)
+    if (error) throw error
+    console.log(publicURL)
+    return publicURL
+  } catch (err) {
+    console.log('Error downloading file: ', err.message)
+  }
 }

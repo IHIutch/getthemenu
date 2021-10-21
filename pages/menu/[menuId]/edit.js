@@ -28,6 +28,7 @@ import {
   ButtonGroup,
   AspectRatio,
   Image,
+  Img,
   HStack,
   VStack,
 } from '@chakra-ui/react'
@@ -51,7 +52,8 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
-import { blurhashEncode } from '@/utils/functions'
+import { blurhashEncode, getPublicURL } from '@/utils/functions'
+import { postUpload } from '@/utils/axios/uploads'
 
 export default function SingleMenu() {
   const {
@@ -318,10 +320,15 @@ const MenuItemsContainer = ({
 }
 
 const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
+  const imageUrl = useMemo(() => {
+    return menuItem?.image
+      ? getPublicURL(menuItem.image.src)
+      : 'https://picsum.photos/200'
+  }, [menuItem.image])
   return (
     <Flex alignItems="flex-start">
       <AspectRatio w="16" ratio="1">
-        <Image src="https://picsum.photos/200" objectFit="cover" />
+        <Img src={imageUrl} objectFit="cover" />
       </AspectRatio>
       <Box flexGrow="1" ml="4">
         <Flex>
@@ -492,6 +499,7 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
       price: '',
       sectionId,
       position: menuItems.filter((mi) => mi.sectionId === sectionId).length,
+      image: null,
     }
   )
 
@@ -514,13 +522,24 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true)
+      const payload = {
+        ...editingItem,
+      }
+      if (itemImage?.file) {
+        const formData = new FormData()
+        formData.append('file', itemImage.file, itemImage.fileName)
+        payload.image = {
+          blurDataURL: itemImage.blurhash,
+          src: await postUpload(formData),
+        }
+      }
       menuItem
         ? await handleUpdateMenuItem({
             id: editingItem.id,
-            payload: editingItem,
+            payload,
           })
         : await handleCreateMenuItem({
-            ...editingItem,
+            ...payload,
             menuId,
             restaurantId: user.restaurants[0].id,
           })
@@ -532,19 +551,19 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
     }
   }
 
-  const handleImageChange = (image) => {
+  const handleImageChange = (file) => {
     let reader = new FileReader()
     reader.onload = async (e) => {
-      const blurhash = await blurhashEncode(image)
+      const blurhash = await blurhashEncode(file)
       setItemImage({
-        image,
-        fileType: image.type,
-        fileName: image.name,
+        file,
+        fileType: file.type,
+        fileName: file.name,
         base64String: e.target.result,
         blurhash,
       })
     }
-    reader.readAsDataURL(image)
+    reader.readAsDataURL(file)
   }
 
   console.log({ itemImage })

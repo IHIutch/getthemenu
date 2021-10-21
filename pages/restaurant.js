@@ -95,7 +95,7 @@ const Details = () => {
   )
 
   const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    user?.restaurants[0].id || null
+    restaurant?.id || null
   )
 
   const defaultValues = useMemo(() => {
@@ -213,7 +213,7 @@ const Address = () => {
   )
 
   const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    user?.restaurants[0].id || null
+    restaurant?.id || null
   )
 
   const defaultValues = useMemo(() => {
@@ -254,7 +254,7 @@ const Address = () => {
       ])
       setIsSubmitting(true)
       await handleUpdateRestaurant({
-        id: user.restaurants[0].id,
+        id: 123,
         payload: {
           address: {
             streetAddress,
@@ -340,7 +340,7 @@ const Contact = () => {
   )
 
   const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    user?.restaurants[0].id || null
+    restaurant?.id || null
   )
 
   const defaultValues = useMemo(() => {
@@ -447,7 +447,7 @@ const Hours = () => {
   )
 
   const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    user?.restaurants[0].id || null
+    restaurant?.id || null
   )
 
   const defaultValues = useMemo(() => {
