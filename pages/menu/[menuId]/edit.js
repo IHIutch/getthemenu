@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 
@@ -33,7 +33,7 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import Head from 'next/head'
-import { MoreVertical, Trash2, Edit } from 'react-feather'
+import { MoreVertical, Trash2, Edit, X } from 'react-feather'
 import { useDropzone } from 'react-dropzone'
 import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
@@ -54,6 +54,7 @@ import {
 } from '@/utils/react-query/sections'
 import { blurhashEncode, getPublicURL } from '@/utils/functions'
 import { postUpload } from '@/utils/axios/uploads'
+import { Controller, useForm } from 'react-hook-form'
 
 export default function SingleMenu() {
   const {
@@ -80,8 +81,6 @@ export default function SingleMenu() {
   }
 
   const move = (sourceList = [], destinationList = [], source, destination) => {
-    console.log({ source, destination })
-
     const [removed] = sourceList.splice(source.index, 1)
     destinationList.splice(destination.index, 0, removed)
 
@@ -489,21 +488,20 @@ const SectionDrawer = ({ section = null, handleDrawerClose }) => {
 const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
-  const { data: menuItems } = useGetMenuItems({ menuId })
+
+  const { register, handleSubmit, reset, control } = useForm()
+
+  useEffect(() => {
+    if (menuItem) {
+      const payload = {
+        ...menuItem,
+        image: menuItem?.image ? getPublicURL(menuItem.image.src) : null,
+      }
+      reset(payload)
+    }
+  }, [menuItem, reset])
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [editingItem, setEditingItem] = useState(
-    menuItem ?? {
-      title: '',
-      description: '',
-      price: '',
-      sectionId,
-      position: menuItems.filter((mi) => mi.sectionId === sectionId).length,
-      image: null,
-    }
-  )
-
-  const [itemImage, setItemImage] = useState(null)
 
   const {
     data: user,
@@ -519,23 +517,22 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
     menuId,
   })
 
-  const handleSubmit = async () => {
+  const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
-      const payload = {
-        ...editingItem,
-      }
-      if (itemImage?.file) {
+      const payload = { ...form }
+      if (form?.image) {
         const formData = new FormData()
-        formData.append('file', itemImage.file, itemImage.fileName)
+        formData.append('file', form.image, form.image.name)
+
         payload.image = {
-          blurDataURL: itemImage.blurhash,
+          blurDataURL: await blurhashEncode(form.image),
           src: await postUpload(formData),
         }
       }
       menuItem
         ? await handleUpdateMenuItem({
-            id: editingItem.id,
+            id: menuItem.id,
             payload,
           })
         : await handleCreateMenuItem({
@@ -551,23 +548,6 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
     }
   }
 
-  const handleImageChange = (file) => {
-    let reader = new FileReader()
-    reader.onload = async (e) => {
-      const blurhash = await blurhashEncode(file)
-      setItemImage({
-        file,
-        fileType: file.type,
-        fileName: file.name,
-        base64String: e.target.result,
-        blurhash,
-      })
-    }
-    reader.readAsDataURL(file)
-  }
-
-  console.log({ itemImage })
-
   return (
     <>
       <DrawerCloseButton />
@@ -579,7 +559,13 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
             <FormControl id="image">
               <FormLabel>Item Image</FormLabel>
               <AspectRatio ratio={16 / 9} d="block">
-                <Dropzone value={itemImage} onChange={handleImageChange} />
+                <Controller
+                  name="image"
+                  control={control}
+                  render={({ field }) => {
+                    return <Dropzone {...field} />
+                  }}
+                />
               </AspectRatio>
             </FormControl>
           </Box>
@@ -587,41 +573,19 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
             <FormLabel>Item Name</FormLabel>
             <Input
               autoComplete="off"
-              value={editingItem.title}
-              onChange={(e) =>
-                setEditingItem({
-                  ...editingItem,
-                  title: e.target.value,
-                })
-              }
+              {...register('title', { required: true })}
             />
           </FormControl>
           <FormControl id="price">
             <FormLabel>Item Price</FormLabel>
-            <Input
-              autoComplete="off"
-              value={editingItem.price}
-              onChange={(e) =>
-                setEditingItem({
-                  ...editingItem,
-                  price: e.target.value,
-                })
-              }
-              type="number"
-            />
+            <Input autoComplete="off" {...register('price')} type="number" />
           </FormControl>
-          <FormControl id="desctription">
+          <FormControl id="description">
             <FormLabel>Item Description</FormLabel>
             <Textarea
               autoComplete="off"
-              value={editingItem.description}
-              onChange={(e) =>
-                setEditingItem({
-                  ...editingItem,
-                  description: e.target.value,
-                })
-              }
-              style={{ resize: 'none' }}
+              {...register('description')}
+              resize="none"
               rows="6"
             />
           </FormControl>
@@ -648,7 +612,7 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
             loadingText={menuItem ? 'Updating...' : 'Creating...'}
             isLoading={isSubmitting}
             colorScheme="blue"
-            onClick={handleSubmit}
+            onClick={handleSubmit(onSubmit)}
             isFullWidth
           >
             {menuItem ? 'Update' : 'Create'}
@@ -659,42 +623,75 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
   )
 }
 
-const Dropzone = ({ onChange, value }) => {
+const Dropzone = ({ onChange, value = '' }) => {
+  const [preview, setPreview] = useState(value)
+  const [file, setFile] = useState(null)
   const onDrop = useCallback(
     (acceptedFiles) => {
-      onChange(acceptedFiles[0])
+      setFile(acceptedFiles[0])
     },
-    [onChange]
+    [setFile]
   )
 
-  console.log({ value })
+  useEffect(() => {
+    if (file) {
+      onChange(file)
+    }
+    const objectUrl = file ? URL.createObjectURL(file) : null
+    setPreview(objectUrl)
+
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [file, onChange])
+
   const {
     getRootProps,
     getInputProps,
     isDragActive,
-    isDragAccept,
-    isDragReject,
+    // isDragAccept,
+    // isDragReject,
   } = useDropzone({ onDrop })
 
+  const previewSrc = useMemo(() => {
+    return preview || value
+  }, [preview, value])
+
   return (
-    <Flex
-      bg={isDragActive ? 'blue.100' : 'gray.100'}
-      rounded="md"
-      borderColor={isDragActive ? 'blue.200' : 'gray.200'}
-      borderWidth="1px"
-      align="center"
-      justify="center"
-      textAlign="center"
-      fontWeight="semibold"
-      transition="all 0.2s ease"
-      cursor="pointer"
-      {...getRootProps()}
-    >
-      <Input {...getInputProps()} />
-      {isDragActive ? (
-        <Text>Drop the files here ...</Text>
+    <Flex rounded="md" overflow="hidden">
+      {previewSrc ? (
+        <Box position="relative" h="100%" w="100%">
+          <IconButton
+            icon={<Icon boxSize="5" as={X} />}
+            size="sm"
+            position="absolute"
+            top="2"
+            right="2"
+            onClick={() => onChange(null)}
+          />
+          <Image h="100%" w="100%" src={previewSrc} objectFit="cover" />
+        </Box>
       ) : (
-        <Text>Upload an Image</Text>
+        <Flex
+          h="100%"
+          w="100%"
+          bg={isDragActive ? 'blue.100' : 'gray.100'}
+          borderColor={isDragActive ? 'blue.200' : 'gray.200'}
+          borderWidth="1px"
+          align="center"
+          justify="center"
+          textAlign="center"
+          fontWeight="semibold"
+          transition="all 0.2s ease"
+          cursor="pointer"
+          {...getRootProps()}
+        >
+          <Input {...getInputProps()} />
+          {isDragActive ? (
+            <Text>Drop the files here ...</Text>
+          ) : (
+            <Text>Upload an Image</Text>
+          )}
+        </Flex>
       )}
     </Flex>
   )

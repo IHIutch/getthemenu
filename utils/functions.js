@@ -128,7 +128,6 @@ export const getPublicURL = (path) => {
       .from('public')
       .getPublicUrl(path)
     if (error) throw error
-    console.log(publicURL)
     return publicURL
   } catch (err) {
     console.log('Error downloading file: ', err.message)
