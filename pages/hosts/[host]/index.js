@@ -32,6 +32,39 @@ export default function RestaurantHome({
   menuItems,
   sections,
 }) {
+  return host ? (
+    <MenuView
+      restaurant={restaurant}
+      menus={menus}
+      menuItems={menuItems}
+      sections={sections}
+    />
+  ) : (
+    <>
+      <Head>
+        <title>GetTheMenu</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Center h="100%">
+        <Box>
+          <Heading as="h1">GetTheMenu</Heading>
+          <ButtonGroup>
+            <NextLink href="/register" passHref>
+              <Button as={Link} colorScheme="blue">
+                Register
+              </Button>
+            </NextLink>
+            <NextLink href="/login" passHref>
+              <Button as={Link}>Log In</Button>
+            </NextLink>
+          </ButtonGroup>
+        </Box>
+      </Center>
+    </>
+  )
+}
+
+const MenuView = ({ restaurant, menus, sections, menuItems }) => {
   const router = useRouter()
   const { query } = router
   // console.log({ host, query })
@@ -58,8 +91,7 @@ export default function RestaurantHome({
   }, [currentMenuSlug, menuItems])
 
   console.log({ currentMenu, currentSections, currentItems })
-
-  return host ? (
+  return (
     <>
       <Head>
         <title>{restaurant?.name}</title>
@@ -81,13 +113,13 @@ export default function RestaurantHome({
         </Select>
         <Stack>
           {/* <Box>
-            <Heading as="h2" fontSize="2xl">
-              Restaurant
-            </Heading>
-            <Text as="pre" fontSize="xs">
-              {JSON.stringify(restaurant, null, 2)}
-            </Text>
-          </Box> */}
+          <Heading as="h2" fontSize="2xl">
+            Restaurant
+          </Heading>
+          <Text as="pre" fontSize="xs">
+            {JSON.stringify(restaurant, null, 2)}
+          </Text>
+        </Box> */}
           <Box>
             <Heading as="h2" fontSize="3xl">
               {currentMenu?.title}
@@ -165,47 +197,25 @@ export default function RestaurantHome({
             )}
           </Box>
           {/* <Box>
-            <Heading as="h2" fontSize="2xl">
-              Sections
-            </Heading>
-            <Text as="pre">{JSON.stringify(sections, null, 2)}</Text>
-          </Box> */}
+          <Heading as="h2" fontSize="2xl">
+            Sections
+          </Heading>
+          <Text as="pre">{JSON.stringify(sections, null, 2)}</Text>
+        </Box> */}
           {/* <Box>
-            <Heading as="h2" fontSize="2xl">
-              Menus
-            </Heading>
-            <Text as="pre">{JSON.stringify(menus, null, 2)}</Text>
-          </Box> */}
+          <Heading as="h2" fontSize="2xl">
+            Menus
+          </Heading>
+          <Text as="pre">{JSON.stringify(menus, null, 2)}</Text>
+        </Box> */}
           {/* <Box>
-            <Heading as="h2" fontSize="2xl">
-              Menu Items
-            </Heading>
-            <Text as="pre">{JSON.stringify(menuItems, null, 2)}</Text>
-          </Box> */}
+          <Heading as="h2" fontSize="2xl">
+            Menu Items
+          </Heading>
+          <Text as="pre">{JSON.stringify(menuItems, null, 2)}</Text>
+        </Box> */}
         </Stack>
       </Container>
-    </>
-  ) : (
-    <>
-      <Head>
-        <title>GetTheMenu</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Center h="100%">
-        <Box>
-          <Heading as="h1">GetTheMenu</Heading>
-          <ButtonGroup>
-            <NextLink href="/register" passHref>
-              <Button as={Link} colorScheme="blue">
-                Register
-              </Button>
-            </NextLink>
-            <NextLink href="/login" passHref>
-              <Button as={Link}>Log In</Button>
-            </NextLink>
-          </ButtonGroup>
-        </Box>
-      </Center>
     </>
   )
 }
@@ -216,7 +226,8 @@ export async function getServerSideProps(context) {
     context.params.host !== 'getthemenu.io' &&
     context.params.host !== 'localhost'
       ? context.params.host.split('.')[0]
-      : 'hello'
+      : ''
+  // : 'hello'
 
   let restaurants, restaurant, menus, menuItems, sections
   if (host) {
