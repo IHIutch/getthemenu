@@ -10,6 +10,13 @@ export const getMenus = async (params = null) => {
   return data
 }
 
+export const getMenu = async (id) => {
+  const { data } = await axios.get(`/api/menus/${id}`).catch((res) => {
+    throw new Error(res.data.res.data.error)
+  })
+  return data
+}
+
 export const postMenu = async (payload) => {
   const { data } = await axios.post(`/api/menus`, payload).catch((res) => {
     throw new Error(res.data.error)

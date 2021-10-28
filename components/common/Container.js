@@ -1,6 +1,6 @@
 import { Box, useToken } from '@chakra-ui/react'
 
-const Container = ({ children, fluid = false, ...props }) => {
+export default function Container({ children, fluid = false, ...props }) {
   const [containerWidths] = useToken('sizes', ['container'])
   const maxW =
     fluid === true
@@ -21,5 +21,3 @@ const Container = ({ children, fluid = false, ...props }) => {
     </Box>
   )
 }
-
-export default Container
