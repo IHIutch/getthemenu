@@ -21,7 +21,7 @@ import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useAuthUser } from '@/utils/react-query/user'
 
-export default function LogIn() {
+export default function LoginView() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const {
@@ -75,7 +75,7 @@ export default function LogIn() {
   return (
     <>
       <Head>
-        <title>Log In</title>
+        <title>GetTheMenu</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container py="24">
