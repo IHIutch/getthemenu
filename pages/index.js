@@ -81,12 +81,19 @@ export default function LogIn() {
       <Container py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem
-            colStart={{ md: '3', xl: '4' }}
-            colSpan={{ md: '8', xl: '6' }}
+            colStart={{ md: '4', lg: '5' }}
+            colSpan={{ md: '6', lg: '4' }}
           >
+            <Box mb="6" textAlign="center">
+              <Heading as="h1" fontSize="4xl">
+                GetTheMenu
+              </Heading>
+            </Box>
             <Box bg="white" borderWidth="1px" rounded="md" p="8">
               <Box mb="8">
-                <Heading as="h1">Log In</Heading>
+                <Heading as="h2" fontSize="3xl" mb="2">
+                  Log In
+                </Heading>
               </Box>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
@@ -134,14 +141,22 @@ export default function LogIn() {
                     <Button
                       ml="auto"
                       isLoading={isSubmitting}
+                      loadingText="Logging In..."
                       colorScheme="blue"
                       type="submit"
                     >
-                      Sign In
+                      Log In
                     </Button>
                   </GridItem>
                 </Grid>
               </form>
+            </Box>
+            <Box textAlign="center" mt="6">
+              <NextLink href="/register" passHref>
+                <Button as={Link} colorScheme="blue" variant="link">
+                  Don't Have an Account? Register Now!
+                </Button>
+              </NextLink>
             </Box>
           </GridItem>
         </Grid>

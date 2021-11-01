@@ -29,7 +29,7 @@ export default function RestaurantHome({ host }) {
                 Register
               </Button>
             </NextLink>
-            <NextLink href="/login" passHref>
+            <NextLink href="/" passHref>
               <Button as={Link}>Log In</Button>
             </NextLink>
           </ButtonGroup>
@@ -45,7 +45,7 @@ export async function getServerSideProps(context) {
     context.params.host !== 'localhost'
       ? context.params.host.split('.')[0]
       : ''
-  //  : 'hello'
+  // : 'hello'
 
   return {
     props: {

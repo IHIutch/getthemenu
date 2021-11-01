@@ -13,10 +13,12 @@ import {
   GridItem,
   Heading,
   Input,
+  Link,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import Container from '@/components/common/Container'
 import { useAuthUser } from '@/utils/react-query/user'
+import NextLink from 'next/link'
 
 export default function Register() {
   const router = useRouter()
@@ -85,12 +87,19 @@ export default function Register() {
       <Container py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem
-            colStart={{ md: '3', xl: '4' }}
-            colSpan={{ md: '8', xl: '6' }}
+            colStart={{ md: '4', lg: '5' }}
+            colSpan={{ md: '6', lg: '4' }}
           >
+            <Box mb="6" textAlign="center">
+              <Heading as="h1" fontSize="4xl">
+                GetTheMenu
+              </Heading>
+            </Box>
             <Box bg="white" borderWidth="1px" rounded="md" p="8">
               <Box mb="8">
-                <Heading as="h1">Create Account</Heading>
+                <Heading as="h2" fontSize="3xl" mb="2">
+                  Register
+                </Heading>
               </Box>
 
               <form onSubmit={handleSubmit(onSubmit)}>
@@ -165,6 +174,7 @@ export default function Register() {
                       type="submit"
                       colorScheme="blue"
                       loadingText="Registering..."
+                      isFullWidth
                       isLoading={isSubmitting}
                     >
                       Register
@@ -172,6 +182,13 @@ export default function Register() {
                   </GridItem>
                 </Grid>
               </form>
+            </Box>
+            <Box textAlign="center" mt="6">
+              <NextLink href="/" passHref>
+                <Button as={Link} colorScheme="blue" variant="link">
+                  Have an Account? Log In Here!
+                </Button>
+              </NextLink>
             </Box>
           </GridItem>
         </Grid>
