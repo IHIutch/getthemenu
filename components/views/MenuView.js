@@ -19,6 +19,7 @@ import { useGetMenu, useGetMenus } from '@/utils/react-query/menus'
 import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useGetSections } from '@/utils/react-query/sections'
 import { useGetRestaurants } from '@/utils/react-query/restaurants'
+import NextImage from 'next/image'
 
 export default function MenuView({ host }) {
   const { query, replace, push } = useRouter()
@@ -106,33 +107,9 @@ export default function MenuView({ host }) {
                                 mb="2"
                                 borderBottomWidth="1px"
                               >
-                                <Image
-                                  h="100%"
-                                  w="100%"
-                                  objectFit="cover"
-                                  src={
-                                    item?.image?.src
-                                      ? getPublicURL(item.image.src)
-                                      : ''
-                                  }
-                                  fallback={
-                                    item?.image?.blurDataURL ? (
-                                      <Box>
-                                        <Blurhash
-                                          hash={item.image.blurDataURL}
-                                          width={800}
-                                          height={400}
-                                          resolutionX={1600}
-                                          resolutionY={900}
-                                          punch={1}
-                                        />
-                                      </Box>
-                                    ) : (
-                                      <Flex align="center" justify="center">
-                                        <Spinner size="sm" />
-                                      </Flex>
-                                    )
-                                  }
+                                <ItemImage
+                                  src={item?.image?.src}
+                                  blurDataURL={item?.image?.blurDataURL}
                                 />
                               </AspectRatio>
                               <Box p="4">
@@ -172,5 +149,39 @@ export default function MenuView({ host }) {
         </Stack>
       </Container>
     </>
+  )
+}
+
+const ItemImage = ({ src, blurDataURL }) => {
+  return src ? (
+    <Image
+      // as={NextImage}
+      // loading="lazy"
+      layout="fill"
+      boxSize="100%"
+      objectFit="cover"
+      transition="all 0.2s ease"
+      src={src ? getPublicURL(src) : ''}
+      fallback={
+        blurDataURL ? (
+          <Box boxSize="100%">
+            <Blurhash
+              hash={blurDataURL}
+              width={800}
+              height={400}
+              resolutionX={56}
+              resolutionY={32}
+              punch={1}
+            />
+          </Box>
+        ) : (
+          <Flex align="center" justify="center">
+            <Spinner size="sm" />
+          </Flex>
+        )
+      }
+    />
+  ) : (
+    <Box boxSize="100%" bg="gray.200" />
   )
 }

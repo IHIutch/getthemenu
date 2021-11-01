@@ -5,6 +5,9 @@ module.exports = {
         ? process.env.VERCEL_URL
         : 'http://localhost:3000',
   },
+  images: {
+    domains: ['kvmdzdprqsxytiuvpxzo.supabase.co'],
+  },
   async rewrites() {
     return {
       afterFiles: [
