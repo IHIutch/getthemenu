@@ -1,25 +1,15 @@
 import React from 'react'
-
 import MenuView from '@/components/views/MenuView'
-import LoginView from '@/components/views/LoginView'
 
-export default function RestaurantHome({ host }) {
-  return host ? <MenuView host={host} /> : <LoginView />
+export default function Home({ host }) {
+  return <MenuView host={host} />
 }
 
-export async function getServerSideProps(context) {
-  const host =
-    context.params.host !== 'getthemenu.io' &&
-    context.params.host !== 'localhost'
-      ? context.params.host.split('.')[0]
-      : ''
-  // : 'hello'
-
+export async function getServerSideProps({ params: { host } }) {
   return {
     props: {
       host,
     },
-    // revalidate: 10,
   }
 }
 

@@ -11,7 +11,7 @@ import {
 import { Select } from '@chakra-ui/select'
 import { Spinner } from '@chakra-ui/spinner'
 import { useRouter } from 'next/router'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Blurhash } from 'react-blurhash'
 import Head from 'next/head'
 import { getPublicURL } from '@/utils/functions'
@@ -21,13 +21,9 @@ import { useGetSections } from '@/utils/react-query/sections'
 import { useGetRestaurants } from '@/utils/react-query/restaurants'
 import NextImage from 'next/image'
 
-export default function MenuView({ host }) {
+export default function MenuView({ host, slug = null }) {
   const { query, replace, push } = useRouter()
   const [activeMenu, setActiveMenu] = useState(query?.slug || null)
-
-  const currentSlug = useMemo(() => {
-    return query?.slug || null
-  }, [query?.slug])
 
   const { data: restaurants } = useGetRestaurants({ subdomain: host })
   const { data: menus } = useGetMenus({ restaurantId: restaurants?.[0]?.id })
@@ -36,16 +32,16 @@ export default function MenuView({ host }) {
   const { data: sections } = useGetSections(menu?.id && { menuId: menu.id })
 
   useEffect(() => {
-    if (!query?.slug) {
+    if (!slug && menus) {
       replace(`/${menus?.[0]?.id}`)
     }
-  }, [menus, query?.slug, replace])
+  }, [menus, replace, slug])
 
   useEffect(() => {
-    if (activeMenu !== currentSlug) {
+    if (activeMenu !== slug) {
       push(`/${activeMenu}`)
     }
-  }, [activeMenu, currentSlug, push])
+  }, [activeMenu, slug, push])
 
   return (
     <>

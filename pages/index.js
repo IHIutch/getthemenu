@@ -21,7 +21,7 @@ import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useAuthUser } from '@/utils/react-query/user'
 
-export default function LoginView() {
+export default function Login() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const {
