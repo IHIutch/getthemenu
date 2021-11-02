@@ -10,7 +10,7 @@ export default function middleware(req) {
   // (in the case of "test.vercel.app", "vercel.app" is the root URL)
   const currentHost =
     process.env.NODE_ENV === 'production'
-      ? hostname.replace(`.${process.env.NEXT_PUBLIC_VERCEL_URL}`, '')
+      ? hostname.replace(`.${process.env.NEXT_PUBLIC_APP_URL}`, '')
       : process.env.CURRENT_HOST
 
   // Prevent security issues – users should not be able to canonically access
