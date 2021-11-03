@@ -174,7 +174,7 @@ const Details = () => {
                     type="text"
                     autoComplete="off"
                   />
-                  <InputRightAddon children=".getthemenu.io" />
+                  <InputRightAddon>.getthemenu.io</InputRightAddon>
                 </InputGroup>
               </FormControl>
             </GridItem>

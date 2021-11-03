@@ -192,7 +192,7 @@ export default function GetStarted() {
                           }
                           autoComplete="off"
                         />
-                        <InputRightAddon children=".getthemenu.io" />
+                        <InputRightAddon>.getthemenu.io</InputRightAddon>
                       </InputGroup>
                       <FormErrorMessage>
                         {errors.subdomain?.message}

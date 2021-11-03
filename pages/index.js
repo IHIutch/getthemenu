@@ -154,7 +154,7 @@ export default function Login() {
             <Box textAlign="center" mt="6">
               <NextLink href="/register" passHref>
                 <Button as={Link} colorScheme="blue" variant="link">
-                  Don't Have an Account? Register Now!
+                  Don&rsquo;t Have an Account? Register Now!
                 </Button>
               </NextLink>
             </Box>
