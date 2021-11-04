@@ -8,8 +8,8 @@ export default function PublicMenuLayout({ children }) {
   return (
     <Box>
       <Box>Test</Box>
-      <AnimateSharedLayout>
-        <AnimatePresence exitBeforeEnter>
+      <AnimateSharedLayout type="crossfade">
+        <AnimatePresence>
           <motion.main
             key={asPath}
             initial={'hidden'}
@@ -24,7 +24,9 @@ export default function PublicMenuLayout({ children }) {
               type: 'easeInOut',
             }}
           >
-            {children}
+            <Box position="absolute" w="100%">
+              {children}
+            </Box>
           </motion.main>
         </AnimatePresence>
       </AnimateSharedLayout>
