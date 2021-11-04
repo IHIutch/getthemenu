@@ -20,7 +20,9 @@ export default function PublicMenuLayout({ children }) {
               enter: { opacity: 1, x: 0, y: 0 },
               exit: { opacity: 0, x: 0, y: 50 },
             }}
-            transition={{ type: 'linear' }}
+            transition={{
+              type: 'easeInOut',
+            }}
           >
             {children}
           </motion.main>
