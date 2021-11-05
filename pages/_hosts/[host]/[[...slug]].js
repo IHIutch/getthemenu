@@ -141,7 +141,7 @@ const ItemImage = ({ src, blurDataURL }) => {
       boxSize="100%"
       objectFit="cover"
       transition="all 0.2s ease"
-      src={src ? getPublicURL(src) : ''}
+      src={src}
       fallback={
         blurDataURL ? (
           <Box boxSize="100%">

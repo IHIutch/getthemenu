@@ -320,9 +320,7 @@ const MenuItemsContainer = ({
 
 const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
   const imageUrl = useMemo(() => {
-    return menuItem?.image
-      ? getPublicURL(menuItem.image.src)
-      : 'https://picsum.photos/200'
+    return menuItem?.image?.src || 'https://picsum.photos/200'
   }, [menuItem.image])
   return (
     <Flex alignItems="flex-start">
@@ -495,7 +493,7 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
     if (menuItem) {
       const payload = {
         ...menuItem,
-        image: menuItem?.image ? getPublicURL(menuItem.image.src) : null,
+        image: menuItem?.image?.src || null,
       }
       reset(payload)
     }

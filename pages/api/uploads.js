@@ -3,6 +3,7 @@ import formidable from 'formidable'
 import fs from 'fs'
 import supabase from '@/utils/supabase'
 import { v4 as uuidv4 } from 'uuid'
+import { getPublicURL } from '@/utils/functions'
 
 const handler = async (req, res) => {
   const { method } = req
@@ -32,7 +33,9 @@ const handler = async (req, res) => {
           .upload(filePath, file)
         if (error) throw new Error(error.message)
 
-        res.status(resStatusType.SUCCESS).json(filePath)
+        const src = await getPublicURL(filePath)
+
+        res.status(resStatusType.SUCCESS).json(src)
       } catch (error) {
         console.error(error)
         res.status(resStatusType.BAD_REQUEST).json(error)

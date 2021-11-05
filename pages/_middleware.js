@@ -22,6 +22,7 @@ export default function middleware(req) {
   }
 
   if (
+    currentHost &&
     currentHost !== process.env.NEXT_PUBLIC_APP_URL &&
     !pathname.includes('.') && // exclude all files in the public folder
     !pathname.startsWith('/api') // exclude all API routes
