@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import Container from '@/components/common/Container'
+
 import Navbar from '@/components/common/Navbar'
 
 import {
@@ -31,6 +31,7 @@ import {
   Img,
   HStack,
   VStack,
+  Container,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Edit, X } from 'react-feather'
@@ -161,7 +162,7 @@ export default function SingleMenu() {
           <SubnavItem href={`/menu/${menuId}/edit`}>Edit</SubnavItem>
         </HStack>
       </Navbar>
-      <Container>
+      <Container maxW="container.xl">
         <Box my="8">
           <Button
             leftIcon={<Icon as={Edit} />}

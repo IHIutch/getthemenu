@@ -11,10 +11,11 @@ import {
   Heading,
   Input,
   Link,
+  Container,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import Container from '@/components/common/Container'
+
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import supabase from '@/utils/supabase'
@@ -50,7 +51,7 @@ export default function ResetPassword() {
         <title>Reset Password</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container py="24">
+      <Container maxW="container.xl" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem
             colStart={{ md: '3', xl: '4' }}

@@ -1,7 +1,6 @@
-import Container from '@/components/common/Container'
 import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
-import { Box, HStack } from '@chakra-ui/react'
+import { Box, HStack, Container } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import React from 'react'

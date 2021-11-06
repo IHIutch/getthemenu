@@ -1,7 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import Head from 'next/head'
-import Container from '@/components/common/Container'
-import Navbar from '@/components/common/Navbar'
 import {
   Grid,
   GridItem,
@@ -19,8 +16,9 @@ import {
   VStack,
   ButtonGroup,
   Button,
+  Container,
 } from '@chakra-ui/react'
-import SubnavItem from '@/components/common/SubnavItem'
+import Head from 'next/head'
 import {
   useGetRestaurant,
   useUpdateRestaurant,
@@ -37,7 +35,7 @@ export default function Restaurant() {
       </Head>
 
       <DefaultLayout>
-        <Container py="8">
+        <Container maxW="container.xl" py="8">
           <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
             <GridItem
               colStart={{ md: '2', xl: '3' }}

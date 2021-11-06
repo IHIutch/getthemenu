@@ -14,9 +14,10 @@ import {
   Heading,
   Input,
   Link,
+  Container,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
-import Container from '@/components/common/Container'
+
 import { useAuthUser } from '@/utils/react-query/user'
 import NextLink from 'next/link'
 
@@ -84,7 +85,7 @@ export default function Register() {
         <title>Register</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container py="24">
+      <Container maxW="container.xl" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem
             colStart={{ md: '4', lg: '5' }}

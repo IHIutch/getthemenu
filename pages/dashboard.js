@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Container from '@/components/common/Container'
 
 import { apiGetMenus } from '@/controllers/menus'
 import { postMenu } from '@/utils/axios/menus'
@@ -31,6 +30,7 @@ import {
   Stack,
   Text,
   useDisclosure,
+  Container,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
@@ -83,7 +83,7 @@ export default function Profile() {
       </Head>
 
       <DefaultLayout>
-        <Container py="8">
+        <Container maxW="container.xl" py="8">
           <Box>
             <Flex mb="4" align="center">
               <Heading fontSize="xl">Your Menus</Heading>

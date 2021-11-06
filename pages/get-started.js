@@ -18,9 +18,10 @@ import {
   InputRightAddon,
   Spinner,
   Text,
+  Container,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
-import Container from '@/components/common/Container'
+
 import slugify from 'slugify'
 import { debounce } from 'lodash'
 import { postRestaurant } from '@/utils/axios/restaurants'
@@ -142,7 +143,7 @@ export default function GetStarted() {
         <title>Register</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container py="24">
+      <Container maxW="container.xl" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem
             colStart={{ md: '3', xl: '4' }}

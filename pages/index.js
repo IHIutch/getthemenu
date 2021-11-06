@@ -11,8 +11,9 @@ import {
   Heading,
   Input,
   Link,
+  Container,
 } from '@chakra-ui/react'
-import Container from '@/components/common/Container'
+
 import Head from 'next/head'
 import supabase from '@/utils/supabase'
 import { useForm } from 'react-hook-form'
@@ -78,7 +79,7 @@ export default function Login() {
         <title>GetTheMenu</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container py="24">
+      <Container maxW="container.xl" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem
             colStart={{ md: '4', lg: '5' }}

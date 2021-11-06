@@ -48,7 +48,7 @@ export default function RestaurantMenu({
       </Head>
       <PublicMenuLayout>
         <Box>
-          <Container maxW="container.sm">
+          <Container maxW="container.xl">
             <Select
               value={activeMenu}
               onChange={(e) => {
