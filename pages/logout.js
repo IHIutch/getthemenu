@@ -15,7 +15,7 @@ export default function SignOut() {
           event,
           session,
         })
-        queryClient.invalidateQueries(['user'])
+        await queryClient.invalidateQueries(['user'])
         router.replace('/')
       }
     )
@@ -26,6 +26,7 @@ export default function SignOut() {
   }, [queryClient, router])
 
   useEffect(() => {
+    console.log('signout')
     supabase.auth.signOut()
   }, [])
 

@@ -88,7 +88,6 @@ export default function GetStarted() {
           })
         }
       } catch (error) {
-        console.log(error)
         setIsCheckingSlug(false)
         alert(error)
       }

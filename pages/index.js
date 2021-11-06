@@ -30,6 +30,12 @@ export default function Login() {
     formState: { errors },
   } = useForm()
 
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -59,12 +65,6 @@ export default function Login() {
       alert(error.message)
     }
   }
-
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
 
   useEffect(() => {
     if (user) {

@@ -27,6 +27,7 @@ import {
 } from '@/utils/react-query/restaurants'
 import { useAuthUser } from '@/utils/react-query/user'
 import { useFieldArray, useForm, useFormState } from 'react-hook-form'
+import DefaultLayout from '@/layouts/Default'
 
 export default function Restaurant() {
   return (
@@ -34,49 +35,45 @@ export default function Restaurant() {
       <Head>
         <title>GetTheMenu</title>
       </Head>
-      <Navbar>
-        <HStack spacing="6">
-          <SubnavItem href="/dashboard">Dashboard</SubnavItem>
-          <SubnavItem href="/restaurant">Restaurant</SubnavItem>
-          <SubnavItem href="/menus">Menus</SubnavItem>
-        </HStack>
-      </Navbar>
-      <Container py="8">
-        <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem
-            colStart={{ md: '2', xl: '3' }}
-            colSpan={{ md: '10', xl: '8' }}
-          >
-            <Box bg="white" rounded="md" shadow="base">
-              <Details />
-            </Box>
-          </GridItem>
-          <GridItem
-            colStart={{ md: '2', xl: '3' }}
-            colSpan={{ md: '10', xl: '8' }}
-          >
-            <Box bg="white" rounded="md" shadow="base">
-              <Contact />
-            </Box>
-          </GridItem>
-          <GridItem
-            colStart={{ md: '2', xl: '3' }}
-            colSpan={{ md: '10', xl: '8' }}
-          >
-            <Box bg="white" rounded="md" shadow="base">
-              <Address />
-            </Box>
-          </GridItem>
-          <GridItem
-            colStart={{ md: '2', xl: '3' }}
-            colSpan={{ md: '10', xl: '8' }}
-          >
-            <Box bg="white" rounded="md" shadow="base">
-              <Hours />
-            </Box>
-          </GridItem>
-        </Grid>
-      </Container>
+
+      <DefaultLayout>
+        <Container py="8">
+          <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
+            <GridItem
+              colStart={{ md: '2', xl: '3' }}
+              colSpan={{ md: '10', xl: '8' }}
+            >
+              <Box bg="white" rounded="md" shadow="base">
+                <Details />
+              </Box>
+            </GridItem>
+            <GridItem
+              colStart={{ md: '2', xl: '3' }}
+              colSpan={{ md: '10', xl: '8' }}
+            >
+              <Box bg="white" rounded="md" shadow="base">
+                <Contact />
+              </Box>
+            </GridItem>
+            <GridItem
+              colStart={{ md: '2', xl: '3' }}
+              colSpan={{ md: '10', xl: '8' }}
+            >
+              <Box bg="white" rounded="md" shadow="base">
+                <Address />
+              </Box>
+            </GridItem>
+            <GridItem
+              colStart={{ md: '2', xl: '3' }}
+              colSpan={{ md: '10', xl: '8' }}
+            >
+              <Box bg="white" rounded="md" shadow="base">
+                <Hours />
+              </Box>
+            </GridItem>
+          </Grid>
+        </Container>
+      </DefaultLayout>
     </>
   )
 }
