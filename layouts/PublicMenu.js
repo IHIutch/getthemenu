@@ -125,7 +125,7 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
         </Box>
         <Container maxW="container.xl">
           <Grid templateColumns="repeat(12, 1fr)" gap="4">
-            <GridItem colSpan={{ base: '12', lg: '7' }}>
+            <GridItem colSpan={{ base: '12', lg: '7' }} position="relative">
               <AnimateSharedLayout type="crossfade">
                 <AnimatePresence>
                   <motion.main
