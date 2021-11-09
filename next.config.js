@@ -25,8 +25,6 @@ const sentryWebpackPluginOptions = {
   //   urlPrefix, include, ignore
 
   silent: true, // Suppresses all logs
-  target: 'experimental-serverless-trace', // Enables experimental serverless tracingß
-  outputFileTracing: false,
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 }
