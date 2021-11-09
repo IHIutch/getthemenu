@@ -14,14 +14,11 @@ const handler = async (req, res) => {
         const parseFile = async () => {
           return await new Promise((resolve, reject) => {
             const form = formidable({})
-            form.parse(req, (err) => {
+            form.parse(req, (err, fields, files) => {
               if (err) reject(err)
-            })
-
-            form.on('file', (formname, file) => {
               resolve({
-                name: file.originalFilename,
-                file: fs.readFileSync(file.filepath),
+                name: files.file[0].originalFilename,
+                file: fs.readFileSync(files.file[0].filepath),
               })
             })
           })
