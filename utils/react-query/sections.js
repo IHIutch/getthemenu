@@ -91,7 +91,10 @@ export const useUpdateSection = (params) => {
         queryClient.setQueryData(['sections', params], (old) => {
           return old.map((o) => {
             if (o.id === payload.id) {
-              return payload
+              return {
+                ...o,
+                payload,
+              }
             }
             return o
           })

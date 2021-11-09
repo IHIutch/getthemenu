@@ -91,7 +91,10 @@ export const useUpdateMenuItem = (params) => {
         queryClient.setQueryData(['menuItems', params], (old) => {
           return old.map((o) => {
             if (o.id === payload.id) {
-              return payload
+              return {
+                ...o,
+                payload,
+              }
             }
             return o
           })
