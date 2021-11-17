@@ -3,12 +3,10 @@ import {
   AspectRatio,
   Box,
   Container,
-  Divider,
   Flex,
   Grid,
   GridItem,
   Heading,
-  HStack,
   StackDivider,
   Text,
   VStack,
@@ -16,7 +14,7 @@ import {
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { Image, Img } from '@chakra-ui/image'
+import { Image } from '@chakra-ui/image'
 import { Select } from '@chakra-ui/select'
 import { FormControl, FormLabel } from '@chakra-ui/form-control'
 

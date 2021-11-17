@@ -69,6 +69,7 @@ export default function RestaurantMenu({
                                   borderBottomWidth="1px"
                                 >
                                   <ItemImage
+                                    alt={item?.title || 'Menu item'}
                                     src={item?.image?.src}
                                     blurDataURL={item?.image?.blurDataURL}
                                   />
@@ -98,7 +99,7 @@ export default function RestaurantMenu({
   )
 }
 
-const ItemImage = ({ src, blurDataURL }) => {
+const ItemImage = ({ src, blurDataURL, alt }) => {
   const [isLoaded, setIsLoaded] = useState(false)
 
   return src ? (
@@ -114,6 +115,7 @@ const ItemImage = ({ src, blurDataURL }) => {
         transition="all 0.2s ease"
         src={src}
         onLoad={() => setIsLoaded(true)}
+        alt={alt}
       />
       <Box
         opacity={isLoaded ? 0 : 1}
