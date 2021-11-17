@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { apiGetMenuItems } from '@/controllers/menuItems'
 import { apiGetMenu, apiGetMenus } from '@/controllers/menus'
 import { apiGetRestaurants } from '@/controllers/restaurants'
 import { apiGetSections } from '@/controllers/sections'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
-import {
-  AspectRatio,
-  Box,
-  Container,
-  Flex,
-  Heading,
-  Stack,
-  Text,
-} from '@chakra-ui/layout'
-import { Select } from '@chakra-ui/select'
+import NextImage from 'next/image'
+import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/layout'
 import { Image } from '@chakra-ui/image'
-import { getPublicURL } from '@/utils/functions'
 import { Blurhash } from 'react-blurhash'
 import { Spinner } from '@chakra-ui/spinner'
 import PublicMenuLayout from '@/layouts/PublicMenu'
-import { AnimatePresence, motion } from 'framer-motion'
 
 export default function RestaurantMenu({
   slug,
@@ -110,34 +99,44 @@ export default function RestaurantMenu({
 }
 
 const ItemImage = ({ src, blurDataURL }) => {
+  const [isLoaded, setIsLoaded] = useState(false)
+
   return src ? (
-    <Image
-      // as={NextImage}
-      // loading="lazy"
-      layout="fill"
-      boxSize="100%"
-      objectFit="cover"
-      transition="all 0.2s ease"
-      src={src}
-      fallback={
-        blurDataURL ? (
-          <Box boxSize="100%">
-            <Blurhash
-              hash={blurDataURL}
-              width={800}
-              height={400}
-              resolutionX={56}
-              resolutionY={32}
-              punch={1}
-            />
-          </Box>
+    <>
+      <Image
+        as={NextImage}
+        position="absolute"
+        opacity={isLoaded ? 1 : 0}
+        loading="lazy"
+        layout="fill"
+        boxSize="100%"
+        objectFit="cover"
+        transition="all 0.2s ease"
+        src={src}
+        onLoad={() => setIsLoaded(true)}
+      />
+      <Box
+        opacity={isLoaded ? 0 : 1}
+        transition="all 0.2s ease"
+        boxSize="100%"
+        position="absolute"
+      >
+        {blurDataURL ? (
+          <Blurhash
+            hash={blurDataURL}
+            width={800}
+            height={400}
+            resolutionX={56}
+            resolutionY={32}
+            punch={1}
+          />
         ) : (
           <Flex align="center" justify="center">
             <Spinner size="sm" />
           </Flex>
-        )
-      }
-    />
+        )}
+      </Box>
+    </>
   ) : (
     <Box boxSize="100%" bg="gray.200" />
   )

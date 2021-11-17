@@ -28,7 +28,6 @@ import {
   ButtonGroup,
   AspectRatio,
   Image,
-  Img,
   HStack,
   VStack,
   Container,
@@ -326,7 +325,7 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
   return (
     <Flex alignItems="flex-start">
       <AspectRatio w="16" ratio="1">
-        <Img src={imageUrl} objectFit="cover" />
+        <Image src={imageUrl} objectFit="cover" />
       </AspectRatio>
       <Box flexGrow="1" ml="4">
         <Flex>

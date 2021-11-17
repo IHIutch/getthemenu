@@ -16,13 +16,13 @@ import {
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { Image } from '@chakra-ui/image'
+import { Image, Img } from '@chakra-ui/image'
 import { Select } from '@chakra-ui/select'
 import { FormControl, FormLabel } from '@chakra-ui/form-control'
 
 export default function PublicMenuLayout({ restaurant, menus, children }) {
   const { asPath, push, query } = useRouter()
-  const slug = query?.slug?.[0] || null
+  const slug = query?.slug?.[0] || ''
   const [activeMenu, setActiveMenu] = useState(slug)
 
   useEffect(() => {
@@ -53,6 +53,7 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
                 boxSize="100%"
                 objectFit="cover"
                 src="https://picsum.photos/1500/450/"
+                alt={restaurant.title}
               />
               <Flex
                 position="absolute"
