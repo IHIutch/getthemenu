@@ -48,44 +48,44 @@ export default function GetStarted() {
     formState: { errors },
   } = useForm()
 
-  const checkSimilarSubdomain = async (subdomain) => {
+  const checkSimilarHost = async (customHost) => {
     try {
-      const { data } = await axios.get(`/api/restaurants?similar=${subdomain}`)
+      const { data } = await axios.get(`/api/restaurants?similar=${customHost}`)
       let count = 0
-      let out = subdomain
+      let out = customHost
       const slugs = data.map((d) => d.slug)
       if (slugs) {
         while (slugs.includes(out)) {
-          out = `${subdomain}-${count + 1}`
+          out = `${customHost}-${count + 1}`
           count++
         }
       }
-      await checkUniqueSubdomain(out)
+      await checkUniqueHost(out)
       return out
     } catch (error) {
       alert(error)
     }
   }
 
-  const checkUniqueSubdomain = async (subdomain) => {
-    if (subdomain) {
+  const checkUniqueHost = async (customHost) => {
+    if (customHost) {
       try {
         const { data } = await axios.get(
-          `/api/restaurants?subdomain=${subdomain}`,
+          `/api/restaurants?customHost=${customHost}`,
           {
-            subdomain,
+            customHost,
           }
         )
         setIsCheckingSlug(false)
         if (data.length) {
           setSlugMessage({
             type: 'error',
-            message: `${subdomain} is already taken.`,
+            message: `${customHost} is already taken.`,
           })
         } else {
           setSlugMessage({
             type: 'success',
-            message: `${subdomain} is available!`,
+            message: `${customHost} is available!`,
           })
         }
       } catch (error) {
@@ -98,37 +98,37 @@ export default function GetStarted() {
     }
   }
 
-  const handleDebounce = useMemo(() => debounce(checkUniqueSubdomain, 500), [])
+  const handleDebounce = useMemo(() => debounce(checkUniqueHost, 500), [])
 
-  const debouncedCheckUniqueSubdomain = useCallback(
-    (subdomain) => {
+  const debouncedCheckUniqueHost = useCallback(
+    (customHost) => {
       setIsCheckingSlug(true)
-      handleDebounce(subdomain)
+      handleDebounce(customHost)
     },
     [handleDebounce]
   )
 
-  const handleSetSubdomain = async (e) => {
-    const [name, subdomain] = getValues(['restaurantName', 'subdomain'])
-    if (name && !subdomain) {
-      // 63 is the max length of a subdomain
-      const newSubdomain = slugify(name.slice(0, 63), {
+  const handleSetHost = async (e) => {
+    const [name, customHost] = getValues(['restaurantName', 'customHost'])
+    if (name && !customHost) {
+      // 63 is the max length of a customHost
+      const newHost = slugify(name.slice(0, 63), {
         lower: true,
         strict: true,
       })
-      const uniqueSubdomain = await checkSimilarSubdomain(newSubdomain)
-      setValue('subdomain', uniqueSubdomain, { shouldValidate: true })
+      const uniqueHost = await checkSimilarHost(newHost)
+      setValue('customHost', uniqueHost, { shouldValidate: true })
     }
   }
 
   const onSubmit = async (form) => {
     try {
-      const [name, subdomain] = getValues(['restaurantName', 'subdomain'])
+      const [name, customHost] = getValues(['restaurantName', 'customHost'])
       setIsSubmitting(true)
       await postRestaurant({
         userId: user.id,
         name,
-        subdomain,
+        customHost,
       })
       router.replace('/dashboard')
     } catch (error) {
@@ -170,7 +170,7 @@ export default function GetStarted() {
                           required: 'This field is required',
                         })}
                         type="text"
-                        onBlur={handleSetSubdomain}
+                        onBlur={handleSetHost}
                         autoComplete="off"
                       />
                       <FormErrorMessage>
@@ -179,23 +179,23 @@ export default function GetStarted() {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="subdomain" isInvalid={errors.subdomain}>
+                    <FormControl id="customHost" isInvalid={errors.customHost}>
                       <FormLabel>Choose a Unique URL</FormLabel>
                       <InputGroup>
                         <Input
-                          {...register('subdomain', {
+                          {...register('customHost', {
                             required: 'This field is required',
                           })}
                           type="text"
                           onChange={(e) =>
-                            debouncedCheckUniqueSubdomain(e.target.value)
+                            debouncedCheckUniqueHost(e.target.value)
                           }
                           autoComplete="off"
                         />
                         <InputRightAddon>.getthemenu.io</InputRightAddon>
                       </InputGroup>
                       <FormErrorMessage>
-                        {errors.subdomain?.message}
+                        {errors.customHost?.message}
                       </FormErrorMessage>
                       {isCheckingSlug && (
                         <Alert status="info" mt="2">

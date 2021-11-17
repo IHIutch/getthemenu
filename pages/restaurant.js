@@ -96,7 +96,7 @@ const Details = () => {
   const defaultValues = useMemo(() => {
     return {
       restaurantName: restaurant?.name || '',
-      subdomain: restaurant?.subdomain || '',
+      customHost: restaurant?.customHost || '',
     }
   }, [restaurant])
 
@@ -121,13 +121,13 @@ const Details = () => {
 
   const onSubmit = async () => {
     try {
-      const [name, subdomain] = getValues(['restaurantName', 'subdomain'])
+      const [name, customHost] = getValues(['restaurantName', 'customHost'])
       setIsSubmitting(true)
       await handleUpdateRestaurant({
         id: user.restaurants[0].id,
         payload: {
           name,
-          subdomain,
+          customHost,
         },
       })
       setIsSubmitting(false)
@@ -163,7 +163,7 @@ const Details = () => {
                 <FormLabel>Unique Slug</FormLabel>
                 <InputGroup>
                   <Input
-                    {...register('subdomain', {
+                    {...register('customHost', {
                       required: 'This field is required',
                     })}
                     type="text"

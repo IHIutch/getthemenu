@@ -36,9 +36,9 @@ export default function Navbar({ children, ...props }) {
               </Flex>
               <Box ml="auto">
                 <HStack>
-                  {restaurant?.subdomain && (
+                  {restaurant?.customHost && (
                     <NextLink
-                      href={`https://${restaurant.subdomain}.getthemenu.io`}
+                      href={`https://${restaurant.customHost}.getthemenu.io`}
                       passHref
                     >
                       <Button size="sm" as={Link} target="blank">

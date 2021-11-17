@@ -147,7 +147,7 @@ const ItemImage = ({ src, blurDataURL, alt }) => {
 export async function getServerSideProps({ params: { host }, query }) {
   const slug = query?.slug?.[0] || null
 
-  const restaurants = await apiGetRestaurants({ subdomain: host })
+  const restaurants = await apiGetRestaurants({ customHost: host })
   const restaurant = restaurants?.[0]
 
   if (!restaurant) {
