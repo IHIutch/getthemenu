@@ -7,7 +7,7 @@ export const handleStructuredData = ({ restaurant, menus }) => {
     '@context': 'http://schema.org',
     '@type': 'Restaurant',
     url: 'http://www.thisisarestaurant.com',
-    name: restaurant.title,
+    name: restaurant.name,
     image: restaurant.image,
     telephone: restaurant.phone,
     priceRange: '$100 - $200',

@@ -34,7 +34,7 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
   return (
     <>
       <Head>
-        <title>{restaurant.title}</title>
+        <title>{restaurant.name}</title>
         <link rel="icon" href="/favicon.ico" />
         {/* <script
           type="application/ld+json"
@@ -51,7 +51,7 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
                 boxSize="100%"
                 objectFit="cover"
                 src="https://picsum.photos/1500/450/"
-                alt={restaurant.title}
+                alt={restaurant.name}
               />
               <Flex
                 position="absolute"
