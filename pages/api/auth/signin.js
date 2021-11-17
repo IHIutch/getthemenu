@@ -1,5 +1,6 @@
 import { apiPostSignInUser } from '@/controllers/users'
 import { resStatusType } from '@/utils/types'
+import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req, res) => {
   const { method } = req
@@ -14,4 +15,4 @@ const handler = async (req, res) => {
   }
 }
 
-export default handler
+export default withSentry(handler)

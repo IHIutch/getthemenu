@@ -4,6 +4,7 @@ import fs from 'fs'
 import supabase from '@/utils/supabase'
 import { v4 as uuidv4 } from 'uuid'
 import { getPublicURL } from '@/utils/functions'
+import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req, res) => {
   const { method } = req
@@ -54,4 +55,4 @@ export const config = {
   },
 }
 
-export default handler
+export default withSentry(handler)
