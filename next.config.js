@@ -15,6 +15,7 @@ const moduleExports = {
   images: {
     domains: ['kvmdzdprqsxytiuvpxzo.supabase.co'],
   },
+  outputFileTracing: false, // Temporary fix for Sentry
 }
 
 const sentryWebpackPluginOptions = {
