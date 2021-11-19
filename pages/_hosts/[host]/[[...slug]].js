@@ -105,7 +105,7 @@ const ItemImage = ({ src, blurDataURL, alt }) => {
   return src ? (
     <>
       <Image
-        as={NextImage}
+        // as={NextImage}
         position="absolute"
         opacity={isLoaded ? 1 : 0}
         loading="lazy"
