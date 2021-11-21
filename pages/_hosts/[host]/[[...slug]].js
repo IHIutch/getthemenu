@@ -105,7 +105,8 @@ const ItemImage = ({ src, blurDataURL, alt }) => {
   return src ? (
     <>
       <Image
-        // as={NextImage}
+        as={NextImage}
+        onLoadingComplete={() => setIsLoaded(true)}
         position="absolute"
         opacity={isLoaded ? 1 : 0}
         loading="lazy"
@@ -114,7 +115,6 @@ const ItemImage = ({ src, blurDataURL, alt }) => {
         objectFit="cover"
         transition="all 0.2s ease"
         src={src}
-        onLoad={() => setIsLoaded(true)}
         alt={alt}
       />
       <Box
