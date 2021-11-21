@@ -226,6 +226,7 @@ export default function SingleMenu() {
                                 handleDrawerOpen(
                                   <MenuItemDrawer
                                     sectionId={s.id}
+                                    position={getSectionItems(s.id).length}
                                     handleDrawerClose={drawerState.onClose}
                                   />
                                 )
@@ -250,7 +251,10 @@ export default function SingleMenu() {
             colorScheme="blue"
             onClick={() =>
               handleDrawerOpen(
-                <SectionDrawer handleDrawerClose={drawerState.onClose} />
+                <SectionDrawer
+                  position={sortedSections.length}
+                  handleDrawerClose={drawerState.onClose}
+                />
               )
             }
           >
@@ -320,12 +324,20 @@ const MenuItemsContainer = ({
 
 const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
   const imageUrl = useMemo(() => {
-    return menuItem?.image?.src || 'https://picsum.photos/200'
+    return menuItem?.image?.src || null
   }, [menuItem.image])
   return (
     <Flex alignItems="flex-start">
       <AspectRatio w="16" ratio="1">
-        <Image src={imageUrl} objectFit="cover" />
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            objectFit="cover"
+            alt={menuItem.title || 'Menu Item'}
+          />
+        ) : (
+          <Box boxSize="100%" bg="gray.100" />
+        )}
       </AspectRatio>
       <Box flexGrow="1" ml="4">
         <Flex>
@@ -392,7 +404,7 @@ const EditTitleDrawer = ({ handleDrawerClose }) => {
   )
 }
 
-const SectionDrawer = ({ section = null, handleDrawerClose }) => {
+const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
   const { data: sections } = useGetSections({ menuId })
@@ -429,6 +441,7 @@ const SectionDrawer = ({ section = null, handleDrawerClose }) => {
           })
         : await handleCreateSection({
             ...editingSection,
+            position,
             menuId,
             restaurantId: user.restaurants[0].id,
           })
@@ -483,7 +496,12 @@ const SectionDrawer = ({ section = null, handleDrawerClose }) => {
   )
 }
 
-const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
+const MenuItemDrawer = ({
+  sectionId,
+  position,
+  menuItem = null,
+  handleDrawerClose,
+}) => {
   const router = useRouter()
   const { menuId } = router.query
 
@@ -518,7 +536,12 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
   const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
-      const payload = { ...form }
+      const payload = {
+        title: form?.title || '',
+        description: form?.description || '',
+        price: form?.price || null,
+        image: null,
+      }
       if (form?.image) {
         const formData = new FormData()
         formData.append('file', form.image, form.image.name)
@@ -535,6 +558,8 @@ const MenuItemDrawer = ({ sectionId, menuItem = null, handleDrawerClose }) => {
           })
         : await handleCreateMenuItem({
             ...payload,
+            sectionId,
+            position,
             menuId,
             restaurantId: user.restaurants[0].id,
           })

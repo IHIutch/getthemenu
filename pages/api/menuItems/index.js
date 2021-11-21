@@ -22,7 +22,8 @@ const handler = async (req, res) => {
         const data = await apiPostMenuItem(req.body)
         res.status(resStatusType.SUCCESS).json(data[0])
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        console.log(error)
+        res.status(resStatusType.BAD_REQUEST).json(error.message)
       }
       break
 
