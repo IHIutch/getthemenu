@@ -90,7 +90,7 @@ export default function GetStarted() {
         }
       } catch (error) {
         setIsCheckingSlug(false)
-        alert(error)
+        alert(error.message)
       }
     } else {
       setIsCheckingSlug(false)
@@ -102,7 +102,6 @@ export default function GetStarted() {
 
   const debouncedCheckUniqueHost = useCallback(
     (customHost) => {
-      setIsCheckingSlug(true)
       handleDebounce(customHost)
     },
     [handleDebounce]
@@ -123,12 +122,12 @@ export default function GetStarted() {
 
   const onSubmit = async (form) => {
     try {
-      const [name, customHost] = getValues(['restaurantName', 'customHost'])
+      const { restaurantName, customHost } = form
       setIsSubmitting(true)
       await postRestaurant({
         userId: user.id,
-        name,
-        customHost,
+        name: restaurantName || '',
+        customHost: customHost || '',
       })
       router.replace('/dashboard')
     } catch (error) {

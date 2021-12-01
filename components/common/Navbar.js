@@ -31,7 +31,9 @@ export default function Navbar({ children, ...props }) {
             <Flex align="center">
               <Flex align="center" h="14">
                 <Heading as="h1" fontSize="lg">
-                  GetTheMenu
+                  <NextLink href={'/dashboard'} passHref>
+                    <Link>GetTheMenu</Link>
+                  </NextLink>
                 </Heading>
               </Flex>
               <Box ml="auto">

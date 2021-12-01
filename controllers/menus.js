@@ -1,7 +1,15 @@
 import supabase from '@/utils/supabase'
 
 export const apiGetMenus = async (params = {}) => {
-  const { data, error } = await supabase.from('menus').select('*').match(params)
+  const { similar, ...rest } = params
+
+  const { data, error } = similar
+    ? await supabase
+        .from('menus')
+        .select('slug')
+        .match({ restaurantId: rest.restaurantId })
+        .ilike('slug', `%${similar}%`)
+    : await supabase.from('menus').select('*').match(rest)
 
   if (error) {
     throw new Error(error.message)

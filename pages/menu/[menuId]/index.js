@@ -1,6 +1,5 @@
 import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
@@ -20,26 +19,25 @@ import {
 } from '@chakra-ui/form-control'
 import { Input } from '@chakra-ui/input'
 import { useForm, useFormState } from 'react-hook-form'
-import { useGetMenu } from '@/utils/react-query/menus'
+import { useGetMenu, useUpdateMenu } from '@/utils/react-query/menus'
 import slugify from 'slugify'
 import { debounce } from 'lodash'
 import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { Spinner } from '@chakra-ui/spinner'
 import { Button, ButtonGroup } from '@chakra-ui/button'
+import axios from 'redaxios'
 
-export default function Overview() {
+export default function Overview({ query: { menuId } }) {
   const [isCheckingSlug, setIsCheckingSlug] = useState(false)
   const [slugMessage, setSlugMessage] = useState(null)
 
-  const {
-    query: { menuId },
-  } = useRouter()
-
   const { data: menu } = useGetMenu(menuId)
+  const { mutate: handleUpdateMenu, isLoading: isSubmitting } =
+    useUpdateMenu(menuId)
 
   const defaultValues = useMemo(() => {
     return {
-      name: menu?.title || '',
+      title: menu?.title || '',
       slug: menu?.slug || '',
     }
   }, [menu])
@@ -64,34 +62,77 @@ export default function Overview() {
     reset(defaultValues)
   }, [defaultValues, reset, menu])
 
-  const handleSetSlug = async (e) => {
-    const [name, slug] = getValues(['name', 'slug'])
-    if (name && !slug) {
-      // 63 is the max length of a customHost
-      const newSlug = slugify(name, {
+  const handleSetSlug = async () => {
+    const [title, slug] = getValues(['title', 'slug'])
+    if (title && !slug) {
+      const newSlug = slugify(title, {
         lower: true,
         strict: true,
       })
-      setValue('slug', newSlug, { shouldValidate: true })
+      // const uniqueSlug = await getUniqueSlug(newSlug)
+      setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
+      debouncedCheckUniqueSlug(newSlug)
     }
   }
 
-  const handleDebounce = useMemo(
-    () =>
-      debounce(async (slug) => {
-        console.log({ slug })
-        setSlugMessage({
-          type: 'error',
-          message: `'${slug}' is already taken.`,
+  // const getUniqueSlug = async (slug) => {
+  //   try {
+  //     const { data } = await axios.get('/api/menus', {
+  //       params: {
+  //         similar: slug,
+  //         restaurantId: menu?.restaurantId,
+  //       },
+  //     })
+  //     let count = 0
+  //     let out = slug
+  //     const slugs = data.map((d) => d.slug)
+  //     if (slugs) {
+  //       while (slugs.includes(out)) {
+  //         out = `${slug}-${count + 1}`
+  //         count++
+  //       }
+  //     }
+  //     await debouncedCheckUniqueSlug(out)
+  //     return out
+  //   } catch (error) {
+  //     alert(error.message)
+  //   }
+  // }
+
+  const checkUniqueSlug = useCallback(
+    async (slug) => {
+      try {
+        if (menu?.slug === slug) return
+        setIsCheckingSlug(true)
+        const { data } = await axios.get('/api/menus', {
+          params: {
+            slug,
+            restaurantId: menu?.restaurantId,
+          },
         })
         setIsCheckingSlug(false)
-      }, 500),
-    []
+        if (data.length) {
+          setSlugMessage({
+            type: 'error',
+            message: `'${slug}' is already used.`,
+          })
+        } else {
+          setSlugMessage(null)
+        }
+      } catch (error) {
+        alert(error.message)
+      }
+    },
+    [menu?.restaurantId, menu?.slug]
+  )
+
+  const handleDebounce = useMemo(
+    () => debounce(checkUniqueSlug, 500),
+    [checkUniqueSlug]
   )
 
   const debouncedCheckUniqueSlug = useCallback(
     (slug) => {
-      setIsCheckingSlug(true)
       handleDebounce(slug)
     },
     [handleDebounce]
@@ -105,7 +146,14 @@ export default function Overview() {
   }, [debouncedCheckUniqueSlug, getValues, watchSlug])
 
   const onSubmit = async (form) => {
-    console.log({ form })
+    try {
+      await handleUpdateMenu({
+        id: menuId,
+        payload: form,
+      })
+    } catch (error) {
+      alert(error.message)
+    }
   }
 
   return (
@@ -130,10 +178,10 @@ export default function Overview() {
                 <Box p="6">
                   <Grid w="100%" gap="4">
                     <GridItem>
-                      <FormControl id="name">
-                        <FormLabel>Menu Name</FormLabel>
+                      <FormControl id="title">
+                        <FormLabel>Menu Title</FormLabel>
                         <Input
-                          {...register('name', {
+                          {...register('title', {
                             required: 'This field is required',
                           })}
                           onBlur={handleSetSlug}
@@ -187,8 +235,12 @@ export default function Overview() {
                     <Button
                       colorScheme="blue"
                       type="submit"
-                      isDisabled={!isDirty}
-                      // isLoading={isSubmitting}
+                      isDisabled={
+                        !isDirty ||
+                        isCheckingSlug ||
+                        slugMessage?.type === 'error'
+                      }
+                      isLoading={isSubmitting}
                       loadingText="Saving..."
                     >
                       Save
@@ -202,4 +254,12 @@ export default function Overview() {
       </Container>
     </>
   )
+}
+
+export async function getServerSideProps({ query }) {
+  return {
+    props: {
+      query,
+    },
+  }
 }

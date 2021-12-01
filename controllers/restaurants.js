@@ -3,10 +3,12 @@ import supabase from '@/utils/supabase'
 export const apiGetRestaurants = async (params = {}) => {
   const { similar, ...rest } = params
 
-  const query = supabase.from('restaurants')
   const { data, error } = similar
-    ? await query.select('customHost').ilike('customHost', `%${similar}%`)
-    : await query.select('*').match(rest)
+    ? await supabase
+        .from('restaurants')
+        .select('customHost')
+        .ilike('customHost', `%${similar}%`)
+    : await supabase.from('restaurants').select('*').match(rest)
 
   if (error) {
     throw new Error(error.message)
