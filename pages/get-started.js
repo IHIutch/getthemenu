@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Head from 'next/head'
 import axios from 'redaxios'
 import {
@@ -45,6 +45,7 @@ export default function GetStarted() {
     handleSubmit,
     getValues,
     setValue,
+    watch,
     formState: { errors },
   } = useForm()
 
@@ -60,43 +61,56 @@ export default function GetStarted() {
           count++
         }
       }
-      await checkUniqueHost(out)
+      await debouncedCheckUniqueHost(out)
       return out
     } catch (error) {
       alert(error)
     }
   }
 
-  const checkUniqueHost = async (customHost) => {
-    if (customHost) {
+  const checkUniqueHost = useCallback(
+    async (customHost) => {
       try {
-        const { data } = await axios.get(
-          `/api/restaurants?customHost=${customHost}`,
-          {
-            customHost,
-          }
-        )
-        setIsCheckingSlug(false)
-        if (data.length) {
+        const testHost = slugify(customHost, {
+          lower: true,
+          strict: true,
+        })
+        setIsCheckingSlug(true)
+        if (!customHost) {
+          setSlugMessage(null)
+        } else if (testHost > 63) {
           setSlugMessage({
             type: 'error',
-            message: `${customHost} is already taken.`,
+            message: `Your URL is too long. Please shorten it to 63 characters or less.`,
+          })
+        } else if (testHost !== customHost) {
+          setSlugMessage({
+            type: 'error',
+            message: `Your URL is not valid. Please use only lowercase letters, numbers, and dashes.`,
           })
         } else {
-          setSlugMessage({
-            type: 'success',
-            message: `${customHost} is available!`,
-          })
+          const { data } = await axios.get(
+            `/api/restaurants?customHost=${customHost}`,
+            {
+              customHost,
+            }
+          )
+          if (data.length) {
+          } else {
+            setSlugMessage({
+              type: 'success',
+              message: `'${customHost}' is available!`,
+            })
+          }
         }
+        setIsCheckingSlug(false)
       } catch (error) {
         setIsCheckingSlug(false)
         alert(error.message)
       }
-    } else {
-      setIsCheckingSlug(false)
-      setSlugMessage(null)
-    }
-  }
+    },
+    [setIsCheckingSlug]
+  )
 
   const handleDebounce = useMemo(() => debounce(checkUniqueHost, 500), [])
 
@@ -120,6 +134,15 @@ export default function GetStarted() {
     }
   }
 
+  const watchCustomHost = watch('customHost')
+  useEffect(() => {
+    if (watchCustomHost) {
+      debouncedCheckUniqueHost(watchCustomHost)
+    } else {
+      setSlugMessage(null)
+    }
+  }, [debouncedCheckUniqueHost, watchCustomHost])
+
   const onSubmit = async (form) => {
     try {
       const { restaurantName, customHost } = form
@@ -127,7 +150,7 @@ export default function GetStarted() {
       await postRestaurant({
         userId: user.id,
         name: restaurantName || '',
-        customHost: customHost || '',
+        customHost: slugify(customHost || '', { lower: true, strict: true }),
       })
       router.replace('/dashboard')
     } catch (error) {
@@ -186,9 +209,6 @@ export default function GetStarted() {
                             required: 'This field is required',
                           })}
                           type="text"
-                          onChange={(e) =>
-                            debouncedCheckUniqueHost(e.target.value)
-                          }
                           autoComplete="off"
                         />
                         <InputRightAddon>.getthemenu.io</InputRightAddon>
@@ -198,14 +218,14 @@ export default function GetStarted() {
                       </FormErrorMessage>
                       {isCheckingSlug && (
                         <Alert status="info" mt="2">
-                          <Spinner />
-                          Checking availability...
+                          <Spinner size="sm" />
+                          <Text ml="2">Checking availability...</Text>
                         </Alert>
                       )}
                       {!isCheckingSlug && slugMessage && (
                         <Alert status={slugMessage.type} mt="2">
                           <AlertIcon />
-                          {slugMessage.message}
+                          <Text ml="2">{slugMessage.message}</Text>
                         </Alert>
                       )}
                       <FormHelperText>
@@ -225,7 +245,8 @@ export default function GetStarted() {
                     <Button
                       type="submit"
                       colorScheme="blue"
-                      loadingText="Submitting..."
+                      loadingText="Creating..."
+                      isDisabled={slugMessage?.type === 'error'}
                       isLoading={isSubmitting}
                     >
                       Create Restaurant

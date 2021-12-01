@@ -102,23 +102,35 @@ export default function Overview({ query: { menuId } }) {
   const checkUniqueSlug = useCallback(
     async (slug) => {
       try {
-        if (menu?.slug === slug) return
         setIsCheckingSlug(true)
-        const { data } = await axios.get('/api/menus', {
-          params: {
-            slug,
-            restaurantId: menu?.restaurantId,
-          },
+        const testSlug = slugify(slug, {
+          lower: true,
+          strict: true,
         })
-        setIsCheckingSlug(false)
-        if (data.length) {
+        if (menu?.slug === slug) {
+          setSlugMessage(null)
+        } else if (testSlug !== slug) {
           setSlugMessage({
             type: 'error',
-            message: `'${slug}' is already used.`,
+            message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
           })
         } else {
-          setSlugMessage(null)
+          const { data } = await axios.get('/api/menus', {
+            params: {
+              slug,
+              restaurantId: menu?.restaurantId,
+            },
+          })
+          if (data.length) {
+            setSlugMessage({
+              type: 'error',
+              message: `'${slug}' is already used.`,
+            })
+          } else {
+            setSlugMessage(null)
+          }
         }
+        setIsCheckingSlug(false)
       } catch (error) {
         alert(error.message)
       }
@@ -143,13 +155,17 @@ export default function Overview({ query: { menuId } }) {
     if (watchSlug) {
       debouncedCheckUniqueSlug(watchSlug)
     }
-  }, [debouncedCheckUniqueSlug, getValues, watchSlug])
+  }, [debouncedCheckUniqueSlug, watchSlug])
 
   const onSubmit = async (form) => {
     try {
+      const payload = {
+        title: form.title || '',
+        slug: slugify(form.slug || '', { lower: true, strict: true }),
+      }
       await handleUpdateMenu({
         id: menuId,
-        payload: form,
+        payload,
       })
     } catch (error) {
       alert(error.message)
@@ -201,14 +217,11 @@ export default function Overview({ query: { menuId } }) {
                           autoComplete="off"
                         />
                         <FormErrorMessage>
-                          {errors.customHost?.message}
+                          {errors.slug?.message}
                         </FormErrorMessage>
-                        <FormHelperText>
-                          Must be unique to your restaurant.
-                        </FormHelperText>
                         {isCheckingSlug && (
                           <Alert status="info" mt="2">
-                            <Spinner />
+                            <Spinner size="sm" />
                             <Text ml="2">Checking availability...</Text>
                           </Alert>
                         )}
@@ -218,6 +231,9 @@ export default function Overview({ query: { menuId } }) {
                             <Text ml="2">{slugMessage.message}</Text>
                           </Alert>
                         )}
+                        <FormHelperText>
+                          Must be unique to your restaurant.
+                        </FormHelperText>
                       </FormControl>
                     </GridItem>
                   </Grid>
