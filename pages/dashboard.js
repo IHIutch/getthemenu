@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { apiGetMenus } from '@/controllers/menus'
 import { postMenu } from '@/utils/axios/menus'
@@ -16,7 +16,6 @@ import {
   FormControl,
   FormLabel,
   Heading,
-  HStack,
   Input,
   LinkBox,
   LinkOverlay,
@@ -31,23 +30,44 @@ import {
   Text,
   useDisclosure,
   Container,
+  FormErrorMessage,
+  Grid,
+  GridItem,
+  Alert,
+  Spinner,
+  FormHelperText,
+  AlertIcon,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import DefaultLayout from '@/layouts/Default'
+import { useForm } from 'react-hook-form'
+import slugify from 'slugify'
+import axios from 'redaxios'
+import { debounce } from 'lodash'
 
 export default function Profile() {
   const router = useRouter()
   const modalState = useDisclosure()
-  const [menuTitle, setMenuTitle] = useState('')
   const [isCreating, setIsCreating] = useState('')
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false)
+  const [slugMessage, setSlugMessage] = useState(null)
 
   const {
     data: user,
     // isLoading: isUserLoading,
     // isError: isUserError,
   } = useAuthUser()
+
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm()
 
   const { data: restaurant } = useGetRestaurant(
     user?.restaurants?.length ? user.restaurants[0].id : null
@@ -61,11 +81,12 @@ export default function Profile() {
       : null
   )
 
-  const handleCreateMenu = async () => {
+  const onSubmit = async (form) => {
     try {
       setIsCreating(true)
       const data = await postMenu({
-        title: menuTitle,
+        title: form.title || '',
+        slug: form.slug || '',
         restaurantId: user.restaurants[0].id,
       })
       if (data.error) throw new Error(data.error)
@@ -75,6 +96,75 @@ export default function Profile() {
       alert(error)
     }
   }
+
+  const checkUniqueSlug = useCallback(
+    async (slug) => {
+      try {
+        setIsCheckingSlug(true)
+        const testSlug = slugify(slug, {
+          lower: true,
+          strict: true,
+        })
+        if (testSlug !== slug) {
+          setSlugMessage({
+            type: 'error',
+            message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
+          })
+        } else {
+          const { data } = await axios.get('/api/menus', {
+            params: {
+              slug,
+              restaurantId: restaurant?.id,
+            },
+          })
+          if (data.length) {
+            setSlugMessage({
+              type: 'error',
+              message: `'${slug}' is already used.`,
+            })
+          } else {
+            setSlugMessage(null)
+          }
+        }
+        setIsCheckingSlug(false)
+      } catch (error) {
+        alert(error.message)
+      }
+    },
+    [restaurant?.id]
+  )
+
+  const handleSetSlug = async () => {
+    const [title, slug] = getValues(['title', 'slug'])
+    if (title && !slug) {
+      const newSlug = slugify(title, {
+        lower: true,
+        strict: true,
+      })
+      // const uniqueSlug = await getUniqueSlug(newSlug)
+      setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
+      debouncedCheckUniqueSlug(newSlug)
+    }
+  }
+
+  const handleDebounce = useMemo(
+    () => debounce(checkUniqueSlug, 500),
+    [checkUniqueSlug]
+  )
+
+  const debouncedCheckUniqueSlug = useCallback(
+    (slug) => {
+      handleDebounce(slug)
+    },
+    [handleDebounce]
+  )
+
+  const watchSlug = watch('slug')
+  useEffect(() => {
+    if (watchSlug) {
+      debouncedCheckUniqueSlug(watchSlug)
+    }
+  }, [debouncedCheckUniqueSlug, watchSlug])
 
   return (
     <>
@@ -149,32 +239,71 @@ export default function Profile() {
       </DefaultLayout>
       <Modal isOpen={modalState.isOpen} onClose={modalState.onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Create a New Menu</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Menu Name</FormLabel>
-              <Input
-                onChange={(e) => setMenuTitle(e.target.value)}
-                type="text"
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <ButtonGroup>
-              <Button onClick={modalState.onClose}>Cancel</Button>
-              <Button
-                isLoading={isCreating}
-                loadingText="Creating..."
-                colorScheme="blue"
-                onClick={handleCreateMenu}
-              >
-                Create
-              </Button>
-            </ButtonGroup>
-          </ModalFooter>
-        </ModalContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <ModalContent>
+            <ModalHeader>Create a New Menu</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Grid w="100%" gap="4">
+                <GridItem>
+                  <FormControl id="title" isInvalid={errors.title}>
+                    <FormLabel>Menu Title</FormLabel>
+                    <Input
+                      {...register('title', {
+                        required: 'This field is required',
+                      })}
+                      onBlur={handleSetSlug}
+                      type="text"
+                      autoComplete="off"
+                    />
+                    <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
+                  </FormControl>
+                </GridItem>
+                <GridItem>
+                  <FormControl id="slug" isInvalid={errors.title}>
+                    <FormLabel>Menu Slug</FormLabel>
+                    <Input
+                      {...register('slug', {
+                        required: 'This field is required',
+                      })}
+                      type="text"
+                    />
+                    <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
+                    {isCheckingSlug && (
+                      <Alert status="info" mt="2">
+                        <Spinner size="sm" />
+                        <Text ml="2">Checking availability...</Text>
+                      </Alert>
+                    )}
+                    {!isCheckingSlug && slugMessage && (
+                      <Alert size="sm" status={slugMessage.type} mt="2">
+                        <AlertIcon />
+                        <Text ml="2">{slugMessage.message}</Text>
+                      </Alert>
+                    )}
+                    <FormHelperText>
+                      Must be unique to your restaurant.
+                    </FormHelperText>
+                  </FormControl>
+                </GridItem>
+              </Grid>
+            </ModalBody>
+            <ModalFooter>
+              <ButtonGroup>
+                <Button onClick={modalState.onClose}>Cancel</Button>
+                <Button
+                  type="submit"
+                  isLoading={isCreating}
+                  loadingText="Creating..."
+                  colorScheme="blue"
+                  isDisabled={slugMessage?.type === 'error'}
+                >
+                  Create
+                </Button>
+              </ButtonGroup>
+            </ModalFooter>
+          </ModalContent>
+        </form>
       </Modal>
     </>
   )

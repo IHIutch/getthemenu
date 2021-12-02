@@ -112,7 +112,10 @@ export default function GetStarted() {
     [setIsCheckingSlug]
   )
 
-  const handleDebounce = useMemo(() => debounce(checkUniqueHost, 500), [])
+  const handleDebounce = useMemo(
+    () => debounce(checkUniqueHost, 500),
+    [checkUniqueHost]
+  )
 
   const debouncedCheckUniqueHost = useCallback(
     (customHost) => {
