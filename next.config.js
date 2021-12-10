@@ -13,7 +13,7 @@ const moduleExports = {
         : 'http://localhost:3000',
   },
   images: {
-    domains: ['kvmdzdprqsxytiuvpxzo.supabase.co'],
+    domains: ['kvmdzdprqsxytiuvpxzo.supabase.co', 'picsum.photos'],
   },
   outputFileTracing: false, // Temporary fix for Sentry
 }
