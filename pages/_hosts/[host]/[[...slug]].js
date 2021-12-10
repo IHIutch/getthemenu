@@ -69,9 +69,6 @@ export default function RestaurantMenu({
                                     alt={item?.title || 'Menu item'}
                                     src={item?.image?.src}
                                     blurDataURL={item?.image?.blurDataURL}
-                                    nextImageProps={{
-                                      loading: 'lazy',
-                                    }}
                                   />
                                 </AspectRatio>
                                 <Box p="4">
