@@ -1,15 +1,12 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { apiGetMenuItems } from '@/controllers/menuItems'
 import { apiGetMenu, apiGetMenus } from '@/controllers/menus'
 import { apiGetRestaurants } from '@/controllers/restaurants'
 import { apiGetSections } from '@/controllers/sections'
 import Head from 'next/head'
-import NextImage from 'next/image'
-import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/layout'
-import { Image } from '@chakra-ui/image'
-import { Blurhash } from 'react-blurhash'
-import { Spinner } from '@chakra-ui/spinner'
+import { AspectRatio, Box, Heading, Stack, Text } from '@chakra-ui/layout'
 import PublicMenuLayout from '@/layouts/PublicMenu'
+import BlurUpImage from '@/components/common/BlurUpImage'
 
 export default function RestaurantMenu({
   slug,
@@ -68,7 +65,7 @@ export default function RestaurantMenu({
                                   mb="2"
                                   borderBottomWidth="1px"
                                 >
-                                  <ItemImage
+                                  <BlurUpImage
                                     alt={item?.title || 'Menu item'}
                                     src={item?.image?.src}
                                     blurDataURL={item?.image?.blurDataURL}
@@ -96,51 +93,6 @@ export default function RestaurantMenu({
         </Box>
       </PublicMenuLayout>
     </>
-  )
-}
-
-const ItemImage = ({ src, blurDataURL, alt }) => {
-  const [isLoaded, setIsLoaded] = useState(false)
-
-  return src ? (
-    <>
-      <Image
-        as={NextImage}
-        onLoadingComplete={() => setIsLoaded(true)}
-        position="absolute"
-        opacity={isLoaded ? 1 : 0}
-        loading="lazy"
-        layout="fill"
-        boxSize="100%"
-        objectFit="cover"
-        transition="all 0.2s ease"
-        src={src}
-        alt={alt}
-      />
-      <Box
-        opacity={isLoaded ? 0 : 1}
-        transition="all 0.2s ease"
-        boxSize="100%"
-        position="absolute"
-      >
-        {blurDataURL ? (
-          <Blurhash
-            hash={blurDataURL}
-            width={800}
-            height={400}
-            resolutionX={56}
-            resolutionY={32}
-            punch={1}
-          />
-        ) : (
-          <Flex align="center" justify="center">
-            <Spinner size="sm" />
-          </Flex>
-        )}
-      </Box>
-    </>
-  ) : (
-    <Box boxSize="100%" bg="gray.200" />
   )
 }
 

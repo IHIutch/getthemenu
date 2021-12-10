@@ -17,6 +17,7 @@ import Head from 'next/head'
 import { Image } from '@chakra-ui/image'
 import { Select } from '@chakra-ui/select'
 import { FormControl, FormLabel } from '@chakra-ui/form-control'
+import BlurUpImage from '@/components/common/BlurUpImage'
 
 export default function PublicMenuLayout({ restaurant, menus, children }) {
   const { asPath, push, query } = useRouter()
@@ -47,12 +48,20 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
         <Box>
           <AspectRatio ratio={{ base: 16 / 9, lg: 21 / 9 }}>
             <Box boxSize="100%">
-              <Image
+              <BlurUpImage
+                alt={restaurant?.name || ''}
+                src={
+                  restaurant?.coverImage?.src ||
+                  'https://picsum.photos/1500/450/'
+                }
+                blurDataURL={restaurant?.coverImage?.blurDataURL}
+              />
+              {/* <Image
                 boxSize="100%"
                 objectFit="cover"
                 src="https://picsum.photos/1500/450/"
                 alt={restaurant.name}
-              />
+              /> */}
               <Flex
                 position="absolute"
                 bottom="0"

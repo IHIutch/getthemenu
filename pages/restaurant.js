@@ -113,7 +113,6 @@ const Details = () => {
   const {
     register,
     handleSubmit,
-    getValues,
     reset,
     control,
     formState: { errors },
