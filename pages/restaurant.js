@@ -17,6 +17,7 @@ import {
   ButtonGroup,
   Button,
   Container,
+  AspectRatio,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import {
@@ -24,8 +25,16 @@ import {
   useUpdateRestaurant,
 } from '@/utils/react-query/restaurants'
 import { useAuthUser } from '@/utils/react-query/user'
-import { useFieldArray, useForm, useFormState } from 'react-hook-form'
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  useFormState,
+} from 'react-hook-form'
 import DefaultLayout from '@/layouts/Default'
+import ImageDropzone from '@/components/common/ImageDropzone'
+import { blurhashEncode } from '@/utils/functions'
+import { postUpload } from '@/utils/axios/uploads'
 
 export default function Restaurant() {
   return (
@@ -97,6 +106,7 @@ const Details = () => {
     return {
       restaurantName: restaurant?.name || '',
       customHost: restaurant?.customHost || '',
+      coverImage: restaurant?.coverImage?.src || null,
     }
   }, [restaurant])
 
@@ -119,16 +129,26 @@ const Details = () => {
     reset(defaultValues)
   }, [defaultValues, reset, restaurant])
 
-  const onSubmit = async () => {
+  const onSubmit = async (form) => {
     try {
-      const [name, customHost] = getValues(['restaurantName', 'customHost'])
       setIsSubmitting(true)
+      const payload = {
+        name: form?.restaurantName || '',
+        customHost: form?.customHost || '',
+        coverImage: null,
+      }
+      if (form?.coverImage) {
+        const formData = new FormData()
+        formData.append('file', form.coverImage, form.coverImage.name)
+
+        payload.coverImage = {
+          blurDataURL: await blurhashEncode(form.coverImage),
+          src: await postUpload(formData),
+        }
+      }
       await handleUpdateRestaurant({
         id: user.restaurants[0].id,
-        payload: {
-          name,
-          customHost,
-        },
+        payload,
       })
       setIsSubmitting(false)
     } catch (error) {
@@ -146,9 +166,9 @@ const Details = () => {
       </Box>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box p="6">
-          <Grid w="100%" gap="4">
-            <GridItem>
-              <FormControl>
+          <Grid w="100%" templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
+            <GridItem colSpan={{ sm: '6' }}>
+              <FormControl mb="4">
                 <FormLabel>Name</FormLabel>
                 <Input
                   {...register('restaurantName', {
@@ -157,8 +177,8 @@ const Details = () => {
                   type="text"
                 />
               </FormControl>
-            </GridItem>
-            <GridItem>
+              {/* </GridItem>
+              <GridItem> */}
               <FormControl>
                 <FormLabel>Unique Slug</FormLabel>
                 <InputGroup>
@@ -171,6 +191,20 @@ const Details = () => {
                   />
                   <InputRightAddon>.getthemenu.io</InputRightAddon>
                 </InputGroup>
+              </FormControl>
+            </GridItem>
+            <GridItem colSpan={{ sm: '6' }}>
+              <FormControl id="coverImage">
+                <FormLabel>Cover Image</FormLabel>
+                <AspectRatio ratio={16 / 9} d="block">
+                  <Controller
+                    name="coverImage"
+                    control={control}
+                    render={({ field }) => {
+                      return <ImageDropzone {...field} />
+                    }}
+                  />
+                </AspectRatio>
               </FormControl>
             </GridItem>
           </Grid>
