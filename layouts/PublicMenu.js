@@ -55,6 +55,9 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
                   'https://picsum.photos/1500/450/'
                 }
                 blurDataURL={restaurant?.coverImage?.blurDataURL}
+                nextImageProps={{
+                  priority: true,
+                }}
               />
               {/* <Image
                 boxSize="100%"

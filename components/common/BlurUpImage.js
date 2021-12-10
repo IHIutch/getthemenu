@@ -3,7 +3,7 @@ import { Box, Flex, Image, Spinner } from '@chakra-ui/react'
 import NextImage from 'next/image'
 import { Blurhash } from 'react-blurhash'
 
-export default function BlurUpImage({ src, blurDataURL, alt }) {
+export default function BlurUpImage({ src, blurDataURL, alt, nextImageProps }) {
   const [isLoaded, setIsLoaded] = useState(false)
 
   return src ? (
@@ -20,6 +20,7 @@ export default function BlurUpImage({ src, blurDataURL, alt }) {
         transition="all 0.2s ease"
         src={src}
         alt={alt}
+        {...nextImageProps}
       />
       <Box
         opacity={isLoaded ? 0 : 1}
