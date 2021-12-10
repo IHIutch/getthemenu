@@ -13,7 +13,6 @@ export default function BlurUpImage({ src, blurDataURL, alt, nextImageProps }) {
         onLoadingComplete={() => setIsLoaded(true)}
         position="absolute"
         opacity={isLoaded ? 1 : 0}
-        loading="lazy"
         layout="fill"
         boxSize="100%"
         objectFit="cover"
