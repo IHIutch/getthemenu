@@ -28,6 +28,7 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
     if (activeMenu !== slug) {
       push(`/${activeMenu}`, `/${activeMenu}`, {
         scroll: false,
+        shallow: true,
       })
     }
   }, [activeMenu, slug, push])
@@ -35,7 +36,7 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
   return (
     <>
       <Head>
-        <title>{restaurant.name}</title>
+        <title>{restaurant?.name}</title>
         <link rel="icon" href="/favicon.ico" />
         {/* <script
           type="application/ld+json"
@@ -73,26 +74,31 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
               >
                 <Container maxW="container.xl">
                   <Heading as="h1" mb="1" textShadow="0 2px 1px black">
-                    {restaurant.name}
+                    {restaurant?.name}
                   </Heading>
                   <Flex>
-                    <Box>
-                      <Text as="span">
-                        <Text as="span" fontWeight="semibold" mr="2">
-                          Phone:
+                    {restaurant?.phone && (
+                      <Box>
+                        <Text as="span">
+                          <Text as="span" fontWeight="semibold" mr="2">
+                            Phone:
+                          </Text>
+                          {restaurant.phone}
                         </Text>
-                        {restaurant.phone}
-                      </Text>
-                    </Box>
-                    <Box ml="6">
-                      <Text as="span">
-                        <Text as="span" fontWeight="semibold" mr="2">
-                          Address:
+                      </Box>
+                    )}
+                    {restaurant?.address && (
+                      <Box ml="6">
+                        <Text as="span">
+                          <Text as="span" fontWeight="semibold" mr="2">
+                            Address:
+                          </Text>
+                          {restaurant.address?.streetAddress}{' '}
+                          {restaurant.address?.city},{' '}
+                          {restaurant.address?.state} {restaurant.address?.zip}
                         </Text>
-                        {restaurant.address.street} {restaurant.address.city},{' '}
-                        {restaurant.address.state} {restaurant.address.zip}
-                      </Text>
-                    </Box>
+                      </Box>
+                    )}
                   </Flex>
                 </Container>
               </Flex>
@@ -119,7 +125,7 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
                     }}
                   >
                     {menus?.map((m) => (
-                      <option key={m.id} value={m.id}>
+                      <option key={m.id} value={m.slug}>
                         {m.title}
                       </option>
                     ))}
@@ -166,44 +172,46 @@ export default function PublicMenuLayout({ restaurant, menus, children }) {
               colSpan={{ base: '12', lg: '4' }}
               colStart={{ lg: '9' }}
             >
-              <Box position="sticky" top="32">
-                <Box mt="12" borderWidth="1px" rounded="md">
-                  <Box p="4" borderBottomWidth="1px">
-                    <Heading fontSize="lg">Hours</Heading>
+              {restaurant?.hours && (
+                <Box position="sticky" top="32">
+                  <Box mt="12" borderWidth="1px" rounded="md">
+                    <Box p="4" borderBottomWidth="1px">
+                      <Heading fontSize="lg">Hours</Heading>
+                    </Box>
+                    <VStack divider={<StackDivider />} py="2">
+                      {[
+                        'Monday',
+                        'Tuesday',
+                        'Wednesday',
+                        'Thursday',
+                        'Friday',
+                        'Saturday',
+                        'Sunday',
+                      ].map((day) => (
+                        <Flex
+                          as="dl"
+                          key={day}
+                          justify="space-between"
+                          px="4"
+                          w="100%"
+                        >
+                          <Box>
+                            <Text as="dt" fontSize="sm" fontWeight="semibold">
+                              {day}:
+                            </Text>
+                          </Box>
+                          <Box>
+                            <Text as="dd" fontSize="sm">
+                              {restaurant.hours[day].openTime} -{' '}
+                              {restaurant.hours[day].closeTime}
+                            </Text>
+                          </Box>
+                        </Flex>
+                      ))}
+                    </VStack>
                   </Box>
-                  <VStack divider={<StackDivider />} py="2">
-                    {[
-                      'Monday',
-                      'Tuesday',
-                      'Wednesday',
-                      'Thursday',
-                      'Friday',
-                      'Saturday',
-                      'Sunday',
-                    ].map((day) => (
-                      <Flex
-                        as="dl"
-                        key={day}
-                        justify="space-between"
-                        px="4"
-                        w="100%"
-                      >
-                        <Box>
-                          <Text as="dt" fontSize="sm" fontWeight="semibold">
-                            {day}:
-                          </Text>
-                        </Box>
-                        <Box>
-                          <Text as="dd" fontSize="sm">
-                            {restaurant.hours[day].openTime} -{' '}
-                            {restaurant.hours[day].closeTime}
-                          </Text>
-                        </Box>
-                      </Flex>
-                    ))}
-                  </VStack>
                 </Box>
-              </Box>
+              )}
             </GridItem>
           </Grid>
         </Container>

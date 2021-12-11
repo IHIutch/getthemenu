@@ -7,15 +7,24 @@ import Head from 'next/head'
 import { AspectRatio, Box, Heading, Stack, Text } from '@chakra-ui/layout'
 import PublicMenuLayout from '@/layouts/PublicMenu'
 import BlurUpImage from '@/components/common/BlurUpImage'
+import { dehydrate, QueryClient } from 'react-query'
+import { useGetMenus } from '@/utils/react-query/menus'
+import { useGetSections } from '@/utils/react-query/sections'
+import { useGetMenuItems } from '@/utils/react-query/menuItems'
+import { useRouter } from 'next/router'
 
-export default function RestaurantMenu({
-  slug,
-  restaurant,
-  menus,
-  menu,
-  sections,
-  menuItems,
-}) {
+export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
+  const { query } = useRouter()
+  const slug = initialSlug === query?.slug?.[0] ? initialSlug : query?.slug?.[0]
+  const { data: menus } = useGetMenus({ restaurantId: restaurant.id })
+
+  const { id: menuId } = slug
+    ? menus.find((menu) => menu.slug === slug)
+    : menus[0]
+  const { data: menu } = useGetMenus(menuId)
+  const { data: sections } = useGetSections({ menuId })
+  const { data: menuItems } = useGetMenuItems({ menuId })
+
   return (
     <>
       <Head>
@@ -26,14 +35,6 @@ export default function RestaurantMenu({
       <PublicMenuLayout restaurant={restaurant} menus={menus}>
         <Box>
           <Stack>
-            {/* <Box>
-            <Heading as="h2" fontSize="2xl">
-              Restaurant
-            </Heading>
-            <Text as="pre" fontSize="xs">
-              {JSON.stringify(restaurant, null, 2)}
-            </Text>
-          </Box> */}
             <Box>
               <Heading as="h2" fontSize="3xl">
                 {menu?.title}
@@ -97,28 +98,56 @@ export default function RestaurantMenu({
 }
 
 export async function getServerSideProps({ params: { host }, query }) {
+  const queryClient = new QueryClient()
+
   const slug = query?.slug?.[0] || null
 
-  const restaurants = await apiGetRestaurants({ customHost: host })
-  const restaurant = restaurants?.[0]
+  const restaurantQuery = { customHost: host }
+  const restaurants = await apiGetRestaurants(restaurantQuery)
 
-  if (!restaurant) {
+  if (!restaurants[0]) {
     return {
       notFound: true,
     }
   }
-  const menus = await apiGetMenus({ restaurantId: restaurant.id })
-  const menu = await apiGetMenu(slug || menus?.[0].id)
-  const sections = await apiGetSections(menu?.id && { menuId: menu.id })
-  const menuItems = await apiGetMenuItems(menu?.id && { menuId: menu.id })
+
+  const menusQuery = { restaurantId: restaurants[0].id }
+  const menus = await apiGetMenus(menusQuery)
+
+  const { id: menuId } = slug
+    ? menus.find((menu) => menu.slug === slug)
+    : menus[0]
+
+  const menu = await apiGetMenu(menuId)
+  const sections = await apiGetSections({ menuId })
+  const menuItems = await apiGetMenuItems({ menuId })
+
+  await queryClient.prefetchQuery(
+    ['restaurants', restaurantQuery],
+    async () => restaurants
+  )
+
+  await queryClient.prefetchQuery(['menus', menusQuery], async () => menus)
+
+  await queryClient.prefetchQuery(['menu', menuId], async () => menu)
+
+  await queryClient.prefetchQuery(
+    ['sections', { menuId }],
+    async () => sections
+  )
+  await queryClient.prefetchQuery(
+    ['menuItems', { menuId }],
+    async () => menuItems
+  )
+
+  console.log({ host, slug })
 
   return {
     props: {
-      menus,
-      menu,
-      restaurant,
-      sections,
-      menuItems,
+      host,
+      slug,
+      restaurant: restaurants[0],
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }

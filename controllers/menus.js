@@ -9,7 +9,7 @@ export const apiGetMenus = async (params = {}) => {
         .select('slug')
         .match({ restaurantId: rest.restaurantId })
         .ilike('slug', `%${similar}%`)
-    : await supabase.from('menus').select('*').match(rest)
+    : await supabase.from('menus').select('*').match(rest).order('position')
 
   if (error) {
     throw new Error(error.message)

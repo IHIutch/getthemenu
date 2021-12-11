@@ -5,7 +5,7 @@ export const apiGetMenuItems = async (params = {}) => {
     .from('menuItems')
     .select('*')
     .match(params)
-    .order('id')
+    .order('position')
 
   if (error) {
     throw new Error(error.message)

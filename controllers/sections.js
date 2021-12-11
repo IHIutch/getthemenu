@@ -5,7 +5,7 @@ export const apiGetSections = async (params = {}) => {
     .from('sections')
     .select('*')
     .match(params)
-    .order('id')
+    .order('position')
 
   if (error) {
     throw new Error(error.message)
