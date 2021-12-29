@@ -13,11 +13,11 @@ import {
   Switch,
   Flex,
   Text,
-  VStack,
   ButtonGroup,
   Button,
   Container,
   AspectRatio,
+  Stack,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import {
@@ -44,41 +44,21 @@ export default function Restaurant() {
       </Head>
 
       <DashboardLayout>
-        <Container maxW="container.xl">
-          <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-            <GridItem
-              colStart={{ md: '2', xl: '3' }}
-              colSpan={{ md: '10', xl: '8' }}
-            >
-              <Box bg="white" rounded="md" shadow="base">
-                <Details />
-              </Box>
-            </GridItem>
-            <GridItem
-              colStart={{ md: '2', xl: '3' }}
-              colSpan={{ md: '10', xl: '8' }}
-            >
-              <Box bg="white" rounded="md" shadow="base">
-                <Contact />
-              </Box>
-            </GridItem>
-            <GridItem
-              colStart={{ md: '2', xl: '3' }}
-              colSpan={{ md: '10', xl: '8' }}
-            >
-              <Box bg="white" rounded="md" shadow="base">
-                <Address />
-              </Box>
-            </GridItem>
-            <GridItem
-              colStart={{ md: '2', xl: '3' }}
-              colSpan={{ md: '10', xl: '8' }}
-            >
-              <Box bg="white" rounded="md" shadow="base">
-                <Hours />
-              </Box>
-            </GridItem>
-          </Grid>
+        <Container maxW="container.md">
+          <Stack spacing="6">
+            <Box bg="white" rounded="md" shadow="base">
+              <Details />
+            </Box>
+            <Box bg="white" rounded="md" shadow="base">
+              <Contact />
+            </Box>
+            <Box bg="white" rounded="md" shadow="base">
+              <Address />
+            </Box>
+            <Box bg="white" rounded="md" shadow="base">
+              <Hours />
+            </Box>
+          </Stack>
         </Container>
       </DashboardLayout>
     </>
@@ -165,8 +145,8 @@ const Details = () => {
       </Box>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box p="6">
-          <Grid w="100%" templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
-            <GridItem colSpan={{ sm: '6' }}>
+          <Grid w="100%" gap="4">
+            <GridItem>
               <FormControl mb="4">
                 <FormLabel>Name</FormLabel>
                 <Input
@@ -176,8 +156,8 @@ const Details = () => {
                   type="text"
                 />
               </FormControl>
-              {/* </GridItem>
-              <GridItem> */}
+            </GridItem>
+            <GridItem>
               <FormControl>
                 <FormLabel>Unique Slug</FormLabel>
                 <InputGroup>
@@ -192,7 +172,7 @@ const Details = () => {
                 </InputGroup>
               </FormControl>
             </GridItem>
-            <GridItem colSpan={{ sm: '6' }}>
+            <GridItem>
               <FormControl id="coverImage">
                 <FormLabel>Cover Image</FormLabel>
                 <AspectRatio ratio={16 / 9} d="block">
@@ -425,20 +405,16 @@ const Contact = () => {
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
             <GridItem colSpan={{ sm: '6' }}>
-              <VStack>
-                <FormControl>
-                  <FormLabel>Phone Number</FormLabel>
-                  <Input {...register('phone')} type="text" />
-                </FormControl>
-              </VStack>
+              <FormControl>
+                <FormLabel>Phone Number</FormLabel>
+                <Input {...register('phone')} type="text" />
+              </FormControl>
             </GridItem>
             <GridItem colSpan={{ sm: '6' }}>
-              <VStack>
-                <FormControl>
-                  <FormLabel>Email</FormLabel>
-                  <Input {...register('email')} type="email" />
-                </FormControl>
-              </VStack>
+              <FormControl>
+                <FormLabel>Email</FormLabel>
+                <Input {...register('email')} type="email" />
+              </FormControl>
             </GridItem>
           </Grid>
         </Box>
@@ -566,12 +542,11 @@ const Hours = () => {
           <Heading fontSize="lg" fontWeight="semibold" mb="2">
             Standard Hours
           </Heading>
-          <VStack spacing={{ base: '6', lg: '4' }}>
+          <Stack spacing={{ base: '6', lg: '4' }}>
             {fields.map((field, idx) => (
               <Grid
                 key={field.id}
                 as="fieldset"
-                w="100%"
                 templateColumns={{ base: 'repeat(12, 1fr)' }}
                 gap="4"
               >
@@ -630,7 +605,7 @@ const Hours = () => {
                 )}
               </Grid>
             ))}
-          </VStack>
+          </Stack>
         </Box>
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">

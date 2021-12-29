@@ -72,7 +72,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                 // align="end"
                 color="white"
               >
-                <Container maxW="container.xl">
+                <Container maxW="container.md">
                   <Heading as="h1" mb="1" textShadow="0 2px 1px black">
                     {restaurant?.name}
                   </Heading>
@@ -113,7 +113,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
           bg="gray.50"
           zIndex="1"
         >
-          <Container maxW="container.xl">
+          <Container maxW="container.md">
             <Grid templateColumns="repeat(12, 1fr)" gap="4">
               <GridItem colSpan={{ base: '12', lg: '7' }}>
                 <FormControl id="menu">
@@ -135,7 +135,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
             </Grid>
           </Container>
         </Box>
-        <Container maxW="container.xl">
+        <Container maxW="container.md">
           <Grid templateColumns="repeat(12, 1fr)" gap="4">
             <GridItem colSpan={{ base: '12', lg: '7' }} position="relative">
               <AnimateSharedLayout type="crossfade">

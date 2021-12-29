@@ -157,7 +157,7 @@ export default function SingleMenu() {
         <title>{menu?.title}</title>
       </Head>
       <MenuLayout>
-        <Container maxW="container.xl">
+        <Container maxW="container.md">
           {sections && menuItems && (
             <DragDropContext
               onDragEnd={handleDragEnd}

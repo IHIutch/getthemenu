@@ -30,7 +30,7 @@ export default function Navbar({ children, ...props }) {
         zIndex="1"
         {...props}
       >
-        <Container maxW="container.xl">
+        <Container maxW="container.md">
           <Box>
             <Flex align="center">
               <Flex align="center" h="14">
@@ -52,7 +52,7 @@ export default function Navbar({ children, ...props }) {
                       </Button>
                     </NextLink>
                   )}
-                  <Menu>
+                  <Menu placement="bottom-end">
                     <MenuButton>
                       <Avatar size="sm" name={`${user && user.fullName}`} />
                     </MenuButton>

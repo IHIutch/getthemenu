@@ -13,8 +13,12 @@ export default function MenuLayout({ children }) {
     <>
       <Navbar>
         <HStack spacing="6">
-          <SubnavItem href={`/menu/${menuId}`}>Overview</SubnavItem>
-          <SubnavItem href={`/menu/${menuId}/edit`}>Edit</SubnavItem>
+          {menuId && (
+            <>
+              <SubnavItem href={`/menu/${menuId}`}>Overview</SubnavItem>
+              <SubnavItem href={`/menu/${menuId}/edit`}>Edit</SubnavItem>
+            </>
+          )}
         </HStack>
       </Navbar>
       <Box pt="32" pb="8" position="relative">

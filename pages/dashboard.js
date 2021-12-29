@@ -173,7 +173,7 @@ export default function Profile() {
       </Head>
 
       <DashboardLayout>
-        <Container maxW="container.xl">
+        <Container maxW="container.md">
           <Box>
             <Flex mb="4" align="center">
               <Heading fontSize="xl">Your Menus</Heading>

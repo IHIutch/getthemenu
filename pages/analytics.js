@@ -6,7 +6,7 @@ export default function Analytics() {
   return (
     <>
       <DashboardLayout>
-        <Container maxW="container.xl">
+        <Container maxW="container.md">
           <Flex
             bg="white"
             align="center"

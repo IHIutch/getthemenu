@@ -51,7 +51,7 @@ export default function ResetPassword() {
         <title>Reset Password</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container maxW="container.xl" py="24">
+      <Container maxW="container.md" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem
             colStart={{ md: '3', xl: '4' }}
