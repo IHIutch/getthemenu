@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import Navbar from '@/components/common/Navbar'
 
@@ -33,8 +33,7 @@ import {
   Container,
 } from '@chakra-ui/react'
 import Head from 'next/head'
-import { MoreVertical, Trash2, Edit, X } from 'react-feather'
-import { useDropzone } from 'react-dropzone'
+import { MoreVertical, Trash2 } from 'react-feather'
 import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
 import {
@@ -52,10 +51,11 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
-import { blurhashEncode, getPublicURL } from '@/utils/functions'
+import { blurhashEncode } from '@/utils/functions'
 import { postUpload } from '@/utils/axios/uploads'
 import { Controller, useForm } from 'react-hook-form'
 import ImageDropzone from '@/components/common/ImageDropzone'
+import MenuLayout from '@/layouts/Menu'
 
 export default function SingleMenu() {
   const {
@@ -156,113 +156,94 @@ export default function SingleMenu() {
       <Head>
         <title>{menu?.title}</title>
       </Head>
-      <Navbar>
-        <HStack spacing="6">
-          <SubnavItem href={`/menu/${menuId}`}>Overview</SubnavItem>
-          <SubnavItem href={`/menu/${menuId}/edit`}>Edit</SubnavItem>
-        </HStack>
-      </Navbar>
-      <Container maxW="container.xl">
-        <Box my="8">
-          <Button
-            leftIcon={<Icon as={Edit} />}
-            colorScheme="blue"
-            variant="link"
-            onClick={() =>
-              handleDrawerOpen(
-                <EditTitleDrawer handleDrawerClose={drawerState.onClose} />
-              )
-            }
-          >
-            Edit
-          </Button>
-          <Heading>{menu?.title}</Heading>
-        </Box>
-        {sections && menuItems && (
-          <DragDropContext
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-          >
-            <Droppable droppableId="sectionWrapper" type="SECTIONS">
-              {(drop) => (
-                <VStack
-                  spacing="8"
-                  ref={drop.innerRef}
-                  {...drop.droppableProps}
-                >
-                  {sortedSections.map((s, idx) => (
-                    <Draggable
-                      key={`${s.id}`}
-                      draggableId={`${s.id}`}
-                      index={idx}
-                    >
-                      {(drag, snapshot) => (
-                        <Box
-                          p="4"
-                          shadow="base"
-                          bg="white"
-                          w="100%"
-                          sx={
-                            snapshot.isDragging && {
-                              bg: 'gray.200',
-                            }
-                          }
-                          ref={drag.innerRef}
-                          {...drag.draggableProps}
-                          {...drag.dragHandleProps}
-                        >
-                          <Heading>{s.title}</Heading>
-                          <Grid mx="-4">
-                            <MenuItemsContainer
-                              sectionId={s.id}
-                              items={getSectionItems(s.id)}
-                              handleDrawerOpen={handleDrawerOpen}
-                              drawerState={drawerState}
-                            />
-                          </Grid>
-                          <Box>
-                            <Button
-                              colorScheme="blue"
-                              onClick={() =>
-                                handleDrawerOpen(
-                                  <MenuItemDrawer
-                                    sectionId={s.id}
-                                    position={getSectionItems(s.id).length}
-                                    handleDrawerClose={drawerState.onClose}
-                                  />
-                                )
+      <MenuLayout>
+        <Container maxW="container.xl">
+          {sections && menuItems && (
+            <DragDropContext
+              onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
+            >
+              <Droppable droppableId="sectionWrapper" type="SECTIONS">
+                {(drop) => (
+                  <VStack
+                    spacing="8"
+                    ref={drop.innerRef}
+                    {...drop.droppableProps}
+                  >
+                    {sortedSections.map((s, idx) => (
+                      <Draggable
+                        key={`${s.id}`}
+                        draggableId={`${s.id}`}
+                        index={idx}
+                      >
+                        {(drag, snapshot) => (
+                          <Box
+                            p="4"
+                            shadow="base"
+                            bg="white"
+                            w="100%"
+                            sx={
+                              snapshot.isDragging && {
+                                bg: 'gray.200',
                               }
-                            >
-                              Add Item
-                            </Button>
+                            }
+                            ref={drag.innerRef}
+                            {...drag.draggableProps}
+                            {...drag.dragHandleProps}
+                          >
+                            <Heading>{s.title}</Heading>
+                            <Grid mx="-4">
+                              <MenuItemsContainer
+                                sectionId={s.id}
+                                items={getSectionItems(s.id)}
+                                handleDrawerOpen={handleDrawerOpen}
+                                drawerState={drawerState}
+                              />
+                            </Grid>
+                            <Box>
+                              <Button
+                                colorScheme="blue"
+                                onClick={() =>
+                                  handleDrawerOpen(
+                                    <MenuItemDrawer
+                                      sectionId={s.id}
+                                      position={getSectionItems(s.id).length}
+                                      handleDrawerClose={drawerState.onClose}
+                                    />
+                                  )
+                                }
+                              >
+                                Add Item
+                              </Button>
+                            </Box>
                           </Box>
-                        </Box>
-                      )}
-                    </Draggable>
-                  ))}
-                  {drop.placeholder}
-                </VStack>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
-        <Box py="8">
-          <Button
-            variant="outline"
-            colorScheme="blue"
-            onClick={() =>
-              handleDrawerOpen(
-                <SectionDrawer
-                  position={sortedSections.length}
-                  handleDrawerClose={drawerState.onClose}
-                />
-              )
-            }
-          >
-            Add Section
-          </Button>
-        </Box>
-      </Container>
+                        )}
+                      </Draggable>
+                    ))}
+                    {drop.placeholder}
+                  </VStack>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+          <Box py="8">
+            <Button
+              variant="outline"
+              colorScheme="blue"
+              onClick={() =>
+                handleDrawerOpen(
+                  <SectionDrawer
+                    position={sortedSections.length}
+                    handleDrawerClose={drawerState.onClose}
+                  />
+                )
+              }
+            >
+              Add Section
+            </Button>
+          </Box>
+        </Container>
+      </MenuLayout>
       <Drawer
         isOpen={drawerState.isOpen}
         placement="right"
@@ -373,35 +354,6 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
         </Flex>
       </Box>
     </Flex>
-  )
-}
-
-const EditTitleDrawer = ({ handleDrawerClose }) => {
-  return (
-    <>
-      <DrawerCloseButton />
-      <DrawerHeader px="4">Edit Menu Title</DrawerHeader>
-
-      <DrawerBody px="4">
-        <Stack spacing="6">
-          <FormControl id="menuTitle">
-            <FormLabel>Menu Title</FormLabel>
-            <Input />
-          </FormControl>
-        </Stack>
-      </DrawerBody>
-
-      <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
-        <ButtonGroup w="100%">
-          <Button variant="outline" onClick={handleDrawerClose} isFullWidth>
-            Cancel
-          </Button>
-          <Button colorScheme="blue" onClick={handleDrawerClose} isFullWidth>
-            Save
-          </Button>
-        </ButtonGroup>
-      </DrawerFooter>
-    </>
   )
 }
 

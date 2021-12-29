@@ -24,6 +24,10 @@ export default function Navbar({ children, ...props }) {
         bg="white"
         borderBottom="1px"
         borderColor="gray.200"
+        position="fixed"
+        top="0"
+        w="100%"
+        zIndex="1"
         {...props}
       >
         <Container maxW="container.xl">
@@ -68,7 +72,7 @@ export default function Navbar({ children, ...props }) {
                 </HStack>
               </Box>
             </Flex>
-            {children}
+            <Box position="relative">{children}</Box>
           </Box>
         </Container>
       </Box>

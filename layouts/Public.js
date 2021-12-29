@@ -19,7 +19,7 @@ import { Select } from '@chakra-ui/select'
 import { FormControl, FormLabel } from '@chakra-ui/form-control'
 import NextImage from 'next/image'
 
-export default function PublicMenuLayout({ restaurant, menus, children }) {
+export default function PublicLayout({ restaurant, menus, children }) {
   const { asPath, push, query } = useRouter()
   const slug = query?.slug?.[0] || ''
   const [activeMenu, setActiveMenu] = useState(slug)

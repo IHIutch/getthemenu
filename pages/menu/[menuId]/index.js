@@ -26,6 +26,7 @@ import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { Spinner } from '@chakra-ui/spinner'
 import { Button, ButtonGroup } from '@chakra-ui/button'
 import axios from 'redaxios'
+import MenuLayout from '@/layouts/Menu'
 
 export default function Overview({ query: { menuId } }) {
   const [isCheckingSlug, setIsCheckingSlug] = useState(false)
@@ -177,97 +178,93 @@ export default function Overview({ query: { menuId } }) {
       <Head>
         <title>Single Menu</title>
       </Head>
-      <Navbar>
-        <HStack spacing="6">
-          <SubnavItem href={`/menu/${menuId}`}>Overview</SubnavItem>
-          <SubnavItem href={`/menu/${menuId}/edit`}>Edit</SubnavItem>
-        </HStack>
-      </Navbar>
-      <Container maxW="container.xl" py="8">
-        <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem
-            colStart={{ md: '2', xl: '3' }}
-            colSpan={{ md: '10', xl: '8' }}
-          >
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Box bg="white" rounded="md" shadow="base">
-                <Box p="6">
-                  <Grid w="100%" gap="4">
-                    <GridItem>
-                      <FormControl id="title">
-                        <FormLabel>Menu Title</FormLabel>
-                        <Input
-                          {...register('title', {
-                            required: 'This field is required',
-                          })}
-                          onBlur={handleSetSlug}
-                          type="text"
-                          autoComplete="off"
-                        />
-                      </FormControl>
-                    </GridItem>
-                    <GridItem>
-                      <FormControl id="slug">
-                        <FormLabel>Menu Slug</FormLabel>
-                        <Input
-                          {...register('slug', {
-                            required: 'This field is required',
-                          })}
-                          type="text"
-                          autoComplete="off"
-                        />
-                        <FormErrorMessage>
-                          {errors.slug?.message}
-                        </FormErrorMessage>
-                        {isCheckingSlug && (
-                          <Alert status="info" mt="2">
-                            <Spinner size="sm" />
-                            <Text ml="2">Checking availability...</Text>
-                          </Alert>
-                        )}
-                        {!isCheckingSlug && slugMessage && (
-                          <Alert size="sm" status={slugMessage.type} mt="2">
-                            <AlertIcon />
-                            <Text ml="2">{slugMessage.message}</Text>
-                          </Alert>
-                        )}
-                        <FormHelperText>
-                          Must be unique to your restaurant.
-                        </FormHelperText>
-                      </FormControl>
-                    </GridItem>
-                  </Grid>
+      <MenuLayout>
+        <Container maxW="container.xl">
+          <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
+            <GridItem
+              colStart={{ md: '2', xl: '3' }}
+              colSpan={{ md: '10', xl: '8' }}
+            >
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Box bg="white" rounded="md" shadow="base">
+                  <Box p="6">
+                    <Grid w="100%" gap="4">
+                      <GridItem>
+                        <FormControl id="title">
+                          <FormLabel>Menu Title</FormLabel>
+                          <Input
+                            {...register('title', {
+                              required: 'This field is required',
+                            })}
+                            onBlur={handleSetSlug}
+                            type="text"
+                            autoComplete="off"
+                          />
+                        </FormControl>
+                      </GridItem>
+                      <GridItem>
+                        <FormControl id="slug">
+                          <FormLabel>Menu Slug</FormLabel>
+                          <Input
+                            {...register('slug', {
+                              required: 'This field is required',
+                            })}
+                            type="text"
+                            autoComplete="off"
+                          />
+                          <FormErrorMessage>
+                            {errors.slug?.message}
+                          </FormErrorMessage>
+                          {isCheckingSlug && (
+                            <Alert status="info" mt="2">
+                              <Spinner size="sm" />
+                              <Text ml="2">Checking availability...</Text>
+                            </Alert>
+                          )}
+                          {!isCheckingSlug && slugMessage && (
+                            <Alert size="sm" status={slugMessage.type} mt="2">
+                              <AlertIcon />
+                              <Text ml="2">{slugMessage.message}</Text>
+                            </Alert>
+                          )}
+                          <FormHelperText>
+                            Must be unique to your restaurant.
+                          </FormHelperText>
+                        </FormControl>
+                      </GridItem>
+                    </Grid>
+                  </Box>
+                  <Flex px="6" py="3" borderTopWidth="1px">
+                    <ButtonGroup ml="auto">
+                      <Button
+                        onClick={() => {
+                          reset(defaultValues)
+                        }}
+                        isDisabled={!isDirty}
+                      >
+                        Reset
+                      </Button>
+                      <Button
+                        colorScheme="blue"
+                        type="submit"
+                        isDisabled={
+                          !isDirty ||
+                          isCheckingSlug ||
+                          slugMessage?.type === 'error'
+                        }
+                        isLoading={isSubmitting}
+                        loadingText="Saving..."
+                      >
+                        Save
+                      </Button>
+                    </ButtonGroup>
+                  </Flex>
                 </Box>
-                <Flex px="6" py="3" borderTopWidth="1px">
-                  <ButtonGroup ml="auto">
-                    <Button
-                      onClick={() => {
-                        reset(defaultValues)
-                      }}
-                      isDisabled={!isDirty}
-                    >
-                      Reset
-                    </Button>
-                    <Button
-                      colorScheme="blue"
-                      type="submit"
-                      isDisabled={
-                        !isDirty ||
-                        isCheckingSlug ||
-                        slugMessage?.type === 'error'
-                      }
-                      isLoading={isSubmitting}
-                      loadingText="Saving..."
-                    >
-                      Save
-                    </Button>
-                  </ButtonGroup>
-                </Flex>
-              </Box>
-            </form>
-          </GridItem>
-        </Grid>
-      </Container>
+              </form>
+            </GridItem>
+          </Grid>
+        </Container>
+      </MenuLayout>
     </>
   )
 }

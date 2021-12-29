@@ -1,9 +1,9 @@
 import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
-import { HStack } from '@chakra-ui/layout'
+import { Box, HStack } from '@chakra-ui/react'
 import React from 'react'
 
-export default function DefaultLayout({ children }) {
+export default function DashboardLayout({ children }) {
   return (
     <>
       <Navbar>
@@ -13,7 +13,9 @@ export default function DefaultLayout({ children }) {
           <SubnavItem href="/analytics">Analytics</SubnavItem>
         </HStack>
       </Navbar>
-      {children}
+      <Box pt="32" pb="8" position="relative">
+        {children}
+      </Box>
     </>
   )
 }

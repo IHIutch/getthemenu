@@ -31,7 +31,7 @@ import {
   useForm,
   useFormState,
 } from 'react-hook-form'
-import DefaultLayout from '@/layouts/Default'
+import DashboardLayout from '@/layouts/Dashboard'
 import ImageDropzone from '@/components/common/ImageDropzone'
 import { blurhashEncode } from '@/utils/functions'
 import { postUpload } from '@/utils/axios/uploads'
@@ -43,8 +43,8 @@ export default function Restaurant() {
         <title>GetTheMenu</title>
       </Head>
 
-      <DefaultLayout>
-        <Container maxW="container.xl" py="8">
+      <DashboardLayout>
+        <Container maxW="container.xl">
           <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
             <GridItem
               colStart={{ md: '2', xl: '3' }}
@@ -80,7 +80,7 @@ export default function Restaurant() {
             </GridItem>
           </Grid>
         </Container>
-      </DefaultLayout>
+      </DashboardLayout>
     </>
   )
 }

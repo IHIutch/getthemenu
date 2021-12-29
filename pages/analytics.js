@@ -1,12 +1,12 @@
-import DefaultLayout from '@/layouts/Default'
+import DashboardLayout from '@/layouts/Dashboard'
 import { Container, Flex } from '@chakra-ui/layout'
 import React from 'react'
 
 export default function Analytics() {
   return (
     <>
-      <DefaultLayout>
-        <Container maxW="container.xl" py="8">
+      <DashboardLayout>
+        <Container maxW="container.xl">
           <Flex
             bg="white"
             align="center"
@@ -18,7 +18,7 @@ export default function Analytics() {
             Coming Soon
           </Flex>
         </Container>
-      </DefaultLayout>
+      </DashboardLayout>
     </>
   )
 }

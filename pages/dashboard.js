@@ -41,7 +41,7 @@ import {
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import DefaultLayout from '@/layouts/Default'
+import DashboardLayout from '@/layouts/Dashboard'
 import { useForm } from 'react-hook-form'
 import slugify from 'slugify'
 import axios from 'redaxios'
@@ -172,8 +172,8 @@ export default function Profile() {
         <title>Single Menu</title>
       </Head>
 
-      <DefaultLayout>
-        <Container maxW="container.xl" py="8">
+      <DashboardLayout>
+        <Container maxW="container.xl">
           <Box>
             <Flex mb="4" align="center">
               <Heading fontSize="xl">Your Menus</Heading>
@@ -236,7 +236,7 @@ export default function Profile() {
             )}
           </Box>
         </Container>
-      </DefaultLayout>
+      </DashboardLayout>
       <Modal isOpen={modalState.isOpen} onClose={modalState.onClose}>
         <ModalOverlay />
         <form onSubmit={handleSubmit(onSubmit)}>
