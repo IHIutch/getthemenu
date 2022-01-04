@@ -1,14 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
-
-import Navbar from '@/components/common/Navbar'
-
 import {
   Box,
   Button,
   FormControl,
   FormLabel,
   Grid,
-  GridItem,
   Input,
   Textarea,
   Heading,
@@ -28,13 +24,11 @@ import {
   ButtonGroup,
   AspectRatio,
   Image,
-  HStack,
   VStack,
   Container,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2 } from 'react-feather'
-import SubnavItem from '@/components/common/SubnavItem'
 import { useRouter } from 'next/router'
 import {
   useCreateMenuItem,
@@ -165,7 +159,7 @@ export default function SingleMenu() {
             >
               <Droppable droppableId="sectionWrapper" type="SECTIONS">
                 {(drop) => (
-                  <VStack
+                  <Stack
                     spacing="8"
                     ref={drop.innerRef}
                     {...drop.droppableProps}
@@ -178,29 +172,27 @@ export default function SingleMenu() {
                       >
                         {(drag, snapshot) => (
                           <Box
-                            p="4"
-                            shadow="base"
                             bg="white"
-                            w="100%"
-                            sx={
-                              snapshot.isDragging && {
-                                bg: 'gray.200',
-                              }
-                            }
+                            rounded="md"
+                            shadow="base"
                             ref={drag.innerRef}
                             {...drag.draggableProps}
                             {...drag.dragHandleProps}
                           >
-                            <Heading>{s.title}</Heading>
-                            <Grid mx="-4">
+                            <Box p="6" borderBottomWidth="1px">
+                              <Heading fontSize="xl" fontWeight="semibold">
+                                {s.title}
+                              </Heading>
+                            </Box>
+                            <Box>
                               <MenuItemsContainer
                                 sectionId={s.id}
                                 items={getSectionItems(s.id)}
                                 handleDrawerOpen={handleDrawerOpen}
                                 drawerState={drawerState}
                               />
-                            </Grid>
-                            <Box>
+                            </Box>
+                            <Flex px="4" py="3" borderTopWidth="1px">
                               <Button
                                 colorScheme="blue"
                                 onClick={() =>
@@ -215,13 +207,13 @@ export default function SingleMenu() {
                               >
                                 Add Item
                               </Button>
-                            </Box>
+                            </Flex>
                           </Box>
                         )}
                       </Draggable>
                     ))}
-                    {drop.placeholder}
-                  </VStack>
+                    <Box bg="gray.50">{drop.placeholder}</Box>
+                  </Stack>
                 )}
               </Droppable>
             </DragDropContext>
@@ -265,40 +257,33 @@ const MenuItemsContainer = ({
   return (
     <Droppable droppableId={`${sectionId}`} type="ITEMS">
       {(drop) => (
-        <Box ref={drop.innerRef} {...drop.droppableProps}>
+        <Stack spacing="0" ref={drop.innerRef} {...drop.droppableProps}>
           {items.map((menuItem, idx) => (
-            <Draggable
-              key={`${sectionId}-${menuItem.id}`}
-              draggableId={`${sectionId}-${menuItem.id}`}
-              index={idx}
-            >
-              {(drag, snapshot) => (
-                <GridItem
-                  sx={
-                    snapshot.isDragging && {
-                      bg: 'gray.200',
-                    }
-                  }
-                  ref={drag.innerRef}
-                  {...drag.draggableProps}
-                  {...drag.dragHandleProps}
-                  p="4"
-                  _notFirst={{
-                    borderTopWidth: '1px',
-                    borderTopColor: 'gray.200',
-                  }}
-                >
-                  <MenuItem
-                    menuItem={menuItem}
-                    handleDrawerOpen={handleDrawerOpen}
-                    drawerState={drawerState}
-                  />
-                </GridItem>
-              )}
-            </Draggable>
+            <Box key={`${sectionId}-${menuItem.id}`}>
+              <Draggable
+                draggableId={`${sectionId}-${menuItem.id}`}
+                index={idx}
+              >
+                {(drag, snapshot) => (
+                  <Box
+                    bg={snapshot.isDragging ? 'blue.50' : 'white'}
+                    ref={drag.innerRef}
+                    {...drag.draggableProps}
+                    {...drag.dragHandleProps}
+                    p="4"
+                  >
+                    <MenuItem
+                      menuItem={menuItem}
+                      handleDrawerOpen={handleDrawerOpen}
+                      drawerState={drawerState}
+                    />
+                  </Box>
+                )}
+              </Draggable>
+            </Box>
           ))}
           {drop.placeholder}
-        </Box>
+        </Stack>
       )}
     </Droppable>
   )
