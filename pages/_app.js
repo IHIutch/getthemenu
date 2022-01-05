@@ -23,9 +23,7 @@ export default function App({ Component, pageProps }) {
   const router = useRouter()
 
   useEffect(() => {
-    Fathom.load('DVZFRWML', {
-      includedDomains: ['getthemenu.io'],
-    })
+    Fathom.load('DVZFRWML')
 
     function onRouteChangeComplete() {
       Fathom.trackPageview()
