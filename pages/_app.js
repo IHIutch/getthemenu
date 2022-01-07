@@ -25,7 +25,7 @@ export default function App({ Component, pageProps }) {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
       Fathom.load('DVZFRWML', {
-        includedDomains: ['*.getthemenu.io'],
+        url: 'https://xyz.getthemenu.io/script.js',
       })
 
       function onRouteChangeComplete() {
