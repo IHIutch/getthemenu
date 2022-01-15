@@ -43,27 +43,27 @@ export default function Restaurant() {
         <title>GetTheMenu</title>
       </Head>
 
-      <DashboardLayout>
-        <Container maxW="container.md">
-          <Stack spacing="6">
-            <Box bg="white" rounded="md" shadow="base">
-              <Details />
-            </Box>
-            <Box bg="white" rounded="md" shadow="base">
-              <Contact />
-            </Box>
-            <Box bg="white" rounded="md" shadow="base">
-              <Address />
-            </Box>
-            <Box bg="white" rounded="md" shadow="base">
-              <Hours />
-            </Box>
-          </Stack>
-        </Container>
-      </DashboardLayout>
+      <Container maxW="container.md">
+        <Stack spacing="6">
+          <Box bg="white" rounded="md" shadow="base">
+            <Details />
+          </Box>
+          <Box bg="white" rounded="md" shadow="base">
+            <Contact />
+          </Box>
+          <Box bg="white" rounded="md" shadow="base">
+            <Address />
+          </Box>
+          <Box bg="white" rounded="md" shadow="base">
+            <Hours />
+          </Box>
+        </Stack>
+      </Container>
     </>
   )
 }
+
+Restaurant.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
 
 const Details = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)

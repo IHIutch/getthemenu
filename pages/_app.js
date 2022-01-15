@@ -8,7 +8,7 @@ import * as Fathom from 'fathom-client'
 
 const theme = extendTheme(customTheme)
 
-export default function App({ Component, pageProps }) {
+export default function App({ Component, pageProps, err }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -41,11 +41,14 @@ export default function App({ Component, pageProps }) {
     }
   }, [router.events])
 
+  const getLayout = Component.getLayout || ((page) => page)
+
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
+          {/* Workaround for https://github.com/vercel/next.js/issues/8592 */}
+          {getLayout(<Component {...pageProps} err={err} />)}
         </ChakraProvider>
       </Hydrate>
       <ReactQueryDevtools initialIsOpen={false} />

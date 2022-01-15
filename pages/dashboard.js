@@ -47,7 +47,7 @@ import slugify from 'slugify'
 import axios from 'redaxios'
 import { debounce } from 'lodash'
 
-export default function Profile() {
+export default function Dashboard() {
   const router = useRouter()
   const modalState = useDisclosure()
   const [isCreating, setIsCreating] = useState('')
@@ -171,72 +171,69 @@ export default function Profile() {
       <Head>
         <title>Single Menu</title>
       </Head>
-
-      <DashboardLayout>
-        <Container maxW="container.md">
-          <Box>
-            <Flex mb="4" align="center">
-              <Heading fontSize="xl">Your Menus</Heading>
-              <Box ml="auto">
-                <Button colorScheme="blue" onClick={modalState.onOpen}>
-                  Create a Menu
-                </Button>
-              </Box>
-            </Flex>
-            {menus?.length ? (
-              <Stack>
-                {menus.map((menu, idx) => (
-                  <LinkBox key={idx} bg="white" rounded="md" shadow="base">
-                    <Box p="3" borderBottomWidth="1px">
-                      <NextLink passHref href={`/menu/${menu.id}`}>
-                        <LinkOverlay fontWeight="medium" fontSize="2xl">
-                          {menu.title}
-                        </LinkOverlay>
-                      </NextLink>
-                    </Box>
-                    <Flex p="3" justify="space-between">
-                      <Flex align="center">
-                        <Circle boxSize="4" bg="green.100">
-                          <Circle boxSize="2" bg="green.500" />
-                        </Circle>
-                        <Text
-                          ml="2"
-                          lineHeight="1.2"
-                          fontWeight="semibold"
-                          color="green.600"
-                        >
-                          Live
-                        </Text>
-                      </Flex>
-                      <Box>
-                        <Text
-                          fontWeight="semibold"
-                          color="gray.600"
-                          fontSize="sm"
-                        >
-                          Published: {formatDate(menu.createdAt)}
-                        </Text>
-                      </Box>
+      <Container maxW="container.md">
+        <Box>
+          <Flex mb="4" align="center">
+            <Heading fontSize="xl">Your Menus</Heading>
+            <Box ml="auto">
+              <Button colorScheme="blue" onClick={modalState.onOpen}>
+                Create a Menu
+              </Button>
+            </Box>
+          </Flex>
+          {menus?.length ? (
+            <Stack>
+              {menus.map((menu, idx) => (
+                <LinkBox key={idx} bg="white" rounded="md" shadow="base">
+                  <Box p="3" borderBottomWidth="1px">
+                    <NextLink passHref href={`/menu/${menu.id}`}>
+                      <LinkOverlay fontWeight="medium" fontSize="2xl">
+                        {menu.title}
+                      </LinkOverlay>
+                    </NextLink>
+                  </Box>
+                  <Flex p="3" justify="space-between">
+                    <Flex align="center">
+                      <Circle boxSize="4" bg="green.100">
+                        <Circle boxSize="2" bg="green.500" />
+                      </Circle>
+                      <Text
+                        ml="2"
+                        lineHeight="1.2"
+                        fontWeight="semibold"
+                        color="green.600"
+                      >
+                        Live
+                      </Text>
                     </Flex>
-                  </LinkBox>
-                ))}
-              </Stack>
-            ) : (
-              <Center
-                borderWidth="2px"
-                borderColor="gray.200"
-                bg="gray.100"
-                py="8"
-                rounded="lg"
-              >
-                <Text fontSize="xl" fontWeight="medium" color="gray.600">
-                  Get started by creating your first menu.
-                </Text>
-              </Center>
-            )}
-          </Box>
-        </Container>
-      </DashboardLayout>
+                    <Box>
+                      <Text
+                        fontWeight="semibold"
+                        color="gray.600"
+                        fontSize="sm"
+                      >
+                        Published: {formatDate(menu.createdAt)}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </LinkBox>
+              ))}
+            </Stack>
+          ) : (
+            <Center
+              borderWidth="2px"
+              borderColor="gray.200"
+              bg="gray.100"
+              py="8"
+              rounded="lg"
+            >
+              <Text fontSize="xl" fontWeight="medium" color="gray.600">
+                Get started by creating your first menu.
+              </Text>
+            </Center>
+          )}
+        </Box>
+      </Container>
       <Modal isOpen={modalState.isOpen} onClose={modalState.onClose}>
         <ModalOverlay />
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -308,6 +305,8 @@ export default function Profile() {
     </>
   )
 }
+
+Dashboard.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
 
 export async function getServerSideProps() {
   const menus = await apiGetMenus()
