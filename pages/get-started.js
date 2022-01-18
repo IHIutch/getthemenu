@@ -168,12 +168,9 @@ export default function GetStarted() {
         <title>Register</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container maxW="container.md" py="24">
+      <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem
-            colStart={{ md: '3', xl: '4' }}
-            colSpan={{ md: '8', xl: '6' }}
-          >
+          <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>
             <Box bg="white" borderWidth="1px" rounded="md" p="8">
               <Box mb="8">
                 <Heading as="h1">Finish Your Account</Heading>

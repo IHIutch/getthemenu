@@ -12,6 +12,7 @@ import {
   Input,
   Link,
   Container,
+  Text,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
@@ -51,21 +52,24 @@ export default function ResetPassword() {
         <title>Reset Password</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container maxW="container.md" py="24">
+      <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem
-            colStart={{ md: '3', xl: '4' }}
-            colSpan={{ md: '8', xl: '6' }}
-          >
+          <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>
             <Box bg="white" borderWidth="1px" rounded="md" p="8">
               <Box mb="8">
-                <Heading as="h1">Reset Password</Heading>
+                <Heading as="h1" mb="2">
+                  Forgot Password
+                </Heading>
+                <Text color="gray.700">
+                  Enter you email below and we&apos;ll send you an email with
+                  instructions about how to reset your password.
+                </Text>
               </Box>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
-                  {/* <GridItem>
+                  <GridItem>
                     <FormControl id="email" isInvalid={errors.email}>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Your Email</FormLabel>
                       <Input
                         {...register('email', {
                           required: 'This field is required',
@@ -74,24 +78,6 @@ export default function ResetPassword() {
                       />
                       <FormErrorMessage>
                         {errors.email?.message}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </GridItem> */}
-                  <GridItem>
-                    <FormControl
-                      id="password"
-                      isInvalid={errors['new-password']}
-                    >
-                      <FormLabel>New Password</FormLabel>
-                      <Input
-                        {...register('new-password', {
-                          required: 'This field is required',
-                        })}
-                        type="password"
-                        autoComplete="new-password"
-                      />
-                      <FormErrorMessage>
-                        {errors['new-password']?.message}
                       </FormErrorMessage>
                     </FormControl>
                   </GridItem>
@@ -114,7 +100,7 @@ export default function ResetPassword() {
                       colorScheme="blue"
                       type="submit"
                     >
-                      Reset Password
+                      Submit
                     </Button>
                   </GridItem>
                 </Grid>

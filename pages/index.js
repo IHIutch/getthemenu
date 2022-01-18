@@ -79,12 +79,9 @@ export default function Login() {
         <title>GetTheMenu</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container maxW="container.md" py="24">
+      <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem
-            colStart={{ md: '4', lg: '5' }}
-            colSpan={{ md: '6', lg: '4' }}
-          >
+          <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>
             <Box mb="6" textAlign="center">
               <Heading as="h1" fontSize="4xl">
                 GetTheMenu
