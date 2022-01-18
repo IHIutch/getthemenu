@@ -26,9 +26,10 @@ import {
   Image,
   VStack,
   Container,
+  Square,
 } from '@chakra-ui/react'
 import Head from 'next/head'
-import { MoreVertical, Trash2 } from 'react-feather'
+import { MoreVertical, Trash2, Move, Camera } from 'react-feather'
 import { useRouter } from 'next/router'
 import {
   useCreateMenuItem,
@@ -50,6 +51,7 @@ import { postUpload } from '@/utils/axios/uploads'
 import { Controller, useForm } from 'react-hook-form'
 import ImageDropzone from '@/components/common/ImageDropzone'
 import MenuLayout from '@/layouts/Menu'
+import groupBy from 'lodash/groupBy'
 
 export default function SingleMenu() {
   const {
@@ -87,15 +89,14 @@ export default function SingleMenu() {
 
   const handleDragStart = () => {
     if (navigator.vibrate) {
-      navigator.vibrate(100)
+      navigator.vibrate(75)
     }
   }
 
-  const getSectionItems = (sectionId) => {
-    return menuItems
-      .filter((mi) => mi.sectionId === sectionId)
-      .sort((a, b) => a.position - b.position)
-  }
+  const groupedSectionItems = groupBy(
+    (menuItems || []).sort((a, b) => a.position - b.position),
+    'sectionId'
+  )
 
   const sortedSections = useMemo(() => {
     return sections ? sections.sort((a, b) => a.position - b.position) : []
@@ -117,7 +118,7 @@ export default function SingleMenu() {
     } else if (type === 'ITEMS') {
       if (source.droppableId === destination.droppableId) {
         const reorderedItems = reorder(
-          getSectionItems(parseInt(source.droppableId)),
+          groupedSectionItems[source.droppableId],
           source.index,
           destination.index
         )
@@ -126,8 +127,8 @@ export default function SingleMenu() {
         )
       } else {
         const movedItems = move(
-          getSectionItems(parseInt(source.droppableId)),
-          getSectionItems(parseInt(destination.droppableId)),
+          groupedSectionItems[source.droppableId],
+          groupedSectionItems[destination.droppableId],
           source,
           destination
         )
@@ -152,7 +153,7 @@ export default function SingleMenu() {
       </Head>
       <MenuLayout>
         <Container maxW="container.md">
-          {sections && menuItems && (
+          {sections && groupedSectionItems && (
             <DragDropContext
               onDragEnd={handleDragEnd}
               onDragStart={handleDragStart}
@@ -171,43 +172,85 @@ export default function SingleMenu() {
                         index={idx}
                       >
                         {(drag, snapshot) => (
-                          <Box
-                            bg="white"
-                            rounded="md"
-                            shadow="base"
-                            ref={drag.innerRef}
-                            {...drag.draggableProps}
-                            {...drag.dragHandleProps}
-                          >
-                            <Box p="6" borderBottomWidth="1px">
-                              <Heading fontSize="xl" fontWeight="semibold">
-                                {s.title}
-                              </Heading>
-                            </Box>
-                            <Box>
-                              <MenuItemsContainer
-                                sectionId={s.id}
-                                items={getSectionItems(s.id)}
-                                handleDrawerOpen={handleDrawerOpen}
-                                drawerState={drawerState}
-                              />
-                            </Box>
-                            <Flex px="4" py="3" borderTopWidth="1px">
-                              <Button
-                                colorScheme="blue"
-                                onClick={() =>
-                                  handleDrawerOpen(
-                                    <MenuItemDrawer
-                                      sectionId={s.id}
-                                      position={getSectionItems(s.id).length}
-                                      handleDrawerClose={drawerState.onClose}
-                                    />
-                                  )
-                                }
+                          <Box ref={drag.innerRef} {...drag.draggableProps}>
+                            <Box
+                              bg="white"
+                              rounded="md"
+                              shadow={snapshot.isDragging ? 'lg' : 'base'}
+                              transform={
+                                snapshot.isDragging ? 'scale(1.04)' : 'none'
+                              }
+                              transition="all 0.1s ease"
+                            >
+                              <Flex
+                                py="6"
+                                px="4"
+                                borderBottomWidth="1px"
+                                align="center"
+                                w="100%"
+                                {...drag.dragHandleProps}
                               >
-                                Add Item
-                              </Button>
-                            </Flex>
+                                <Flex align="center">
+                                  <Icon as={Move} />
+                                  <Heading
+                                    ml="2"
+                                    fontSize="xl"
+                                    fontWeight="semibold"
+                                  >
+                                    {s.title}
+                                  </Heading>
+                                </Flex>
+                                <Box ml="auto">
+                                  <IconButton
+                                    ml="2"
+                                    size="xs"
+                                    variant="outline"
+                                    icon={
+                                      <Icon
+                                        boxSize="5"
+                                        as={MoreVertical}
+                                        onClick={() =>
+                                          handleDrawerOpen(
+                                            <SectionDrawer
+                                              section={s}
+                                              handleDrawerClose={
+                                                drawerState.onClose
+                                              }
+                                            />
+                                          )
+                                        }
+                                      />
+                                    }
+                                  />
+                                </Box>
+                              </Flex>
+                              <Box>
+                                <MenuItemsContainer
+                                  sectionId={s.id}
+                                  items={groupedSectionItems[s.id] || []}
+                                  handleDrawerOpen={handleDrawerOpen}
+                                  drawerState={drawerState}
+                                />
+                              </Box>
+                              <Flex px="4" py="3" borderTopWidth="1px">
+                                <Button
+                                  colorScheme="blue"
+                                  onClick={() =>
+                                    handleDrawerOpen(
+                                      <MenuItemDrawer
+                                        sectionId={s.id}
+                                        position={
+                                          groupedSectionItems[s.id].length
+                                        }
+                                        handleDrawerClose={drawerState.onClose}
+                                      />
+                                    )
+                                  }
+                                >
+                                  Add Item
+                                </Button>
+                              </Flex>
+                            </Box>
                           </Box>
                         )}
                       </Draggable>
@@ -249,7 +292,7 @@ export default function SingleMenu() {
 }
 
 const MenuItemsContainer = ({
-  items,
+  items = [],
   handleDrawerOpen,
   drawerState,
   sectionId,
@@ -266,17 +309,24 @@ const MenuItemsContainer = ({
               >
                 {(drag, snapshot) => (
                   <Box
-                    bg={snapshot.isDragging ? 'blue.50' : 'white'}
                     ref={drag.innerRef}
                     {...drag.draggableProps}
                     {...drag.dragHandleProps}
-                    p="4"
                   >
-                    <MenuItem
-                      menuItem={menuItem}
-                      handleDrawerOpen={handleDrawerOpen}
-                      drawerState={drawerState}
-                    />
+                    <Box
+                      borderRadius="md"
+                      bg="white"
+                      shadow={snapshot.isDragging ? 'md' : 'none'}
+                      transform={snapshot.isDragging ? 'scale(1.02)' : 'none'}
+                      transition="all 0.1s ease"
+                      p="4"
+                    >
+                      <MenuItem
+                        menuItem={menuItem}
+                        handleDrawerOpen={handleDrawerOpen}
+                        drawerState={drawerState}
+                      />
+                    </Box>
                   </Box>
                 )}
               </Draggable>
@@ -303,17 +353,25 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
             alt={menuItem.title || 'Menu Item'}
           />
         ) : (
-          <Box boxSize="100%" bg="gray.100" />
+          <Square boxSize="100%" bg="gray.100" rounded="md">
+            <Icon color="gray.400" boxSize="5" as={Camera} />
+          </Square>
         )}
       </AspectRatio>
       <Box flexGrow="1" ml="4">
         <Flex>
           <Box flexGrow="1">
-            <Text as="span" fontSize="lg" fontWeight="medium">
-              {menuItem.title}
+            <Text fontSize="lg" fontWeight="semibold" lineHeight="1">
+              {menuItem.title || 'Untitled'}
             </Text>
-            <Text fontWeight="semibold">{menuItem.price}</Text>
-            <Text>{menuItem.description}</Text>
+            {menuItem?.price && (
+              <Text color="gray.800" fontWeight="medium" mb="1">
+                ${menuItem.price}
+              </Text>
+            )}
+            {menuItem.description && (
+              <Text color="gray.600">{menuItem.description}</Text>
+            )}
           </Box>
           <Box>
             <IconButton
