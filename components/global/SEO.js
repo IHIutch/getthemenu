@@ -16,6 +16,10 @@ export default function SEO({
       content: description,
     },
     {
+      property: 'og:type',
+      content: 'website',
+    },
+    {
       property: 'og:title',
       content: title,
     },
@@ -30,6 +34,10 @@ export default function SEO({
     {
       property: 'og:image',
       content: image,
+    },
+    {
+      property: 'twitter:card',
+      content: 'summary_large_image',
     },
     {
       property: 'twitter:title',
