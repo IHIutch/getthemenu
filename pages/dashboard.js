@@ -204,7 +204,7 @@ export default function Dashboard() {
       </Head>
       <Container maxW="container.md">
         <Box>
-          <Flex mb="4" align="center">
+          <Flex mb="2" align="center">
             <Heading fontSize="xl">Your Menus</Heading>
             <Box ml="auto">
               <Button colorScheme="blue" onClick={modalState.onOpen}>
@@ -213,72 +213,86 @@ export default function Dashboard() {
             </Box>
           </Flex>
           {menus?.length ? (
-            <DragDropContext
-              onDragEnd={handleDragEnd}
-              onDragStart={handleDragStart}
-            >
-              <Droppable droppableId="menuWrapper">
-                {(drop) => (
-                  <Stack ref={drop.innerRef} {...drop.droppableProps}>
-                    {sortedMenus.map((menu, idx) => (
-                      <Draggable
-                        draggableId={`${menu.id}`}
-                        key={`${menu.id}`}
-                        index={idx}
-                      >
-                        {(drag, snapshot) => (
-                          <Box ref={drag.innerRef} {...drag.draggableProps}>
-                            <LinkBox bg="white" rounded="md" shadow="base">
-                              <Box p="3" borderBottomWidth="1px">
-                                <Flex align="center" {...drag.dragHandleProps}>
-                                  <Icon as={Move} />
-                                  <NextLink passHref href={`/menu/${menu.id}`}>
-                                    <LinkOverlay>
-                                      <Heading
-                                        ml="2"
-                                        fontSize="2xl"
-                                        fontWeight="semibold"
-                                      >
-                                        {menu.title}
-                                      </Heading>
-                                    </LinkOverlay>
-                                  </NextLink>
-                                </Flex>
-                              </Box>
-                              <Flex p="3" justify="space-between">
-                                <Flex align="center">
-                                  <Circle boxSize="4" bg="green.100">
-                                    <Circle boxSize="2" bg="green.500" />
-                                  </Circle>
-                                  <Text
-                                    ml="2"
-                                    lineHeight="1.2"
-                                    fontWeight="semibold"
-                                    color="green.600"
+            <>
+              <Box mb="4">
+                <Text fontSize="sm" color="gray.700">
+                  Your first ordered menu will automatically be set as your
+                  homepage.
+                </Text>
+              </Box>
+              <DragDropContext
+                onDragEnd={handleDragEnd}
+                onDragStart={handleDragStart}
+              >
+                <Droppable droppableId="menuWrapper">
+                  {(drop) => (
+                    <Stack ref={drop.innerRef} {...drop.droppableProps}>
+                      {sortedMenus.map((menu, idx) => (
+                        <Draggable
+                          draggableId={`${menu.id}`}
+                          key={`${menu.id}`}
+                          index={idx}
+                        >
+                          {(drag, snapshot) => (
+                            <Box ref={drag.innerRef} {...drag.draggableProps}>
+                              <LinkBox bg="white" rounded="md" shadow="base">
+                                <Box p="3" borderBottomWidth="1px">
+                                  <Flex
+                                    align="center"
+                                    {...drag.dragHandleProps}
                                   >
-                                    Live
-                                  </Text>
-                                </Flex>
-                                <Box>
-                                  <Text
-                                    fontWeight="semibold"
-                                    color="gray.600"
-                                    fontSize="sm"
-                                  >
-                                    Published: {formatDate(menu.createdAt)}
-                                  </Text>
+                                    <Icon as={Move} />
+                                    <NextLink
+                                      passHref
+                                      href={`/menu/${menu.id}`}
+                                    >
+                                      <LinkOverlay>
+                                        <Heading
+                                          ml="2"
+                                          fontSize="2xl"
+                                          fontWeight="semibold"
+                                        >
+                                          {menu.title}
+                                        </Heading>
+                                      </LinkOverlay>
+                                    </NextLink>
+                                  </Flex>
                                 </Box>
-                              </Flex>
-                            </LinkBox>
-                          </Box>
-                        )}
-                      </Draggable>
-                    ))}
-                    <Box bg="gray.50">{drop.placeholder}</Box>
-                  </Stack>
-                )}
-              </Droppable>
-            </DragDropContext>
+                                <Flex p="3" justify="space-between">
+                                  <Flex align="center">
+                                    <Circle boxSize="4" bg="green.100">
+                                      <Circle boxSize="2" bg="green.500" />
+                                    </Circle>
+                                    <Text
+                                      ml="2"
+                                      lineHeight="1.2"
+                                      fontWeight="semibold"
+                                      color="green.600"
+                                    >
+                                      Live
+                                    </Text>
+                                  </Flex>
+                                  <Box>
+                                    <Text
+                                      fontWeight="semibold"
+                                      color="gray.600"
+                                      fontSize="sm"
+                                    >
+                                      Published: {formatDate(menu.createdAt)}
+                                    </Text>
+                                  </Box>
+                                </Flex>
+                              </LinkBox>
+                            </Box>
+                          )}
+                        </Draggable>
+                      ))}
+                      <Box bg="gray.50">{drop.placeholder}</Box>
+                    </Stack>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </>
           ) : (
             <Center
               borderWidth="2px"
@@ -365,6 +379,8 @@ export default function Dashboard() {
     </>
   )
 }
+
+Dashboard.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
 
 export async function getServerSideProps() {
   const menus = await apiGetMenus()
