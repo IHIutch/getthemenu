@@ -366,7 +366,10 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
             </Text>
             {menuItem?.price && (
               <Text color="gray.800" fontWeight="medium" mb="1">
-                ${menuItem.price}
+                {menuItem.price?.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                })}
               </Text>
             )}
             {menuItem.description && (

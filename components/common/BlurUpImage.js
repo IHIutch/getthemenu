@@ -3,7 +3,7 @@ import { Box, Flex, Image, Spinner } from '@chakra-ui/react'
 import NextImage from 'next/image'
 import { Blurhash } from 'react-blurhash'
 
-export default function BlurUpImage({ src, blurDataURL, alt }) {
+export default function BlurUpImage({ src, blurDataURL, alt, priority }) {
   const [isLoaded, setIsLoaded] = useState(false)
 
   return src ? (
@@ -13,13 +13,14 @@ export default function BlurUpImage({ src, blurDataURL, alt }) {
         onLoadingComplete={() => setIsLoaded(true)}
         position="absolute"
         opacity={isLoaded ? 1 : 0}
-        loading="lazy"
+        loading={priority ? 'eager' : 'lazy'}
         layout="fill"
         boxSize="100%"
         objectFit="cover"
         transition="all 0.2s ease"
         src={src}
         alt={alt}
+        priority={priority}
       />
       <Box
         opacity={isLoaded ? 0 : 1}

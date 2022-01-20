@@ -4,14 +4,14 @@ import { apiGetMenu, apiGetMenus } from '@/controllers/menus'
 import { apiGetRestaurants } from '@/controllers/restaurants'
 import { apiGetSections } from '@/controllers/sections'
 import Head from 'next/head'
-import { AspectRatio, Box, Heading, Stack, Text } from '@chakra-ui/layout'
 import PublicLayout from '@/layouts/Public'
 import BlurUpImage from '@/components/common/BlurUpImage'
 import { dehydrate, QueryClient } from 'react-query'
-import { useGetMenus } from '@/utils/react-query/menus'
+import { useGetMenu, useGetMenus } from '@/utils/react-query/menus'
 import { useGetSections } from '@/utils/react-query/sections'
 import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useRouter } from 'next/router'
+import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const { query } = useRouter()
@@ -21,7 +21,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const { id: menuId } = slug
     ? menus.find((menu) => menu.slug === slug)
     : menus[0]
-  const { data: menu } = useGetMenus(menuId)
+  const { data: menu } = useGetMenu(menuId)
   const { data: sections } = useGetSections({ menuId })
   const { data: menuItems } = useGetMenuItems({ menuId })
 
@@ -36,7 +36,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
         <Box>
           <Stack>
             <Box>
-              <Heading as="h2" fontSize="3xl">
+              <Heading as="h2" fontSize="3xl" mb="4">
                 {menu?.title}
               </Heading>
             </Box>
@@ -73,13 +73,28 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                                   />
                                 </AspectRatio>
                                 <Box p="4">
-                                  <Heading as="h4" fontSize="lg">
-                                    {item.title}
-                                  </Heading>
-                                  <Text fontWeight="semibold">
-                                    ${item.price}
+                                  <Flex>
+                                    <Heading
+                                      as="h4"
+                                      fontSize="lg"
+                                      flexGrow="1"
+                                      fontWeight="semibold"
+                                    >
+                                      {item.title}
+                                    </Heading>
+                                    <Text
+                                      color="gray.800"
+                                      fontWeight="semibold"
+                                    >
+                                      {item?.price?.toLocaleString('en-US', {
+                                        style: 'currency',
+                                        currency: 'USD',
+                                      })}
+                                    </Text>
+                                  </Flex>
+                                  <Text color="gray.600">
+                                    {item.description}
                                   </Text>
-                                  <Text>{item.description}</Text>
                                 </Box>
                               </Box>
                             ))}
