@@ -30,6 +30,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useBreakpointValue,
   useDisclosure,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
@@ -58,7 +59,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
     <>
       <Box position="fixed" boxSize="100%" overflow="auto">
         <Box>
-          <AspectRatio ratio={{ base: 16 / 9, sm: 21 / 9 }}>
+          <AspectRatio ratio={{ base: 4 / 3, sm: 21 / 9 }}>
             <Box boxSize="100%">
               {restaurant?.coverImage?.src ? (
                 <BlurUpImage
@@ -86,26 +87,20 @@ export default function PublicLayout({ restaurant, menus, children }) {
                     textShadow="0 2px 1px black"
                     flexGrow="1"
                     color="white"
-                    size="2xl"
+                    size={useBreakpointValue({ base: 'xl', sm: '2xl' })}
                     mb="4"
                   >
                     {restaurant?.name}
                   </Heading>
                   <Flex align="center">
-                    <Stack
-                      direction="row"
-                      color="white"
-                      spacing="6"
-                      fontSize={{ md: 'lg' }}
-                      flexGrow="1"
-                    >
+                    <Flex wrap="wrap" color="white" flexGrow="1">
                       {restaurant?.phone?.length && (
-                        <Stack direction="row" align="center">
+                        <Stack direction="row" align="center" mr="6" py="1">
                           <Icon as={Phone} />
                           <Text>{restaurant.phone[0]}</Text>
                         </Stack>
                       )}
-                      <Stack direction="row" align="center">
+                      <Stack direction="row" align="center" py="1">
                         <Icon as={Clock} />
                         {restaurant?.hours?.[weekdayName]?.openTime &&
                         restaurant?.hours?.[weekdayName]?.closeTime ? (
@@ -117,7 +112,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                           <Text>Closed Today</Text>
                         )}
                       </Stack>
-                    </Stack>
+                    </Flex>
                     <Box d={{ lg: 'none' }} flexShrink="0">
                       <Button onClick={modalState.onOpen}>View Details</Button>
                     </Box>
