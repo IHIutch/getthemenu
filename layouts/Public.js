@@ -56,16 +56,6 @@ export default function PublicLayout({ restaurant, menus, children }) {
 
   return (
     <>
-      <Head>
-        <title>{restaurant?.name}</title>
-        <link rel="icon" href="/favicon.ico" />
-        {/* <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
-          }}
-        /> */}
-      </Head>
       <Box position="fixed" boxSize="100%" overflow="auto">
         <Box>
           <AspectRatio ratio={{ base: 16 / 9, sm: 21 / 9 }}>
