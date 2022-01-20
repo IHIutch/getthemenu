@@ -46,7 +46,7 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
-import { blurhashEncode } from '@/utils/functions'
+import { blurhashEncode, reorderList } from '@/utils/functions'
 import { postUpload } from '@/utils/axios/uploads'
 import { Controller, useForm } from 'react-hook-form'
 import ImageDropzone from '@/components/common/ImageDropzone'
@@ -69,13 +69,6 @@ export default function SingleMenu() {
   const { data: sections } = useGetSections({ menuId })
   const { mutate: reorderMenuItems } = useReorderMenuItems({ menuId })
   const { mutate: reorderSections } = useReorderSections({ menuId })
-
-  const reorder = (list = [], startIndex, endIndex) => {
-    const temp = [...list]
-    const [removed] = temp.splice(startIndex, 1)
-    temp.splice(endIndex, 0, removed)
-    return temp
-  }
 
   const move = (sourceList = [], destinationList = [], source, destination) => {
     const [removed] = sourceList.splice(source.index, 1)
@@ -107,7 +100,7 @@ export default function SingleMenu() {
     if (!destination) return // dropped outside the list
 
     if (type === 'SECTIONS') {
-      const reorderedSections = reorder(
+      const reorderedSections = reorderList(
         sections.sort((a, b) => a.position - b.position),
         source.index,
         destination.index
@@ -117,7 +110,7 @@ export default function SingleMenu() {
       )
     } else if (type === 'ITEMS') {
       if (source.droppableId === destination.droppableId) {
-        const reorderedItems = reorder(
+        const reorderedItems = reorderList(
           groupedSectionItems[source.droppableId],
           source.index,
           destination.index

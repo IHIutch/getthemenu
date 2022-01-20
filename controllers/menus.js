@@ -52,6 +52,15 @@ export const apiPutMenu = async (id, payload) => {
   return data
 }
 
+export const apiPutMenus = async (payload) => {
+  const { data, error } = await supabase.from('menus').upsert(payload)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
+
 export const apiDeleteMenu = async (id) => {
   const { data, error } = await supabase.from('menus').delete().match({ id })
 

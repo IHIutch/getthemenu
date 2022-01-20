@@ -31,6 +31,15 @@ export const putMenu = async (id, payload) => {
   return data
 }
 
+export const putMenusReorder = async (payload) => {
+  const { data } = await axios
+    .put(`/api/menus/reorder`, payload)
+    .catch((res) => {
+      throw new Error(res.data.error)
+    })
+  return data
+}
+
 export const deleteMenu = async (id) => {
   const { data } = await axios.delete(`/api/menus/${id}`).catch((res) => {
     throw new Error(res.data.error)

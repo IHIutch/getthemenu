@@ -102,8 +102,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       )}
                       <Stack direction="row" align="center" py="1">
                         <Icon as={Clock} />
-                        {restaurant?.hours?.[weekdayName]?.openTime &&
-                        restaurant?.hours?.[weekdayName]?.closeTime ? (
+                        {restaurant?.hours?.[weekdayName]?.isOpen ? (
                           <Text>
                             {restaurant.hours[weekdayName].openTime} -{' '}
                             {restaurant.hours[weekdayName].closeTime}

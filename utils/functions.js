@@ -133,3 +133,10 @@ export const getPublicURL = (path) => {
     console.log('Error downloading file: ', err.message)
   }
 }
+
+export const reorderList = (list = [], startIndex, endIndex) => {
+  const temp = [...list]
+  const [removed] = temp.splice(startIndex, 1)
+  temp.splice(endIndex, 0, removed)
+  return temp
+}
