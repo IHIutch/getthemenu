@@ -26,6 +26,18 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const { data: menuItems } = useGetMenuItems({ menuId })
 
   const structuredData = useMemo(() => {
+    const minPrice = Math.min(
+      ...menuItems.map((mi) => mi?.price || 0)
+    ).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    })
+    const maxPrice = Math.max(
+      ...menuItems.map((mi) => mi?.price || 0)
+    ).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    })
     const restaurantJson = {
       '@type': 'Restaurant',
       url:
@@ -35,7 +47,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
       name: restaurant?.name || '',
       image: restaurant?.coverImage?.src || '',
       telephone: restaurant?.phone?.[0] || '',
-      priceRange: '$100 - $200',
+      priceRange: `${minPrice} - ${maxPrice}`,
       description: restaurant?.description || '',
       address: {
         '@type': 'PostalAddress',
@@ -44,30 +56,34 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
         addressRegion: restaurant.address?.state || '',
         postalCode: restaurant.address?.zip || '',
       },
-      // servesCuisine: ['American cuisine'],
+      servesCuisine: ['American cuisine'],
     }
     const menusJson = {
       hasMenu: menus.map((menu) => ({
         '@type': 'Menu',
-        name: menu?.name || '',
+        name: menu?.title || '',
         description: menu?.description || '',
         hasMenuSection: sections
           .filter((s) => s.menuId === menu.id)
           .map((s) => ({
             '@type': 'MenuSection',
-            name: s?.name,
+            name: s?.title,
             description: s?.description || '',
             hasMenuItem: menuItems
               .filter((mi) => mi.sectionId === s.id)
               .map((mi) => ({
                 '@type': 'MenuItem',
-                name: mi?.name || '',
+                name: mi?.title || '',
                 description: mi?.description || '',
                 image: mi?.image?.src || '',
                 offers: [
                   {
                     '@type': 'Offer',
-                    price: mi?.price,
+                    price:
+                      mi?.price?.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }) || '',
                     priceCurrency: 'USD',
                   },
                 ],
@@ -82,7 +98,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
       ...restaurantJson,
       ...menusJson,
     }
-  }, [restaurant, menus])
+  }, [restaurant, menus, sections, menuItems])
 
   return (
     <>
