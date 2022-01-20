@@ -155,8 +155,6 @@ export async function getServerSideProps({ params: { host }, query }) {
     async () => menuItems
   )
 
-  console.log({ host, slug })
-
   return {
     props: {
       host,

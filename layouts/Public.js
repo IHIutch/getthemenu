@@ -14,6 +14,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  Icon,
   Link,
   Modal,
   ModalBody,
@@ -32,6 +33,8 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
+import dayjs from 'dayjs'
+import { Phone, Clock } from 'react-feather'
 
 export default function PublicLayout({ restaurant, menus, children }) {
   const modalState = useDisclosure()
@@ -39,6 +42,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
   const { asPath, push, query } = useRouter()
   const slug = query?.slug?.[0] || ''
   const [activeMenu, setActiveMenu] = useState(slug)
+
+  const weekdayName = dayjs().format('dddd')
 
   useEffect(() => {
     if (activeMenu !== slug) {
@@ -63,7 +68,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
       </Head>
       <Box position="fixed" boxSize="100%" overflow="auto">
         <Box>
-          <AspectRatio ratio={{ base: 16 / 9, lg: 21 / 9 }}>
+          <AspectRatio ratio={{ base: 16 / 9, sm: 21 / 9 }}>
             <Box boxSize="100%">
               {restaurant?.coverImage?.src ? (
                 <BlurUpImage
@@ -91,9 +96,42 @@ export default function PublicLayout({ restaurant, menus, children }) {
                     textShadow="0 2px 1px black"
                     flexGrow="1"
                     color="white"
+                    size="2xl"
+                    mb="4"
                   >
                     {restaurant?.name}
                   </Heading>
+                  <Flex align="center">
+                    <Stack
+                      direction="row"
+                      color="white"
+                      spacing="6"
+                      fontSize={{ md: 'lg' }}
+                      flexGrow="1"
+                    >
+                      {restaurant?.phone?.length && (
+                        <Stack direction="row" align="center">
+                          <Icon as={Phone} />
+                          <Text>{restaurant.phone[0]}</Text>
+                        </Stack>
+                      )}
+                      <Stack direction="row" align="center">
+                        <Icon as={Clock} />
+                        {restaurant?.hours?.[weekdayName]?.openTime &&
+                        restaurant?.hours?.[weekdayName]?.closeTime ? (
+                          <Text>
+                            {restaurant.hours[weekdayName].openTime} -{' '}
+                            {restaurant.hours[weekdayName].closeTime}
+                          </Text>
+                        ) : (
+                          <Text>Closed Today</Text>
+                        )}
+                      </Stack>
+                    </Stack>
+                    <Box d={{ lg: 'none' }} flexShrink="0">
+                      <Button onClick={modalState.onOpen}>View Details</Button>
+                    </Box>
+                  </Flex>
                 </Container>
               </Flex>
             </Box>
@@ -114,6 +152,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                   <FormControl flexGrow="1" id="menu">
                     <FormLabel mb="1">Select a Menu</FormLabel>
                     <Select
+                      bg="white"
                       value={activeMenu}
                       onChange={(e) => {
                         setActiveMenu(e.target.value)
@@ -126,9 +165,6 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       ))}
                     </Select>
                   </FormControl>
-                  <Box d={{ lg: 'none' }} flexShrink="0">
-                    <Button onClick={modalState.onOpen}>View Details</Button>
-                  </Box>
                 </Stack>
               </GridItem>
             </Grid>
@@ -174,11 +210,11 @@ export default function PublicLayout({ restaurant, menus, children }) {
               <Box position="sticky" top="28">
                 {restaurant?.hours && (
                   <Stack pt="4" spacing="8">
-                    <Box bg="white" shadow="sm" rounded="md">
+                    <Box bg="white" shadow="sm" rounded="md" borderWidth="1px">
                       <Box p="4" borderBottomWidth="1px">
                         <Heading fontSize="lg">Contact</Heading>
                       </Box>
-                      <Stack spacing="4" p="4">
+                      <Stack spacing="4" p="4" fontSize="sm">
                         {restaurant?.phone && (
                           <Box>
                             <Text fontWeight="semibold">Phone</Text>
@@ -220,11 +256,11 @@ export default function PublicLayout({ restaurant, menus, children }) {
                         )}
                       </Stack>
                     </Box>
-                    <Box bg="white" shadow="sm" rounded="md">
+                    <Box bg="white" shadow="sm" rounded="md" borderWidth="1px">
                       <Box p="4" borderBottomWidth="1px">
                         <Heading fontSize="lg">Hours</Heading>
                       </Box>
-                      <Stack spacing="3" py="3">
+                      <Stack spacing="3" py="3" fontSize="sm">
                         {[
                           'Monday',
                           'Tuesday',
@@ -242,12 +278,12 @@ export default function PublicLayout({ restaurant, menus, children }) {
                             w="100%"
                           >
                             <Box>
-                              <Text as="dt" fontSize="sm" fontWeight="semibold">
+                              <Text as="dt" fontWeight="semibold">
                                 {day}:
                               </Text>
                             </Box>
                             <Box>
-                              <Text as="dd" fontSize="sm">
+                              <Text as="dd">
                                 {restaurant.hours[day].openTime} -{' '}
                                 {restaurant.hours[day].closeTime}
                               </Text>
