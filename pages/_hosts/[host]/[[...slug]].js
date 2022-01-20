@@ -28,13 +28,13 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
 
   const structuredData = useMemo(() => {
     const minPrice = Math.min(
-      ...menuItems.map((mi) => mi?.price || 0)
+      ...(menuItems || []).map((mi) => mi?.price || 0)
     ).toLocaleString('en-US', {
       style: 'currency',
       currency: 'USD',
     })
     const maxPrice = Math.max(
-      ...menuItems.map((mi) => mi?.price || 0)
+      ...(menuItems || []).map((mi) => mi?.price || 0)
     ).toLocaleString('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -60,17 +60,17 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
       servesCuisine: ['American cuisine'],
     }
     const menusJson = {
-      hasMenu: menus.map((menu) => ({
+      hasMenu: (menus || []).map((menu) => ({
         '@type': 'Menu',
         name: menu?.title || '',
         description: menu?.description || '',
-        hasMenuSection: sections
+        hasMenuSection: (sections || [])
           .filter((s) => s.menuId === menu.id)
           .map((s) => ({
             '@type': 'MenuSection',
             name: s?.title,
             description: s?.description || '',
-            hasMenuItem: menuItems
+            hasMenuItem: (menuItems || [])
               .filter((mi) => mi.sectionId === s.id)
               .map((mi) => ({
                 '@type': 'MenuItem',
