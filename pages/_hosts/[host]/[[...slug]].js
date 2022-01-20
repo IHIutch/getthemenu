@@ -12,6 +12,7 @@ import { useGetSections } from '@/utils/react-query/sections'
 import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import SEO from '@/components/global/SEO'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const { query } = useRouter()
@@ -103,7 +104,16 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   return (
     <>
       <Head>
-        <title>{restaurant?.name}</title>
+        <SEO
+          title={restaurant?.name}
+          description={restaurant?.description || ''}
+          image={restaurant?.coverImage?.src || ''}
+          url={
+            restaurant?.customDomain || restaurant?.customHost
+              ? `https://${restaurant.customHost}.getthemenu.io`
+              : ''
+          }
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
