@@ -31,8 +31,8 @@ export default function BlurUpImage({ src, blurDataURL, alt, priority }) {
         {blurDataURL ? (
           <Blurhash
             hash={blurDataURL}
-            width={800}
-            height={400}
+            width={priority ? '100%' : 800}
+            height={priority ? '100%' : 400}
             resolutionX={56}
             resolutionY={32}
             punch={1}
