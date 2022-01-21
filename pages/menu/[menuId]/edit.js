@@ -29,13 +29,7 @@ import {
   StackDivider,
 } from '@chakra-ui/react'
 import Head from 'next/head'
-import {
-  MoreVertical,
-  Trash2,
-  Move,
-  Camera,
-  GripHorizontal,
-} from 'lucide-react'
+import { MoreVertical, Trash2, Camera, GripHorizontal } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   useCreateMenuItem,
@@ -441,21 +435,22 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
 const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
-  const { data: sections } = useGetSections({ menuId })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [editingSection, setEditingSection] = useState(
-    section ?? {
-      title: '',
-      position: sections.length,
-    }
-  )
 
   const {
     data: user,
     // isLoading: isUserLoading,
     // isError: isUserError,
   } = useAuthUser()
+
+  const { register, handleSubmit, reset } = useForm()
+
+  useEffect(() => {
+    if (section) {
+      reset(section)
+    }
+  }, [section, reset])
 
   const { mutate: handleUpdateSection } = useUpdateSection({
     menuId,
@@ -465,16 +460,20 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
     menuId,
   })
 
-  const handleSubmit = async () => {
+  const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
+      const payload = {
+        title: form?.title || '',
+        description: form?.description || '',
+      }
       section
         ? await handleUpdateSection({
-            id: editingSection.id,
-            payload: editingSection,
+            id: section.id,
+            payload,
           })
         : await handleCreateSection({
-            ...editingSection,
+            ...payload,
             position,
             menuId,
             restaurantId: user.restaurants[0].id,
@@ -495,18 +494,32 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
       <DrawerBody px="4">
         <Stack spacing="6">
           <FormControl id="title">
-            <FormLabel>Section Name</FormLabel>
+            <FormLabel>Title</FormLabel>
             <Input
               autoComplete="off"
-              value={editingSection.title}
-              onChange={(e) =>
-                setEditingSection({
-                  ...editingSection,
-                  title: e.target.value,
-                })
-              }
+              {...register('title', { required: true })}
             />
           </FormControl>
+          <FormControl id="description">
+            <FormLabel>Description</FormLabel>
+            <Textarea
+              autoComplete="off"
+              {...register('description')}
+              resize="none"
+              rows="6"
+            />
+          </FormControl>
+          {section && (
+            <Box>
+              <Button
+                colorScheme="red"
+                variant="link"
+                leftIcon={<Icon as={Trash2} />}
+              >
+                Delete Section
+              </Button>
+            </Box>
+          )}
         </Stack>
       </DrawerBody>
 
@@ -519,7 +532,7 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
             loadingText={section ? 'Updating...' : 'Creating...'}
             isLoading={isSubmitting}
             colorScheme="blue"
-            onClick={handleSubmit}
+            onClick={handleSubmit(onSubmit)}
             isFullWidth
           >
             {section ? 'Update' : 'Create'}
