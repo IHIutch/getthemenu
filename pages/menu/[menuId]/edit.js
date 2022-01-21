@@ -361,7 +361,7 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
   }, [menuItem.image])
   return (
     <Flex alignItems="flex-start">
-      <AspectRatio w="16" ratio="1">
+      <AspectRatio w="16" ratio="1" flexShrink="0">
         {imageUrl ? (
           <Image
             src={imageUrl}
