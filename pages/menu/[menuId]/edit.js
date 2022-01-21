@@ -497,15 +497,17 @@ const MenuItemDrawer = ({
   const router = useRouter()
   const { menuId } = router.query
 
-  const { register, handleSubmit, reset, control } = useForm()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { dirtyFields },
+  } = useForm()
 
   useEffect(() => {
     if (menuItem) {
-      const payload = {
-        ...menuItem,
-        image: menuItem?.image?.src || null,
-      }
-      reset(payload)
+      reset({ ...menuItem })
     }
   }, [menuItem, reset])
 
@@ -532,9 +534,9 @@ const MenuItemDrawer = ({
         title: form?.title || '',
         description: form?.description || '',
         price: form?.price || null,
-        image: null,
+        image: form?.image || null,
       }
-      if (form?.image) {
+      if (form?.image && dirtyFields?.image) {
         const formData = new FormData()
         formData.append('file', form.image, form.image.name)
 
