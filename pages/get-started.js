@@ -54,7 +54,8 @@ export default function GetStarted() {
       const { data } = await axios.get(`/api/restaurants?similar=${customHost}`)
       let count = 0
       let out = customHost
-      const slugs = data.map((d) => d.slug)
+      const analyticsHost = 'xyz'
+      const slugs = [analyticsHost, ...data].map((d) => d.slug)
       if (slugs) {
         while (slugs.includes(out)) {
           out = `${customHost}-${count + 1}`
