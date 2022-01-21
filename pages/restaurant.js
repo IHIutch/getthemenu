@@ -353,8 +353,8 @@ const Contact = () => {
 
   const defaultValues = useMemo(() => {
     return {
-      phone: restaurant?.phone[0] || '',
-      email: restaurant?.email[0] || '',
+      phone: restaurant?.phone?.[0] || '',
+      email: restaurant?.email?.[0] || '',
     }
   }, [restaurant])
 
