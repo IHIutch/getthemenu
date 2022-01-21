@@ -34,7 +34,7 @@ import {
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import dayjs from 'dayjs'
-import { Phone, Clock } from 'react-feather'
+import { Phone, Clock } from 'lucide-react'
 
 export default function PublicLayout({ restaurant, menus, children }) {
   const modalState = useDisclosure()

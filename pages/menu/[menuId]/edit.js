@@ -26,9 +26,16 @@ import {
   Container,
   Square,
   Center,
+  StackDivider,
 } from '@chakra-ui/react'
 import Head from 'next/head'
-import { MoreVertical, Trash2, Move, Camera } from 'react-feather'
+import {
+  MoreVertical,
+  Trash2,
+  Move,
+  Camera,
+  GripHorizontal,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   useCreateMenuItem,
@@ -174,24 +181,27 @@ export default function SingleMenu() {
                               }
                               transition="all 0.1s ease"
                             >
+                              <Center {...drag.dragHandleProps}>
+                                <Icon
+                                  color="gray.500"
+                                  boxSize="5"
+                                  as={GripHorizontal}
+                                />
+                              </Center>
                               <Flex
-                                py="6"
+                                pb="6"
                                 px="4"
                                 borderBottomWidth="1px"
                                 align="center"
                                 w="100%"
-                                {...drag.dragHandleProps}
                               >
-                                <Flex align="center">
-                                  <Icon as={Move} />
-                                  <Heading
-                                    ml="2"
-                                    fontSize="xl"
-                                    fontWeight="semibold"
-                                  >
-                                    {s.title}
-                                  </Heading>
-                                </Flex>
+                                <Heading
+                                  ml="2"
+                                  fontSize="2xl"
+                                  fontWeight="semibold"
+                                >
+                                  {s.title}
+                                </Heading>
                                 <Box ml="auto">
                                   <IconButton
                                     ml="2"
@@ -312,7 +322,12 @@ const MenuItemsContainer = ({
   return items?.length > 0 ? (
     <Droppable droppableId={`${sectionId}`} type="ITEMS">
       {(drop) => (
-        <Stack spacing="0" ref={drop.innerRef} {...drop.droppableProps}>
+        <Stack
+          spacing="0"
+          ref={drop.innerRef}
+          {...drop.droppableProps}
+          divider={<StackDivider />}
+        >
           {items.map((menuItem, idx) => (
             <Box key={`${sectionId}-${menuItem.id}`}>
               <Draggable
@@ -320,24 +335,28 @@ const MenuItemsContainer = ({
                 index={idx}
               >
                 {(drag, snapshot) => (
-                  <Box
-                    ref={drag.innerRef}
-                    {...drag.draggableProps}
-                    {...drag.dragHandleProps}
-                  >
+                  <Box ref={drag.innerRef} {...drag.draggableProps}>
                     <Box
                       borderRadius="md"
                       bg="white"
                       shadow={snapshot.isDragging ? 'md' : 'none'}
                       transform={snapshot.isDragging ? 'scale(1.02)' : 'none'}
                       transition="all 0.1s ease"
-                      p="4"
                     >
-                      <MenuItem
-                        menuItem={menuItem}
-                        handleDrawerOpen={handleDrawerOpen}
-                        drawerState={drawerState}
-                      />
+                      <Center {...drag.dragHandleProps}>
+                        <Icon
+                          color="gray.500"
+                          boxSize="5"
+                          as={GripHorizontal}
+                        />
+                      </Center>
+                      <Box pb="4" px="4">
+                        <MenuItem
+                          menuItem={menuItem}
+                          handleDrawerOpen={handleDrawerOpen}
+                          drawerState={drawerState}
+                        />
+                      </Box>
                     </Box>
                   </Box>
                 )}

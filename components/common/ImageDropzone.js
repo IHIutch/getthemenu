@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { X } from 'react-feather'
+import { X } from 'lucide-react'
 
 export default function ImageDropzone({ onChange, value = '' }) {
   const [preview, setPreview] = useState(value)

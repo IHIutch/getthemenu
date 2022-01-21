@@ -47,7 +47,7 @@ import { useForm } from 'react-hook-form'
 import slugify from 'slugify'
 import axios from 'redaxios'
 import { debounce } from 'lodash'
-import { Move } from 'react-feather'
+import { GripHorizontal, Move } from 'lucide-react'
 import { Draggable } from 'react-beautiful-dnd'
 import { Droppable } from 'react-beautiful-dnd'
 import { DragDropContext } from 'react-beautiful-dnd'
@@ -235,7 +235,7 @@ export default function Dashboard() {
                         >
                           {(drag, snapshot) => (
                             <Box ref={drag.innerRef} {...drag.draggableProps}>
-                              <LinkBox
+                              <Box
                                 bg="white"
                                 rounded="md"
                                 shadow={snapshot.isDragging ? 'lg' : 'base'}
@@ -244,53 +244,59 @@ export default function Dashboard() {
                                 }
                                 transition="all 0.1s ease"
                               >
-                                <Box p="3" borderBottomWidth="1px">
-                                  <Flex
-                                    align="center"
-                                    {...drag.dragHandleProps}
-                                  >
-                                    <Icon as={Move} />
-                                    <NextLink
-                                      passHref
-                                      href={`/menu/${menu.id}`}
-                                    >
-                                      <LinkOverlay>
-                                        <Heading
-                                          ml="2"
-                                          fontSize="2xl"
-                                          fontWeight="semibold"
-                                        >
-                                          {menu.title}
-                                        </Heading>
-                                      </LinkOverlay>
-                                    </NextLink>
-                                  </Flex>
-                                </Box>
-                                <Flex p="3" justify="space-between">
-                                  <Flex align="center">
-                                    <Circle boxSize="4" bg="green.100">
-                                      <Circle boxSize="2" bg="green.500" />
-                                    </Circle>
-                                    <Text
-                                      ml="2"
-                                      lineHeight="1.2"
-                                      fontWeight="semibold"
-                                      color="green.600"
-                                    >
-                                      Live
-                                    </Text>
-                                  </Flex>
+                                <Center {...drag.dragHandleProps}>
+                                  <Icon
+                                    color="gray.500"
+                                    boxSize="5"
+                                    as={GripHorizontal}
+                                  />
+                                </Center>
+                                <LinkBox>
                                   <Box>
-                                    <Text
-                                      fontWeight="semibold"
-                                      color="gray.600"
-                                      fontSize="sm"
-                                    >
-                                      Published: {formatDate(menu.createdAt)}
-                                    </Text>
+                                    <Box pb="3" px="3" borderBottomWidth="1px">
+                                      <NextLink
+                                        passHref
+                                        href={`/menu/${menu.id}`}
+                                      >
+                                        <LinkOverlay>
+                                          <Heading
+                                            ml="2"
+                                            fontSize="2xl"
+                                            fontWeight="semibold"
+                                          >
+                                            {menu.title}
+                                          </Heading>
+                                        </LinkOverlay>
+                                      </NextLink>
+                                    </Box>
+                                    <Flex p="3" justify="space-between">
+                                      <Flex align="center">
+                                        <Circle boxSize="4" bg="green.100">
+                                          <Circle boxSize="2" bg="green.500" />
+                                        </Circle>
+                                        <Text
+                                          ml="2"
+                                          lineHeight="1.2"
+                                          fontWeight="semibold"
+                                          color="green.600"
+                                        >
+                                          Live
+                                        </Text>
+                                      </Flex>
+                                      <Box>
+                                        <Text
+                                          fontWeight="semibold"
+                                          color="gray.600"
+                                          fontSize="sm"
+                                        >
+                                          Published:{' '}
+                                          {formatDate(menu.createdAt)}
+                                        </Text>
+                                      </Box>
+                                    </Flex>
                                   </Box>
-                                </Flex>
-                              </LinkBox>
+                                </LinkBox>
+                              </Box>
                             </Box>
                           )}
                         </Draggable>
