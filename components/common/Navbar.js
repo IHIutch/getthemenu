@@ -60,10 +60,10 @@ export default function Navbar({ children, ...props }) {
                       <NextLink href="/dashboard" passHref>
                         <MenuItem as={Link}>Dashboard</MenuItem>
                       </NextLink>
-                      <NextLink href="/settings" passHref>
+                      {/* <NextLink href="/settings" passHref>
                         <MenuItem as={Link}>Account Settings</MenuItem>
-                      </NextLink>
-                      <MenuItem as="button">Feedback</MenuItem>
+                      </NextLink> */}
+                      {/* <MenuItem as="button">Feedback</MenuItem> */}
                       <NextLink href="/logout" passHref>
                         <MenuItem as={Link}>Log Out</MenuItem>
                       </NextLink>

@@ -98,7 +98,7 @@ export default function Dashboard() {
         restaurantId: user.restaurants[0].id,
       })
       if (data.error) throw new Error(data.error)
-      router.replace(`/menu/${data.id}/edit`)
+      router.push(`/menu/${data.id}/edit`)
     } catch (error) {
       setIsCreating(false)
       alert(error)
@@ -307,6 +307,7 @@ export default function Dashboard() {
               borderColor="gray.200"
               bg="gray.100"
               py="8"
+              px="4"
               rounded="lg"
             >
               <Text fontSize="xl" fontWeight="medium" color="gray.600">

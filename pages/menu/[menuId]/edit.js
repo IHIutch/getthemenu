@@ -27,6 +27,7 @@ import {
   VStack,
   Container,
   Square,
+  Center,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Move, Camera } from 'react-feather'
@@ -145,8 +146,8 @@ export default function SingleMenu() {
         <title>{menu?.title}</title>
       </Head>
       <MenuLayout>
-        <Container maxW="container.md">
-          {sections && groupedSectionItems && (
+        <Container maxW="container.md" px={{ base: '2', lg: '4' }}>
+          {sections?.length > 0 && groupedSectionItems ? (
             <DragDropContext
               onDragEnd={handleDragEnd}
               onDragStart={handleDragStart}
@@ -253,6 +254,26 @@ export default function SingleMenu() {
                 )}
               </Droppable>
             </DragDropContext>
+          ) : (
+            <Box>
+              <Center
+                borderWidth="2px"
+                borderColor="gray.200"
+                bg="gray.100"
+                py="8"
+                px="4"
+                rounded="lg"
+              >
+                <Text
+                  fontSize="xl"
+                  fontWeight="medium"
+                  color="gray.600"
+                  textAlign="center"
+                >
+                  Get started by adding a section to your menu.
+                </Text>
+              </Center>
+            </Box>
           )}
           <Box py="8">
             <Button
@@ -290,7 +311,7 @@ const MenuItemsContainer = ({
   drawerState,
   sectionId,
 }) => {
-  return (
+  return items?.length > 0 ? (
     <Droppable droppableId={`${sectionId}`} type="ITEMS">
       {(drop) => (
         <Stack spacing="0" ref={drop.innerRef} {...drop.droppableProps}>
@@ -329,6 +350,10 @@ const MenuItemsContainer = ({
         </Stack>
       )}
     </Droppable>
+  ) : (
+    <Center p="4">
+      <Text color="gray.600">Add an item to this section</Text>
+    </Center>
   )
 }
 
