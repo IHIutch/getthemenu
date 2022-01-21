@@ -235,7 +235,15 @@ export default function Dashboard() {
                         >
                           {(drag, snapshot) => (
                             <Box ref={drag.innerRef} {...drag.draggableProps}>
-                              <LinkBox bg="white" rounded="md" shadow="base">
+                              <LinkBox
+                                bg="white"
+                                rounded="md"
+                                shadow={snapshot.isDragging ? 'lg' : 'base'}
+                                transform={
+                                  snapshot.isDragging ? 'scale(1.04)' : 'none'
+                                }
+                                transition="all 0.1s ease"
+                              >
                                 <Box p="3" borderBottomWidth="1px">
                                   <Flex
                                     align="center"
