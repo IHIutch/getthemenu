@@ -468,9 +468,9 @@ const Hours = () => {
       standardHours: daysOfWeek.map((day) => {
         return {
           label: day,
-          isOpen: restaurant?.hours[day]?.isOpen || false,
-          openTime: restaurant?.hours[day]?.openTime || '',
-          closeTime: restaurant?.hours[day]?.closeTime || '',
+          isOpen: restaurant?.hours?.[day]?.isOpen || false,
+          openTime: restaurant?.hours?.[day]?.openTime || '',
+          closeTime: restaurant?.hours?.[day]?.closeTime || '',
         }
       }),
     }
