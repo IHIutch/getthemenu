@@ -40,26 +40,24 @@ export default function Login() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        axios.post(`/api/auth/signin`, {
-          event,
-          session,
-        })
+        if (event === 'PASSWORD_RECOVERY') {
+          router.replace({
+            pathname: '/reset-password',
+            query: {
+              access_token: router.query.access_token,
+            },
+          })
+        }
+        if (event === 'SIGNED_IN')
+          axios.post(`/api/auth/signin`, {
+            event,
+            session,
+          })
       }
     )
 
     return () => {
       authListener.unsubscribe()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (router?.query?.access_token && router?.query?.type === 'recovery') {
-      router.replace({
-        pathname: '/reset-password',
-        query: {
-          access_token: router.query.access_token,
-        },
-      })
     }
   }, [router])
 
@@ -150,7 +148,6 @@ export default function Login() {
                     <Button
                       ml="auto"
                       isLoading={isSubmitting}
-                      loadingText="Logging In..."
                       colorScheme="blue"
                       type="submit"
                     >
