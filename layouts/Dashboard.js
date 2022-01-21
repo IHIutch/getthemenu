@@ -9,7 +9,6 @@ export default function DashboardLayout({ children }) {
       <Navbar>
         <HStack spacing="6">
           <SubnavItem href="/dashboard">Dashboard</SubnavItem>
-          <SubnavItem href="/restaurant">Restaurant</SubnavItem>
           <SubnavItem href="/analytics">Analytics</SubnavItem>
         </HStack>
       </Navbar>
