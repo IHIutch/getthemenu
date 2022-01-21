@@ -12,16 +12,19 @@ import {
   Input,
   Link,
   Container,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/router'
+import router, { useRouter } from 'next/router'
 import supabase from '@/utils/supabase'
 
 export default function ResetPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [success, setSuccess] = useState(false)
   const { query } = useRouter()
   const { access_token } = query
 
@@ -39,6 +42,9 @@ export default function ResetPassword() {
       })
       if (error) throw new Error(error.message)
       setIsSubmitting(false)
+      setSuccess(true)
+
+      router.replace('/dashboard')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -60,20 +66,6 @@ export default function ResetPassword() {
               </Box>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
-                  {/* <GridItem>
-                    <FormControl id="email" isInvalid={errors.email}>
-                      <FormLabel>Email</FormLabel>
-                      <Input
-                        {...register('email', {
-                          required: 'This field is required',
-                        })}
-                        type="email"
-                      />
-                      <FormErrorMessage>
-                        {errors.email?.message}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </GridItem> */}
                   <GridItem>
                     <FormControl
                       id="password"
@@ -92,6 +84,14 @@ export default function ResetPassword() {
                       </FormErrorMessage>
                     </FormControl>
                   </GridItem>
+                  {success && (
+                    <GridItem>
+                      <Alert status="success">
+                        <AlertIcon />
+                        You have successfully updated your password.
+                      </Alert>
+                    </GridItem>
+                  )}
                   <GridItem d="flex">
                     <Flex align="center">
                       <NextLink href={'/'} passHref>

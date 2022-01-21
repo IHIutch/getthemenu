@@ -36,10 +36,7 @@ export default function ResetPassword() {
     try {
       setIsSubmitting(true)
       const { error } = await supabase.auth.api.resetPasswordForEmail(
-        form.email,
-        {
-          redirectTo: 'http://localhost:3000/reset-password',
-        }
+        form.email
       )
       if (error) throw new Error(error.message)
       setIsSubmitting(false)
