@@ -549,7 +549,10 @@ const MenuItemDrawer = ({
 
   useEffect(() => {
     if (menuItem) {
-      reset({ ...menuItem })
+      reset({
+        ...menuItem,
+        image: menuItem.image?.src,
+      })
     }
   }, [menuItem, reset])
 
@@ -576,7 +579,6 @@ const MenuItemDrawer = ({
         title: form?.title || '',
         description: form?.description || '',
         price: form?.price || null,
-        image: form?.image || null,
       }
       if (form?.image && dirtyFields?.image) {
         const formData = new FormData()
