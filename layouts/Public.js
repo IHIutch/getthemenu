@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion'
 import { useRouter } from 'next/router'
-import Head from 'next/head'
 import BlurUpImage from '@/components/common/BlurUpImage'
 import {
   AspectRatio,
@@ -80,7 +79,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                 pb="6"
                 bgGradient="linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2) 20%, rgba(0, 0, 0, 0.9))"
               >
-                <Container maxW="container.lg">
+                <Container maxW="container.lg" px={{ base: '2', lg: '4' }}>
                   <Heading
                     as="h1"
                     lineHeight="1.2"
@@ -129,7 +128,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
           bg="gray.50"
           zIndex="1"
         >
-          <Container maxW="container.lg">
+          <Container maxW="container.lg" px={{ base: '2', lg: '4' }}>
             <Grid templateColumns="repeat(12, 1fr)" gap="4">
               <GridItem colSpan={{ base: '12', lg: '7' }}>
                 <Stack direction="row" align="flex-end">
