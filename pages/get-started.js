@@ -97,6 +97,10 @@ export default function GetStarted() {
             }
           )
           if (data.length) {
+            setSlugMessage({
+              type: 'error',
+              message: `Sorry, '${customHost}' is taken. Please choose another.`,
+            })
           } else {
             setSlugMessage({
               type: 'success',

@@ -35,7 +35,7 @@ export default function Register() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        const [fullName] = getValues(['fullName'])
+        const fullName = getValues('fullName')
         await axios.post(`/api/auth/register`, {
           event,
           session,
@@ -157,6 +157,9 @@ export default function Register() {
                       <Input
                         {...register('confirm-password', {
                           required: 'This field is required',
+                          validate: (value) =>
+                            value === getValues('new-password') ||
+                            'Passwords must match',
                         })}
                         type="password"
                         autoComplete="new-password"
