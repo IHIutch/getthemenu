@@ -236,7 +236,8 @@ export default function SingleMenu() {
                                       <MenuItemDrawer
                                         sectionId={s.id}
                                         position={
-                                          groupedSectionItems[s.id].length
+                                          groupedSectionItems?.[s.id]?.length ||
+                                          0
                                         }
                                         handleDrawerClose={drawerState.onClose}
                                       />
