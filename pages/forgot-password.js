@@ -13,18 +13,18 @@ import {
   Link,
   Container,
   Text,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/router'
 import supabase from '@/utils/supabase'
 
 export default function ResetPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { query } = useRouter()
-  const { access_token } = query
+  const [success, setSuccess] = useState(false)
 
   const {
     register,
@@ -35,11 +35,15 @@ export default function ResetPassword() {
   const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
-      const { error } = await supabase.auth.api.updateUser(access_token, {
-        password: form['new-password'],
-      })
+      const { error } = await supabase.auth.api.resetPasswordForEmail(
+        form.email,
+        {
+          redirectTo: 'http://localhost:3000/reset-password',
+        }
+      )
       if (error) throw new Error(error.message)
       setIsSubmitting(false)
+      setSuccess(true)
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
@@ -81,6 +85,15 @@ export default function ResetPassword() {
                       </FormErrorMessage>
                     </FormControl>
                   </GridItem>
+                  {success && (
+                    <GridItem>
+                      <Alert status="success">
+                        <AlertIcon />
+                        Instructions with how to create a new password have been
+                        sent to your email.
+                      </Alert>
+                    </GridItem>
+                  )}
                   <GridItem d="flex">
                     <Flex align="center">
                       <NextLink href={'/'} passHref>

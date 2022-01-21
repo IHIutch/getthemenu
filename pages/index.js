@@ -52,6 +52,17 @@ export default function Login() {
     }
   }, [])
 
+  useEffect(() => {
+    if (router?.query?.access_token && router?.query?.type === 'recovery') {
+      router.replace({
+        pathname: '/reset-password',
+        query: {
+          access_token: router.query.access_token,
+        },
+      })
+    }
+  }, [router])
+
   const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
