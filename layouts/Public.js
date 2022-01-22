@@ -6,6 +6,7 @@ import {
   AspectRatio,
   Box,
   Button,
+  Center,
   Container,
   Flex,
   FormControl,
@@ -53,6 +54,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
       })
     }
   }, [activeMenu, slug, push])
+
+  console.log({ activeMenu, menus })
 
   return (
     <>
@@ -120,167 +123,214 @@ export default function PublicLayout({ restaurant, menus, children }) {
             </Box>
           </AspectRatio>
         </Box>
-        <Box
-          position="sticky"
-          top="0"
-          borderBottomWidth="1px"
-          py="4"
-          bg="gray.50"
-          zIndex="1"
-        >
-          <Container maxW="container.lg" px={{ base: '2', lg: '4' }}>
-            <Grid templateColumns="repeat(12, 1fr)" gap="4">
-              <GridItem colSpan={{ base: '12', lg: '7' }}>
-                <Stack direction="row" align="flex-end">
-                  <FormControl flexGrow="1" id="menu">
-                    <FormLabel mb="1">Select a Menu</FormLabel>
-                    <Select
-                      bg="white"
-                      value={activeMenu}
-                      onChange={(e) => {
-                        setActiveMenu(e.target.value)
-                      }}
-                    >
-                      {menus?.map((m) => (
-                        <option key={m.id} value={m.slug}>
-                          {m.title}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Stack>
-              </GridItem>
-            </Grid>
-          </Container>
-        </Box>
-        <Container maxW="container.lg">
-          <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">
-            <GridItem colSpan={{ base: '12', lg: '7' }} position="relative">
-              <AnimateSharedLayout type="crossfade">
-                <AnimatePresence>
-                  <motion.main
-                    key={asPath}
-                    initial={'hidden'}
-                    animate={'enter'}
-                    exit={'exit'}
-                    variants={{
-                      hidden: {
-                        opacity: 0,
-                        x: 0,
-                        y: 50,
-                        position: 'absolute',
-                      },
-                      enter: { opacity: 1, x: 0, y: 0, position: 'relative' },
-                      exit: { opacity: 0, x: 0, y: 50, position: 'absolute' },
-                    }}
-                    transition={{
-                      type: 'easeInOut',
-                    }}
-                    style={{
-                      width: '100%',
-                    }}
-                  >
-                    <Box py="4">{children}</Box>
-                  </motion.main>
-                </AnimatePresence>
-              </AnimateSharedLayout>
-            </GridItem>
-            <GridItem
-              d={{ base: 'none', lg: 'block' }}
-              colSpan={{ base: '12', lg: '4' }}
-              colStart={{ lg: '9' }}
+        {activeMenu && menus?.length > 0 ? (
+          <>
+            <Box
+              position="sticky"
+              top="0"
+              borderBottomWidth="1px"
+              py="4"
+              bg="gray.50"
+              zIndex="1"
             >
-              <Box position="sticky" top="28">
-                {restaurant?.hours && (
-                  <Stack pt="4" spacing="8">
-                    <Box bg="white" shadow="sm" rounded="md" borderWidth="1px">
-                      <Box p="4" borderBottomWidth="1px">
-                        <Heading fontSize="lg">Contact</Heading>
-                      </Box>
-                      <Stack spacing="4" p="4" fontSize="sm">
-                        {restaurant?.phone && (
-                          <Box>
-                            <Text fontWeight="semibold">Phone</Text>
-                            <Stack as="ul" spacing="1">
-                              {restaurant.phone.map((phone, idx) => (
-                                <Text as="li" key={idx} listStyleType="none">
-                                  {phone}
-                                </Text>
-                              ))}
-                            </Stack>
-                          </Box>
-                        )}
+              <Container maxW="container.lg" px={{ base: '2', lg: '4' }}>
+                <Grid templateColumns="repeat(12, 1fr)" gap="4">
+                  <GridItem colSpan={{ base: '12', lg: '7' }}>
+                    <Stack direction="row" align="flex-end">
+                      <FormControl flexGrow="1" id="menu">
+                        <FormLabel mb="1">Select a Menu</FormLabel>
+                        <Select
+                          bg="white"
+                          value={activeMenu}
+                          onChange={(e) => {
+                            setActiveMenu(e.target.value)
+                          }}
+                        >
+                          {menus?.map((m) => (
+                            <option key={m.id} value={m.slug}>
+                              {m.title}
+                            </option>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Stack>
+                  </GridItem>
+                </Grid>
+              </Container>
+            </Box>
 
-                        {restaurant?.address && (
-                          <Box>
-                            <Text as="dt" fontWeight="semibold">
-                              Address
-                            </Text>
-                            <Text as="dd">
-                              {restaurant.address?.streetAddress} <br />
-                              {restaurant.address?.city},{' '}
-                              {restaurant.address?.state}{' '}
-                              {restaurant.address?.zip}
-                            </Text>
+            <Container maxW="container.lg">
+              <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">
+                <GridItem colSpan={{ base: '12', lg: '7' }} position="relative">
+                  <AnimateSharedLayout type="crossfade">
+                    <AnimatePresence>
+                      <motion.main
+                        key={asPath}
+                        initial={'hidden'}
+                        animate={'enter'}
+                        exit={'exit'}
+                        variants={{
+                          hidden: {
+                            opacity: 0,
+                            x: 0,
+                            y: 50,
+                            position: 'absolute',
+                          },
+                          enter: {
+                            opacity: 1,
+                            x: 0,
+                            y: 0,
+                            position: 'relative',
+                          },
+                          exit: {
+                            opacity: 0,
+                            x: 0,
+                            y: 50,
+                            position: 'absolute',
+                          },
+                        }}
+                        transition={{
+                          type: 'easeInOut',
+                        }}
+                        style={{
+                          width: '100%',
+                        }}
+                      >
+                        <Box py="4">{children}</Box>
+                      </motion.main>
+                    </AnimatePresence>
+                  </AnimateSharedLayout>
+                </GridItem>
+                <GridItem
+                  d={{ base: 'none', lg: 'block' }}
+                  colSpan={{ base: '12', lg: '4' }}
+                  colStart={{ lg: '9' }}
+                >
+                  <Box position="sticky" top="28">
+                    {restaurant?.hours && (
+                      <Stack pt="4" spacing="8">
+                        <Box
+                          bg="white"
+                          shadow="sm"
+                          rounded="md"
+                          borderWidth="1px"
+                        >
+                          <Box p="4" borderBottomWidth="1px">
+                            <Heading fontSize="lg">Contact</Heading>
                           </Box>
-                        )}
+                          <Stack spacing="4" p="4" fontSize="sm">
+                            {restaurant?.phone && (
+                              <Box>
+                                <Text fontWeight="semibold">Phone</Text>
+                                <Stack as="ul" spacing="1">
+                                  {restaurant.phone.map((phone, idx) => (
+                                    <Text
+                                      as="li"
+                                      key={idx}
+                                      listStyleType="none"
+                                    >
+                                      {phone}
+                                    </Text>
+                                  ))}
+                                </Stack>
+                              </Box>
+                            )}
 
-                        {restaurant?.email && (
-                          <Box>
-                            <Text fontWeight="semibold">Email</Text>
-                            <Stack as="ul" spacing="1">
-                              {restaurant.email.map((email, idx) => (
-                                <Text as="li" key={idx} listStyleType="none">
-                                  {email}
+                            {restaurant?.address && (
+                              <Box>
+                                <Text as="dt" fontWeight="semibold">
+                                  Address
                                 </Text>
-                              ))}
-                            </Stack>
+                                <Text as="dd">
+                                  {restaurant.address?.streetAddress} <br />
+                                  {restaurant.address?.city},{' '}
+                                  {restaurant.address?.state}{' '}
+                                  {restaurant.address?.zip}
+                                </Text>
+                              </Box>
+                            )}
+
+                            {restaurant?.email && (
+                              <Box>
+                                <Text fontWeight="semibold">Email</Text>
+                                <Stack as="ul" spacing="1">
+                                  {restaurant.email.map((email, idx) => (
+                                    <Text
+                                      as="li"
+                                      key={idx}
+                                      listStyleType="none"
+                                    >
+                                      {email}
+                                    </Text>
+                                  ))}
+                                </Stack>
+                              </Box>
+                            )}
+                          </Stack>
+                        </Box>
+                        <Box
+                          bg="white"
+                          shadow="sm"
+                          rounded="md"
+                          borderWidth="1px"
+                        >
+                          <Box p="4" borderBottomWidth="1px">
+                            <Heading fontSize="lg">Hours</Heading>
                           </Box>
-                        )}
+                          <Stack spacing="3" py="3" fontSize="sm">
+                            {[
+                              'Monday',
+                              'Tuesday',
+                              'Wednesday',
+                              'Thursday',
+                              'Friday',
+                              'Saturday',
+                              'Sunday',
+                            ].map((day) => (
+                              <Flex
+                                as="dl"
+                                key={day}
+                                justify="space-between"
+                                px="4"
+                                w="100%"
+                              >
+                                <Box>
+                                  <Text as="dt" fontWeight="semibold">
+                                    {day}:
+                                  </Text>
+                                </Box>
+                                <Box>
+                                  <Text as="dd">
+                                    {restaurant.hours?.[day].openTime} -{' '}
+                                    {restaurant.hours?.[day].closeTime}
+                                  </Text>
+                                </Box>
+                              </Flex>
+                            ))}
+                          </Stack>
+                        </Box>
                       </Stack>
-                    </Box>
-                    <Box bg="white" shadow="sm" rounded="md" borderWidth="1px">
-                      <Box p="4" borderBottomWidth="1px">
-                        <Heading fontSize="lg">Hours</Heading>
-                      </Box>
-                      <Stack spacing="3" py="3" fontSize="sm">
-                        {[
-                          'Monday',
-                          'Tuesday',
-                          'Wednesday',
-                          'Thursday',
-                          'Friday',
-                          'Saturday',
-                          'Sunday',
-                        ].map((day) => (
-                          <Flex
-                            as="dl"
-                            key={day}
-                            justify="space-between"
-                            px="4"
-                            w="100%"
-                          >
-                            <Box>
-                              <Text as="dt" fontWeight="semibold">
-                                {day}:
-                              </Text>
-                            </Box>
-                            <Box>
-                              <Text as="dd">
-                                {restaurant.hours?.[day].openTime} -{' '}
-                                {restaurant.hours?.[day].closeTime}
-                              </Text>
-                            </Box>
-                          </Flex>
-                        ))}
-                      </Stack>
-                    </Box>
-                  </Stack>
-                )}
-              </Box>
-            </GridItem>
-          </Grid>
-        </Container>
+                    )}
+                  </Box>
+                </GridItem>
+              </Grid>
+            </Container>
+          </>
+        ) : (
+          <Center h="96">
+            <Box textAlign="center">
+              <Text fontSize="5xl" mb="4">
+                🚧
+              </Text>
+              <Heading size="lg" fontWeight="semibold" mb="4">
+                Looks like this site is under construction.
+              </Heading>
+              <Text fontSize="lg" color="gray.600">
+                Check back soon!
+              </Text>
+            </Box>
+          </Center>
+        )}
         <Box as="footer" borderTopWidth="1px" py="6">
           <Text textAlign="center" fontWeight="medium" color="gray.600">
             Powered by{' '}
