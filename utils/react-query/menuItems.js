@@ -43,29 +43,33 @@ export const useGetMenuItem = (id) => {
 
 export const useCreateMenuItem = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
-    postMenuItem,
-    {
-      // When mutate is called:
-      onMutate: async (updated) => {
-        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-        await queryClient.cancelQueries(['menuItems', params])
-        const previous = queryClient.getQueryData(['menuItems', params])
-        queryClient.setQueryData(['menuItems', params], (old) => {
-          return [...old, updated]
-        })
-        return { previous, updated }
-      },
-      // If the mutation fails, use the context we returned above
-      onError: (err, updated, context) => {
-        queryClient.setQueryData(['menuItems', params], context.previous)
-      },
-      // Always refetch after error or success:
-      onSettled: (updated) => {
-        queryClient.invalidateQueries(['menuItems', params])
-      },
-    }
-  )
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(postMenuItem, {
+    // When mutate is called:
+    onMutate: async (updated) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(['menuItems', params])
+      const previous = queryClient.getQueryData(['menuItems', params])
+      queryClient.setQueryData(['menuItems', params], (old) => {
+        return [...old, updated]
+      })
+      return { previous, updated }
+    },
+    // If the mutation fails, use the context we returned above
+    onError: (err, updated, context) => {
+      queryClient.setQueryData(['menuItems', params], context.previous)
+    },
+    // Always refetch after error or success:
+    onSettled: (updated) => {
+      queryClient.invalidateQueries(['menuItems', params])
+    },
+  })
   return {
     mutate,
     data,
@@ -78,9 +82,18 @@ export const useCreateMenuItem = (params) => {
 
 export const useUpdateMenuItem = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(
     async ({ id, payload }) => {
-      await putMenuItem(id, payload)
+      const test = await putMenuItem(id, payload)
+      console.log({ test })
+      return test
     },
     {
       // When mutate is called:
@@ -93,7 +106,7 @@ export const useUpdateMenuItem = (params) => {
             if (o.id === payload.id) {
               return {
                 ...o,
-                payload,
+                ...payload,
               }
             }
             return o
@@ -123,7 +136,14 @@ export const useUpdateMenuItem = (params) => {
 
 export const useReorderMenuItems = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(
     async (payload) => {
       await putMenuItemsReorder(payload)
     },

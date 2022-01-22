@@ -41,7 +41,14 @@ export const useGetRestaurant = (id) => {
 
 export const useUpdateRestaurant = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(
     async ({ id, payload }) => {
       await putRestaurant(id, payload)
     },

@@ -43,29 +43,33 @@ export const useGetSection = (id) => {
 
 export const useCreateSection = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
-    postSection,
-    {
-      // When mutate is called:
-      onMutate: async (updated) => {
-        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-        await queryClient.cancelQueries(['sections', params])
-        const previous = queryClient.getQueryData(['sections', params])
-        queryClient.setQueryData(['sections', params], (old) => {
-          return [...old, updated]
-        })
-        return { previous, updated }
-      },
-      // If the mutation fails, use the context we returned above
-      onError: (err, updated, context) => {
-        queryClient.setQueryData(['sections', params], context.previous)
-      },
-      // Always refetch after error or success:
-      onSettled: (updated) => {
-        queryClient.invalidateQueries(['sections', params])
-      },
-    }
-  )
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(postSection, {
+    // When mutate is called:
+    onMutate: async (updated) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(['sections', params])
+      const previous = queryClient.getQueryData(['sections', params])
+      queryClient.setQueryData(['sections', params], (old) => {
+        return [...old, updated]
+      })
+      return { previous, updated }
+    },
+    // If the mutation fails, use the context we returned above
+    onError: (err, updated, context) => {
+      queryClient.setQueryData(['sections', params], context.previous)
+    },
+    // Always refetch after error or success:
+    onSettled: (updated) => {
+      queryClient.invalidateQueries(['sections', params])
+    },
+  })
   return {
     mutate,
     data,
@@ -78,7 +82,14 @@ export const useCreateSection = (params) => {
 
 export const useUpdateSection = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(
     async ({ id, payload }) => {
       await putSection(id, payload)
     },
@@ -90,10 +101,11 @@ export const useUpdateSection = (params) => {
         const previous = queryClient.getQueryData(['sections', params])
         queryClient.setQueryData(['sections', params], (old) => {
           return old.map((o) => {
+            console.log({ o, payload })
             if (o.id === payload.id) {
               return {
                 ...o,
-                payload,
+                ...payload,
               }
             }
             return o
@@ -123,7 +135,14 @@ export const useUpdateSection = (params) => {
 
 export const useReorderSections = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(
     async (payload) => {
       await putSectionsReorder(payload)
     },

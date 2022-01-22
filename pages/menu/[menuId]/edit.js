@@ -372,7 +372,13 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
   }, [menuItem.image])
   return (
     <Flex alignItems="flex-start">
-      <AspectRatio w="16" ratio="1" flexShrink="0">
+      <AspectRatio
+        w="16"
+        ratio="1"
+        flexShrink="0"
+        rounded="sm"
+        overflow="hidden"
+      >
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -380,7 +386,7 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
             alt={menuItem.title || 'Menu Item'}
           />
         ) : (
-          <Square boxSize="100%" bg="gray.100" rounded="md">
+          <Square boxSize="100%" bg="gray.100">
             <Icon color="gray.400" boxSize="5" as={Camera} />
           </Square>
         )}
@@ -393,7 +399,7 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
             </Text>
             {menuItem?.price && (
               <Text color="gray.800" fontWeight="medium" mb="1">
-                {menuItem.price?.toLocaleString('en-US', {
+                {Number(menuItem?.price || 0).toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD',
                 })}
@@ -434,6 +440,8 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
 
+  console.log({ section })
+
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
@@ -442,13 +450,9 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
     // isError: isUserError,
   } = useAuthUser()
 
-  const { register, handleSubmit, reset } = useForm()
-
-  useEffect(() => {
-    if (section) {
-      reset(section)
-    }
-  }, [section, reset])
+  const { register, handleSubmit } = useForm({
+    defaultValues: { ...section },
+  })
 
   const { mutate: handleUpdateSection } = useUpdateSection({
     menuId,
@@ -462,21 +466,31 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
     try {
       setIsSubmitting(true)
       const payload = {
+        ...form,
         title: form?.title || '',
         description: form?.description || '',
       }
       section
-        ? await handleUpdateSection({
-            id: section.id,
-            payload,
-          })
-        : await handleCreateSection({
-            ...payload,
-            position,
-            menuId,
-            restaurantId: user.restaurants[0].id,
-          })
-      handleDrawerClose()
+        ? handleUpdateSection(
+            {
+              id: section.id,
+              payload,
+            },
+            {
+              onSuccess: handleDrawerClose(),
+            }
+          )
+        : handleCreateSection(
+            {
+              ...payload,
+              position,
+              menuId,
+              restaurantId: user.restaurants[0].id,
+            },
+            {
+              onSuccess: handleDrawerClose(),
+            }
+          )
       setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
@@ -553,19 +567,15 @@ const MenuItemDrawer = ({
   const {
     register,
     handleSubmit,
-    reset,
+    // reset,
     control,
     formState: { dirtyFields },
-  } = useForm()
-
-  useEffect(() => {
-    if (menuItem) {
-      reset({
-        ...menuItem,
-        image: menuItem.image?.src,
-      })
-    }
-  }, [menuItem, reset])
+  } = useForm({
+    defaultValues: {
+      ...menuItem,
+      image: menuItem?.image?.src || null,
+    },
+  })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -587,6 +597,7 @@ const MenuItemDrawer = ({
     try {
       setIsSubmitting(true)
       const payload = {
+        ...form,
         title: form?.title || '',
         description: form?.description || '',
         price: form?.price || null,
@@ -601,18 +612,28 @@ const MenuItemDrawer = ({
         }
       }
       menuItem
-        ? await handleUpdateMenuItem({
-            id: menuItem.id,
-            payload,
-          })
-        : await handleCreateMenuItem({
-            ...payload,
-            sectionId,
-            position,
-            menuId,
-            restaurantId: user.restaurants[0].id,
-          })
-      handleDrawerClose()
+        ? handleUpdateMenuItem(
+            {
+              id: menuItem.id,
+              payload,
+            },
+            {
+              onSuccess: handleDrawerClose(),
+            }
+          )
+        : handleCreateMenuItem(
+            {
+              ...payload,
+              sectionId,
+              position,
+              menuId,
+              restaurantId: user.restaurants[0].id,
+            },
+            {
+              onSuccess: handleDrawerClose(),
+            }
+          )
+
       setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)

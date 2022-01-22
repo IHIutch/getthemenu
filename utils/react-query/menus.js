@@ -37,7 +37,14 @@ export const useGetMenu = (id) => {
 
 export const useUpdateMenu = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(
     async ({ id, payload }) => {
       await putMenu(id, payload)
     },
@@ -75,7 +82,14 @@ export const useUpdateMenu = (params) => {
 
 export const useReorderMenus = (params) => {
   const queryClient = useQueryClient()
-  const { mutate, isLoading, isError, isSuccess, data, error } = useMutation(
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(
     async (payload) => {
       await putMenusReorder(payload)
     },
