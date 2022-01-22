@@ -12,7 +12,6 @@ const handler = async (req, res) => {
         const data = await apiGetUser(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        console.error(error)
         res.status(resStatusType.BAD_REQUEST).json(error)
       }
       break

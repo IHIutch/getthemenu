@@ -434,9 +434,6 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
 const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
-
-  console.log({ section })
-
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {

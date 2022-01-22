@@ -38,7 +38,6 @@ const handler = async (req, res) => {
 
         res.status(resStatusType.SUCCESS).json(src)
       } catch (error) {
-        console.error(error)
         res.status(resStatusType.BAD_REQUEST).json(error)
       }
       break

@@ -63,7 +63,7 @@ export const isTimeInputSupported = () => {
   var value = 'a'
   input.setAttribute('type', 'time')
   input.setAttribute('value', value)
-  console.log('time', input.value, value)
+  // console.log('time', input.value, value)
   return input.value !== value
 }
 
@@ -74,7 +74,7 @@ export const isDateInputSupported = () => {
   var value = 'a'
   input.setAttribute('type', 'date')
   input.setAttribute('value', value)
-  console.log('date', input.value, value)
+  // console.log('date', input.value, value)
   return input.value !== value
 }
 

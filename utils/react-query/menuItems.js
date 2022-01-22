@@ -91,9 +91,7 @@ export const useUpdateMenuItem = (params) => {
     error,
   } = useMutation(
     async ({ id, payload }) => {
-      const test = await putMenuItem(id, payload)
-      console.log({ test })
-      return test
+      await putMenuItem(id, payload)
     },
     {
       // When mutate is called:
