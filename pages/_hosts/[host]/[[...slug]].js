@@ -11,15 +11,7 @@ import { useGetMenu, useGetMenus } from '@/utils/react-query/menus'
 import { useGetSections } from '@/utils/react-query/sections'
 import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useRouter } from 'next/router'
-import {
-  AspectRatio,
-  Box,
-  Center,
-  Flex,
-  Heading,
-  Stack,
-  Text,
-} from '@chakra-ui/react'
+import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import SEO from '@/components/global/SEO'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
@@ -113,6 +105,10 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
     }
   }, [restaurant, menus, sections, menuItems])
 
+  const isSiteReady = useMemo(() => {
+    return activeMenu && menus?.length > 0
+  }, [activeMenu, menus])
+
   return (
     <>
       <Head>
@@ -126,12 +122,14 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
               : ''
           }
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
-          }}
-        />
+        {isSiteReady && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(structuredData),
+            }}
+          />
+        )}
       </Head>
       <PublicLayout restaurant={restaurant} menus={menus}>
         <Stack>

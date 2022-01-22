@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import BlurUpImage from '@/components/common/BlurUpImage'
@@ -55,7 +55,9 @@ export default function PublicLayout({ restaurant, menus, children }) {
     }
   }, [activeMenu, slug, push])
 
-  console.log({ activeMenu, menus })
+  const isSiteReady = useMemo(() => {
+    return activeMenu && menus?.length > 0
+  }, [activeMenu, menus])
 
   return (
     <>
@@ -114,16 +116,20 @@ export default function PublicLayout({ restaurant, menus, children }) {
                         )}
                       </Stack>
                     </Flex>
-                    <Box d={{ lg: 'none' }} flexShrink="0">
-                      <Button onClick={modalState.onOpen}>View Details</Button>
-                    </Box>
+                    {isSiteReady && (
+                      <Box d={{ lg: 'none' }} flexShrink="0">
+                        <Button onClick={modalState.onOpen}>
+                          View Details
+                        </Button>
+                      </Box>
+                    )}
                   </Flex>
                 </Container>
               </Flex>
             </Box>
           </AspectRatio>
         </Box>
-        {activeMenu && menus?.length > 0 ? (
+        {isSiteReady ? (
           <>
             <Box
               position="sticky"
