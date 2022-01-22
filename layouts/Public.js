@@ -103,8 +103,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
                         <Icon as={Clock} />
                         {restaurant?.hours?.[weekdayName]?.isOpen ? (
                           <Text>
-                            {restaurant.hours[weekdayName].openTime} -{' '}
-                            {restaurant.hours[weekdayName].closeTime}
+                            {restaurant.hours?.[weekdayName].openTime} -{' '}
+                            {restaurant.hours?.[weekdayName].closeTime}
                           </Text>
                         ) : (
                           <Text>Closed Today</Text>
@@ -267,8 +267,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
                             </Box>
                             <Box>
                               <Text as="dd">
-                                {restaurant.hours[day].openTime} -{' '}
-                                {restaurant.hours[day].closeTime}
+                                {restaurant.hours?.[day].openTime} -{' '}
+                                {restaurant.hours?.[day].closeTime}
                               </Text>
                             </Box>
                           </Flex>
@@ -366,8 +366,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
                         </Box>
                         <Box>
                           <Text as="dd">
-                            {restaurant.hours[day].openTime} -{' '}
-                            {restaurant.hours[day].closeTime}
+                            {restaurant.hours?.[day].openTime} -{' '}
+                            {restaurant.hours?.[day].closeTime}
                           </Text>
                         </Box>
                       </Flex>
