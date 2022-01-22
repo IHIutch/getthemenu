@@ -37,24 +37,31 @@ import NextLink from 'next/link'
 import dayjs from 'dayjs'
 import { Phone, Clock } from 'lucide-react'
 
-export default function PublicLayout({ restaurant, menus, children }) {
+export default function PublicLayout({
+  restaurant,
+  menus,
+  initialSlug,
+  children,
+}) {
   const modalState = useDisclosure()
-
   const { asPath, push, query } = useRouter()
   const slug = query?.slug?.[0] || ''
-  const [activeMenu, setActiveMenu] = useState(slug)
+  const activeMenu = slug
+    ? menus.find((menu) => menu.slug === slug)
+    : menus?.[0]
 
-  const weekdayName = dayjs().format('dddd')
+  const [activeSlug, setActiveSlug] = useState(slug)
 
   useEffect(() => {
-    if (activeMenu !== slug) {
-      push(`/${activeMenu}`, `/${activeMenu}`, {
+    if (activeSlug !== slug) {
+      push(`/${activeSlug}`, `/${activeSlug}`, {
         scroll: false,
         shallow: true,
       })
     }
-  }, [activeMenu, slug, push])
+  }, [activeSlug, slug, push])
 
+  const weekdayName = dayjs().format('dddd')
   const isSiteReady = useMemo(() => {
     return activeMenu && menus?.length > 0
   }, [activeMenu, menus])
@@ -149,7 +156,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                           bg="white"
                           value={activeMenu}
                           onChange={(e) => {
-                            setActiveMenu(e.target.value)
+                            setActiveSlug(e.target.value)
                           }}
                         >
                           {menus?.map((m) => (

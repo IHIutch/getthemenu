@@ -131,7 +131,11 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
           />
         )}
       </Head>
-      <PublicLayout restaurant={restaurant} menus={menus}>
+      <PublicLayout
+        restaurant={restaurant}
+        menus={menus}
+        initialSlug={initialSlug}
+      >
         <Stack>
           <Box>
             <Heading as="h2" fontSize="3xl" mb="4">
