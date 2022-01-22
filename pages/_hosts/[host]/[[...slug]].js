@@ -233,7 +233,7 @@ export async function getServerSideProps({ params: { host }, query }) {
 
   await queryClient.prefetchQuery(['menus', menusQuery], async () => menus)
 
-  await queryClient.prefetchQuery(['menu', menuId], async () => menu)
+  await queryClient.prefetchQuery(['menus', menuId], async () => menu)
 
   await queryClient.prefetchQuery(
     ['sections', { menuId }],
