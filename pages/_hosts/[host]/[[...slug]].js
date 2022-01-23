@@ -85,7 +85,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                   {
                     '@type': 'Offer',
                     price:
-                      mi?.price?.toLocaleString('en-US', {
+                      (mi?.price || 0).toLocaleString('en-US', {
                         style: 'currency',
                         currency: 'USD',
                       }) || '',
@@ -184,14 +184,27 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                                   >
                                     {item.title}
                                   </Heading>
-                                  <Text color="gray.800" fontWeight="semibold">
-                                    {item?.price?.toLocaleString('en-US', {
-                                      style: 'currency',
-                                      currency: 'USD',
-                                    })}
-                                  </Text>
+                                  {(item?.price || item.price === 0) && (
+                                    <Text
+                                      color="gray.800"
+                                      fontWeight="medium"
+                                      mb="1"
+                                    >
+                                      {Number(item.price).toLocaleString(
+                                        'en-US',
+                                        {
+                                          style: 'currency',
+                                          currency: 'USD',
+                                        }
+                                      )}
+                                    </Text>
+                                  )}
                                 </Flex>
-                                <Text color="gray.600">{item.description}</Text>
+                                {item.description && (
+                                  <Text color="gray.600">
+                                    {item.description}
+                                  </Text>
+                                )}
                               </Box>
                             </Box>
                           ))}

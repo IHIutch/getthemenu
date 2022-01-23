@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -26,6 +26,11 @@ import {
   Container,
   Center,
   StackDivider,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Camera, GripHorizontal } from 'lucide-react'
@@ -392,9 +397,9 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
             <Text fontSize="lg" fontWeight="semibold" lineHeight="1">
               {menuItem.title || 'Untitled'}
             </Text>
-            {menuItem?.price && (
+            {(menuItem?.price || menuItem.price === 0) && (
               <Text color="gray.800" fontWeight="medium" mb="1">
-                {Number(menuItem?.price || 0).toLocaleString('en-US', {
+                {Number(menuItem.price).toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD',
                 })}
@@ -561,13 +566,20 @@ const MenuItemDrawer = ({
     handleSubmit,
     // reset,
     control,
+    watch,
     formState: { dirtyFields },
   } = useForm({
     defaultValues: {
       ...menuItem,
+      price:
+        menuItem?.price || menuItem.price === 0
+          ? parseFloat(menuItem.price).toFixed(2)
+          : null,
       image: menuItem?.image?.src || null,
     },
   })
+
+  console.log({ menuItem })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -633,6 +645,11 @@ const MenuItemDrawer = ({
     }
   }
 
+  const test = watch()
+  useEffect(() => {
+    console.log(test)
+  }, [test])
+
   return (
     <>
       <DrawerCloseButton />
@@ -663,7 +680,25 @@ const MenuItemDrawer = ({
           </FormControl>
           <FormControl id="price">
             <FormLabel>Item Price</FormLabel>
-            <Input autoComplete="off" {...register('price')} type="number" />
+            <Controller
+              control={control}
+              name="price"
+              render={({ field: { value, ...field } }) => (
+                <NumberInput
+                  {...field}
+                  value={value || value === 0 ? '$' + value : ''}
+                  precision={2}
+                  step={0.01}
+                  min={0}
+                >
+                  <NumberInputField inputMode="numeric" />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              )}
+            />
           </FormControl>
           <FormControl id="description">
             <FormLabel>Item Description</FormLabel>
