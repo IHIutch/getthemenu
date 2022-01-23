@@ -140,3 +140,12 @@ export const reorderList = (list = [], startIndex, endIndex) => {
   temp.splice(endIndex, 0, removed)
   return temp
 }
+
+export const formatTime = (time) => {
+  const [hours, minutes] = time.split(':')
+  return dayjs()
+    .startOf('year')
+    .add(hours, 'hour')
+    .add(minutes, 'minute')
+    .format('h:mm A')
+}

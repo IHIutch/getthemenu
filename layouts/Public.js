@@ -36,6 +36,7 @@ import {
 import NextLink from 'next/link'
 import dayjs from 'dayjs'
 import { Phone, Clock } from 'lucide-react'
+import { formatTime } from '@/utils/functions'
 
 export default function PublicLayout({
   restaurant,
@@ -294,13 +295,13 @@ export default function PublicLayout({
                               </Box>
                               <Stack spacing="3" py="3" fontSize="sm">
                                 {[
+                                  'Sunday',
                                   'Monday',
                                   'Tuesday',
                                   'Wednesday',
                                   'Thursday',
                                   'Friday',
                                   'Saturday',
-                                  'Sunday',
                                 ].map((day) => (
                                   <Flex
                                     as="dl"
@@ -315,10 +316,21 @@ export default function PublicLayout({
                                       </Text>
                                     </Box>
                                     <Box>
-                                      <Text as="dd">
-                                        {restaurant.hours?.[day].openTime} -{' '}
-                                        {restaurant.hours?.[day].closeTime}
-                                      </Text>
+                                      {restaurant.hours?.[day]?.isOpen ? (
+                                        <Text as="dd">
+                                          {restaurant.hours?.[day]?.openTime &&
+                                            formatTime(
+                                              restaurant.hours?.[day]?.openTime
+                                            )}{' '}
+                                          -{' '}
+                                          {restaurant.hours?.[day]?.closeTime &&
+                                            formatTime(
+                                              restaurant.hours?.[day]?.closeTime
+                                            )}
+                                        </Text>
+                                      ) : (
+                                        <Text as="dd">Closed</Text>
+                                      )}
                                     </Box>
                                   </Flex>
                                 ))}
@@ -418,13 +430,13 @@ export default function PublicLayout({
                 <TabPanel px="0">
                   <Stack spacing="3">
                     {[
+                      'Sunday',
                       'Monday',
                       'Tuesday',
                       'Wednesday',
                       'Thursday',
                       'Friday',
                       'Saturday',
-                      'Sunday',
                     ].map((day) => (
                       <Flex as="dl" key={day} justify="space-between" w="100%">
                         <Box>
@@ -433,10 +445,19 @@ export default function PublicLayout({
                           </Text>
                         </Box>
                         <Box>
-                          <Text as="dd">
-                            {restaurant.hours?.[day].openTime} -{' '}
-                            {restaurant.hours?.[day].closeTime}
-                          </Text>
+                          {restaurant.hours?.[day]?.isOpen ? (
+                            <Text as="dd">
+                              {restaurant.hours?.[day]?.openTime &&
+                                formatTime(
+                                  restaurant.hours?.[day]?.openTime
+                                )}{' '}
+                              -{' '}
+                              {restaurant.hours?.[day]?.closeTime &&
+                                formatTime(restaurant.hours?.[day]?.closeTime)}
+                            </Text>
+                          ) : (
+                            <Text as="dd">Closed</Text>
+                          )}
                         </Box>
                       </Flex>
                     ))}
