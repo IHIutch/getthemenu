@@ -187,11 +187,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                                     {item.title}
                                   </Heading>
                                   {(item?.price || item.price === 0) && (
-                                    <Text
-                                      color="gray.800"
-                                      fontWeight="medium"
-                                      mb="1"
-                                    >
+                                    <Text color="gray.800" fontWeight="medium">
                                       {Number(item.price).toLocaleString(
                                         'en-US',
                                         {
@@ -203,7 +199,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                                   )}
                                 </Flex>
                                 {item.description && (
-                                  <Text color="gray.600">
+                                  <Text color="gray.600" mt="1">
                                     {item.description}
                                   </Text>
                                 )}
