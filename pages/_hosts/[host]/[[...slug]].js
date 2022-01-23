@@ -163,17 +163,19 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                               bg="white"
                               shadow="sm"
                             >
-                              <AspectRatio
-                                ratio={16 / 9}
-                                mb="2"
-                                borderBottomWidth="1px"
-                              >
-                                <BlurUpImage
-                                  alt={item?.title || 'Menu item'}
-                                  src={item?.image?.src}
-                                  blurDataURL={item?.image?.blurDataURL}
-                                />
-                              </AspectRatio>
+                              {item?.image && (
+                                <AspectRatio
+                                  ratio={16 / 9}
+                                  mb="2"
+                                  borderBottomWidth="1px"
+                                >
+                                  <BlurUpImage
+                                    alt={item?.title || 'Menu item'}
+                                    src={item?.image?.src}
+                                    blurDataURL={item?.image?.blurDataURL}
+                                  />
+                                </AspectRatio>
+                              )}
                               <Box p="4">
                                 <Flex>
                                   <Heading
