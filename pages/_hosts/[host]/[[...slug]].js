@@ -238,6 +238,12 @@ export async function getServerSideProps({ params: { host }, query }) {
 
   const activeMenu = slug ? menus.find((menu) => menu.slug === slug) : menus[0]
 
+  if (!activeMenu) {
+    return {
+      notFound: true,
+    }
+  }
+
   const menu = activeMenu?.id ? await apiGetMenu(activeMenu.id) : null
   const sections = activeMenu?.id
     ? await apiGetSections({ menuId: activeMenu.id })
