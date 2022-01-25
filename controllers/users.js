@@ -1,19 +1,10 @@
 import supabase from '@/utils/supabase'
 
-export const apiPostRegisterUser = async (
-  req,
-  res,
-  { session: { user }, userData }
-) => {
-  const { error } = await supabase.from('users').insert([
-    {
-      id: user.id,
-      ...userData,
-    },
-  ])
-  if (error) throw new Error(error.message)
+export const apiPostRegisterUser = async (payload) => {
+  const { data, error } = await supabase.from('users').insert(payload)
 
-  return supabase.auth.api.setAuthCookie(req, res)
+  if (error) throw new Error(error.message)
+  return data
 }
 
 export const apiGetUser = async (id) => {

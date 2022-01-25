@@ -40,17 +40,18 @@ export default function Register() {
           event,
           session,
           // Any additional user data
-          userData: {
+          payload: {
             fullName,
           },
         })
+        router.replace('/get-started')
       }
     )
 
     return () => {
       authListener.unsubscribe()
     }
-  }, [getValues])
+  }, [getValues, router])
 
   const onSubmit = async (form) => {
     try {
@@ -60,7 +61,6 @@ export default function Register() {
         password: form['new-password'],
       })
       if (error) throw new Error(error.message)
-      router.replace('/get-started')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)
