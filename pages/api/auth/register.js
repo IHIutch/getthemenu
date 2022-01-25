@@ -14,7 +14,7 @@ const handler = async (req, res) => {
 
         const stripeCustomer = await createStripeCustomer({
           email: session.user.email,
-          fullName: payload.fullName,
+          name: payload.fullName,
         })
 
         await apiPostRegisterUser({
