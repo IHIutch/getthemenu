@@ -1,6 +1,5 @@
-import { createStripeCustomer } from '@/controllers/stripe'
-import { apiPostRegisterUser } from '@/controllers/users'
 import supabase from '@/utils/supabase'
+import { apiPostUser } from '@/controllers/users'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -12,14 +11,8 @@ const handler = async (req, res) => {
       try {
         const { session, payload } = req.body
 
-        const stripeCustomer = await createStripeCustomer({
-          email: session.user.email,
-          // name: payload.fullName,
-        })
-
-        await apiPostRegisterUser({
+        await apiPostUser({
           id: session.user.id,
-          stripeCustomerId: stripeCustomer.id,
           ...payload,
         })
 

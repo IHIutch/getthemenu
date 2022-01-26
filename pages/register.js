@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import Head from 'next/head'
 import supabase from '@/utils/supabase'
 import axios from 'redaxios'
@@ -21,7 +21,6 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { Controller, useForm } from 'react-hook-form'
-import { useAuthUser } from '@/utils/react-query/user'
 import NextLink from 'next/link'
 import { loadStripe } from '@stripe/stripe-js'
 import {

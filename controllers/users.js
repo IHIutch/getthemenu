@@ -1,12 +1,5 @@
 import supabase from '@/utils/supabase'
 
-export const apiPostRegisterUser = async (payload) => {
-  const { data, error } = await supabase.from('users').insert(payload)
-
-  if (error) throw new Error(error.message)
-  return data
-}
-
 export const apiGetUser = async (id) => {
   const { data, error } = await supabase
     .from('users')
