@@ -26,7 +26,7 @@ const handler = async (req, res) => {
         const { id } = req.query
         const payload = req.body
         const data = await apiPutMenuItem(id, payload)
-        res.status(resStatusType.SUCCESS).json(data[0])
+        res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error)
       }

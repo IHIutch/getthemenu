@@ -3,8 +3,8 @@ import supabase from '@/utils/supabase'
 export const apiGetMenuItems = async (params = {}) => {
   const { data, error } = await supabase
     .from('menuItems')
-    .select('*')
     .match(params)
+    .select('*')
     .order('position')
 
   if (error) {
@@ -41,6 +41,7 @@ export const apiPutMenuItem = async (id, payload) => {
     .update(payload)
     .match({ id })
     .select('*')
+    .single()
 
   if (error) {
     throw new Error(error.message)

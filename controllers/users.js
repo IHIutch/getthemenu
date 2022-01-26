@@ -38,6 +38,7 @@ export const apiPutUser = async (id, payload) => {
     .from('users')
     .update(payload)
     .match({ id })
+    .single()
 
   if (error) {
     throw new Error(error)

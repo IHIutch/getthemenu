@@ -45,6 +45,7 @@ export const apiPutMenu = async (id, payload) => {
     .update(payload)
     .match({ id })
     .select('*')
+    .single()
 
   if (error) {
     throw new Error(error.message)

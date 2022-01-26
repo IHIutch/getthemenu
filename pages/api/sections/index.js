@@ -20,7 +20,7 @@ const handler = async (req, res) => {
     case 'POST':
       try {
         const data = await apiPostSection(req.body)
-        res.status(resStatusType.SUCCESS).json(data[0])
+        res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
