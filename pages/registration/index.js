@@ -17,41 +17,38 @@ import {
   Container,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
-
 import { useAuthUser } from '@/utils/react-query/user'
 import NextLink from 'next/link'
 
-export default function Register() {
+export default function Register({ prices }) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm()
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        const fullName = getValues('fullName')
         await axios.post(`/api/auth/register`, {
           event,
           session,
           // Any additional user data
           payload: {
-            fullName,
+            // fullName,
           },
         })
-        router.replace('/get-started')
+        router.replace('/registration/select-subscription')
       }
     )
 
     return () => {
       authListener.unsubscribe()
     }
-  }, [getValues, router])
+  }, [router])
 
   const onSubmit = async (form) => {
     try {
@@ -73,9 +70,10 @@ export default function Register() {
     // isError: isUserError,
   } = useAuthUser()
 
+  // TODO: Use getServerSideProps for this
   useEffect(() => {
     if (user) {
-      router.replace('/get-started')
+      router.replace('/registration/select-subscription')
     }
   }, [router, user])
 
@@ -103,21 +101,6 @@ export default function Register() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl id="fullName" isInvalid={errors.email}>
-                      <FormLabel>Full Name</FormLabel>
-                      <Input
-                        {...register('fullName', {
-                          required: 'This field is required',
-                        })}
-                        type="text"
-                        autoComplete="name"
-                      />
-                      <FormErrorMessage>
-                        {errors.email?.message}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
                     <FormControl id="email" isInvalid={errors.email}>
                       <FormLabel>Email</FormLabel>
                       <Input
@@ -127,7 +110,9 @@ export default function Register() {
                         type="email"
                         autoComplete="email"
                       />
-                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors.email?.message}
+                      </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
@@ -145,27 +130,6 @@ export default function Register() {
                       />
                       <FormErrorMessage>
                         {errors['new-password']?.message}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
-                    <FormControl
-                      id="confirmPassword"
-                      isInvalid={errors['confirm-password']}
-                    >
-                      <FormLabel>Confirm Password</FormLabel>
-                      <Input
-                        {...register('confirm-password', {
-                          required: 'This field is required',
-                          validate: (value) =>
-                            value === getValues('new-password') ||
-                            'Passwords must match',
-                        })}
-                        type="password"
-                        autoComplete="new-password"
-                      />
-                      <FormErrorMessage>
-                        {errors['confirm-password']?.message}
                       </FormErrorMessage>
                     </FormControl>
                   </GridItem>
