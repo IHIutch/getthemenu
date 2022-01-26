@@ -38,7 +38,10 @@ export default function ImageDropzone({ onChange, value = '' }) {
     isDragActive,
     // isDragAccept,
     // isDragReject,
-  } = useDropzone({ onDrop })
+  } = useDropzone({
+    onDrop,
+    accept: 'image/*',
+  })
 
   const previewSrc = useMemo(() => {
     return preview || value
