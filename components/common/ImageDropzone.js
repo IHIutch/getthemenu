@@ -56,7 +56,7 @@ export default function ImageDropzone({ onChange, value = '' }) {
             right="2"
             onClick={() => onChange(null)}
           />
-          <Image h="100%" w="100%" src={previewSrc} objectFit="cover" />
+          <Image h="100%" w="100%" src={previewSrc} objectFit="cover" alt="" />
         </Box>
       ) : (
         <Flex

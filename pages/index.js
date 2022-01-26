@@ -160,7 +160,7 @@ export default function Login() {
               </form>
             </Box>
             <Box textAlign="center" mt="6">
-              <NextLink href="/register" passHref>
+              <NextLink href="/registration" passHref>
                 <Button as={Link} colorScheme="blue" variant="link">
                   Don&rsquo;t Have an Account? Register Now!
                 </Button>
