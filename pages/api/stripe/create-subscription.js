@@ -8,9 +8,9 @@ const handler = async (req, res) => {
   switch (method) {
     case 'POST':
       try {
-        const { user, priceId } = req.body
+        const { customerId, priceId } = req.body
         const stripeSubscription = await createStripeSubscription({
-          customerId: user.stripeCustomerId,
+          customerId,
           priceId,
         })
         res.status(resStatusType.SUCCESS).json({
