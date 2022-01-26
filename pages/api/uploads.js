@@ -38,7 +38,7 @@ const handler = async (req, res) => {
 
         res.status(resStatusType.SUCCESS).json(src)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
 

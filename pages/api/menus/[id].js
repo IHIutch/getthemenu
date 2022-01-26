@@ -13,7 +13,7 @@ const handler = async (req, res) => {
         const data = await apiGetMenu(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
     // Update
@@ -24,7 +24,7 @@ const handler = async (req, res) => {
         const data = await apiPutMenu(id, payload)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
     // Delete
@@ -34,7 +34,7 @@ const handler = async (req, res) => {
         const data = await apiDeleteMenu(id)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
 
