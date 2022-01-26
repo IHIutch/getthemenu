@@ -3,11 +3,18 @@ import { useQuery } from 'react-query'
 import { getUser } from '../axios/users'
 
 export const useAuthUser = () => {
-  const user = supabase.auth.user()
+  const sessionUser = supabase.auth.user()
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     ['user'],
     async () => {
-      return user ? await getUser(user.id) : null
+      if (sessionUser) {
+        const user = await getUser(sessionUser.id)
+        return {
+          // ...sessionUser,
+          ...user,
+        }
+      }
+      return null
     }
   )
   return {
