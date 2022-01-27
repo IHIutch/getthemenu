@@ -8,7 +8,7 @@ export const apiGetRestaurants = async (params = {}) => {
         .from('restaurants')
         .select('customHost')
         .ilike('customHost', `%${similar}%`)
-    : await supabase.from('restaurants').match(rest)
+    : await supabase.from('restaurants').select('*').match(rest)
 
   if (error) {
     throw new Error(error.message)
