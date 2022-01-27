@@ -8,7 +8,7 @@ export const apiGetRestaurants = async (params = {}) => {
         .from('restaurants')
         .select('customHost')
         .ilike('customHost', `%${similar}%`)
-    : await supabase.from('restaurants').select('*').match(rest)
+    : await supabase.from('restaurants').match(rest)
 
   if (error) {
     throw new Error(error.message)
@@ -19,7 +19,6 @@ export const apiGetRestaurants = async (params = {}) => {
 export const apiGetRestaurant = async (id) => {
   const { data, error } = await supabase
     .from('restaurants')
-    .select('*')
     .match({ id })
     .single()
 
@@ -30,7 +29,7 @@ export const apiGetRestaurant = async (id) => {
 }
 
 export const apiPostRestaurant = async (payload) => {
-  const { data, error } = await supabase.from('restaurants').insert([payload])
+  const { data, error } = await supabase.from('restaurants').insert(payload)
 
   if (error) {
     throw new Error(error.message)

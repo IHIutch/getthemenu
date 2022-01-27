@@ -4,7 +4,6 @@ export const apiGetMenuItems = async (params = {}) => {
   const { data, error } = await supabase
     .from('menuItems')
     .match(params)
-    .select('*')
     .order('position')
 
   if (error) {
@@ -16,7 +15,6 @@ export const apiGetMenuItems = async (params = {}) => {
 export const apiGetMenuItem = async (id) => {
   const { data, error } = await supabase
     .from('menuItems')
-    .select('*')
     .match({ id })
     .single()
 
@@ -27,7 +25,7 @@ export const apiGetMenuItem = async (id) => {
 }
 
 export const apiPostMenuItem = async (payload) => {
-  const { data, error } = await supabase.from('menuItems').insert([payload])
+  const { data, error } = await supabase.from('menuItems').insert(payload)
 
   if (error) {
     throw new Error(error.message)

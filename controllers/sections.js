@@ -4,7 +4,6 @@ export const apiGetSections = async (params = {}) => {
   const { data, error } = await supabase
     .from('sections')
     .match(params)
-    .select('*')
     .order('position')
 
   if (error) {
@@ -14,11 +13,7 @@ export const apiGetSections = async (params = {}) => {
 }
 
 export const apiGetSection = async (id) => {
-  const { data, error } = await supabase
-    .from('sections')
-    .match({ id })
-    .select('*')
-    .single()
+  const { data, error } = await supabase.from('sections').match({ id }).single()
 
   if (error) {
     throw new Error(error.message)
@@ -27,7 +22,7 @@ export const apiGetSection = async (id) => {
 }
 
 export const apiPostSection = async (payload) => {
-  const { data, error } = await supabase.from('sections').insert([payload])
+  const { data, error } = await supabase.from('sections').insert(payload)
 
   if (error) {
     throw new Error(error.message)
