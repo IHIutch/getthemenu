@@ -311,58 +311,64 @@ const MenuItemsContainer = ({
   drawerState,
   sectionId,
 }) => {
-  return items?.length > 0 ? (
+  return (
     <Droppable droppableId={`${sectionId}`} type="ITEMS">
       {(drop) => (
-        <Stack
-          spacing="0"
-          ref={drop.innerRef}
-          {...drop.droppableProps}
-          divider={<StackDivider />}
-        >
-          {items.map((menuItem, idx) => (
-            <Box key={`${sectionId}-${menuItem.id}`}>
-              <Draggable
-                draggableId={`${sectionId}-${menuItem.id}`}
-                index={idx}
-              >
-                {(drag, snapshot) => (
-                  <Box ref={drag.innerRef} {...drag.draggableProps}>
-                    <Box
-                      borderRadius="md"
-                      bg="white"
-                      shadow={snapshot.isDragging ? 'md' : 'none'}
-                      transform={snapshot.isDragging ? 'scale(1.02)' : 'none'}
-                      transition="all 0.1s ease"
-                    >
-                      <Center {...drag.dragHandleProps}>
-                        <Icon
-                          color="gray.500"
-                          boxSize="5"
-                          as={GripHorizontal}
-                        />
-                      </Center>
-                      <Box pb="4" px="4">
-                        <MenuItem
-                          menuItem={menuItem}
-                          handleDrawerOpen={handleDrawerOpen}
-                          drawerState={drawerState}
-                        />
+        <Box>
+          <Stack
+            spacing="0"
+            ref={drop.innerRef}
+            {...drop.droppableProps}
+            divider={<StackDivider />}
+          >
+            {items?.length > 0 ? (
+              items.map((menuItem, idx) => (
+                <Box key={`${sectionId}-${menuItem.id}`}>
+                  <Draggable
+                    draggableId={`${sectionId}-${menuItem.id}`}
+                    index={idx}
+                  >
+                    {(drag, snapshot) => (
+                      <Box ref={drag.innerRef} {...drag.draggableProps}>
+                        <Box
+                          borderRadius="md"
+                          bg="white"
+                          shadow={snapshot.isDragging ? 'md' : 'none'}
+                          transform={
+                            snapshot.isDragging ? 'scale(1.02)' : 'none'
+                          }
+                          transition="all 0.1s ease"
+                        >
+                          <Center {...drag.dragHandleProps}>
+                            <Icon
+                              color="gray.500"
+                              boxSize="5"
+                              as={GripHorizontal}
+                            />
+                          </Center>
+                          <Box pb="4" px="4">
+                            <MenuItem
+                              menuItem={menuItem}
+                              handleDrawerOpen={handleDrawerOpen}
+                              drawerState={drawerState}
+                            />
+                          </Box>
+                        </Box>
                       </Box>
-                    </Box>
-                  </Box>
-                )}
-              </Draggable>
-            </Box>
-          ))}
-          {drop.placeholder}
-        </Stack>
+                    )}
+                  </Draggable>
+                </Box>
+              ))
+            ) : (
+              <Center p="4">
+                <Text color="gray.600">Add an item to this section</Text>
+              </Center>
+            )}
+            {drop.placeholder}
+          </Stack>
+        </Box>
       )}
     </Droppable>
-  ) : (
-    <Center p="4">
-      <Text color="gray.600">Add an item to this section</Text>
-    </Center>
   )
 }
 
