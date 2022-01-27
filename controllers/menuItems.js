@@ -3,6 +3,7 @@ import supabase from '@/utils/supabase'
 export const apiGetMenuItems = async (params = {}) => {
   const { data, error } = await supabase
     .from('menuItems')
+    .select('*')
     .match(params)
     .order('position')
 
@@ -15,6 +16,7 @@ export const apiGetMenuItems = async (params = {}) => {
 export const apiGetMenuItem = async (id) => {
   const { data, error } = await supabase
     .from('menuItems')
+    .select('*')
     .match({ id })
     .single()
 
@@ -38,7 +40,6 @@ export const apiPutMenuItem = async (id, payload) => {
     .from('menuItems')
     .update(payload)
     .match({ id })
-    .select('*')
     .single()
 
   if (error) {

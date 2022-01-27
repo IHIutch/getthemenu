@@ -6,10 +6,10 @@ export const apiGetMenus = async (params = {}) => {
   const { data, error } = similar
     ? await supabase
         .from('menus')
-        .select('slug')
+        .select('slug, restaurantId')
         .match({ restaurantId: rest.restaurantId })
         .ilike('slug', `%${similar}%`)
-    : await supabase.from('menus').match(rest).order('position')
+    : await supabase.from('menus').select('*').match(rest).order('position')
 
   if (error) {
     throw new Error(error.message)
@@ -18,7 +18,11 @@ export const apiGetMenus = async (params = {}) => {
 }
 
 export const apiGetMenu = async (id) => {
-  const { data, error } = await supabase.from('menus').match({ id }).single()
+  const { data, error } = await supabase
+    .from('menus')
+    .select('*')
+    .match({ id })
+    .single()
 
   if (error) {
     throw new Error(error.message)
@@ -40,7 +44,6 @@ export const apiPutMenu = async (id, payload) => {
     .from('menus')
     .update(payload)
     .match({ id })
-    .select('*')
     .single()
 
   if (error) {

@@ -19,6 +19,7 @@ export const apiGetRestaurants = async (params = {}) => {
 export const apiGetRestaurant = async (id) => {
   const { data, error } = await supabase
     .from('restaurants')
+    .select('*')
     .match({ id })
     .single()
 
@@ -42,7 +43,6 @@ export const apiPutRestaurant = async (id, payload) => {
     .from('restaurants')
     .update(payload)
     .match({ id })
-    .select('*')
     .single()
 
   if (error) {

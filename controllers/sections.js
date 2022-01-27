@@ -3,6 +3,7 @@ import supabase from '@/utils/supabase'
 export const apiGetSections = async (params = {}) => {
   const { data, error } = await supabase
     .from('sections')
+    .select('*')
     .match(params)
     .order('position')
 
@@ -13,7 +14,11 @@ export const apiGetSections = async (params = {}) => {
 }
 
 export const apiGetSection = async (id) => {
-  const { data, error } = await supabase.from('sections').match({ id }).single()
+  const { data, error } = await supabase
+    .from('sections')
+    .select('*')
+    .match({ id })
+    .single()
 
   if (error) {
     throw new Error(error.message)
@@ -35,7 +40,6 @@ export const apiPutSection = async (id, payload) => {
     .from('sections')
     .update(payload)
     .match({ id })
-    .select('*')
     .single()
 
   if (error) {
