@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_CONNECTION_STRING")
+}
+
+model menuItems {
+  id           BigInt      @id @default(autoincrement())
+  menuId       BigInt
+  sectionId    BigInt
+  restaurantId String      @db.Uuid
+  title        String?     @db.VarChar
+  price        Decimal     @db.Money
+  description  String?
+  position     Int?        @db.SmallInt
+  image        Json?       @db.Json
+  createdAt    DateTime    @default(now()) @db.Timestamptz()
+  updatedAt    DateTime    @updatedAt @db.Timestamptz()
+  deletedAt    DateTime    @db.Timestamptz()
+  menus        menus       @relation(fields: [menuId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  restaurants  restaurants @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sections     sections    @relation(fields: [sectionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model menus {
+  id           BigInt      @id @default(autoincrement())
+  restaurantId String      @db.Uuid
+  title        String?     @db.VarChar
+  slug         String?     @db.VarChar
+  position     Int?        @db.SmallInt
+  description  String?
+  createdAt    DateTime    @default(now()) @db.Timestamptz()
+  updatedAt    DateTime    @updatedAt @db.Timestamptz()
+  deletedAt    DateTime    @db.Timestamptz()
+  restaurants  restaurants @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menuItems    menuItems[]
+  sections     sections[]
+}
+
+model restaurants {
+  id           String      @id @default(uuid())
+  userId       String      @db.Uuid
+  hours        Json?
+  name         String?     @db.VarChar
+  address      Json?
+  phone        Json?
+  email        Json?
+  image        Json?       @db.Json
+  coverImage   Json?       @db.Json
+  customHost   String?     @unique @db.VarChar
+  customDomain String?     @unique @db.VarChar
+  createdAt    DateTime?   @default(now()) @db.Timestamptz()
+  updatedAt    DateTime    @updatedAt @db.Timestamptz()
+  deletedAt    DateTime    @db.Timestamptz()
+  users        users       @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menuItems    menuItems[]
+  menus        menus[]
+  sections     sections[]
+}
+
+model sections {
+  id           BigInt      @id @default(autoincrement())
+  menuId       BigInt
+  restaurantId String      @db.Uuid
+  title        String?     @db.VarChar
+  position     Int?
+  description  String?
+  createdAt    DateTime    @default(now()) @db.Timestamptz()
+  updatedAt    DateTime    @updatedAt @db.Timestamptz()
+  deletedAt    DateTime    @db.Timestamptz()
+  menus        menus       @relation(fields: [menuId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  restaurants  restaurants @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menuItems    menuItems[]
+}
+
+model users {
+  id                   String        @id @db.Uuid
+  fullName             String?       @db.VarChar
+  stripeSubscriptionId String?       @unique @db.VarChar
+  stripeCustomerId     String?       @unique @db.VarChar
+  createdAt            DateTime      @default(now()) @db.Timestamptz()
+  updatedAt            DateTime      @updatedAt @db.Timestamptz()
+  deletedAt            DateTime      @db.Timestamptz()
+  restaurants          restaurants[]
+}
