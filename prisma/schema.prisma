@@ -48,7 +48,6 @@ model restaurants {
   address      Json?
   phone        Json?
   email        Json?
-  image        Json?       @db.Json
   coverImage   Json?       @db.Json
   customHost   String?     @unique @db.VarChar
   customDomain String?     @unique @db.VarChar
