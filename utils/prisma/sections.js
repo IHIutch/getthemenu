@@ -1,4 +1,4 @@
-import { prisma } from '@prisma/client'
+import prisma from '.'
 import { sectionSchema } from '../joi/schemas'
 
 export const prismaGetSections = async (where) => {

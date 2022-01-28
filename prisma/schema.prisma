@@ -13,13 +13,13 @@ model menuItems {
   sectionId    BigInt
   restaurantId String      @db.Uuid
   title        String?     @db.VarChar
-  price        Decimal     @db.Money
+  price        Decimal?    @db.Money
   description  String?
   position     Int?        @db.SmallInt
   image        Json?       @db.Json
   createdAt    DateTime    @default(now()) @db.Timestamptz()
-  updatedAt    DateTime    @updatedAt @db.Timestamptz()
-  deletedAt    DateTime    @db.Timestamptz()
+  updatedAt    DateTime    @default(now()) @updatedAt @db.Timestamptz()
+  deletedAt    DateTime?   @db.Timestamptz()
   menus        menus       @relation(fields: [menuId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   restaurants  restaurants @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   sections     sections    @relation(fields: [sectionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -33,8 +33,8 @@ model menus {
   position     Int?        @db.SmallInt
   description  String?
   createdAt    DateTime    @default(now()) @db.Timestamptz()
-  updatedAt    DateTime    @updatedAt @db.Timestamptz()
-  deletedAt    DateTime    @db.Timestamptz()
+  updatedAt    DateTime    @default(now()) @updatedAt @db.Timestamptz()
+  deletedAt    DateTime?   @db.Timestamptz()
   restaurants  restaurants @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   menuItems    menuItems[]
   sections     sections[]
@@ -52,8 +52,8 @@ model restaurants {
   customHost   String?     @unique @db.VarChar
   customDomain String?     @unique @db.VarChar
   createdAt    DateTime?   @default(now()) @db.Timestamptz()
-  updatedAt    DateTime    @updatedAt @db.Timestamptz()
-  deletedAt    DateTime    @db.Timestamptz()
+  updatedAt    DateTime    @default(now()) @updatedAt @db.Timestamptz()
+  deletedAt    DateTime?   @db.Timestamptz()
   users        users       @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   menuItems    menuItems[]
   menus        menus[]
@@ -68,8 +68,8 @@ model sections {
   position     Int?
   description  String?
   createdAt    DateTime    @default(now()) @db.Timestamptz()
-  updatedAt    DateTime    @updatedAt @db.Timestamptz()
-  deletedAt    DateTime    @db.Timestamptz()
+  updatedAt    DateTime    @default(now()) @updatedAt @db.Timestamptz()
+  deletedAt    DateTime?   @db.Timestamptz()
   menus        menus       @relation(fields: [menuId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   restaurants  restaurants @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   menuItems    menuItems[]
@@ -81,7 +81,7 @@ model users {
   stripeSubscriptionId String?       @unique @db.VarChar
   stripeCustomerId     String?       @unique @db.VarChar
   createdAt            DateTime      @default(now()) @db.Timestamptz()
-  updatedAt            DateTime      @updatedAt @db.Timestamptz()
-  deletedAt            DateTime      @db.Timestamptz()
+  updatedAt            DateTime      @default(now()) @updatedAt @db.Timestamptz()
+  deletedAt            DateTime?     @db.Timestamptz()
   restaurants          restaurants[]
 }

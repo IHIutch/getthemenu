@@ -1,4 +1,4 @@
-import { prisma } from '@prisma/client'
+import prisma from '.'
 import { menuItemSchema } from '../joi/schemas'
 
 export const prismaGetMenuItems = async (where) => {

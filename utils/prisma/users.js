@@ -1,4 +1,4 @@
-import { prisma } from '@prisma/client'
+import prisma from '.'
 import { userSchema } from '../joi/schemas'
 
 export const prismaGetUsers = async (where) => {
