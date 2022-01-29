@@ -51,19 +51,19 @@ export default function GetStarted() {
 
   const checkSimilarHost = async (customHost) => {
     try {
-      const { data } = await axios.get(`/api/restaurants?similar=${customHost}`)
+      const { data: hosts } = await axios.get(
+        `/api/verify/restaurants?customHost=${customHost}`
+      )
       let count = 0
-      let out = customHost
-      const analyticsHost = 'xyz'
-      const slugs = [analyticsHost, ...data].map((d) => d.slug)
-      if (slugs) {
-        while (slugs.includes(out)) {
-          out = `${customHost}-${count + 1}`
+      let suggestion = customHost
+      if (hosts) {
+        while (hosts.map((h) => h.customHost).includes(suggestion)) {
+          suggestion = `${customHost}-${count + 1}`
           count++
         }
       }
-      await debouncedCheckUniqueHost(out)
-      return out
+      debouncedCheckUniqueHost(suggestion)
+      return suggestion
     } catch (error) {
       alert(error)
     }
