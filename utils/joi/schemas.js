@@ -32,7 +32,7 @@ export const menuSchema = Joi.object().keys({
 
 export const restaurantSchema = Joi.object().keys({
   id: Joi.number().integer().min(1),
-  userId: Joi.number().integer().min(1),
+  userId: Joi.string().guid(),
   hours: Joi.object(),
   name: Joi.string(),
   address: Joi.object().keys({
