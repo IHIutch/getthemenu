@@ -13,24 +13,18 @@ import { X } from 'lucide-react'
 
 export default function ImageDropzone({ onChange, value = '' }) {
   const [preview, setPreview] = useState(value)
-  const [file, setFile] = useState(null)
   const onDrop = useCallback(
     (acceptedFiles) => {
-      setFile(acceptedFiles[0])
+      const objectUrl = URL.createObjectURL(acceptedFiles[0])
+      onChange(objectUrl)
+      setPreview(objectUrl)
     },
-    [setFile]
+    [onChange]
   )
 
   useEffect(() => {
-    if (file) {
-      onChange(file)
-    }
-    const objectUrl = file ? URL.createObjectURL(file) : null
-    setPreview(objectUrl)
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [file, onChange])
+    setPreview(value)
+  }, [value])
 
   const {
     getRootProps,
