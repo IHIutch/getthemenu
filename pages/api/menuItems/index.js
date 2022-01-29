@@ -25,7 +25,7 @@ const handler = async (req, res) => {
         const data = await prismaPostMenuItem(req.body)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error.message)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
 

@@ -25,7 +25,9 @@ const handler = async (req, res) => {
 
         return supabase.auth.api.setAuthCookie(req, res)
       } catch (error) {
-        return res.status(resStatusType.BAD_REQUEST).json({ error })
+        return res
+          .status(resStatusType.BAD_REQUEST)
+          .json({ error: error.message })
       }
 
     default:

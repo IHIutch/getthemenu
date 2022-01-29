@@ -27,7 +27,7 @@ const handler = async (req, res) => {
           throw new Error(`Column ${column} is not allowed`)
         }
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json(error.message)
+        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }
       break
 

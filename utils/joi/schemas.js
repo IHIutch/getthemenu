@@ -6,7 +6,7 @@ export const menuItemSchema = Joi.object().keys({
   sectionId: Joi.number().integer().min(1),
   restaurantId: Joi.string(),
   title: Joi.string(),
-  price: Joi.float().min(0),
+  price: Joi.number().min(0),
   description: Joi.string(),
   position: Joi.number().integer().min(0),
   image: Joi.object().keys({
