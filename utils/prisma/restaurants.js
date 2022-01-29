@@ -35,11 +35,22 @@ export const prismaPostRestaurant = async (payload) => {
 }
 
 export const prismaPutRestaurant = async (where, payload) => {
-  const validPayload = await restaurantSchema.validateAsync(payload)
-  const validWhere = await restaurantSchema.validateAsync(where)
   try {
-    return await prisma.user.update({
+    const validPayload = await restaurantSchema.validateAsync(payload)
+    const validWhere = await restaurantSchema.validateAsync(where)
+    return await prisma.restaurants.update({
       data: validPayload,
+      where: validWhere,
+    })
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+export const prismaDeleteRestaurant = async (where) => {
+  try {
+    const validWhere = await restaurantSchema.validateAsync(where)
+    return await prisma.restaurants.delete({
       where: validWhere,
     })
   } catch (error) {

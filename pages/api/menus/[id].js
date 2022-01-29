@@ -1,4 +1,8 @@
-import { apiDeleteMenu, apiGetMenu, apiPutMenu } from '@/controllers/menus'
+import {
+  prismaDeleteMenu,
+  prismaGetMenu,
+  prismaPutMenu,
+} from '@/utils/prisma/menus'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -10,7 +14,7 @@ const handler = async (req, res) => {
     case 'GET':
       try {
         const { id } = req.query
-        const data = await apiGetMenu(id)
+        const data = await prismaGetMenu({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -21,7 +25,7 @@ const handler = async (req, res) => {
       try {
         const { id } = req.query
         const payload = req.body
-        const data = await apiPutMenu(id, payload)
+        const data = await prismaPutMenu({ id }, payload)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -31,7 +35,7 @@ const handler = async (req, res) => {
     case 'DELETE':
       try {
         const { id } = req.query
-        const data = await apiDeleteMenu(id)
+        const data = await prismaDeleteMenu({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })

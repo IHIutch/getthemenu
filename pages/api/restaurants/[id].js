@@ -1,8 +1,8 @@
 import {
-  apiDeleteRestaurant,
-  apiGetRestaurant,
-  apiPutRestaurant,
-} from '@/controllers/restaurants'
+  prismaDeleteRestaurant,
+  prismaGetRestaurant,
+  prismaPutRestaurant,
+} from '@/utils/prisma/restaurants'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -14,7 +14,7 @@ const handler = async (req, res) => {
     case 'GET':
       try {
         const { id } = req.query
-        const data = await apiGetRestaurant(id)
+        const data = await prismaGetRestaurant({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -24,8 +24,7 @@ const handler = async (req, res) => {
     case 'PUT':
       try {
         const { id } = req.query
-        const payload = req.body
-        const data = await apiPutRestaurant(id, payload)
+        const data = await prismaPutRestaurant({ id }, req.body)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -35,7 +34,7 @@ const handler = async (req, res) => {
     case 'DELETE':
       try {
         const { id } = req.query
-        const data = apiDeleteRestaurant(id)
+        const data = prismaDeleteRestaurant({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })

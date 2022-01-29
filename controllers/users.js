@@ -46,14 +46,6 @@ export const apiPutUser = async (id, payload) => {
   return data
 }
 
-export const apiPostSignInUser = async (req, res) => {
-  return supabase.auth.api.setAuthCookie(req, res)
-}
-
-export const apiPostSignOutUser = async (req, res) => {
-  return await supabase.auth.api.signOut(req, res)
-}
-
 export const apiPostForgotPassword = () => {}
 
 export const apiPostUpdatePassword = () => {}

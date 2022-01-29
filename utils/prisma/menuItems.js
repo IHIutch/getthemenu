@@ -38,11 +38,22 @@ export const prismaPostMenuItem = async (payload) => {
 }
 
 export const prismaPutMenuItem = async (where, payload) => {
-  const validPayload = await menuItemSchema.validateAsync(payload)
-  const validWhere = await menuItemSchema.validateAsync(where)
   try {
-    return await prisma.user.update({
+    const validPayload = await menuItemSchema.validateAsync(payload)
+    const validWhere = await menuItemSchema.validateAsync(where)
+    return await prisma.menuItem.update({
       data: validPayload,
+      where: validWhere,
+    })
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+export const prismaDeleteMenuItem = async (where) => {
+  try {
+    const validWhere = await menuItemSchema.validateAsync(where)
+    return await prisma.menuItem.delete({
       where: validWhere,
     })
   } catch (error) {

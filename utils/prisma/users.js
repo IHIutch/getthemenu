@@ -49,11 +49,22 @@ export const prismaPostUser = async (payload) => {
 }
 
 export const prismaPutUser = async (where, payload) => {
-  const validPayload = await userSchema.validateAsync(payload)
-  const validWhere = await userSchema.validateAsync(where)
   try {
-    return await prisma.user.update({
+    const validPayload = await userSchema.validateAsync(payload)
+    const validWhere = await userSchema.validateAsync(where)
+    return await prisma.users.update({
       data: validPayload,
+      where: validWhere,
+    })
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+export const prismaDeleteUser = async (where) => {
+  try {
+    const validWhere = await userSchema.validateAsync(where)
+    return await prisma.users.delete({
       where: validWhere,
     })
   } catch (error) {

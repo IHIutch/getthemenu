@@ -1,4 +1,4 @@
-import { apiPostSignInUser } from '@/controllers/users'
+import supabase from '@/utils/supabase'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -7,7 +7,7 @@ const handler = async (req, res) => {
 
   switch (method) {
     case 'POST':
-      return apiPostSignInUser(req, res) // Set auth cookie works for signing in and out
+      return await supabase.auth.api.signOut(req, res)
 
     default:
       res.setHeader('Allow', ['POST'])

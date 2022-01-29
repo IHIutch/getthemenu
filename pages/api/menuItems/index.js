@@ -1,4 +1,7 @@
-import { apiGetMenuItems, apiPostMenuItem } from '@/controllers/menuItems'
+import {
+  prismaGetMenuItems,
+  prismaPostMenuItem,
+} from '@/utils/prisma/menuItems'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -9,7 +12,7 @@ const handler = async (req, res) => {
     // Get
     case 'GET':
       try {
-        const data = await apiGetMenuItems(req.query)
+        const data = await prismaGetMenuItems(req.query)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -19,7 +22,7 @@ const handler = async (req, res) => {
     // Create
     case 'POST':
       try {
-        const data = await apiPostMenuItem(req.body)
+        const data = await prismaPostMenuItem(req.body)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json(error.message)

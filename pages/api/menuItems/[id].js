@@ -1,8 +1,8 @@
 import {
-  apiDeleteMenuItem,
-  apiGetMenuItem,
-  apiPutMenuItem,
-} from '@/controllers/menuItems'
+  prismaDeleteMenuItem,
+  prismaGetMenuItem,
+  prismaPutMenuItem,
+} from '@/utils/prisma/menuItems'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -14,7 +14,7 @@ const handler = async (req, res) => {
     case 'GET':
       try {
         const { id } = req.query
-        const data = await apiGetMenuItem(id)
+        const data = await prismaGetMenuItem({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -25,7 +25,7 @@ const handler = async (req, res) => {
       try {
         const { id } = req.query
         const payload = req.body
-        const data = await apiPutMenuItem(id, payload)
+        const data = await prismaPutMenuItem({ id }, payload)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -35,7 +35,7 @@ const handler = async (req, res) => {
     case 'DELETE':
       try {
         const { id } = req.query
-        const data = await apiDeleteMenuItem(id)
+        const data = await prismaDeleteMenuItem({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })

@@ -1,4 +1,4 @@
-import { apiGetSections, apiPostSection } from '@/controllers/sections'
+import { prismaGetSections, prismaPostSection } from '@/utils/prisma/sections'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -9,7 +9,7 @@ const handler = async (req, res) => {
     // Get
     case 'GET':
       try {
-        const data = await apiGetSections(req.query)
+        const data = await prismaGetSections(req.query)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -19,7 +19,7 @@ const handler = async (req, res) => {
     // Create
     case 'POST':
       try {
-        const data = await apiPostSection(req.body)
+        const data = await prismaPostSection(req.body)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })

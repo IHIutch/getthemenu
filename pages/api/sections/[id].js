@@ -1,8 +1,8 @@
 import {
-  apiDeleteSection,
-  apiGetSection,
-  apiPutSection,
-} from '@/controllers/sections'
+  prismaDeleteSection,
+  prismaGetSection,
+  prismaPutSection,
+} from '@/utils/prisma/sections'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -14,7 +14,7 @@ const handler = async (req, res) => {
     case 'GET':
       try {
         const { id } = req.query
-        const data = await apiGetSection(id)
+        const data = await prismaGetSection({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -24,8 +24,7 @@ const handler = async (req, res) => {
     case 'PUT':
       try {
         const { id } = req.query
-        const payload = req.body
-        const data = await apiPutSection(id, payload)
+        const data = await prismaPutSection({ id }, req.body)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -35,7 +34,7 @@ const handler = async (req, res) => {
     case 'DELETE':
       try {
         const { id } = req.query
-        const data = await apiDeleteSection(id)
+        const data = await prismaDeleteSection({ id })
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
