@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import prisma from '.'
 import { menuItemSchema } from '../joi/schemas'
 
@@ -30,7 +31,10 @@ export const prismaPostMenuItem = async (payload) => {
   try {
     const validPayload = await menuItemSchema.validateAsync(payload)
     return await prisma.menuItems.create({
-      data: validPayload,
+      data: {
+        ...validPayload,
+        coverImage: validPayload.coverImage || Prisma.DbNull,
+      },
     })
   } catch (error) {
     throw new Error(error.message)
@@ -42,7 +46,10 @@ export const prismaPutMenuItem = async (where, payload) => {
     const validPayload = await menuItemSchema.validateAsync(payload)
     const validWhere = await menuItemSchema.validateAsync(where)
     return await prisma.menuItems.update({
-      data: validPayload,
+      data: {
+        ...validPayload,
+        coverImage: validPayload.coverImage || Prisma.DbNull,
+      },
       where: validWhere,
     })
   } catch (error) {

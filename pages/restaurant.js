@@ -84,7 +84,7 @@ const Details = () => {
 
   const defaultValues = useMemo(() => {
     return {
-      restaurantName: restaurant?.name || '',
+      name: restaurant?.name || '',
       customHost: restaurant?.customHost || '',
       coverImage: restaurant?.coverImage?.src || null,
     }
@@ -112,9 +112,9 @@ const Details = () => {
     try {
       setIsSubmitting(true)
       const payload = {
-        name: form?.restaurantName || '',
+        ...form,
+        name: form?.name || '',
         customHost: form?.customHost || '',
-        coverImage: null,
       }
       if (form?.coverImage) {
         const formData = new FormData()
@@ -150,7 +150,7 @@ const Details = () => {
               <FormControl mb="4">
                 <FormLabel>Name</FormLabel>
                 <Input
-                  {...register('restaurantName', {
+                  {...register('name', {
                     required: 'This field is required',
                   })}
                   type="text"
@@ -221,7 +221,7 @@ const Address = () => {
   )
 
   const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    restaurant?.id || null
+    user?.restaurants?.length ? user.restaurants[0].id : null
   )
 
   const defaultValues = useMemo(() => {
@@ -236,7 +236,6 @@ const Address = () => {
   const {
     register,
     handleSubmit,
-    getValues,
     reset,
     control,
     formState: { errors },
@@ -252,23 +251,17 @@ const Address = () => {
     reset(defaultValues)
   }, [defaultValues, reset, restaurant])
 
-  const onSubmit = async () => {
+  const onSubmit = async (form) => {
     try {
-      const [streetAddress, city, state, zip] = getValues([
-        'streetAddress',
-        'city',
-        'state',
-        'zip',
-      ])
       setIsSubmitting(true)
       await handleUpdateRestaurant({
-        id: 123,
+        id: user.restaurants[0].id,
         payload: {
           address: {
-            streetAddress,
-            city,
-            state,
-            zip,
+            streetAddress: form?.streetAddress,
+            city: form?.city,
+            state: form?.state,
+            zip: form?.zip,
           },
         },
       })

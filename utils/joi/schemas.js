@@ -38,17 +38,19 @@ export const restaurantSchema = Joi.object().keys({
   hours: Joi.object(),
   name: Joi.string(),
   address: Joi.object().keys({
-    streetAddress: Joi.string(),
-    city: Joi.string(),
-    state: Joi.string(),
-    zip: Joi.string(),
+    streetAddress: Joi.string().empty(''),
+    city: Joi.string().empty(''),
+    state: Joi.string().empty(''),
+    zip: Joi.string().empty(''),
   }),
   email: Joi.array().items(Joi.string()),
   phone: Joi.array().items(Joi.string()),
-  coverImage: Joi.object().keys({
-    src: Joi.string(),
-    blurDataURL: Joi.string(),
-  }),
+  coverImage: Joi.object()
+    .keys({
+      src: Joi.string(),
+      blurDataURL: Joi.string(),
+    })
+    .allow(null),
   customHost: Joi.string().empty(''),
   customDomain: Joi.string().empty(''),
   createdAt: Joi.date(),

@@ -582,7 +582,7 @@ const MenuItemDrawer = ({
         menuItem?.price || menuItem?.price === 0
           ? parseFloat(menuItem.price).toFixed(2)
           : null,
-      image: menuItem?.image?.src || undefined,
+      image: menuItem?.image?.src || null,
     },
   })
 

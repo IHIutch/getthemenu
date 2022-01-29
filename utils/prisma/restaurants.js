@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import prisma from '.'
 import { restaurantSchema } from '../joi/schemas'
 
@@ -27,7 +28,10 @@ export const prismaPostRestaurant = async (payload) => {
   try {
     const validPayload = await restaurantSchema.validateAsync(payload)
     return await prisma.restaurants.create({
-      data: validPayload,
+      data: {
+        ...validPayload,
+        coverImage: validPayload.coverImage || Prisma.DbNull,
+      },
     })
   } catch (error) {
     throw new Error(error.message)
@@ -39,7 +43,10 @@ export const prismaPutRestaurant = async (where, payload) => {
     const validPayload = await restaurantSchema.validateAsync(payload)
     const validWhere = await restaurantSchema.validateAsync(where)
     return await prisma.restaurants.update({
-      data: validPayload,
+      data: {
+        ...validPayload,
+        coverImage: validPayload.coverImage || Prisma.DbNull,
+      },
       where: validWhere,
     })
   } catch (error) {
