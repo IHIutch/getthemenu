@@ -13,15 +13,14 @@ const handler = async (req, res) => {
           const data = await prisma.restaurants.findMany({
             where: {
               [column]: { startsWith: req.query[column] },
-              // NOT: {
-              //   customHost: 'xyz', // Analytics host (reserved)
-              // },
+              NOT: {
+                customHost: 'xyz', // Analytics host (reserved)
+              },
             },
             select: {
               [column]: true,
             },
           })
-          console.log(column, req.query[column])
           res.status(resStatusType.SUCCESS).json(data)
         } else {
           throw new Error(`Column ${column} is not allowed`)

@@ -41,7 +41,7 @@ export const prismaPutMenuItem = async (where, payload) => {
   try {
     const validPayload = await menuItemSchema.validateAsync(payload)
     const validWhere = await menuItemSchema.validateAsync(where)
-    return await prisma.menuItem.update({
+    return await prisma.menuItems.update({
       data: validPayload,
       where: validWhere,
     })
@@ -53,7 +53,7 @@ export const prismaPutMenuItem = async (where, payload) => {
 export const prismaDeleteMenuItem = async (where) => {
   try {
     const validWhere = await menuItemSchema.validateAsync(where)
-    return await prisma.menuItem.delete({
+    return await prisma.menuItems.delete({
       where: validWhere,
     })
   } catch (error) {

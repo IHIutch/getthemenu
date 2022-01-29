@@ -8,9 +8,9 @@ datasource db {
 }
 
 model menuItems {
-  id           BigInt      @id @default(autoincrement())
-  menuId       BigInt
-  sectionId    BigInt
+  id           Int         @id @default(autoincrement())
+  menuId       Int
+  sectionId    Int
   restaurantId String      @db.Uuid
   title        String?     @db.VarChar
   price        Decimal?    @db.Money
@@ -26,7 +26,7 @@ model menuItems {
 }
 
 model menus {
-  id           BigInt      @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   restaurantId String      @db.Uuid
   title        String?     @db.VarChar
   slug         String?     @db.VarChar
@@ -61,8 +61,8 @@ model restaurants {
 }
 
 model sections {
-  id           BigInt      @id @default(autoincrement())
-  menuId       BigInt
+  id           Int         @id @default(autoincrement())
+  menuId       Int
   restaurantId String      @db.Uuid
   title        String?     @db.VarChar
   position     Int?

@@ -5,14 +5,14 @@ export const getMenus = async (params = null) => {
   const { data } = await axios
     .get(`/api/menus?` + qs.stringify(params))
     .catch((res) => {
-      throw new Error(res.data.res.data.error)
+      throw new Error(res.data.error)
     })
   return data
 }
 
 export const getMenu = async (id) => {
   const { data } = await axios.get(`/api/menus/${id}`).catch((res) => {
-    throw new Error(res.data.res.data.error)
+    throw new Error(res.data.error)
   })
   return data
 }

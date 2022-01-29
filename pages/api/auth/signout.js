@@ -7,7 +7,7 @@ const handler = async (req, res) => {
 
   switch (method) {
     case 'POST':
-      return await supabase.auth.api.signOut(req, res)
+      return supabase.auth.api.setAuthCookie(req, res)
 
     default:
       res.setHeader('Allow', ['POST'])

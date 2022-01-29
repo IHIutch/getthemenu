@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -234,7 +234,9 @@ export default function MenuEdit() {
                                   handleDrawerOpen(
                                     <MenuItemDrawer
                                       sectionId={s.id}
-                                      position={groupedSectionItems.length}
+                                      position={
+                                        groupedSectionItems?.[s.id]?.length || 0
+                                      }
                                       handleDrawerClose={drawerState.onClose}
                                     />
                                   )
@@ -567,12 +569,11 @@ const MenuItemDrawer = ({
   const router = useRouter()
   const { menuId } = router.query
 
+  console.log({ position })
   const {
     register,
     handleSubmit,
-    // reset,
     control,
-    watch,
     formState: { dirtyFields },
   } = useForm({
     defaultValues: {
@@ -581,18 +582,16 @@ const MenuItemDrawer = ({
         menuItem?.price || menuItem?.price === 0
           ? parseFloat(menuItem.price).toFixed(2)
           : null,
-      image: menuItem?.image?.src || null,
+      image: menuItem?.image?.src || undefined,
     },
   })
-
-  console.log({ menuItem })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
+    isLoading: isUserLoading,
+    isError: isUserError,
   } = useAuthUser()
 
   const { mutate: handleUpdateMenuItem } = useUpdateMenuItem({
@@ -650,11 +649,6 @@ const MenuItemDrawer = ({
       alert(error)
     }
   }
-
-  const test = watch()
-  useEffect(() => {
-    console.log(test)
-  }, [test])
 
   return (
     <>

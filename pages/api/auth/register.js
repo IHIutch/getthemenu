@@ -1,5 +1,5 @@
 import { createStripeCustomer } from '@/controllers/stripe'
-import { apiPostRegisterUser } from '@/controllers/users'
+import { prismaPostUser } from '@/utils/prisma/users'
 import supabase from '@/utils/supabase'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
@@ -17,7 +17,7 @@ const handler = async (req, res) => {
           name: payload.fullName,
         })
 
-        await apiPostRegisterUser({
+        await prismaPostUser({
           id: session.user.id,
           stripeCustomerId: stripeCustomer.id,
           ...payload,

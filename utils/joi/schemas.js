@@ -6,16 +6,18 @@ export const menuItemSchema = Joi.object().keys({
   sectionId: Joi.number().integer().min(1),
   restaurantId: Joi.string(),
   title: Joi.string(),
-  price: Joi.number().min(0),
-  description: Joi.string(),
+  price: Joi.number().min(0).allow(null),
+  description: Joi.string().empty(''),
   position: Joi.number().integer().min(0),
-  image: Joi.object().keys({
-    src: Joi.string(),
-    blurDataURL: Joi.string(),
-  }),
+  image: Joi.object()
+    .keys({
+      src: Joi.string(),
+      blurDataURL: Joi.string(),
+    })
+    .allow(null),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
-  deletedAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
 })
 
 export const menuSchema = Joi.object().keys({
@@ -24,14 +26,14 @@ export const menuSchema = Joi.object().keys({
   title: Joi.string(),
   slug: Joi.string(),
   position: Joi.number().integer().min(0),
-  description: Joi.string(),
+  description: Joi.string().empty(''),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
-  deletedAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
 })
 
 export const restaurantSchema = Joi.object().keys({
-  id: Joi.number().integer().min(1),
+  id: Joi.string().guid(),
   userId: Joi.string().guid(),
   hours: Joi.object(),
   name: Joi.string(),
@@ -47,11 +49,11 @@ export const restaurantSchema = Joi.object().keys({
     src: Joi.string(),
     blurDataURL: Joi.string(),
   }),
-  customHost: Joi.string(),
-  customDomain: Joi.string(),
+  customHost: Joi.string().empty(''),
+  customDomain: Joi.string().empty(''),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
-  deletedAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
 })
 
 export const sectionSchema = Joi.object().keys({
@@ -60,10 +62,10 @@ export const sectionSchema = Joi.object().keys({
   restaurantId: Joi.string(),
   title: Joi.string(),
   position: Joi.number().integer().min(0),
-  description: Joi.string(),
+  description: Joi.string().empty(''),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
-  deletedAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
 })
 
 export const userSchema = Joi.object().keys({
@@ -73,5 +75,5 @@ export const userSchema = Joi.object().keys({
   stripeSubscriptionId: Joi.string(),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
-  deletedAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
 })
