@@ -104,7 +104,7 @@ export default function Register() {
                 <Grid gap="6">
                   <GridItem>
                     <FormControl id="fullName" isInvalid={errors.email}>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>Your Name</FormLabel>
                       <Input
                         {...register('fullName', {
                           required: 'This field is required',
@@ -119,7 +119,7 @@ export default function Register() {
                   </GridItem>
                   <GridItem>
                     <FormControl id="email" isInvalid={errors.email}>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Your Email</FormLabel>
                       <Input
                         {...register('email', {
                           required: 'This field is required',
