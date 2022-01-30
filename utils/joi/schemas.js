@@ -79,3 +79,13 @@ export const userSchema = Joi.object().keys({
   updatedAt: Joi.date(),
   deletedAt: Joi.date().allow(null),
 })
+
+export const feedbackSchema = Joi.object().keys({
+  id: Joi.number().integer().min(1),
+  type: Joi.string(),
+  comment: Joi.string(),
+  userId: Joi.string().guid(),
+  createdAt: Joi.date(),
+  updatedAt: Joi.date(),
+  deletedAt: Joi.date().allow(null),
+})

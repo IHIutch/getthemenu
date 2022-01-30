@@ -84,4 +84,16 @@ model users {
   updatedAt            DateTime      @default(now()) @updatedAt @db.Timestamptz()
   deletedAt            DateTime?     @db.Timestamptz()
   restaurants          restaurants[]
+  feedback             feedback[]
+}
+
+model feedback {
+  id        Int       @id @default(autoincrement())
+  type      String?   @db.VarChar
+  comment   String?
+  userId    String    @db.Uuid
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz()
+  deletedAt DateTime? @db.Timestamptz()
+  users     users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
