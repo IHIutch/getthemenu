@@ -1,4 +1,4 @@
-import { apiPutSections } from '@/controllers/sections'
+import { prismaPutSections } from '@/utils/prisma/sections'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -9,8 +9,7 @@ const handler = async (req, res) => {
     // Update
     case 'PUT':
       try {
-        const payload = req.body
-        const data = await apiPutSections(payload)
+        const data = await prismaPutSections(req.body)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })

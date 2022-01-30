@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { apiGetMenus } from '@/controllers/menus'
 import { postMenu } from '@/utils/axios/menus'
 import { formatDate, reorderList } from '@/utils/functions'
 import { useGetMenus, useReorderMenus } from '@/utils/react-query/menus'
@@ -81,7 +80,7 @@ export default function Dashboard() {
   const { data: menus } = useGetMenus(
     restaurant?.id ? { restaurantId: restaurant.id } : null
   )
-  const { mutate: reorderMenus } = useReorderMenus(
+  const { mutate: handleReorderMenus } = useReorderMenus(
     restaurant?.id
       ? {
           restaurantId: restaurant.id,
@@ -189,8 +188,11 @@ export default function Dashboard() {
       source.index,
       destination.index
     )
-    reorderMenus(
-      reorderedMenus.map((menu, idx) => ({ ...menu, position: idx }))
+    handleReorderMenus(
+      reorderedMenus.map((menu, idx) => ({
+        id: Number(menu.id),
+        position: idx,
+      }))
     )
   }
   const sortedMenus = useMemo(() => {
@@ -396,13 +398,3 @@ export default function Dashboard() {
 }
 
 Dashboard.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
-
-export async function getServerSideProps() {
-  const menus = await apiGetMenus()
-  return {
-    props: {
-      // restaurant,
-      menus,
-    },
-  }
-}

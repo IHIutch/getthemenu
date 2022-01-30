@@ -41,7 +41,7 @@ export const prismaPutMenu = async (where, payload) => {
   try {
     const validPayload = await menuSchema.validateAsync(payload)
     const validWhere = await menuSchema.validateAsync(where)
-    return await prisma.menu.update({
+    return await prisma.menus.update({
       data: validPayload,
       where: validWhere,
     })
@@ -50,10 +50,33 @@ export const prismaPutMenu = async (where, payload) => {
   }
 }
 
+export const prismaPutMenus = async (payload) => {
+  try {
+    const validPayload = await Promise.all(
+      payload.map(async (p) => await menuSchema.validateAsync(p))
+    )
+    return await prisma.$transaction(
+      validPayload.map((vp) =>
+        prisma.menus.update({
+          data: vp,
+          where: {
+            id: vp.id,
+          },
+          select: {
+            position: true,
+          },
+        })
+      )
+    )
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
 export const prismaDeleteMenu = async (where) => {
   try {
     const validWhere = await menuSchema.validateAsync(where)
-    return await prisma.menu.delete({
+    return await prisma.menus.delete({
       where: validWhere,
     })
   } catch (error) {

@@ -71,8 +71,10 @@ export default function MenuEdit() {
   const { data: menu } = useGetMenu(menuId)
   const { data: menuItems } = useGetMenuItems({ menuId })
   const { data: sections } = useGetSections({ menuId })
-  const { mutate: reorderMenuItems } = useReorderMenuItems({ menuId })
-  const { mutate: reorderSections } = useReorderSections({ menuId })
+  const { mutate: handleReorderMenuItems } = useReorderMenuItems({
+    menuId,
+  })
+  const { mutate: handleReorderSections } = useReorderSections({ menuId })
 
   const move = (sourceList = [], destinationList = [], source, destination) => {
     const [removed] = sourceList.splice(source.index, 1)
@@ -109,8 +111,11 @@ export default function MenuEdit() {
         source.index,
         destination.index
       )
-      reorderSections(
-        reorderedSections.map((s, idx) => ({ ...s, position: idx }))
+      handleReorderSections(
+        reorderedSections.map((s, idx) => ({
+          id: Number(s.id),
+          position: idx,
+        }))
       )
     } else if (type === 'ITEMS') {
       if (source.droppableId === destination.droppableId) {
@@ -119,8 +124,11 @@ export default function MenuEdit() {
           source.index,
           destination.index
         )
-        reorderMenuItems(
-          reorderedItems.map((i, idx) => ({ ...i, position: idx }))
+        handleReorderMenuItems(
+          reorderedItems.map((i, idx) => ({
+            id: Number(i.id),
+            position: idx,
+          }))
         )
       } else {
         const movedItems = move(
@@ -130,15 +138,19 @@ export default function MenuEdit() {
           destination
         )
 
-        const newSource = movedItems[source.droppableId]
+        const newSource = movedItems[source.droppableId].map((i, idx) => ({
+          id: Number(i.id),
+          position: idx,
+          sectionId: Number(source.droppableId),
+        }))
         const newDestination = movedItems[destination.droppableId].map(
           (i, idx) => ({
-            ...i,
+            id: Number(i.id),
             position: idx,
-            sectionId: parseInt(destination.droppableId),
+            sectionId: Number(destination.droppableId),
           })
         )
-        reorderMenuItems([...newSource, ...newDestination])
+        handleReorderMenuItems([...newSource, ...newDestination])
       }
     }
   }

@@ -153,7 +153,10 @@ export const useReorderSections = (params) => {
         const previous = queryClient.getQueryData(['sections', params])
         queryClient.setQueryData(['sections', params], (old) => {
           return old.map((o) => {
-            return payload.find((p) => p.id === o.id) || o
+            return {
+              ...o,
+              ...(payload.find((p) => p.id === o.id) || {}),
+            }
           })
         })
         return { previous, payload }

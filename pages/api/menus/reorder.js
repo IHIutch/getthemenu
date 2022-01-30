@@ -1,4 +1,4 @@
-import { apiPutMenus } from '@/controllers/menus'
+import { prismaPutMenus } from '@/utils/prisma/menus'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
 
@@ -9,8 +9,7 @@ const handler = async (req, res) => {
     // Update
     case 'PUT':
       try {
-        const payload = req.body
-        const data = await apiPutMenus(payload)
+        const data = await prismaPutMenus(req.body)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })

@@ -50,6 +50,29 @@ export const prismaPutSection = async (where, payload) => {
   }
 }
 
+export const prismaPutSections = async (payload) => {
+  try {
+    const validPayload = await Promise.all(
+      payload.map(async (p) => await sectionSchema.validateAsync(p))
+    )
+    return await prisma.$transaction(
+      validPayload.map((vp) =>
+        prisma.sections.update({
+          data: vp,
+          where: {
+            id: vp.id,
+          },
+          select: {
+            position: true,
+          },
+        })
+      )
+    )
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
 export const prismaDeleteSection = async (where) => {
   try {
     const validWhere = await sectionSchema.validateAsync(where)

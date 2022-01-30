@@ -101,7 +101,10 @@ export const useReorderMenus = (params) => {
         const previous = queryClient.getQueryData(['menus', params])
         queryClient.setQueryData(['menus', params], (old) => {
           return old.map((o) => {
-            return payload.find((p) => p.id === o.id) || o
+            return {
+              ...o,
+              ...(payload.find((p) => p.id === o.id) || {}),
+            }
           })
         })
         return { previous, payload }
