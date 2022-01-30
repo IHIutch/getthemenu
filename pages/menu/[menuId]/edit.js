@@ -849,7 +849,7 @@ const MenuItemDeleteDialog = ({
 
       <AlertDialogBody>
         <Text mb="4">Are you sure you want to delete this item?</Text>
-        <Text>This action cannot be undone.</Text>
+        <Text>This action is permanent and cannot be undone.</Text>
       </AlertDialogBody>
 
       <AlertDialogFooter>
@@ -888,7 +888,7 @@ const SectionDeleteDialog = ({
           </Text>
           .
         </Text>
-        <Text>This action cannot be undone.</Text>
+        <Text>This action is permanent and cannot be undone.</Text>
       </AlertDialogBody>
 
       <AlertDialogFooter>
