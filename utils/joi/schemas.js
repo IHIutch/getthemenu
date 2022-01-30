@@ -7,7 +7,7 @@ export const menuItemSchema = Joi.object().keys({
   restaurantId: Joi.string(),
   title: Joi.string(),
   price: Joi.number().min(0).allow(null),
-  description: Joi.string().empty(''),
+  description: Joi.string().empty('').allow(null),
   position: Joi.number().integer().min(0),
   image: Joi.object()
     .keys({
@@ -26,7 +26,7 @@ export const menuSchema = Joi.object().keys({
   title: Joi.string(),
   slug: Joi.string(),
   position: Joi.number().integer().min(0),
-  description: Joi.string().empty(''),
+  description: Joi.string().empty('').allow(null),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
   deletedAt: Joi.date().allow(null),
@@ -64,7 +64,7 @@ export const sectionSchema = Joi.object().keys({
   restaurantId: Joi.string(),
   title: Joi.string(),
   position: Joi.number().integer().min(0),
-  description: Joi.string().empty(''),
+  description: Joi.string().empty('').allow(null),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
   deletedAt: Joi.date().allow(null),
