@@ -1,29 +1,49 @@
 import Head from 'next/head'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Box, Container, Flex, Grid, GridItem, Text } from '@chakra-ui/layout'
-import {
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
-} from '@chakra-ui/form-control'
-import { Input } from '@chakra-ui/input'
 import { useForm, useFormState } from 'react-hook-form'
 import { useGetMenu, useUpdateMenu } from '@/utils/react-query/menus'
 import slugify from 'slugify'
 import { debounce } from 'lodash'
-import { Alert, AlertIcon } from '@chakra-ui/alert'
-import { Spinner } from '@chakra-ui/spinner'
-import { Button, ButtonGroup } from '@chakra-ui/button'
 import axios from 'redaxios'
 import MenuLayout from '@/layouts/Menu'
 import { useRouter } from 'next/router'
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  GridItem,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  Spinner,
+  Text,
+} from '@chakra-ui/react'
+import { useAuthUser } from '@/utils/react-query/user'
+import { useGetRestaurant } from '@/utils/react-query/restaurants'
 
 export default function MenuOverview() {
   const {
     query: { menuId },
   } = useRouter()
 
+  const {
+    data: user,
+    // isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
+  const { data: restaurant } = useGetRestaurant(
+    user?.restaurants?.length ? user.restaurants[0].id : null
+  )
   const [isCheckingSlug, setIsCheckingSlug] = useState(false)
   const [slugMessage, setSlugMessage] = useState(null)
 
@@ -99,7 +119,10 @@ export default function MenuOverview() {
               message: `'${slug}' is already used.`,
             })
           } else {
-            setSlugMessage(null)
+            setSlugMessage({
+              type: 'success',
+              message: `'${slug}' is available.`,
+            })
           }
         }
         setIsCheckingSlug(false)
@@ -170,13 +193,22 @@ export default function MenuOverview() {
                 <GridItem>
                   <FormControl id="slug">
                     <FormLabel>Menu Slug</FormLabel>
-                    <Input
-                      {...register('slug', {
-                        required: 'This field is required',
-                      })}
-                      type="text"
-                      autoComplete="off"
-                    />
+                    <InputGroup>
+                      {(restaurant?.customHost || restaurant?.customDomain) && (
+                        <InputLeftAddon>
+                          {restaurant?.customHost
+                            ? `${restaurant.customHost}.getthemenu.io/`
+                            : `${restaurant.customDomain}/`}
+                        </InputLeftAddon>
+                      )}
+                      <Input
+                        {...register('slug', {
+                          required: 'This field is required',
+                        })}
+                        type="text"
+                        autoComplete="off"
+                      />
+                    </InputGroup>
                     <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
                     {isCheckingSlug && (
                       <Alert status="info" mt="2">

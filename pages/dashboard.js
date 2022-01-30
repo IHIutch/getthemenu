@@ -37,6 +37,8 @@ import {
   FormHelperText,
   AlertIcon,
   Icon,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
@@ -130,7 +132,10 @@ export default function Dashboard() {
               message: `'${slug}' is already used.`,
             })
           } else {
-            setSlugMessage(null)
+            setSlugMessage({
+              type: 'success',
+              message: `'${slug}' is available.`,
+            })
           }
         }
         setIsCheckingSlug(false)
@@ -350,12 +355,22 @@ export default function Dashboard() {
                 <GridItem>
                   <FormControl id="slug" isInvalid={errors.title}>
                     <FormLabel>Menu Slug</FormLabel>
-                    <Input
-                      {...register('slug', {
-                        required: 'This field is required',
-                      })}
-                      type="text"
-                    />
+                    <InputGroup>
+                      {(restaurant?.customHost || restaurant?.customDomain) && (
+                        <InputLeftAddon>
+                          {restaurant?.customHost
+                            ? `${restaurant.customHost}.getthemenu.io/`
+                            : `${restaurant.customDomain}/`}
+                        </InputLeftAddon>
+                      )}
+                      <Input
+                        {...register('slug', {
+                          required: 'This field is required',
+                        })}
+                        type="text"
+                        autoComplete="off"
+                      />
+                    </InputGroup>
                     <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
                     {isCheckingSlug && (
                       <Alert status="info" mt="2">
