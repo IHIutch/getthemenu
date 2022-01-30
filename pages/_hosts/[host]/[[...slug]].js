@@ -244,7 +244,9 @@ export async function getServerSideProps({ params: { host }, query }) {
     }
   }
 
-  const menu = activeMenu?.id ? await prismaGetMenu(activeMenu.id) : null
+  const menu = activeMenu?.id
+    ? await prismaGetMenu({ id: activeMenu.id })
+    : null
   const sections = activeMenu?.id
     ? await prismaGetSections({ menuId: activeMenu.id })
     : null
@@ -252,35 +254,69 @@ export async function getServerSideProps({ params: { host }, query }) {
     ? await prismaGetMenuItems({ menuId: activeMenu.id })
     : null
 
-  await queryClient.prefetchQuery(
-    ['restaurants', restaurantQuery],
-    async () => restaurants
+  await queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
+    restaurants
+      ? restaurants.map((i) => ({
+          ...i,
+          createdAt: i.createdAt.toISOString(),
+          updatedAt: i.updatedAt.toISOString(),
+        }))
+      : null
   )
 
-  await queryClient.prefetchQuery(
-    ['menus', menusQuery],
-    async () => menus || null
+  await queryClient.prefetchQuery(['menus', menusQuery], async () =>
+    menus
+      ? menus.map((i) => ({
+          ...i,
+          createdAt: i.createdAt.toISOString(),
+          updatedAt: i.updatedAt.toISOString(),
+        }))
+      : null
   )
 
-  await queryClient.prefetchQuery(
-    ['menus', activeMenu?.id || null],
-    async () => menu || null
+  await queryClient.prefetchQuery(['menus', activeMenu?.id || null], async () =>
+    menu
+      ? {
+          ...menu,
+          createdAt: menu.createdAt.toISOString(),
+          updatedAt: menu.updatedAt.toISOString(),
+        }
+      : null
   )
 
   await queryClient.prefetchQuery(
     ['sections', { menuId: activeMenu?.id || null }],
-    async () => sections || null
+    async () =>
+      sections
+        ? sections.map((i) => ({
+            ...i,
+            createdAt: i.createdAt.toISOString(),
+            updatedAt: i.updatedAt.toISOString(),
+          }))
+        : null
   )
   await queryClient.prefetchQuery(
     ['menuItems', { menuId: activeMenu?.id || null }],
-    async () => menuItems || null
+    async () =>
+      menuItems
+        ? menuItems.map((i) => ({
+            ...i,
+            createdAt: i.createdAt.toISOString(),
+            updatedAt: i.updatedAt.toISOString(),
+            price: i.price ? i.price.toString() : '',
+          }))
+        : null
   )
 
   return {
     props: {
       host,
       slug,
-      restaurant: restaurants[0],
+      restaurant: {
+        ...restaurants[0],
+        createdAt: restaurants[0].createdAt.toISOString(),
+        updatedAt: restaurants[0].updatedAt.toISOString(),
+      },
       dehydratedState: dehydrate(queryClient),
     },
   }
