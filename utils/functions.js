@@ -1,6 +1,6 @@
 import { encode } from 'blurhash'
 import dayjs from 'dayjs'
-import supabase from './supabase'
+import supabase from '@/utils/supabase'
 
 export const handleStructuredData = ({ restaurant, menus }) => {
   return {

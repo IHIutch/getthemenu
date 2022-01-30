@@ -1,4 +1,4 @@
-import prisma from '.'
+import prisma from '@/utils/prisma'
 import { userSchema } from '../joi/schemas'
 
 export const prismaGetUsers = async (where) => {

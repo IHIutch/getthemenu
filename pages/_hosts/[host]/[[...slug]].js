@@ -1,8 +1,4 @@
 import React, { useMemo } from 'react'
-import { apiGetMenuItems } from '@/controllers/menuItems'
-import { apiGetMenu, apiGetMenus } from '@/controllers/menus'
-import { apiGetRestaurants } from '@/controllers/restaurants'
-import { apiGetSections } from '@/controllers/sections'
 import Head from 'next/head'
 import PublicLayout from '@/layouts/Public'
 import BlurUpImage from '@/components/common/BlurUpImage'
@@ -13,6 +9,10 @@ import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import SEO from '@/components/global/SEO'
+import { prismaGetMenu, prismaGetMenus } from '@/utils/prisma/menus'
+import { prismaGetSections } from '@/utils/prisma/sections'
+import { prismaGetMenuItems } from '@/utils/prisma/menuItems'
+import { prismaGetRestaurants } from '@/utils/prisma/restaurants'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const { query } = useRouter()
@@ -225,7 +225,7 @@ export async function getServerSideProps({ params: { host }, query }) {
   const slug = query?.slug?.[0] || null
 
   const restaurantQuery = { customHost: host }
-  const restaurants = await apiGetRestaurants(restaurantQuery)
+  const restaurants = await prismaGetRestaurants(restaurantQuery)
 
   if (!restaurants[0]) {
     return {
@@ -234,7 +234,7 @@ export async function getServerSideProps({ params: { host }, query }) {
   }
 
   const menusQuery = { restaurantId: restaurants[0].id }
-  const menus = await apiGetMenus(menusQuery)
+  const menus = await prismaGetMenus(menusQuery)
 
   const activeMenu = slug ? menus.find((menu) => menu.slug === slug) : menus[0]
 
@@ -244,12 +244,12 @@ export async function getServerSideProps({ params: { host }, query }) {
     }
   }
 
-  const menu = activeMenu?.id ? await apiGetMenu(activeMenu.id) : null
+  const menu = activeMenu?.id ? await prismaGetMenu(activeMenu.id) : null
   const sections = activeMenu?.id
-    ? await apiGetSections({ menuId: activeMenu.id })
+    ? await prismaGetSections({ menuId: activeMenu.id })
     : null
   const menuItems = activeMenu?.id
-    ? await apiGetMenuItems({ menuId: activeMenu.id })
+    ? await prismaGetMenuItems({ menuId: activeMenu.id })
     : null
 
   await queryClient.prefetchQuery(
