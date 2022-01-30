@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import {
+  deleteMenuItem,
   getMenuItem,
   getMenuItems,
   postMenuItem,
@@ -110,7 +111,7 @@ export const useUpdateMenuItem = (params) => {
             return o
           })
         })
-        return { previous, payload }
+        return { previous, updated: payload }
       },
       // If the mutation fails, use the context we returned above
       onError: (err, updated, context) => {
@@ -159,7 +160,7 @@ export const useReorderMenuItems = (params) => {
             }
           })
         })
-        return { previous, payload }
+        return { previous, updated: payload }
       },
       // If the mutation fails, use the context we returned above
       onError: (err, updated, context) => {
@@ -171,6 +172,45 @@ export const useReorderMenuItems = (params) => {
       },
     }
   )
+  return {
+    mutate,
+    data,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  }
+}
+
+export const useDeleteMenuItem = (params) => {
+  const queryClient = useQueryClient()
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(deleteMenuItem, {
+    // When mutate is called:
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(['menuItems', params])
+      const previous = queryClient.getQueryData(['menuItems', params])
+      queryClient.setQueryData(['menuItems', params], (old) => {
+        return old.filter((o) => o.id !== id)
+      })
+      return { previous, updated: id }
+    },
+    // If the mutation fails, use the context we returned above
+    onError: (err, updated, context) => {
+      queryClient.setQueryData(['menuItems', params], context.previous)
+    },
+    // Always refetch after error or success:
+    onSettled: (updated) => {
+      queryClient.invalidateQueries(['menuItems', params])
+    },
+  })
   return {
     mutate,
     data,

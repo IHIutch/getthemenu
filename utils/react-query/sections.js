@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import {
+  deleteSection,
   getSection,
   getSections,
   postSection,
@@ -110,7 +111,7 @@ export const useUpdateSection = (params) => {
             return o
           })
         })
-        return { previous, payload }
+        return { previous, updated: payload }
       },
       // If the mutation fails, use the context we returned above
       onError: (err, updated, context) => {
@@ -159,7 +160,7 @@ export const useReorderSections = (params) => {
             }
           })
         })
-        return { previous, payload }
+        return { previous, updated: payload }
       },
       // If the mutation fails, use the context we returned above
       onError: (err, updated, context) => {
@@ -171,6 +172,45 @@ export const useReorderSections = (params) => {
       },
     }
   )
+  return {
+    mutate,
+    data,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  }
+}
+
+export const useDeleteSection = (params) => {
+  const queryClient = useQueryClient()
+  const {
+    mutateAsync: mutate,
+    isLoading,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(deleteSection, {
+    // When mutate is called:
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(['sections', params])
+      const previous = queryClient.getQueryData(['sections', params])
+      queryClient.setQueryData(['sections', params], (old) => {
+        return old.filter((o) => o.id !== id)
+      })
+      return { previous, updated: id }
+    },
+    // If the mutation fails, use the context we returned above
+    onError: (err, updated, context) => {
+      queryClient.setQueryData(['sections', params], context.previous)
+    },
+    // Always refetch after error or success:
+    onSettled: (updated) => {
+      queryClient.invalidateQueries(['sections', params])
+    },
+  })
   return {
     mutate,
     data,

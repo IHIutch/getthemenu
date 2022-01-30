@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import {
   Box,
   Button,
@@ -31,12 +31,19 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { MoreVertical, Trash2, Camera, GripHorizontal } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   useCreateMenuItem,
+  useDeleteMenuItem,
   useGetMenuItems,
   useReorderMenuItems,
   useUpdateMenuItem,
@@ -46,6 +53,7 @@ import { useAuthUser } from '@/utils/react-query/user'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import {
   useCreateSection,
+  useDeleteSection,
   useGetSections,
   useReorderSections,
   useUpdateSection,
@@ -459,6 +467,10 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
 const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
   const router = useRouter()
   const { menuId } = router.query
+
+  const dialogState = useDisclosure()
+  const leastDestructiveRef = useRef()
+
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
@@ -478,6 +490,20 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
   const { mutate: handleCreateSection } = useCreateSection({
     menuId,
   })
+
+  const { mutate: handleDeleteSection, isLoading: isDeleting } =
+    useDeleteSection({
+      menuId,
+    })
+
+  const onDelete = () => {
+    handleDeleteSection(section.id, {
+      onSuccess: () => {
+        dialogState.onClose()
+        handleDrawerClose()
+      },
+    })
+  }
 
   const onSubmit = async (form) => {
     try {
@@ -544,6 +570,7 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
                 colorScheme="red"
                 variant="link"
                 leftIcon={<Icon as={Trash2} />}
+                onClick={dialogState.onOpen}
               >
                 Delete Section
               </Button>
@@ -568,6 +595,24 @@ const SectionDrawer = ({ position, section = null, handleDrawerClose }) => {
           </Button>
         </ButtonGroup>
       </DrawerFooter>
+
+      <AlertDialog
+        isOpen={dialogState.isOpen}
+        onClose={dialogState.onClose}
+        leastDestructiveRef={leastDestructiveRef}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <SectionDeleteDialog
+              leastDestructiveRef={leastDestructiveRef}
+              onClose={dialogState.onClose}
+              onDelete={onDelete}
+              isDeleting={isDeleting}
+              section={section}
+            />
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   )
 }
@@ -581,7 +626,9 @@ const MenuItemDrawer = ({
   const router = useRouter()
   const { menuId } = router.query
 
-  console.log({ position })
+  const dialogState = useDisclosure()
+  const leastDestructiveRef = useRef()
+
   const {
     register,
     handleSubmit,
@@ -613,6 +660,20 @@ const MenuItemDrawer = ({
   const { mutate: handleCreateMenuItem } = useCreateMenuItem({
     menuId,
   })
+
+  const { mutate: handleDeleteMenuItem, isLoading: isDeleting } =
+    useDeleteMenuItem({
+      menuId,
+    })
+
+  const onDelete = () => {
+    handleDeleteMenuItem(menuItem.id, {
+      onSuccess: () => {
+        dialogState.onClose()
+        handleDrawerClose()
+      },
+    })
+  }
 
   const onSubmit = async (form) => {
     try {
@@ -727,6 +788,7 @@ const MenuItemDrawer = ({
                 colorScheme="red"
                 variant="link"
                 leftIcon={<Icon as={Trash2} />}
+                onClick={dialogState.onOpen}
               >
                 Delete Item
               </Button>
@@ -751,6 +813,94 @@ const MenuItemDrawer = ({
           </Button>
         </ButtonGroup>
       </DrawerFooter>
+
+      <AlertDialog
+        isOpen={dialogState.isOpen}
+        onClose={dialogState.onClose}
+        leastDestructiveRef={leastDestructiveRef}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <MenuItemDeleteDialog
+              onClose={dialogState.onClose}
+              leastDestructiveRef={leastDestructiveRef}
+              onDelete={onDelete}
+              isDeleting={isDeleting}
+            />
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </>
+  )
+}
+
+const MenuItemDeleteDialog = ({
+  leastDestructiveRef,
+  onClose,
+  onDelete,
+  isDeleting,
+  menuItem,
+}) => {
+  return (
+    <>
+      <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        Delete Item
+      </AlertDialogHeader>
+
+      <AlertDialogBody>
+        <Text mb="4">Are you sure you want to delete this item?</Text>
+        <Text>This action cannot be undone.</Text>
+      </AlertDialogBody>
+
+      <AlertDialogFooter>
+        <ButtonGroup>
+          <Button ref={leastDestructiveRef} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button colorScheme="red" onClick={onDelete} isLoading={isDeleting}>
+            Delete
+          </Button>
+        </ButtonGroup>
+      </AlertDialogFooter>
+    </>
+  )
+}
+
+const SectionDeleteDialog = ({
+  leastDestructiveRef,
+  onClose,
+  onDelete,
+  isDeleting,
+  section,
+}) => {
+  return (
+    <>
+      <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        Delete Section & Items
+      </AlertDialogHeader>
+
+      <AlertDialogBody>
+        <Text mb="4">
+          Are you sure you want to delete this section? Deleting a section also
+          deletes{' '}
+          <Text as="em" fontWeight="semibold">
+            all the items it contains
+          </Text>
+          .
+        </Text>
+        <Text>This action cannot be undone.</Text>
+      </AlertDialogBody>
+
+      <AlertDialogFooter>
+        <ButtonGroup>
+          <Button ref={leastDestructiveRef} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button colorScheme="red" onClick={onDelete} isLoading={isDeleting}>
+            Delete
+          </Button>
+        </ButtonGroup>
+      </AlertDialogFooter>
     </>
   )
 }

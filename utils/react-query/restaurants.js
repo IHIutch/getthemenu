@@ -62,7 +62,7 @@ export const useUpdateRestaurant = (params) => {
           ...old,
           ...payload,
         }))
-        return { previous, payload }
+        return { previous, updated: payload }
       },
       // If the mutation fails, use the context we returned above
       onError: (err, updated, context) => {
