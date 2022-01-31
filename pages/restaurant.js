@@ -18,6 +18,7 @@ import {
   Container,
   AspectRatio,
   Stack,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import {
@@ -95,7 +96,7 @@ const Details = () => {
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm({
     defaultValues,
   })
@@ -112,11 +113,10 @@ const Details = () => {
     try {
       setIsSubmitting(true)
       const payload = {
-        ...form,
         name: form?.name || '',
         customHost: form?.customHost || '',
       }
-      if (form?.coverImage) {
+      if (form?.coverImage && dirtyFields?.coverImage) {
         const formData = new FormData()
         formData.append('file', form.coverImage, form.coverImage.name)
 
@@ -147,7 +147,7 @@ const Details = () => {
         <Box p="6">
           <Grid w="100%" gap="4">
             <GridItem>
-              <FormControl mb="4">
+              <FormControl isInvalid={errors.name}>
                 <FormLabel>Name</FormLabel>
                 <Input
                   {...register('name', {
@@ -158,8 +158,8 @@ const Details = () => {
               </FormControl>
             </GridItem>
             <GridItem>
-              <FormControl>
-                <FormLabel>Unique Slug</FormLabel>
+              <FormControl isInvalid={errors.customHost}>
+                <FormLabel>Unique URL</FormLabel>
                 <InputGroup>
                   <Input
                     {...register('customHost', {
@@ -170,10 +170,13 @@ const Details = () => {
                   />
                   <InputRightAddon>.getthemenu.io</InputRightAddon>
                 </InputGroup>
+                <FormErrorMessage>
+                  {errors.customHost?.message}
+                </FormErrorMessage>
               </FormControl>
             </GridItem>
             <GridItem>
-              <FormControl id="coverImage">
+              <FormControl id="coverImage" isInvalid={errors.coverImage}>
                 <FormLabel>Cover Image</FormLabel>
                 <AspectRatio ratio={16 / 9} d="block">
                   <Controller
@@ -184,13 +187,23 @@ const Details = () => {
                     }}
                   />
                 </AspectRatio>
+                <FormErrorMessage>
+                  {errors.coverImage?.message}
+                </FormErrorMessage>
               </FormControl>
             </GridItem>
           </Grid>
         </Box>
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
-            {/* <Button>Reset</Button> */}
+            <Button
+              onClick={() => {
+                reset(defaultValues)
+              }}
+              isDisabled={!isDirty}
+            >
+              Reset
+            </Button>
             <Button
               colorScheme="blue"
               type="submit"
@@ -283,34 +296,47 @@ const Address = () => {
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
             <GridItem colSpan={{ sm: '12' }}>
-              <FormControl>
+              <FormControl isInvalid={errors.streetAddress}>
                 <FormLabel>Street Address</FormLabel>
                 <Input {...register('streetAddress')} type="text" />
+                <FormErrorMessage>
+                  {errors.streetAddress?.message}
+                </FormErrorMessage>
               </FormControl>
             </GridItem>
             <GridItem colSpan={{ sm: '12', md: '6' }}>
-              <FormControl>
+              <FormControl isInvalid={errors.city}>
                 <FormLabel>City</FormLabel>
                 <Input {...register('city')} type="text" />
+                <FormErrorMessage>{errors.city?.message}</FormErrorMessage>
               </FormControl>
             </GridItem>
             <GridItem colSpan={{ sm: '6', md: '3' }}>
-              <FormControl>
+              <FormControl isInvalid={errors.state}>
                 <FormLabel>State</FormLabel>
                 <Input {...register('state')} type="text" />
+                <FormErrorMessage>{errors.state?.message}</FormErrorMessage>
               </FormControl>
             </GridItem>
             <GridItem colSpan={{ sm: '6', md: '3' }}>
-              <FormControl>
+              <FormControl isInvalid={errors.zip}>
                 <FormLabel>Postal Code</FormLabel>
                 <Input {...register('zip')} type="text" />
+                <FormErrorMessage>{errors.zip?.message}</FormErrorMessage>
               </FormControl>
             </GridItem>
           </Grid>
         </Box>
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
-            {/* <Button>Reset</Button> */}
+            <Button
+              onClick={() => {
+                reset(defaultValues)
+              }}
+              isDisabled={!isDirty}
+            >
+              Reset
+            </Button>
             <Button
               colorScheme="blue"
               type="submit"
@@ -398,22 +424,31 @@ const Contact = () => {
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
             <GridItem colSpan={{ sm: '6' }}>
-              <FormControl>
+              <FormControl isInvalid={errors.phone}>
                 <FormLabel>Phone Number</FormLabel>
                 <Input {...register('phone')} type="text" />
+                <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
               </FormControl>
             </GridItem>
             <GridItem colSpan={{ sm: '6' }}>
-              <FormControl>
+              <FormControl isInvalid={errors.email}>
                 <FormLabel>Email</FormLabel>
                 <Input {...register('email')} type="email" />
+                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
               </FormControl>
             </GridItem>
           </Grid>
         </Box>
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
-            {/* <Button>Reset</Button> */}
+            <Button
+              onClick={() => {
+                reset(defaultValues)
+              }}
+              isDisabled={!isDirty}
+            >
+              Reset
+            </Button>
             <Button
               colorScheme="blue"
               type="submit"
@@ -560,10 +595,7 @@ const Hours = () => {
                   h={{ lg: '10' }}
                 >
                   <FormControl d="flex" alignItems="center">
-                    <Switch
-                      {...register(`standardHours.${idx}.isOpen`)}
-                      // defaultValue={field.isOpen}
-                    />
+                    <Switch {...register(`standardHours.${idx}.isOpen`)} />
                     <FormLabel ml="2" mb="0">
                       {watchField(idx) ? 'Open' : 'Closed'}
                     </FormLabel>
@@ -576,7 +608,6 @@ const Hours = () => {
                         <FormLabel hidden>{field.label} Open Time</FormLabel>
                         <Input
                           {...register(`standardHours.${idx}.openTime`)}
-                          // defaultValue={field.openTime}
                           isRequired
                           type="time"
                           // TODO: Add support for browsers that don't support time inputs
@@ -602,7 +633,14 @@ const Hours = () => {
         </Box>
         <Flex px="6" py="3" borderTopWidth="1px">
           <ButtonGroup ml="auto">
-            {/* <Button>Reset</Button> */}
+            <Button
+              onClick={() => {
+                reset(defaultValues)
+              }}
+              isDisabled={!isDirty}
+            >
+              Reset
+            </Button>
             <Button
               colorScheme="blue"
               type="submit"

@@ -679,7 +679,6 @@ const MenuItemDrawer = ({
     try {
       setIsSubmitting(true)
       const payload = {
-        ...form,
         title: form?.title || '',
         description: form?.description || '',
         price: form?.price || null,
