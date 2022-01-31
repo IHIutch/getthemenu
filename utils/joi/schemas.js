@@ -43,8 +43,8 @@ export const restaurantSchema = Joi.object().keys({
     state: Joi.string().empty(''),
     zip: Joi.string().empty(''),
   }),
-  email: Joi.array().items(Joi.string()),
-  phone: Joi.array().items(Joi.string()),
+  email: Joi.array().items(Joi.string().empty('')),
+  phone: Joi.array().items(Joi.string().empty('')),
   coverImage: Joi.object()
     .keys({
       src: Joi.string(),
