@@ -16,7 +16,7 @@ export default function ImageDropzone({ onChange, value = '' }) {
   const onDrop = useCallback(
     (acceptedFiles) => {
       const objectUrl = URL.createObjectURL(acceptedFiles[0])
-      onChange(objectUrl)
+      onChange(acceptedFiles[0])
       setPreview(objectUrl)
     },
     [onChange]
