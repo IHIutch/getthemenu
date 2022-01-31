@@ -118,9 +118,6 @@ export default function PublicLayout({
                             <Icon as={Clock} />
                             {restaurant?.hours?.[weekdayName]?.isOpen ? (
                               <Text>
-                                <Text as="span" fontWeight="semibold">
-                                  Hours:{' '}
-                                </Text>
                                 {restaurant.hours?.[weekdayName]?.openTime &&
                                   formatTime(
                                     restaurant.hours?.[weekdayName]?.openTime
