@@ -397,7 +397,7 @@ export default function PublicLayout({
               <TabPanels>
                 <TabPanel px="0">
                   <Stack spacing="4">
-                    {restaurant?.phone && (
+                    {restaurant?.phone.length > 0 && (
                       <Box>
                         <Text fontWeight="semibold">Phone</Text>
                         <Stack as="ul" spacing="1">
@@ -423,7 +423,7 @@ export default function PublicLayout({
                       </Box>
                     )}
 
-                    {restaurant?.email && (
+                    {restaurant?.email.length > 0 && (
                       <Box>
                         <Text fontWeight="semibold">Email</Text>
                         <Stack as="ul" spacing="1">
