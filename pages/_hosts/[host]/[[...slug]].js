@@ -132,89 +132,91 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
         menus={menus}
         initialSlug={initialSlug}
       >
-        <Stack>
-          <Box>
-            <Heading as="h2" fontSize="3xl" mb="4">
-              {menu?.title}
-            </Heading>
-          </Box>
-          <Box>
-            {sections && (
-              <Stack spacing="16">
-                {sections
-                  .filter((section) => section.menuId === menu.id)
-                  .map((section) => (
-                    <Box key={section.id}>
-                      <Heading as="h3" fontSize="2xl" mb="4">
-                        {section.title}
-                      </Heading>
-                      {menuItems && (
-                        <Stack spacing="4">
-                          {menuItems
-                            .filter((item) => item.sectionId === section.id)
-                            .map((item) => (
-                              <Box
-                                key={item.id}
-                                borderWidth="1px"
-                                rounded="md"
-                                overflow="hidden"
-                                bg="white"
-                                shadow="sm"
-                              >
-                                {item?.image && (
-                                  <AspectRatio
-                                    ratio={16 / 9}
-                                    mb="2"
-                                    borderBottomWidth="1px"
-                                  >
-                                    <BlurUpImage
-                                      alt={item?.title || 'Menu item'}
-                                      src={item?.image?.src}
-                                      blurDataURL={item?.image?.blurDataURL}
-                                    />
-                                  </AspectRatio>
-                                )}
-                                <Box p="4">
-                                  <Flex>
-                                    <Heading
-                                      as="h4"
-                                      fontSize="lg"
-                                      flexGrow="1"
-                                      fontWeight="semibold"
+        {menu && (
+          <Stack>
+            <Box>
+              <Heading as="h2" fontSize="3xl" mb="4">
+                {menu?.title}
+              </Heading>
+            </Box>
+            <Box>
+              {sections && (
+                <Stack spacing="16">
+                  {sections
+                    .filter((section) => section.menuId === menu.id)
+                    .map((section) => (
+                      <Box key={section.id}>
+                        <Heading as="h3" fontSize="2xl" mb="4">
+                          {section.title}
+                        </Heading>
+                        {menuItems && (
+                          <Stack spacing="4">
+                            {menuItems
+                              .filter((item) => item.sectionId === section.id)
+                              .map((item) => (
+                                <Box
+                                  key={item.id}
+                                  borderWidth="1px"
+                                  rounded="md"
+                                  overflow="hidden"
+                                  bg="white"
+                                  shadow="sm"
+                                >
+                                  {item?.image && (
+                                    <AspectRatio
+                                      ratio={16 / 9}
+                                      mb="2"
+                                      borderBottomWidth="1px"
                                     >
-                                      {item.title}
-                                    </Heading>
-                                    {(item?.price || item.price === 0) && (
-                                      <Text
-                                        color="gray.800"
-                                        fontWeight="medium"
+                                      <BlurUpImage
+                                        alt={item?.title || 'Menu item'}
+                                        src={item?.image?.src}
+                                        blurDataURL={item?.image?.blurDataURL}
+                                      />
+                                    </AspectRatio>
+                                  )}
+                                  <Box p="4">
+                                    <Flex>
+                                      <Heading
+                                        as="h4"
+                                        fontSize="lg"
+                                        flexGrow="1"
+                                        fontWeight="semibold"
                                       >
-                                        {Number(item.price).toLocaleString(
-                                          'en-US',
-                                          {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                          }
-                                        )}
+                                        {item.title}
+                                      </Heading>
+                                      {(item?.price || item.price === 0) && (
+                                        <Text
+                                          color="gray.800"
+                                          fontWeight="medium"
+                                        >
+                                          {Number(item.price).toLocaleString(
+                                            'en-US',
+                                            {
+                                              style: 'currency',
+                                              currency: 'USD',
+                                            }
+                                          )}
+                                        </Text>
+                                      )}
+                                    </Flex>
+                                    {item.description && (
+                                      <Text color="gray.600" mt="1">
+                                        {item.description}
                                       </Text>
                                     )}
-                                  </Flex>
-                                  {item.description && (
-                                    <Text color="gray.600" mt="1">
-                                      {item.description}
-                                    </Text>
-                                  )}
+                                  </Box>
                                 </Box>
-                              </Box>
-                            ))}
-                        </Stack>
-                      )}
-                    </Box>
-                  ))}
-              </Stack>
-            )}
-          </Box>
-        </Stack>
+                              ))}
+                          </Stack>
+                        )}
+                      </Box>
+                    ))}
+                </Stack>
+              )}
+            </Box>
+          </Stack>
+        )}
       </PublicLayout>
     </>
   )
