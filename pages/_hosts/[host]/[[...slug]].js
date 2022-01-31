@@ -12,7 +12,7 @@ import SEO from '@/components/global/SEO'
 import { prismaGetMenu, prismaGetMenus } from '@/utils/prisma/menus'
 import { prismaGetSections } from '@/utils/prisma/sections'
 import { prismaGetMenuItems } from '@/utils/prisma/menuItems'
-import { prismaGetRestaurants } from '@/utils/prisma/restaurants'
+import { prismaGetRestaurant } from '@/utils/prisma/restaurants'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const { query } = useRouter()
@@ -228,15 +228,15 @@ export async function getServerSideProps({ params: { host }, query }) {
   const slug = query?.slug?.[0] || null
 
   const restaurantQuery = { customHost: host }
-  const restaurants = await prismaGetRestaurants(restaurantQuery)
+  const restaurant = await prismaGetRestaurant(restaurantQuery)
 
-  if (!restaurants[0]) {
+  if (!restaurant) {
     return {
       notFound: true,
     }
   }
 
-  const menusQuery = { restaurantId: restaurants[0].id }
+  const menusQuery = { restaurantId: restaurant.id }
   const menus = await prismaGetMenus(menusQuery)
 
   const activeMenu = slug ? menus.find((menu) => menu.slug === slug) : menus[0]
@@ -254,12 +254,12 @@ export async function getServerSideProps({ params: { host }, query }) {
   const menuItems = activeMenu?.id ? await prismaGetMenuItems(menusQuery) : null
 
   await queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
-    restaurants
-      ? restaurants.map((i) => ({
-          ...i,
-          createdAt: i.createdAt.toISOString(),
-          updatedAt: i.updatedAt.toISOString(),
-        }))
+    restaurant
+      ? {
+          ...restaurant,
+          createdAt: restaurant.createdAt.toISOString(),
+          updatedAt: restaurant.updatedAt.toISOString(),
+        }
       : null
   )
 
@@ -312,9 +312,9 @@ export async function getServerSideProps({ params: { host }, query }) {
       host,
       slug,
       restaurant: {
-        ...restaurants[0],
-        createdAt: restaurants[0].createdAt.toISOString(),
-        updatedAt: restaurants[0].updatedAt.toISOString(),
+        ...restaurant,
+        createdAt: restaurant.createdAt.toISOString(),
+        updatedAt: restaurant.updatedAt.toISOString(),
       },
       dehydratedState: dehydrate(queryClient),
     },
