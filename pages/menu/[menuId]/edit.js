@@ -691,7 +691,10 @@ const MenuItemDrawer = ({
           blurDataURL: await blurhashEncode(form.image),
           src: await postUpload(formData),
         }
+      } else if (form?.image === null && dirtyFields?.image) {
+        payload.image = null
       }
+
       menuItem
         ? handleUpdateMenuItem(
             {

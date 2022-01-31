@@ -30,10 +30,13 @@ export const prismaGetMenuItem = async (where) => {
 export const prismaPostMenuItem = async (payload) => {
   try {
     const validPayload = await menuItemSchema.validateAsync(payload)
+    if (validPayload?.image === null) {
+      validPayload.image = Prisma.DbNull
+    }
+
     return await prisma.menuItems.create({
       data: {
         ...validPayload,
-        image: validPayload.image || Prisma.DbNull,
       },
     })
   } catch (error) {
@@ -45,10 +48,14 @@ export const prismaPutMenuItem = async (where, payload) => {
   try {
     const validPayload = await menuItemSchema.validateAsync(payload)
     const validWhere = await menuItemSchema.validateAsync(where)
+
+    if (validPayload?.image === null) {
+      validPayload.image = Prisma.DbNull
+    }
+
     return await prisma.menuItems.update({
       data: {
         ...validPayload,
-        image: validPayload.image || Prisma.DbNull,
       },
       where: validWhere,
     })

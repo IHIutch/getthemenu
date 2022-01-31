@@ -124,6 +124,8 @@ const Details = () => {
           blurDataURL: await blurhashEncode(form.coverImage),
           src: await postUpload(formData),
         }
+      } else if (form?.coverImage === null && dirtyFields?.coverImage) {
+        payload.coverImage = null
       }
       await handleUpdateRestaurant({
         id: user.restaurants[0].id,

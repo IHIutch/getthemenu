@@ -27,10 +27,13 @@ export const prismaGetRestaurant = async (where) => {
 export const prismaPostRestaurant = async (payload) => {
   try {
     const validPayload = await restaurantSchema.validateAsync(payload)
+    if (validPayload?.coverImage === null) {
+      validPayload.coverImage = Prisma.DbNull
+    }
+
     return await prisma.restaurants.create({
       data: {
         ...validPayload,
-        coverImage: validPayload.coverImage || Prisma.DbNull,
       },
     })
   } catch (error) {
@@ -42,10 +45,14 @@ export const prismaPutRestaurant = async (where, payload) => {
   try {
     const validPayload = await restaurantSchema.validateAsync(payload)
     const validWhere = await restaurantSchema.validateAsync(where)
+
+    if (validPayload?.coverImage === null) {
+      validPayload.coverImage = Prisma.DbNull
+    }
+
     return await prisma.restaurants.update({
       data: {
         ...validPayload,
-        coverImage: validPayload.coverImage || Prisma.DbNull,
       },
       where: validWhere,
     })
