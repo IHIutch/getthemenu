@@ -35,6 +35,7 @@ export default function ImageDropzone({ onChange, value = '' }) {
   } = useDropzone({
     onDrop,
     accept: 'image/*',
+    multiple: false,
   })
 
   const previewSrc = useMemo(() => {
