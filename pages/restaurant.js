@@ -405,8 +405,8 @@ const Contact = () => {
       await handleUpdateRestaurant({
         id: user.restaurants[0].id,
         payload: {
-          phone: [phone],
-          email: [email],
+          phone: phone ? [phone] : [],
+          email: email ? [email] : [],
         },
       })
       setIsSubmitting(false)

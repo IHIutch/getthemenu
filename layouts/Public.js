@@ -244,7 +244,7 @@ export default function PublicLayout({
                                 <Heading fontSize="lg">Contact</Heading>
                               </Box>
                               <Stack spacing="4" p="4" fontSize="sm">
-                                {restaurant?.phone && (
+                                {restaurant?.phone.length > 0 && (
                                   <Box>
                                     <Text fontWeight="semibold">Phone</Text>
                                     <Stack as="ul" spacing="1">
@@ -273,7 +273,7 @@ export default function PublicLayout({
                                     </Text>
                                   </Box>
                                 )}
-                                {restaurant?.email && (
+                                {restaurant?.email.length > 0 && (
                                   <Box>
                                     <Text fontWeight="semibold">Email</Text>
                                     <Stack as="ul" spacing="1">
