@@ -23,12 +23,8 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
     ? menus.find((menu) => menu.slug === slug)
     : menus?.[0]
   const { data: menu } = useGetMenu(activeMenu?.id || null)
-  const { data: sections } = useGetSections(
-    activeMenu?.id ? { menuId: activeMenu.id } : null
-  )
-  const { data: menuItems } = useGetMenuItems(
-    activeMenu?.id ? { menuId: activeMenu.id } : null
-  )
+  const { data: sections } = useGetSections({ restaurantId: restaurant.id })
+  const { data: menuItems } = useGetMenuItems({ restaurantId: restaurant.id })
 
   const structuredData = useMemo(() => {
     const minPrice = Math.min(
@@ -64,12 +60,12 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
       servesCuisine: ['American cuisine'],
     }
     const menusJson = {
-      hasMenu: (menus || []).map((menu) => ({
+      hasMenu: (menus || []).map((m) => ({
         '@type': 'Menu',
-        name: menu?.title || '',
-        description: menu?.description || '',
+        name: m?.title || '',
+        description: m?.description || '',
         hasMenuSection: (sections || [])
-          .filter((s) => s.menuId === menu.id)
+          .filter((s) => s.menuId === m.id)
           .map((s) => ({
             '@type': 'MenuSection',
             name: s?.title,
@@ -145,71 +141,76 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
           <Box>
             {sections && (
               <Stack spacing="16">
-                {sections.map((section) => (
-                  <Box key={section.id}>
-                    <Heading as="h3" fontSize="2xl" mb="4">
-                      {section.title}
-                    </Heading>
-                    {menuItems && (
-                      <Stack spacing="4">
-                        {menuItems
-                          .filter((item) => item.sectionId === section.id)
-                          .map((item) => (
-                            <Box
-                              key={item.id}
-                              borderWidth="1px"
-                              rounded="md"
-                              overflow="hidden"
-                              bg="white"
-                              shadow="sm"
-                            >
-                              {item?.image && (
-                                <AspectRatio
-                                  ratio={16 / 9}
-                                  mb="2"
-                                  borderBottomWidth="1px"
-                                >
-                                  <BlurUpImage
-                                    alt={item?.title || 'Menu item'}
-                                    src={item?.image?.src}
-                                    blurDataURL={item?.image?.blurDataURL}
-                                  />
-                                </AspectRatio>
-                              )}
-                              <Box p="4">
-                                <Flex>
-                                  <Heading
-                                    as="h4"
-                                    fontSize="lg"
-                                    flexGrow="1"
-                                    fontWeight="semibold"
+                {sections
+                  .filter((section) => section.menuId === menu.id)
+                  .map((section) => (
+                    <Box key={section.id}>
+                      <Heading as="h3" fontSize="2xl" mb="4">
+                        {section.title}
+                      </Heading>
+                      {menuItems && (
+                        <Stack spacing="4">
+                          {menuItems
+                            .filter((item) => item.sectionId === section.id)
+                            .map((item) => (
+                              <Box
+                                key={item.id}
+                                borderWidth="1px"
+                                rounded="md"
+                                overflow="hidden"
+                                bg="white"
+                                shadow="sm"
+                              >
+                                {item?.image && (
+                                  <AspectRatio
+                                    ratio={16 / 9}
+                                    mb="2"
+                                    borderBottomWidth="1px"
                                   >
-                                    {item.title}
-                                  </Heading>
-                                  {(item?.price || item.price === 0) && (
-                                    <Text color="gray.800" fontWeight="medium">
-                                      {Number(item.price).toLocaleString(
-                                        'en-US',
-                                        {
-                                          style: 'currency',
-                                          currency: 'USD',
-                                        }
-                                      )}
+                                    <BlurUpImage
+                                      alt={item?.title || 'Menu item'}
+                                      src={item?.image?.src}
+                                      blurDataURL={item?.image?.blurDataURL}
+                                    />
+                                  </AspectRatio>
+                                )}
+                                <Box p="4">
+                                  <Flex>
+                                    <Heading
+                                      as="h4"
+                                      fontSize="lg"
+                                      flexGrow="1"
+                                      fontWeight="semibold"
+                                    >
+                                      {item.title}
+                                    </Heading>
+                                    {(item?.price || item.price === 0) && (
+                                      <Text
+                                        color="gray.800"
+                                        fontWeight="medium"
+                                      >
+                                        {Number(item.price).toLocaleString(
+                                          'en-US',
+                                          {
+                                            style: 'currency',
+                                            currency: 'USD',
+                                          }
+                                        )}
+                                      </Text>
+                                    )}
+                                  </Flex>
+                                  {item.description && (
+                                    <Text color="gray.600" mt="1">
+                                      {item.description}
                                     </Text>
                                   )}
-                                </Flex>
-                                {item.description && (
-                                  <Text color="gray.600" mt="1">
-                                    {item.description}
-                                  </Text>
-                                )}
+                                </Box>
                               </Box>
-                            </Box>
-                          ))}
-                      </Stack>
-                    )}
-                  </Box>
-                ))}
+                            ))}
+                        </Stack>
+                      )}
+                    </Box>
+                  ))}
               </Stack>
             )}
           </Box>
@@ -247,12 +248,8 @@ export async function getServerSideProps({ params: { host }, query }) {
   const menu = activeMenu?.id
     ? await prismaGetMenu({ id: activeMenu.id })
     : null
-  const sections = activeMenu?.id
-    ? await prismaGetSections({ menuId: activeMenu.id })
-    : null
-  const menuItems = activeMenu?.id
-    ? await prismaGetMenuItems({ menuId: activeMenu.id })
-    : null
+  const sections = activeMenu?.id ? await prismaGetSections(menusQuery) : null
+  const menuItems = activeMenu?.id ? await prismaGetMenuItems(menusQuery) : null
 
   await queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
     restaurants
