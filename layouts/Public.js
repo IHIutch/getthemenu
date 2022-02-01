@@ -38,14 +38,10 @@ import dayjs from 'dayjs'
 import { Phone, Clock } from 'lucide-react'
 import { formatTime } from '@/utils/functions'
 
-export default function PublicLayout({
-  restaurant,
-  menus,
-  initialSlug,
-  children,
-}) {
+export default function PublicLayout({ restaurant, menus, children }) {
   const modalState = useDisclosure()
   const { asPath, push, query } = useRouter()
+
   const slug = query?.slug?.[0] || ''
   const activeMenu = slug
     ? menus.find((menu) => menu.slug === slug)
@@ -55,12 +51,23 @@ export default function PublicLayout({
 
   useEffect(() => {
     if (activeSlug !== slug) {
-      push(`/${activeSlug}`, `/${activeSlug}`, {
-        scroll: false,
-        shallow: true,
-      })
+      if (asPath.includes('preview')) {
+        push(
+          `/preview/${query.host}/${activeSlug}`,
+          `/preview/${query.host}/${activeSlug}`,
+          {
+            scroll: false,
+            shallow: true,
+          }
+        )
+      } else {
+        push(`/${activeSlug}`, `/${activeSlug}`, {
+          scroll: false,
+          shallow: true,
+        })
+      }
     }
-  }, [activeSlug, slug, push])
+  }, [activeSlug, slug, push, asPath, query.host])
 
   const weekdayName = dayjs().format('dddd')
   const isSiteReady = useMemo(() => {
