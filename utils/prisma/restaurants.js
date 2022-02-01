@@ -18,6 +18,23 @@ export const prismaGetRestaurant = async (where) => {
     const validWhere = await restaurantSchema.validateAsync(where)
     return await prisma.restaurants.findUnique({
       where: validWhere,
+      include: {
+        menus: {
+          where: {
+            deletedAt: null,
+          },
+        },
+        sections: {
+          where: {
+            deletedAt: null,
+          },
+        },
+        menuItems: {
+          where: {
+            deletedAt: null,
+          },
+        },
+      },
     })
   } catch (error) {
     throw new Error(error.message)

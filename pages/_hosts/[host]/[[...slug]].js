@@ -3,30 +3,27 @@ import Head from 'next/head'
 import PublicLayout from '@/layouts/Public'
 import BlurUpImage from '@/components/common/BlurUpImage'
 import { dehydrate, QueryClient } from 'react-query'
-import { useGetMenu, useGetMenus } from '@/utils/react-query/menus'
+import { useGetMenus } from '@/utils/react-query/menus'
 import { useGetSections } from '@/utils/react-query/sections'
 import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import SEO from '@/components/global/SEO'
-import { prismaGetMenu, prismaGetMenus } from '@/utils/prisma/menus'
-import { prismaGetSections } from '@/utils/prisma/sections'
-import { prismaGetMenuItems } from '@/utils/prisma/menuItems'
 import { prismaGetRestaurant } from '@/utils/prisma/restaurants'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
+  const menusQuery = { restaurantId: restaurant.id }
+
   const { query } = useRouter()
   const slug = initialSlug === query?.slug?.[0] ? initialSlug : query?.slug?.[0]
-  const { data: menus } = useGetMenus({ restaurantId: restaurant.id })
+
+  const { data: menus } = useGetMenus(menusQuery)
+  const { data: sections } = useGetSections(menusQuery)
+  const { data: menuItems } = useGetMenuItems(menusQuery)
 
   const activeMenu = slug
     ? menus.find((menu) => menu.slug === slug)
     : menus?.[0]
-  const { data: menu } = useGetMenu(activeMenu?.id || null)
-  const { data: sections } = useGetSections({ restaurantId: restaurant.id })
-  const { data: menuItems } = useGetMenuItems({ restaurantId: restaurant.id })
-
-  console.log({ restaurant, menu, menus, sections, menuItems })
 
   const structuredData = useMemo(() => {
     const minPrice = Math.min(
@@ -134,18 +131,18 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
         menus={menus}
         initialSlug={initialSlug}
       >
-        {menu && (
+        {activeMenu && (
           <Stack>
             <Box>
               <Heading as="h2" fontSize="3xl" mb="4">
-                {menu?.title}
+                {activeMenu?.title}
               </Heading>
             </Box>
             <Box>
               {sections && (
                 <Stack spacing="16">
                   {sections
-                    .filter((section) => section.menuId === menu.id)
+                    .filter((section) => section.menuId === activeMenu.id)
                     .map((section) => (
                       <Box key={section.id}>
                         <Box mb="6">
@@ -254,11 +251,8 @@ export async function getServerSideProps({ params: { host }, query }) {
       notFound: true,
     }
   }
-
-  const menusQuery = { restaurantId: restaurant.id }
-  const menus = await prismaGetMenus(menusQuery)
-
-  const activeMenu = slug ? menus.find((menu) => menu.slug === slug) : menus[0]
+  const menus = restaurant.menus
+  const activeMenu = menus.find((menu) => menu.slug === slug) || menus?.[0]
 
   if (menus?.length && !activeMenu) {
     return {
@@ -266,12 +260,13 @@ export async function getServerSideProps({ params: { host }, query }) {
     }
   }
 
-  const menu = activeMenu?.id
-    ? await prismaGetMenu({ id: activeMenu.id })
-    : null
-  const sections = activeMenu?.id ? await prismaGetSections(menusQuery) : null
-  const menuItems = activeMenu?.id ? await prismaGetMenuItems(menusQuery) : null
+  const sections = restaurant.sections
+  const menuItems = restaurant.menuItems
+  delete restaurant.menus
+  delete restaurant.sections
+  delete restaurant.menuItems
 
+  const menusQuery = { restaurantId: restaurant.id }
   await queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
     restaurant
       ? {
@@ -289,16 +284,6 @@ export async function getServerSideProps({ params: { host }, query }) {
           createdAt: i.createdAt.toISOString(),
           updatedAt: i.updatedAt.toISOString(),
         }))
-      : null
-  )
-
-  await queryClient.prefetchQuery(['menus', activeMenu?.id || null], async () =>
-    menu
-      ? {
-          ...menu,
-          createdAt: menu.createdAt.toISOString(),
-          updatedAt: menu.updatedAt.toISOString(),
-        }
       : null
   )
 
