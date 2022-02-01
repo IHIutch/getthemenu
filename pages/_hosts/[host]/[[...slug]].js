@@ -26,6 +26,8 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const { data: sections } = useGetSections({ restaurantId: restaurant.id })
   const { data: menuItems } = useGetMenuItems({ restaurantId: restaurant.id })
 
+  console.log({ restaurant, menu, menus, sections, menuItems })
+
   const structuredData = useMemo(() => {
     const minPrice = Math.min(
       ...(menuItems || []).map((mi) => mi?.price || 0)
@@ -283,28 +285,24 @@ export async function getServerSideProps({ params: { host }, query }) {
       : null
   )
 
-  await queryClient.prefetchQuery(
-    ['sections', { menuId: activeMenu?.id || null }],
-    async () =>
-      sections
-        ? sections.map((i) => ({
-            ...i,
-            createdAt: i.createdAt.toISOString(),
-            updatedAt: i.updatedAt.toISOString(),
-          }))
-        : null
+  await queryClient.prefetchQuery(['sections', menusQuery], async () =>
+    sections
+      ? sections.map((i) => ({
+          ...i,
+          createdAt: i.createdAt.toISOString(),
+          updatedAt: i.updatedAt.toISOString(),
+        }))
+      : null
   )
-  await queryClient.prefetchQuery(
-    ['menuItems', { menuId: activeMenu?.id || null }],
-    async () =>
-      menuItems
-        ? menuItems.map((i) => ({
-            ...i,
-            createdAt: i.createdAt.toISOString(),
-            updatedAt: i.updatedAt.toISOString(),
-            price: i.price ? i.price.toString() : '',
-          }))
-        : null
+  await queryClient.prefetchQuery(['menuItems', menusQuery], async () =>
+    menuItems
+      ? menuItems.map((i) => ({
+          ...i,
+          createdAt: i.createdAt.toISOString(),
+          updatedAt: i.updatedAt.toISOString(),
+          price: i.price ? i.price.toString() : '',
+        }))
+      : null
   )
 
   return {
