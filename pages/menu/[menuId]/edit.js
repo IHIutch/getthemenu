@@ -208,13 +208,20 @@ export default function MenuEdit() {
                               align="center"
                               w="100%"
                             >
-                              <Heading
-                                ml="2"
-                                fontSize="2xl"
-                                fontWeight="semibold"
-                              >
-                                {s.title}
-                              </Heading>
+                              <Box>
+                                <Heading fontSize="2xl" fontWeight="semibold">
+                                  {s.title}
+                                </Heading>
+                                {s.description && (
+                                  <Text
+                                    color="gray.600"
+                                    mt="1"
+                                    whiteSpace="pre-line"
+                                  >
+                                    {s.description}
+                                  </Text>
+                                )}
+                              </Box>
                               <Box ml="auto">
                                 <IconButton
                                   ml="2"

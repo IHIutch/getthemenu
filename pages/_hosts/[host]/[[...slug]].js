@@ -148,9 +148,22 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                     .filter((section) => section.menuId === menu.id)
                     .map((section) => (
                       <Box key={section.id}>
-                        <Heading as="h3" fontSize="2xl" mb="4">
-                          {section.title}
-                        </Heading>
+                        <Box mb="6">
+                          <Heading as="h3" fontSize="2xl" fontWeight="semibold">
+                            {section.title}
+                          </Heading>
+                          {section.description && (
+                            <Text
+                              color="gray.700"
+                              fontSize="lg"
+                              mt="1"
+                              lineHeight="1.4"
+                              whiteSpace="pre-line"
+                            >
+                              {section.description}
+                            </Text>
+                          )}
+                        </Box>
                         {menuItems && (
                           <Stack spacing="4">
                             {menuItems
@@ -203,7 +216,11 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                                       )}
                                     </Flex>
                                     {item.description && (
-                                      <Text color="gray.600" mt="1">
+                                      <Text
+                                        color="gray.600"
+                                        mt="1"
+                                        whiteSpace="pre-line"
+                                      >
                                         {item.description}
                                       </Text>
                                     )}
