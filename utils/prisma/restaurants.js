@@ -23,15 +23,24 @@ export const prismaGetRestaurant = async (where) => {
           where: {
             deletedAt: null,
           },
+          orderBy: {
+            position: 'asc',
+          },
         },
         sections: {
           where: {
             deletedAt: null,
           },
+          orderBy: {
+            position: 'asc',
+          },
         },
         menuItems: {
           where: {
             deletedAt: null,
+          },
+          orderBy: {
+            position: 'asc',
           },
         },
       },
