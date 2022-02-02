@@ -199,7 +199,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       position="relative"
                     >
                       <AnimateSharedLayout type="crossfade">
-                        <AnimatePresence>
+                        <AnimatePresence initial={false}>
                           <motion.main
                             key={asPath}
                             initial={'hidden'}
