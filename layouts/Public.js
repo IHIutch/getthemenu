@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion'
 import { useRouter } from 'next/router'
-import BlurUpImage from '@/components/common/BlurUpImage'
 import {
   AspectRatio,
   Box,
@@ -15,7 +14,6 @@ import {
   GridItem,
   Heading,
   Icon,
-  Image,
   Link,
   Modal,
   ModalBody,
@@ -90,7 +88,6 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       alt={restaurant?.name || ''}
                       src={restaurant?.coverImage?.src}
                       blurDataURL={restaurant?.coverImage?.blurDataURL}
-                      placeholder="blur"
                       layout="fill"
                       objectFit="cover"
                       priority={true}

@@ -58,12 +58,13 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
-import { blurhashEncode, reorderList } from '@/utils/functions'
+import { reorderList } from '@/utils/functions'
 import { postUpload } from '@/utils/axios/uploads'
 import { Controller, useForm } from 'react-hook-form'
 import ImageDropzone from '@/components/common/ImageDropzone'
 import MenuLayout from '@/layouts/Menu'
 import groupBy from 'lodash/groupBy'
+import BlurImage from '@/components/common/BlurImage'
 
 export default function MenuEdit() {
   const {
@@ -415,10 +416,12 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
         overflow="hidden"
       >
         {imageUrl ? (
-          <Image
-            src={imageUrl}
-            objectFit="cover"
+          <BlurImage
             alt={menuItem.title || 'Menu Item'}
+            src={menuItem?.image?.src}
+            blurDataURL={menuItem?.image?.blurDataURL}
+            layout="fill"
+            objectFit="cover"
           />
         ) : (
           <Box boxSize="100%" bg="gray.100">

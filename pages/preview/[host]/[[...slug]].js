@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import Head from 'next/head'
 import PublicLayout from '@/layouts/Public'
-import BlurUpImage from '@/components/common/BlurUpImage'
 import { dehydrate, QueryClient } from 'react-query'
 import { useGetMenus } from '@/utils/react-query/menus'
 import { useGetSections } from '@/utils/react-query/sections'
@@ -10,6 +9,7 @@ import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import SEO from '@/components/global/SEO'
 import { prismaGetRestaurant } from '@/utils/prisma/restaurants'
+import BlurImage from '@/components/common/BlurImage'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const menusQuery = { restaurantId: restaurant.id }
@@ -180,10 +180,12 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                                       mb="2"
                                       borderBottomWidth="1px"
                                     >
-                                      <BlurUpImage
-                                        alt={item?.title || 'Menu item'}
+                                      <BlurImage
+                                        alt={item?.title}
                                         src={item?.image?.src}
                                         blurDataURL={item?.image?.blurDataURL}
+                                        layout="fill"
+                                        objectFit="cover"
                                       />
                                     </AspectRatio>
                                   )}
