@@ -15,16 +15,17 @@ export default function ImageDropzone({ onChange, value = '' }) {
   const [preview, setPreview] = useState(value)
   const onDrop = useCallback(
     (acceptedFiles) => {
-      const objectUrl = URL.createObjectURL(acceptedFiles[0])
       onChange(acceptedFiles[0])
+      const objectUrl = URL.createObjectURL(acceptedFiles[0])
       setPreview(objectUrl)
     },
     [onChange]
   )
 
-  useEffect(() => {
-    setPreview(value)
-  }, [value])
+  const handleClearImage = () => {
+    onChange(null)
+    setPreview('')
+  }
 
   const {
     getRootProps,
@@ -38,13 +39,9 @@ export default function ImageDropzone({ onChange, value = '' }) {
     multiple: false,
   })
 
-  const previewSrc = useMemo(() => {
-    return preview || value
-  }, [preview, value])
-
   return (
     <Flex rounded="md" overflow="hidden">
-      {previewSrc ? (
+      {preview ? (
         <Box position="relative" h="100%" w="100%">
           <IconButton
             icon={<Icon boxSize="5" as={X} />}
@@ -52,9 +49,9 @@ export default function ImageDropzone({ onChange, value = '' }) {
             position="absolute"
             top="2"
             right="2"
-            onClick={() => onChange(null)}
+            onClick={handleClearImage}
           />
-          <Image h="100%" w="100%" src={previewSrc} objectFit="cover" alt="" />
+          <Image h="100%" w="100%" src={preview} objectFit="cover" alt="" />
         </Box>
       ) : (
         <Flex
