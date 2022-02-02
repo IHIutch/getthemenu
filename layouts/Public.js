@@ -91,6 +91,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       layout="fill"
                       objectFit="cover"
                       priority={true}
+                      placeholder="blur"
                     />
                   ) : (
                     <Box boxSize="100%" bg="gray.400" />

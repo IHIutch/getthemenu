@@ -422,6 +422,7 @@ const MenuItem = ({ menuItem, handleDrawerOpen, drawerState }) => {
             blurDataURL={menuItem?.image?.blurDataURL}
             layout="fill"
             objectFit="cover"
+            placeholder="blur"
           />
         ) : (
           <Box boxSize="100%" bg="gray.100">

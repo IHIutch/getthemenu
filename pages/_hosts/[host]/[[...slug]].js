@@ -186,6 +186,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
                                         blurDataURL={item?.image?.blurDataURL}
                                         layout="fill"
                                         objectFit="cover"
+                                        placeholder="blur"
                                       />
                                     </AspectRatio>
                                   )}
