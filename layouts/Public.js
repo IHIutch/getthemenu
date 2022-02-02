@@ -39,6 +39,7 @@ import dayjs from 'dayjs'
 import { Phone, Clock } from 'lucide-react'
 import { formatTime } from '@/utils/functions'
 import NextImage from 'next/image'
+import BlurImage from '@/components/common/BlurImage'
 
 export default function PublicLayout({ restaurant, menus, children }) {
   const modalState = useDisclosure()
@@ -76,8 +77,6 @@ export default function PublicLayout({ restaurant, menus, children }) {
     return activeMenu && menus?.length > 0
   }, [activeMenu, menus])
 
-  console.log({ restaurant })
-
   return (
     <>
       <Box position="fixed" boxSize="100%" overflow="auto">
@@ -87,17 +86,13 @@ export default function PublicLayout({ restaurant, menus, children }) {
               <AspectRatio ratio={{ base: 4 / 3, sm: 21 / 9 }}>
                 <Box boxSize="100%">
                   {restaurant?.coverImage?.src ? (
-                    <Image
-                      as={NextImage}
-                      position="absolute"
-                      loading="eager"
-                      layout="fill"
-                      boxSize="100%"
-                      objectFit="cover"
-                      transition="all 0.2s ease"
+                    <BlurImage
                       alt={restaurant?.name || ''}
                       src={restaurant?.coverImage?.src}
                       blurDataURL={restaurant?.coverImage?.blurDataURL}
+                      placeholder="blur"
+                      layout="fill"
+                      objectFit="cover"
                       priority={true}
                     />
                   ) : (

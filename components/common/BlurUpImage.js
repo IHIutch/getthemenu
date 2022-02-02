@@ -6,8 +6,6 @@ import { Blurhash } from 'react-blurhash'
 export default function BlurUpImage({ src, blurDataURL, alt, priority }) {
   const [isLoaded, setIsLoaded] = useState(false)
 
-  console.log({ src, blurDataURL, alt, priority, isLoaded })
-
   return src ? (
     <>
       <Image

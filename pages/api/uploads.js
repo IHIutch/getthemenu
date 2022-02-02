@@ -5,6 +5,7 @@ import supabase from '@/utils/supabase'
 import { v4 as uuidv4 } from 'uuid'
 import { getPublicURL } from '@/utils/functions'
 import { withSentry } from '@sentry/nextjs'
+import { getPlaiceholder } from 'plaiceholder'
 
 const handler = async (req, res) => {
   const { method } = req
@@ -34,9 +35,13 @@ const handler = async (req, res) => {
           .upload(filePath, file)
         if (error) throw new Error(error.message)
 
-        const src = await getPublicURL(filePath)
+        const src = getPublicURL(filePath)
 
-        res.status(resStatusType.SUCCESS).json(src)
+        const { base64: blurDataURL } = await getPlaiceholder(src, {
+          size: 10,
+        })
+
+        res.status(resStatusType.SUCCESS).json({ blurDataURL, src })
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
       }

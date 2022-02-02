@@ -120,10 +120,7 @@ const Details = () => {
         const formData = new FormData()
         formData.append('file', form.coverImage, form.coverImage.name)
 
-        payload.coverImage = {
-          blurDataURL: await blurhashEncode(form.coverImage),
-          src: await postUpload(formData),
-        }
+        payload.coverImage = await postUpload(formData)
       } else if (form?.coverImage === null && dirtyFields?.coverImage) {
         payload.coverImage = null
       }

@@ -694,10 +694,7 @@ const MenuItemDrawer = ({
         const formData = new FormData()
         formData.append('file', form.image, form.image.name)
 
-        payload.image = {
-          blurDataURL: await blurhashEncode(form.image),
-          src: await postUpload(formData),
-        }
+        payload.image = await postUpload(formData)
       } else if (form?.image === null && dirtyFields?.image) {
         payload.image = null
       }
