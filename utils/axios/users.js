@@ -1,9 +1,10 @@
-import qs from 'qs'
 import axios from 'redaxios'
 
 export const getUsers = async (params = null) => {
   const { data } = await axios
-    .get(`/api/users?` + qs.stringify(params))
+    .get(`/api/users?`, {
+      params,
+    })
     .catch((res) => {
       throw new Error(res.data.error)
     })

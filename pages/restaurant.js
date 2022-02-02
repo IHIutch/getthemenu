@@ -34,7 +34,6 @@ import {
 } from 'react-hook-form'
 import DashboardLayout from '@/layouts/Dashboard'
 import ImageDropzone from '@/components/common/ImageDropzone'
-import { blurhashEncode } from '@/utils/functions'
 import { postUpload } from '@/utils/axios/uploads'
 
 export default function Restaurant() {

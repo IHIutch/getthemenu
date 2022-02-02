@@ -1,9 +1,10 @@
-import qs from 'qs'
 import axios from 'redaxios'
 
 export const getSections = async (params = null) => {
   const { data } = await axios
-    .get(`/api/sections?` + qs.stringify(params))
+    .get(`/api/sections?`, {
+      params,
+    })
     .catch((res) => {
       throw new Error(res.data.error)
     })

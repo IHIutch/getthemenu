@@ -1,9 +1,10 @@
-import qs from 'qs'
 import axios from 'redaxios'
 
 export const getMenus = async (params = null) => {
   const { data } = await axios
-    .get(`/api/menus?` + qs.stringify(params))
+    .get(`/api/menus?`, {
+      params,
+    })
     .catch((res) => {
       throw new Error(res.data.error)
     })
