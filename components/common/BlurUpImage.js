@@ -6,6 +6,8 @@ import { Blurhash } from 'react-blurhash'
 export default function BlurUpImage({ src, blurDataURL, alt, priority }) {
   const [isLoaded, setIsLoaded] = useState(false)
 
+  console.log({ src, blurDataURL, alt, priority, isLoaded })
+
   return src ? (
     <>
       <Image
@@ -13,7 +15,7 @@ export default function BlurUpImage({ src, blurDataURL, alt, priority }) {
         onLoadingComplete={() => setIsLoaded(true)}
         position="absolute"
         opacity={isLoaded ? 1 : 0}
-        loading={priority ? 'eager' : 'lazy'}
+        loading="eager"
         layout="fill"
         boxSize="100%"
         objectFit="cover"
@@ -31,10 +33,10 @@ export default function BlurUpImage({ src, blurDataURL, alt, priority }) {
         {blurDataURL ? (
           <Blurhash
             hash={blurDataURL}
-            width={priority ? '100%' : 800}
-            height={priority ? '100%' : 400}
+            width={priority ? 1920 : 720}
+            height={priority ? 1080 : 405}
             resolutionX={56}
-            resolutionY={32}
+            resolutionY={56}
             punch={1}
           />
         ) : (
