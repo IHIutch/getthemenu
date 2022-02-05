@@ -36,7 +36,6 @@ import NextLink from 'next/link'
 import dayjs from 'dayjs'
 import { Phone, Clock } from 'lucide-react'
 import { formatTime } from '@/utils/functions'
-import NextImage from 'next/image'
 import BlurImage from '@/components/common/BlurImage'
 
 export default function PublicLayout({ restaurant, menus, children }) {
@@ -203,8 +202,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
                           <motion.main
                             key={asPath}
                             initial={'hidden'}
-                            animate={'enter'}
-                            exit={'exit'}
+                            animate={'shown'}
+                            exit={'hidden'}
                             variants={{
                               hidden: {
                                 opacity: 0,
@@ -212,17 +211,11 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                 y: 50,
                                 position: 'absolute',
                               },
-                              enter: {
+                              shown: {
                                 opacity: 1,
                                 x: 0,
                                 y: 0,
                                 position: 'relative',
-                              },
-                              exit: {
-                                opacity: 0,
-                                x: 0,
-                                y: 50,
-                                position: 'absolute',
                               },
                             }}
                             transition={{
@@ -255,7 +248,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                 <Heading fontSize="lg">Contact</Heading>
                               </Box>
                               <Stack spacing="4" p="4" fontSize="sm">
-                                {restaurant?.phone.length > 0 && (
+                                {restaurant?.phone?.length > 0 && (
                                   <Box>
                                     <Text fontWeight="semibold">Phone</Text>
                                     <Stack as="ul" spacing="1">
@@ -284,7 +277,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                     </Text>
                                   </Box>
                                 )}
-                                {restaurant?.email.length > 0 && (
+                                {restaurant?.email?.length > 0 && (
                                   <Box>
                                     <Text fontWeight="semibold">Email</Text>
                                     <Stack as="ul" spacing="1">
@@ -405,7 +398,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
               <TabPanels>
                 <TabPanel px="0">
                   <Stack spacing="4">
-                    {restaurant?.phone.length > 0 && (
+                    {restaurant?.phone?.length > 0 && (
                       <Box>
                         <Text fontWeight="semibold">Phone</Text>
                         <Stack as="ul" spacing="1">
@@ -431,7 +424,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       </Box>
                     )}
 
-                    {restaurant?.email.length > 0 && (
+                    {restaurant?.email?.length > 0 && (
                       <Box>
                         <Text fontWeight="semibold">Email</Text>
                         <Stack as="ul" spacing="1">
