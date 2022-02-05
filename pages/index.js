@@ -21,6 +21,7 @@ import axios from 'redaxios'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useAuthUser } from '@/utils/react-query/user'
+import SEO from '@/components/global/SEO'
 
 export default function Login() {
   const router = useRouter()
@@ -92,7 +93,11 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title>GetTheMenu</title>
+        <SEO
+          title="GetTheMenu"
+          description="The platform built for resturants and their customers"
+          image="https://getthemenu.io/meta.png"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container maxW="container.lg" py="24">
