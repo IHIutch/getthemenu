@@ -97,6 +97,7 @@ export default function Login() {
           title="GetTheMenu"
           description="The platform built for both restaurants and their customers"
           image="https://getthemenu.io/meta.png"
+          url="https://getthemenu.io"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
