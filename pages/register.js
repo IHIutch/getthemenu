@@ -24,11 +24,12 @@ export default function Register() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const sessionUser = supabase.auth.user()
   const {
     data: user,
     isLoading: isUserLoading,
     // isError: isUserError,
-  } = useAuthUser()
+  } = useAuthUser(sessionUser)
 
   // Doing this client side because of https://github.com/supabase/supabase/issues/3783
   useEffect(() => {
@@ -51,16 +52,18 @@ export default function Register() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        const fullName = getValues('fullName')
-        await axios.post(`/api/auth/register`, {
-          event,
-          session,
-          // Any additional user data
-          payload: {
-            fullName,
-          },
-        })
-        router.replace('/get-started')
+        if (event === 'SIGNED_IN') {
+          const fullName = getValues('fullName')
+          await axios.post(`/api/auth/register`, {
+            event,
+            session,
+            payload: {
+              // Any additional user data
+              fullName,
+            },
+          })
+          router.replace('/get-started')
+        }
       }
     )
 

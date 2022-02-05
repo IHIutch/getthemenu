@@ -40,12 +40,9 @@ export default function Login() {
   // Doing this client side because of https://github.com/supabase/supabase/issues/3783
   useEffect(() => {
     if (!isUserLoading) {
-      console.log({ user })
       if (user && user.restaurants?.length === 0) {
-        console.log('index', 'get started')
         router.replace('/get-started')
       } else if (user) {
-        console.log('index', 'dashboard')
         router.replace('/dashboard')
       }
     }
@@ -53,7 +50,7 @@ export default function Login() {
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           // This probably isn't right. Forgot password logs in a user, they can change their password from the settings page
           return router.replace({
@@ -64,10 +61,11 @@ export default function Login() {
           })
         }
         if (event === 'SIGNED_IN') {
-          return axios.post(`/api/auth/signin`, {
+          await axios.post(`/api/auth/signin`, {
             event,
             session,
           })
+          router.replace('/dashboard')
         }
       }
     )
@@ -85,7 +83,6 @@ export default function Login() {
         password: form.password,
       })
       if (error) throw new Error(error.message)
-      router.replace('/dashboard')
     } catch (error) {
       setIsSubmitting(false)
       alert(error.message)

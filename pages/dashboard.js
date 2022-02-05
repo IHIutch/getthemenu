@@ -69,7 +69,6 @@ export default function Dashboard() {
   // Doing this client side because of https://github.com/supabase/supabase/issues/3783
   useEffect(() => {
     if (!isUserLoading) {
-      console.log({ user })
       if (!user) {
         router.replace('/')
       } else if (!user?.restaurants?.length) {
