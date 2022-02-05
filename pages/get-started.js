@@ -36,9 +36,20 @@ export default function GetStarted() {
 
   const {
     data: user,
-    // isLoading: isUserLoading,
+    isLoading: isUserLoading,
     // isError: isUserError,
   } = useAuthUser()
+
+  // Doing this client side because of https://github.com/supabase/supabase/issues/3783
+  useEffect(() => {
+    if (!isUserLoading) {
+      if (!user) {
+        router.replace('/')
+      } else if (user?.restaurants?.length) {
+        router.replace('/dashboard')
+      }
+    }
+  }, [isUserLoading, router, user])
 
   const {
     register,
@@ -266,3 +277,27 @@ export default function GetStarted() {
     </>
   )
 }
+
+// export async function getServerSideProps(req) {
+//   const user = await getLoggedUser(req)
+//   if (!user) {
+//     return {
+//       redirect: {
+//         permanent: false,
+//         destination: '/register',
+//       },
+//     }
+//   }
+//   if (user?.restaurants?.length) {
+//     return {
+//       redirect: {
+//         permanent: false,
+//         destination: '/dashboard',
+//       },
+//     }
+//   }
+
+//   return {
+//     props: {},
+//   }
+// }

@@ -33,9 +33,23 @@ export default function Login() {
 
   const {
     data: user,
-    // isLoading: isUserLoading,
+    isLoading: isUserLoading,
     // isError: isUserError,
   } = useAuthUser()
+
+  // Doing this client side because of https://github.com/supabase/supabase/issues/3783
+  useEffect(() => {
+    if (!isUserLoading) {
+      console.log({ user })
+      if (user && user.restaurants?.length === 0) {
+        console.log('index', 'get started')
+        router.replace('/get-started')
+      } else if (user) {
+        console.log('index', 'dashboard')
+        router.replace('/dashboard')
+      }
+    }
+  }, [isUserLoading, router, user])
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -77,12 +91,6 @@ export default function Login() {
       alert(error.message)
     }
   }
-
-  useEffect(() => {
-    if (user) {
-      router.replace('/dashboard')
-    }
-  }, [router, user])
 
   return (
     <>
@@ -172,3 +180,20 @@ export default function Login() {
     </>
   )
 }
+
+// export async function getServerSideProps(req) {
+//   const user = await getLoggedUser(req)
+
+//   if (user) {
+//     return {
+//       redirect: {
+//         permanent: false,
+//         destination: '/dashboard',
+//       },
+//     }
+//   }
+
+//   return {
+//     props: {},
+//   }
+// }

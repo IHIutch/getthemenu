@@ -17,13 +17,29 @@ import {
   Container,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
-
-import { useAuthUser } from '@/utils/react-query/user'
 import NextLink from 'next/link'
+import { useAuthUser } from '@/utils/react-query/user'
 
 export default function Register() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+
+  // Doing this client side because of https://github.com/supabase/supabase/issues/3783
+  useEffect(() => {
+    if (!isUserLoading) {
+      if (user && user.restaurants?.length === 0) {
+        router.replace('/get-started')
+      } else if (user) {
+        router.replace('/dashboard')
+      }
+    }
+  }, [isUserLoading, router, user])
 
   const {
     register,
@@ -66,18 +82,6 @@ export default function Register() {
       alert(error.message)
     }
   }
-
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  useEffect(() => {
-    if (user) {
-      router.replace('/get-started')
-    }
-  }, [router, user])
 
   return (
     <>
@@ -197,3 +201,20 @@ export default function Register() {
     </>
   )
 }
+
+// export async function getServerSideProps(req) {
+//   const user = await getLoggedUser(req)
+
+//   if (user) {
+//     return {
+//       redirect: {
+//         permanent: false,
+//         destination: '/dashboard',
+//       },
+//     }
+//   }
+
+//   return {
+//     props: {},
+//   }
+// }
