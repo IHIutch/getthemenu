@@ -95,7 +95,7 @@ export default function Login() {
       <Head>
         <SEO
           title="GetTheMenu"
-          description="The platform built for resturants and their customers"
+          description="The platform built for restaurants and their customers"
           image="https://getthemenu.io/meta.png"
         />
         <link rel="icon" href="/favicon.ico" />
