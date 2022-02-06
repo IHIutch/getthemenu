@@ -774,7 +774,7 @@ const MenuItemDrawer = ({
                   step={0.01}
                   min={0}
                 >
-                  <NumberInputField inputMode="numeric" />
+                  <NumberInputField inputMode="decimal" />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
                     <NumberDecrementStepper />
