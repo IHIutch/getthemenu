@@ -373,7 +373,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
           <Box as="footer" borderTopWidth="1px" py="6" mt="auto">
             <Text textAlign="center" fontWeight="medium" color="gray.600">
               Powered by{' '}
-              <NextLink href="https://getthemenu.io" passHref>
+              <NextLink href={{pathname: "https://getthemenu.io", query: {ref: query.host}}} passHref>
                 <Link color="blue.500" target="_blank">
                   GetTheMenu
                 </Link>
