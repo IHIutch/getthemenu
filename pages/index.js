@@ -53,15 +53,14 @@ export default function Login() {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
-          // This probably isn't right. Forgot password logs in a user, they can change their password from the settings page
+          // TODO: This probably isn't right. Forgot password logs in a user, they can change their password from the settings page
           return router.replace({
             pathname: '/reset-password',
             query: {
               access_token: session.access_token,
             },
           })
-        }
-        if (event === 'SIGNED_IN') {
+        } else if (event === 'SIGNED_IN') {
           await axios.post(`/api/auth/signin`, {
             event,
             session,
