@@ -1,5 +1,5 @@
-import { createStripeCustomer } from '@/utils/stripe'
 import { prismaPostUser } from '@/utils/prisma/users'
+import { createStripeCustomer } from '@/utils/stripe'
 import supabase from '@/utils/supabase'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
