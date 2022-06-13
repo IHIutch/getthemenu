@@ -122,9 +122,9 @@ export default function Navbar({ children, ...props }) {
                       <NextLink href="/dashboard" passHref>
                         <MenuItem as={Link}>Dashboard</MenuItem>
                       </NextLink>
-                      {/* <NextLink href="/settings" passHref>
-                        <MenuItem as={Link}>Account Settings</MenuItem>
-                      </NextLink> */}
+                      <NextLink href="/account" passHref>
+                        <MenuItem as={Link}>Account Details</MenuItem>
+                      </NextLink>
                       <MenuItem as="button" onClick={modalState.onOpen}>
                         Feedback
                       </MenuItem>

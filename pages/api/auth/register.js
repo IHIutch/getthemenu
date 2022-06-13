@@ -1,4 +1,4 @@
-import { createStripeCustomer } from '@/utils/supabase/stripe'
+import { createStripeCustomer } from '@/utils/stripe'
 import { prismaPostUser } from '@/utils/prisma/users'
 import supabase from '@/utils/supabase'
 import { resStatusType } from '@/utils/types'
