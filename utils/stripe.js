@@ -9,7 +9,7 @@ export const createStripeCustomer = async (user) => {
 export const createStripeBillingSession = async (stripeCustomerId) => {
   return await stripe.billingPortal.sessions.create({
     customer: stripeCustomerId,
-    return_url: 'http://localhost:3000/account',
+    return_url: `${process.env.BASE_URL}/account`,
   })
 }
 
@@ -22,7 +22,7 @@ export const createStripeCheckoutSession = async (
     mode: 'subscription',
     payment_method_types: ['card'],
     line_items: lineItems,
-    success_url: 'http://localhost:3000/account?checkout=success',
-    cancel_url: 'http://localhost:3000/account?checkout=cancelled',
+    success_url: `${process.env.BASE_URL}/account?checkout=success`,
+    cancel_url: `${process.env.BASE_URL}/account?checkout=cancel`,
   })
 }

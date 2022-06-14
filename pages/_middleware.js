@@ -11,8 +11,8 @@ export default function middleware(req) {
 
   const currentHost =
     process.env.NODE_ENV === 'production'
-      ? hostname.replace(`.${process.env.NEXT_PUBLIC_APP_URL}`, '')
-      : process.env.TEST_HOST
+      ? hostname.replace(`.${process.env.NEXT_PUBLIC_HOSTNAME}`, '')
+      : process.env.TEST_HOSTNAME
 
   // Prevent security issues – users should not be able to canonically access
   // the pages/sites folder and its respective contents. This can also be done
@@ -23,7 +23,7 @@ export default function middleware(req) {
 
   if (
     currentHost &&
-    currentHost !== process.env.NEXT_PUBLIC_APP_URL &&
+    currentHost !== process.env.NEXT_PUBLIC_HOSTNAME &&
     !pathname.includes('.') && // exclude all files in the public folder
     !pathname.startsWith('/api') // exclude all API routes
   ) {
