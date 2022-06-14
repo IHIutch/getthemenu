@@ -3,6 +3,7 @@ import { createStripeCustomer } from '@/utils/stripe'
 import supabase from '@/utils/supabase'
 import { resStatusType } from '@/utils/types'
 import { withSentry } from '@sentry/nextjs'
+import dayjs from 'dayjs'
 
 const handler = async (req, res) => {
   const { method } = req
@@ -20,6 +21,7 @@ const handler = async (req, res) => {
         await prismaPostUser({
           id: session.user.id,
           stripeCustomerId: stripeCustomer.id,
+          trialEndsAt: dayjs().add(30, 'day').endOf('day').toISOString(),
           ...payload,
         })
 

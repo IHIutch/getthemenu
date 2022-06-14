@@ -80,6 +80,7 @@ model users {
   fullName             String?       @db.VarChar
   stripeSubscriptionId String?       @unique @db.VarChar
   stripeCustomerId     String?       @unique @db.VarChar
+  trialEndsAt          DateTime?     @db.Timestamptz()
   createdAt            DateTime      @default(now()) @db.Timestamptz()
   updatedAt            DateTime      @default(now()) @updatedAt @db.Timestamptz()
   deletedAt            DateTime?     @db.Timestamptz()

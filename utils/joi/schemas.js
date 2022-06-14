@@ -75,6 +75,7 @@ export const userSchema = Joi.object().keys({
   fullName: Joi.string(),
   stripeCustomerId: Joi.string(),
   stripeSubscriptionId: Joi.string(),
+  trialEndsAt: Joi.date(),
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
   deletedAt: Joi.date().allow(null),
