@@ -15,6 +15,7 @@ import {
   AlertDescription,
   Flex,
   Circle,
+  Center,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useAuthUser } from '@/utils/react-query/user'
@@ -139,6 +140,7 @@ const Subscription = ({ prices }) => {
                           {...radio}
                           key={price.id}
                           sx={{
+                            transition: 'all 0.2s ease-in-out',
                             p: '4',
                             borderWidth: '1px',
                             mt: '-1px',
@@ -158,6 +160,8 @@ const Subscription = ({ prices }) => {
                           <Flex mb="1">
                             <Flex>
                               <Circle
+                                as={Center}
+                                transition="all 0.2s ease-in-out"
                                 mt="2"
                                 boxSize="4"
                                 borderWidth="2px"
@@ -169,16 +173,16 @@ const Subscription = ({ prices }) => {
                                     bg: 'blue.600',
                                   }
                                 }
-                                p="3px"
                               >
                                 <Circle
-                                  boxSize="full"
+                                  transition="all 0.2s ease-in-out"
+                                  boxSize={radio.isChecked ? '2' : '0'}
                                   bg={radio.isChecked && 'white'}
                                 />
                               </Circle>
                             </Flex>
                             <Box ml="2">
-                              <Text fontWeight="bold" fontSize="lg">
+                              <Text fontWeight="semibold" fontSize="lg">
                                 {price.name}
                               </Text>
                               <Text color="gray.600">
