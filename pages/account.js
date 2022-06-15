@@ -139,58 +139,11 @@ const Subscription = ({ prices }) => {
                         <CompoundRadio
                           {...radio}
                           key={price.id}
-                          sx={{
-                            transition: 'all 0.2s ease-in-out',
-                            p: '4',
-                            borderWidth: '1px',
-                            mt: '-1px',
-                            _first: {
-                              borderTopRadius: 'md',
-                            },
-                            _last: {
-                              borderBottomRadius: 'md',
-                            },
-                            _checked: {
-                              zIndex: '1',
-                              bg: 'blue.100',
-                              borderColor: 'blue.500',
-                            },
-                          }}
-                        >
-                          <Flex mb="1">
-                            <Flex>
-                              <Circle
-                                as={Center}
-                                transition="all 0.2s ease-in-out"
-                                mt="1.5"
-                                boxSize="4"
-                                borderWidth="2px"
-                                borderColor={radio.isChecked && 'blue.500'}
-                                bg={radio.isChecked && 'blue.500'}
-                                _hover={
-                                  radio.isChecked && {
-                                    borderColor: 'blue.600',
-                                    bg: 'blue.600',
-                                  }
-                                }
-                              >
-                                <Circle
-                                  transition="all 0.2s ease-in-out"
-                                  boxSize={radio.isChecked ? '2' : '0'}
-                                  bg={radio.isChecked && 'white'}
-                                />
-                              </Circle>
-                            </Flex>
-                            <Box ml="2">
-                              <Text fontWeight="semibold" fontSize="lg">
-                                {price.name}
-                              </Text>
-                              <Text color="gray.600">
-                                ${price.price / 100} / {price.interval}
-                              </Text>
-                            </Box>
-                          </Flex>
-                        </CompoundRadio>
+                          label={price.name}
+                          description={`$${price.price / 100} / ${
+                            price.interval
+                          }`}
+                        />
                       )
                     })}
                   </VStack>
@@ -222,6 +175,8 @@ const CompoundRadio = (props) => {
   const input = getInputProps()
   const checkbox = getCheckboxProps()
 
+  console.log({ input, checkbox })
+
   return (
     <Box
       as="label"
@@ -230,11 +185,57 @@ const CompoundRadio = (props) => {
       _focus={{
         boxShadow: 'outline',
       }}
-      {...props.sx}
+      transition="all 0.2s ease-in-out"
+      p="4"
+      borderWidth="1px"
+      mt="-1px"
+      _first={{
+        borderTopRadius: 'md',
+      }}
+      _last={{
+        borderBottomRadius: 'md',
+      }}
+      _checked={{
+        zIndex: '1',
+        bg: 'blue.100',
+        borderColor: 'blue.500',
+      }}
       {...checkbox}
     >
-      <input {...input} />
-      <Box>{props.children}</Box>
+      <input {...input} aria-describedby={`${input.id}-helper-text`} />
+      <Box>
+        <Flex mb="1">
+          <Flex alignItems="">
+            <Circle
+              as={Center}
+              transition="all 0.2s ease-in-out"
+              mt="1.5"
+              boxSize="4"
+              borderWidth="2px"
+              borderColor={props.isChecked && 'blue.500'}
+              bg={props.isChecked && 'blue.500'}
+              _hover={
+                props.isChecked && {
+                  borderColor: 'blue.600',
+                  bg: 'blue.600',
+                }
+              }
+            >
+              <Circle
+                transition="all 0.2s ease-in-out"
+                boxSize={props.isChecked ? '2' : '0'}
+                bg={props.isChecked && 'white'}
+              />
+            </Circle>
+          </Flex>
+          <Box ml="2" id={`${input.id}-helper-text`}>
+            <Text fontWeight="semibold" fontSize="lg">
+              {props.label}
+            </Text>
+            <Text color="gray.600">{props.description}</Text>
+          </Box>
+        </Flex>
+      </Box>
     </Box>
   )
 }
