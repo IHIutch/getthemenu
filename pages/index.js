@@ -3,7 +3,8 @@ import supabase from '@/utils/supabase'
 import SEO from '@/components/global/SEO'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Button, Link, Stack, Text } from '@chakra-ui/react'
+import NextLink from 'next/link'
 
 export default function Homepage() {
   const router = useRouter()
@@ -40,6 +41,14 @@ export default function Homepage() {
       </Head>
       <Box>
         <Text>Homepage</Text>
+        <Stack direction="row">
+          <NextLink href="/login" passHref>
+            <Button as={Link}>Log In</Button>
+          </NextLink>
+          <NextLink href="/register" passHref>
+            <Button as={Link}>Sign Up</Button>
+          </NextLink>
+        </Stack>
       </Box>
     </>
   )

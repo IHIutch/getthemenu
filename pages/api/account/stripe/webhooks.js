@@ -29,7 +29,7 @@ const handler = async (req, res) => {
       await prismaPutUser(
         { stripeCustomerId: event.data.object.customer },
         {
-          stripeSubscriptionId: event.data.object.plan.id,
+          stripeSubscriptionId: event.data.object.id,
         }
       )
       break

@@ -6,10 +6,6 @@ import { createStripeBillingSession } from '@/utils/stripe'
 const handler = async (req, res) => {
   const { user: sessionUser } = await supabase.auth.api.getUserByCookie(req)
 
-  console.log({ sessionUser })
-
-  console.log({ user: sessionUser.id })
-
   if (!sessionUser) {
     return res.status(401).send('Unauthorized')
   }
