@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import AccountLayout from '@/layouts/Account'
 import {
   Container,
@@ -7,15 +7,14 @@ import {
   Box,
   Button,
   Text,
-  GridItem,
   Alert,
   useRadioGroup,
-  HStack,
   useRadio,
   VStack,
   AlertIcon,
   AlertDescription,
   Flex,
+  Circle,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useAuthUser } from '@/utils/react-query/user'
@@ -128,21 +127,66 @@ const Subscription = ({ prices }) => {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault()
+                    // console.log(e.target.priceId.value)
                     loadCheckout(e.target.priceId.value)
                   }}
                 >
-                  <VStack {...group} spacing="0" mb="2">
+                  <VStack {...group} spacing="-1px" mb="3">
                     {prices.map((price) => {
                       const radio = getRadioProps({ value: price.id })
                       return (
-                        <RadioCard key={price.id} {...radio}>
-                          <Heading as="h2" fontSize="lg">
-                            {price.name}
-                          </Heading>
-                          <Text color="gray.600">
-                            ${price.price / 100} / {price.interval}
-                          </Text>
-                        </RadioCard>
+                        <CompoundRadio
+                          {...radio}
+                          key={price.id}
+                          sx={{
+                            p: '4',
+                            borderWidth: '1px',
+                            mt: '-1px',
+                            _first: {
+                              borderTopRadius: 'md',
+                            },
+                            _last: {
+                              borderBottomRadius: 'md',
+                            },
+                            _checked: {
+                              zIndex: '1',
+                              bg: 'blue.100',
+                              borderColor: 'blue.500',
+                            },
+                          }}
+                        >
+                          <Flex mb="1">
+                            <Flex>
+                              <Circle
+                                mt="2"
+                                boxSize="4"
+                                borderWidth="2px"
+                                borderColor={radio.isChecked && 'blue.500'}
+                                bg={radio.isChecked && 'blue.500'}
+                                _hover={
+                                  radio.isChecked && {
+                                    borderColor: 'blue.600',
+                                    bg: 'blue.600',
+                                  }
+                                }
+                                p="3px"
+                              >
+                                <Circle
+                                  boxSize="full"
+                                  bg={radio.isChecked && 'white'}
+                                />
+                              </Circle>
+                            </Flex>
+                            <Box ml="2">
+                              <Text fontWeight="bold" fontSize="lg">
+                                {price.name}
+                              </Text>
+                              <Text color="gray.600">
+                                ${price.price / 100} / {price.interval}
+                              </Text>
+                            </Box>
+                          </Flex>
+                        </CompoundRadio>
                       )
                     })}
                   </VStack>
@@ -168,7 +212,7 @@ const Subscription = ({ prices }) => {
 
 Account.getLayout = (page) => <AccountLayout>{page}</AccountLayout>
 
-const RadioCard = (props) => {
+const CompoundRadio = (props) => {
   const { getInputProps, getCheckboxProps } = useRadio(props)
 
   const input = getInputProps()
@@ -178,34 +222,15 @@ const RadioCard = (props) => {
     <Box
       as="label"
       width="full"
-      borderTopWidth="1px"
-      borderLeftWidth="1px"
-      borderRightWidth="1px"
-      _first={{
-        borderTopRadius: 'md',
+      cursor="pointer"
+      _focus={{
+        boxShadow: 'outline',
       }}
-      _last={{
-        borderBottomRadius: 'md',
-        borderBottomWidth: '1px',
-      }}
-      overflow="hidden"
+      {...props.sx}
+      {...checkbox}
     >
       <input {...input} />
-      <Box
-        {...checkbox}
-        width="full"
-        cursor="pointer"
-        _checked={{
-          bg: 'blue.100',
-        }}
-        _focus={{
-          boxShadow: 'outline',
-        }}
-        px={5}
-        py={3}
-      >
-        {props.children}
-      </Box>
+      <Box>{props.children}</Box>
     </Box>
   )
 }
