@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import Head from 'next/head'
-import supabase from '@/utils/supabase'
-import axios from 'redaxios'
 import {
   Box,
   Button,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -16,20 +13,30 @@ import {
   Link,
   Container,
 } from '@chakra-ui/react'
+
+import Head from 'next/head'
+import supabase from '@/utils/supabase'
 import { useForm } from 'react-hook-form'
+import axios from 'redaxios'
+import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useAuthUser } from '@/utils/react-query/user'
+import SEO from '@/components/global/SEO'
 
-export default function Register() {
+export default function Login() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
 
-  const sessionUser = supabase.auth.user()
   const {
     data: user,
     isLoading: isUserLoading,
     // isError: isUserError,
-  } = useAuthUser(sessionUser)
+  } = useAuthUser()
 
   // Doing this client side because of https://github.com/supabase/supabase/issues/3783
   useEffect(() => {
@@ -42,27 +49,15 @@ export default function Register() {
     }
   }, [isUserLoading, router, user])
 
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    formState: { errors },
-  } = useForm()
-
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN') {
-          const fullName = getValues('fullName')
-          await axios.post(`/api/auth/register`, {
+          await axios.post(`/api/auth/signin`, {
             event,
             session,
-            payload: {
-              // Any additional user data
-              fullName,
-            },
           })
-          router.replace('/get-started')
+          router.replace('/dashboard')
         }
       }
     )
@@ -70,14 +65,14 @@ export default function Register() {
     return () => {
       authListener.unsubscribe()
     }
-  }, [getValues, router])
+  }, [router])
 
   const onSubmit = async (form) => {
     try {
       setIsSubmitting(true)
-      const { error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signIn({
         email: form.email,
-        password: form['new-password'],
+        password: form.password,
       })
       if (error) throw new Error(error.message)
     } catch (error) {
@@ -89,8 +84,7 @@ export default function Register() {
   return (
     <>
       <Head>
-        <title>Register</title>
-        <link rel="icon" href="/favicon.ico" />
+        <SEO title="Log In" />
       </Head>
       <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
@@ -103,31 +97,14 @@ export default function Register() {
             <Box bg="white" borderWidth="1px" rounded="md" p="8">
               <Box mb="8">
                 <Heading as="h2" fontSize="3xl" mb="2">
-                  Register
+                  Log In
                 </Heading>
               </Box>
-
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl id="fullName" isInvalid={errors.email}>
-                      <FormLabel>Your Name</FormLabel>
-                      <Input
-                        {...register('fullName', {
-                          required: 'This field is required',
-                        })}
-                        type="text"
-                        autoComplete="name"
-                        isRequired
-                      />
-                      <FormErrorMessage>
-                        {errors.email?.message}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
                     <FormControl id="email" isInvalid={errors.email}>
-                      <FormLabel>Your Email</FormLabel>
+                      <FormLabel>Email address</FormLabel>
                       <Input
                         {...register('email', {
                           required: 'This field is required',
@@ -136,69 +113,56 @@ export default function Register() {
                         autoComplete="email"
                         isRequired
                       />
-                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors.email?.message}
+                      </FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl
-                      id="password"
-                      isInvalid={errors['new-password']}
-                    >
+                    <FormControl id="password" isInvalid={errors.password}>
                       <FormLabel>Password</FormLabel>
                       <Input
-                        {...register('new-password', {
+                        {...register('password', {
                           required: 'This field is required',
                         })}
                         type="password"
-                        autoComplete="new-password"
+                        autoComplete="current-password"
                         isRequired
                       />
                       <FormErrorMessage>
-                        {errors['new-password']?.message}
+                        {errors.password?.message}
                       </FormErrorMessage>
                     </FormControl>
                   </GridItem>
-                  <GridItem>
-                    <FormControl
-                      id="confirmPassword"
-                      isInvalid={errors['confirm-password']}
-                    >
-                      <FormLabel>Confirm Password</FormLabel>
-                      <Input
-                        {...register('confirm-password', {
-                          required: 'This field is required',
-                          validate: (value) =>
-                            value === getValues('new-password') ||
-                            'Passwords must match',
-                        })}
-                        type="password"
-                        autoComplete="new-password"
-                        isRequired
-                      />
-                      <FormErrorMessage>
-                        {errors['confirm-password']?.message}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
+                  <GridItem d="flex">
+                    <Flex align="center">
+                      <NextLink href={'/forgot-password'} passHref>
+                        <Button
+                          as={Link}
+                          variant="link"
+                          fontWeight="semibold"
+                          colorScheme="blue"
+                        >
+                          Forgot Password?
+                        </Button>
+                      </NextLink>
+                    </Flex>
                     <Button
                       ml="auto"
-                      type="submit"
-                      colorScheme="blue"
-                      loadingText="Registering..."
-                      isFullWidth
                       isLoading={isSubmitting}
+                      colorScheme="blue"
+                      type="submit"
                     >
-                      Register
+                      Log In
                     </Button>
                   </GridItem>
                 </Grid>
               </form>
             </Box>
             <Box textAlign="center" mt="6">
-              <NextLink href="/" passHref>
+              <NextLink href="/register" passHref>
                 <Button as={Link} colorScheme="blue" variant="link">
-                  Have an Account? Log In Here!
+                  Don&rsquo;t Have an Account? Register Now!
                 </Button>
               </NextLink>
             </Box>

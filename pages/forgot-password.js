@@ -21,6 +21,7 @@ import NextLink from 'next/link'
 
 import { useForm } from 'react-hook-form'
 import supabase from '@/utils/supabase'
+import SEO from '@/components/global/SEO'
 
 export default function ResetPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -36,7 +37,10 @@ export default function ResetPassword() {
     try {
       setIsSubmitting(true)
       const { error } = await supabase.auth.api.resetPasswordForEmail(
-        form.email
+        form.email,
+        {
+          redirectTo: `${process.env.BASE_URL}/reset-password`,
+        }
       )
       if (error) throw new Error(error.message)
       setIsSubmitting(false)
@@ -50,8 +54,7 @@ export default function ResetPassword() {
   return (
     <>
       <Head>
-        <title>Reset Password</title>
-        <link rel="icon" href="/favicon.ico" />
+        <SEO title="Forgot Password" />
       </Head>
       <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
@@ -76,6 +79,8 @@ export default function ResetPassword() {
                           required: 'This field is required',
                         })}
                         type="email"
+                        autoComplete="email"
+                        required
                       />
                       <FormErrorMessage>
                         {errors.email?.message}
