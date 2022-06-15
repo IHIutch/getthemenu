@@ -162,7 +162,7 @@ const Subscription = ({ prices }) => {
                               <Circle
                                 as={Center}
                                 transition="all 0.2s ease-in-out"
-                                mt="2"
+                                mt="1.5"
                                 boxSize="4"
                                 borderWidth="2px"
                                 borderColor={radio.isChecked && 'blue.500'}
