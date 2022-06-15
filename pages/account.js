@@ -202,7 +202,7 @@ const CompoundRadio = (props) => {
       }}
       {...checkbox}
     >
-      <input {...input} aria-describedby={`${input.id}-helper-text`} />
+      <input {...input} />
       <Box>
         <Flex mb="1">
           <Flex alignItems="">
@@ -228,7 +228,7 @@ const CompoundRadio = (props) => {
               />
             </Circle>
           </Flex>
-          <Box ml="2" id={`${input.id}-helper-text`}>
+          <Box ml="2">
             <Text fontWeight="semibold" fontSize="lg">
               {props.label}
             </Text>
