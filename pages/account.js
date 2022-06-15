@@ -136,14 +136,14 @@ const Subscription = ({ prices }) => {
                     {prices.map((price) => {
                       const radio = getRadioProps({ value: price.id })
                       return (
-                        <CompoundRadio
-                          {...radio}
-                          key={price.id}
-                          label={price.name}
-                          description={`$${price.price / 100} / ${
-                            price.interval
-                          }`}
-                        />
+                        <CompoundRadio {...radio} key={price.id}>
+                          <Text fontWeight="semibold" fontSize="lg">
+                            {price.name}
+                          </Text>
+                          <Text color="gray.600">
+                            ${price.price / 100} / {price.interval}
+                          </Text>
+                        </CompoundRadio>
                       )
                     })}
                   </VStack>
@@ -174,8 +174,6 @@ const CompoundRadio = (props) => {
 
   const input = getInputProps()
   const checkbox = getCheckboxProps()
-
-  console.log({ input, checkbox })
 
   return (
     <Box
@@ -223,17 +221,12 @@ const CompoundRadio = (props) => {
             >
               <Circle
                 transition="all 0.2s ease-in-out"
-                boxSize={props.isChecked ? '2' : '0'}
+                boxSize={props.isChecked ? '50%' : '0'}
                 bg={props.isChecked && 'white'}
               />
             </Circle>
           </Flex>
-          <Box ml="2">
-            <Text fontWeight="semibold" fontSize="lg">
-              {props.label}
-            </Text>
-            <Text color="gray.600">{props.description}</Text>
-          </Box>
+          <Box ml="2">{props.children}</Box>
         </Flex>
       </Box>
     </Box>
