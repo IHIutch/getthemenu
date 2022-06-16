@@ -16,6 +16,13 @@ import {
   Flex,
   Circle,
   Center,
+  FormControl,
+  FormLabel,
+  Input,
+  FormErrorMessage,
+  InputGroup,
+  InputRightAddon,
+  InputRightElement,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useAuthUser } from '@/utils/react-query/user'
@@ -24,6 +31,7 @@ import { useRouter } from 'next/router'
 import initStripe from 'stripe'
 import { loadStripe } from '@stripe/stripe-js'
 import dayjs from 'dayjs'
+import { useGetRestaurant } from '@/utils/react-query/restaurants'
 
 export default function Account({ plans: prices }) {
   return (
@@ -36,6 +44,9 @@ export default function Account({ plans: prices }) {
         <Stack spacing="6">
           <Box bg="white" rounded="md" shadow="base">
             <UserDetails />
+          </Box>
+          <Box bg="white" rounded="md" shadow="base">
+            <SiteDetails />
           </Box>
           <Box bg="white" rounded="md" shadow="base">
             <Subscription prices={prices} />
@@ -60,6 +71,70 @@ const UserDetails = () => {
         </Heading>
       </Box>
       <Box p="6">Email: {user?.email}</Box>
+    </>
+  )
+}
+
+const SiteDetails = () => {
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    // isError: isUserError,
+  } = useAuthUser()
+  const { data: restaurant } = useGetRestaurant(
+    user?.restaurants?.length ? user.restaurants[0].id : null
+  )
+  return (
+    <>
+      <Box p="6" borderBottomWidth="1px">
+        <Heading fontSize="xl" fontWeight="semibold">
+          Site Details
+        </Heading>
+      </Box>
+      <Box p="6">
+        <Stack spacing="6">
+          <form action="">
+            <FormControl
+              id="customHost"
+              // isInvalid={errors.restaurantName}
+            >
+              <FormLabel>Host</FormLabel>
+              <InputGroup>
+                <Input
+                  type="text"
+                  defaultValue={restaurant?.customHost || ''}
+                />
+                <InputRightElement w="auto">
+                  <Button type="submit" colorScheme="blue">
+                    Update
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+              {/* <FormErrorMessage>{errors.restaurantName?.message}</FormErrorMessage> */}
+            </FormControl>
+          </form>
+          <form action="">
+            <FormControl
+              id="customDomain"
+              // isInvalid={errors.restaurantName}
+            >
+              <FormLabel>Domain</FormLabel>
+              <InputGroup>
+                <Input
+                  type="text"
+                  defaultValue={restaurant?.customDomain || ''}
+                />
+                <InputRightElement w="auto">
+                  <Button type="submit" colorScheme="blue">
+                    Update
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+              {/* <FormErrorMessage>{errors.restaurantName?.message}</FormErrorMessage> */}
+            </FormControl>
+          </form>
+        </Stack>
+      </Box>
     </>
   )
 }
@@ -110,17 +185,17 @@ const Subscription = ({ prices }) => {
           Subscription
         </Heading>
       </Box>
+      {trialCountdown() ? (
+        <Alert mb="3" status="warning">
+          <AlertIcon />
+          <AlertDescription>
+            Your trial ends {trialCountdown()}
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <Box p="6">
         {!isUserLoading && (
           <>
-            {trialCountdown ? (
-              <Alert mb="3" status="warning">
-                <AlertIcon />
-                <AlertDescription>
-                  Your trial ends {trialCountdown()}
-                </AlertDescription>
-              </Alert>
-            ) : null}
             <Text className="mb-6">
               {!user?.stripeSubscriptionId ? (
                 <Button onClick={loadCustomerPortal}>Payment Portal</Button>
@@ -138,7 +213,7 @@ const Subscription = ({ prices }) => {
                       return (
                         <CompoundRadio {...radio} key={price.id}>
                           <Text fontWeight="semibold" fontSize="lg">
-                            {price.name}
+                            {price.label || price.name}
                           </Text>
                           <Text color="gray.600">
                             ${price.price / 100} / {price.interval}
@@ -249,6 +324,7 @@ export const getServerSideProps = async () => {
         price: price.unit_amount,
         interval: price.recurring.interval,
         currency: price.currency,
+        label: price.metadata?.label || '',
       }
     })
   )
@@ -256,8 +332,6 @@ export const getServerSideProps = async () => {
   const subscription = await stripe.subscriptions.retrieve(
     'sub_1LAabzA1eyXMj3XCLJOcF3Zm'
   )
-
-  console.log({ subscription })
 
   const sortedPlans = plans.sort((a, b) => a.price - b.price)
 
