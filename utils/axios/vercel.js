@@ -15,7 +15,7 @@ export const postVercelDomain = async (domain) => {
       }
     )
     .catch((res) => {
-      throw new Error(res.data.error)
+      throw new Error(res.data.error.message)
     })
   return data
 }
@@ -35,7 +35,7 @@ export const patchVercelDomain = async (domain) => {
       }
     )
     .catch((res) => {
-      throw new Error(res.data.error)
+      throw new Error(res.data.error.message)
     })
   return data
 }
@@ -43,8 +43,7 @@ export const patchVercelDomain = async (domain) => {
 export const deleteVercelDomain = async (domain) => {
   const { data } = await axios
     .delete(
-      `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains`,
-      null,
+      `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains/${domain}`,
       {
         headers: {
           Authorization: `Bearer ${process.env.VERCEL_BEARER_TOKEN}`,
@@ -53,7 +52,7 @@ export const deleteVercelDomain = async (domain) => {
       }
     )
     .catch((res) => {
-      throw new Error(res.data.error)
+      throw new Error(res.data.error.message)
     })
   return data
 }
@@ -71,16 +70,15 @@ export const postVerifyVercelDomain = async (domain) => {
       }
     )
     .catch((res) => {
-      throw new Error(res.data.error)
+      throw new Error(res.data.error.message)
     })
   return data
 }
 
-export const getCheckVercelDomain = async (domain) => {
+export const getAvailabilityVercelDomain = async (domain) => {
   const { data } = await axios
     .get(
       `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains/${domain}`,
-      null,
       {
         headers: {
           Authorization: `Bearer ${process.env.VERCEL_BEARER_TOKEN}`,
@@ -89,7 +87,22 @@ export const getCheckVercelDomain = async (domain) => {
       }
     )
     .catch((res) => {
-      throw new Error(res.data.error)
+      throw new Error(res.data.error.message)
+    })
+  return data
+}
+
+export const getConfigVercelDomain = async (domain) => {
+  const { data } = await axios
+    .get(`https://api.vercel.com/v6/domains/${domain}/config`, {
+      headers: {
+        Authorization: `Bearer ${process.env.VERCEL_BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    .catch((res) => {
+      console.log({ res })
+      throw new Error(res.data.error.message)
     })
   return data
 }

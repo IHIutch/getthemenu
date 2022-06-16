@@ -19,18 +19,16 @@ import {
   FormControl,
   FormLabel,
   Input,
-  FormErrorMessage,
   InputGroup,
-  InputRightAddon,
   InputRightElement,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useAuthUser } from '@/utils/react-query/user'
+import initStripe from 'stripe'
+import dayjs from 'dayjs'
 import axios from 'redaxios'
 import { useRouter } from 'next/router'
-import initStripe from 'stripe'
 import { loadStripe } from '@stripe/stripe-js'
-import dayjs from 'dayjs'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
 
 export default function Account({ plans: prices }) {
@@ -84,6 +82,48 @@ const SiteDetails = () => {
   const { data: restaurant } = useGetRestaurant(
     user?.restaurants?.length ? user.restaurants[0].id : null
   )
+
+  const handleCheckDomain = async (domain) => {
+    try {
+      // const { data: checkData } = await axios
+      //   .post('/api/account/vercel/domain/check', {
+      //     domain,
+      //   })
+      //   .catch((res) => {
+      //     throw new Error(res.data.error)
+      //   })
+      // const { data: verifyData } = await axios
+      //   .post('/api/account/vercel/domain/verify', {
+      //     domain,
+      //   })
+      //   .catch((res) => {
+      //     throw new Error(res.data.error)
+      //   })
+
+      // console.log({ checkData, verifyData })
+
+      // const { data: createData } = await axios
+      //   .post('/api/account/vercel/domain', {
+      //     domain,
+      //   })
+      //   .catch((res) => {
+      //     throw new Error(res.data.error)
+      //   })
+
+      const { data: configData } = await axios
+        .post('/api/account/vercel/domain/config', {
+          domain,
+        })
+        .catch((res) => {
+          throw new Error(res.data.error)
+        })
+
+      console.log({ configData })
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+
   return (
     <>
       <Box p="6" borderBottomWidth="1px">
@@ -102,6 +142,7 @@ const SiteDetails = () => {
               <InputGroup>
                 <Input
                   type="text"
+                  name="customHost"
                   defaultValue={restaurant?.customHost || ''}
                 />
                 <InputRightElement w="auto">
@@ -113,7 +154,12 @@ const SiteDetails = () => {
               {/* <FormErrorMessage>{errors.restaurantName?.message}</FormErrorMessage> */}
             </FormControl>
           </form>
-          <form action="">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleCheckDomain(e.target.customDomain.value)
+            }}
+          >
             <FormControl
               id="customDomain"
               // isInvalid={errors.restaurantName}
@@ -122,6 +168,7 @@ const SiteDetails = () => {
               <InputGroup>
                 <Input
                   type="text"
+                  name="customDomain"
                   defaultValue={restaurant?.customDomain || ''}
                 />
                 <InputRightElement w="auto">

@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   switch (method) {
     case 'POST':
       try {
-        const { domain } = req.query
+        const { domain } = req.body
         const data = await postVercelDomain(domain)
 
         // Not sure if this will work with axios, might need to put in the catch block
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
     case 'PATCH':
       try {
-        const { domain } = req.query
+        const { domain } = req.body
 
         if (restrictedDomains.includes(domain)) {
           res
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
     case 'DELETE':
       try {
-        const { domain } = req.query
+        const { domain } = req.body
 
         if (restrictedDomains.includes(domain)) {
           res

@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   switch (method) {
     case 'POST':
       try {
-        const { domain } = req.query
+        const { domain } = req.body
         const data = await postVerifyVercelDomain(domain)
 
         res.status(resStatusType.SUCCESS).json(data)
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       break
 
     default:
-      res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
+      res.setHeader('Allow', ['POST'])
       res.status(resStatusType.NOT_ALLOWED).end(`Method ${method} Not Allowed`)
   }
 }
