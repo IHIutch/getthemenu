@@ -86,14 +86,14 @@ const SiteDetails = () => {
   const handleCheckDomain = async (domain) => {
     try {
       // const { data: checkData } = await axios
-      //   .post('/api/account/vercel/domain/check', {
+      //   .post('/api/account/domain/check', {
       //     domain,
       //   })
       //   .catch((res) => {
       //     throw new Error(res.data.error)
       //   })
       // const { data: verifyData } = await axios
-      //   .post('/api/account/vercel/domain/verify', {
+      //   .post('/api/account/domain/verify', {
       //     domain,
       //   })
       //   .catch((res) => {
@@ -103,7 +103,7 @@ const SiteDetails = () => {
       // console.log({ checkData, verifyData })
 
       // const { data: createData } = await axios
-      //   .post('/api/account/vercel/domain', {
+      //   .post('/api/account/domain', {
       //     domain,
       //   })
       //   .catch((res) => {
@@ -111,7 +111,7 @@ const SiteDetails = () => {
       //   })
 
       const { data: configData } = await axios
-        .post('/api/account/vercel/domain/config', {
+        .post('/api/account/domain/config', {
           domain,
         })
         .catch((res) => {
