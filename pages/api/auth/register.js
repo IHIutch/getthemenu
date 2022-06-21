@@ -1,7 +1,7 @@
 import { prismaPostUser } from '@/utils/prisma/users'
 import { createStripeCustomer } from '@/utils/stripe'
 import supabase from '@/utils/supabase'
-import { resStatusType } from '@/utils/types'
+import { resStatusType } from '@/utils/apiResponseTypes'
 import { withSentry } from '@sentry/nextjs'
 import dayjs from 'dayjs'
 

@@ -1,4 +1,4 @@
-import { resStatusType } from '@/utils/types'
+import { resStatusType } from '@/utils/apiResponseTypes'
 import {
   vercelAddDomain,
   vercelRemoveDomain,

@@ -1,5 +1,5 @@
 import initStripe from 'stripe'
-import { resStatusType } from '@/utils/types'
+import { resStatusType } from '@/utils/apiResponseTypes'
 import { prismaPutUser } from '@/utils/prisma/users'
 import { buffer } from 'micro'
 

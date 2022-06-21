@@ -1,4 +1,4 @@
-import { resStatusType } from '@/utils/types'
+import { resStatusType } from '@/utils/apiResponseTypes'
 import formidable from 'formidable'
 import fs from 'fs'
 import supabase from '@/utils/supabase'

@@ -1,5 +1,5 @@
 import { vercelCheckDomain } from '@/utils/vercel'
-import { resStatusType } from '@/utils/types'
+import { resStatusType } from '@/utils/apiResponseTypes'
 
 export default async function handler(req, res) {
   const { method } = req

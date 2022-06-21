@@ -1,5 +1,5 @@
 import supabase from '@/utils/supabase'
-import { resStatusType } from '@/utils/types'
+import { resStatusType } from '@/utils/apiResponseTypes'
 import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req, res) => {

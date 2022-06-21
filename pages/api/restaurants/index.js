@@ -2,7 +2,7 @@ import {
   prismaGetRestaurants,
   prismaPostRestaurant,
 } from '@/utils/prisma/restaurants'
-import { resStatusType } from '@/utils/types'
+import { resStatusType } from '@/utils/apiResponseTypes'
 import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req, res) => {
