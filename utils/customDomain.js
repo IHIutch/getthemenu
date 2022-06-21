@@ -6,35 +6,37 @@ import {
   postVerifyVercelDomain,
 } from './axios/vercel'
 
-export const vercelVerifyDomain = async (domain) => {
+// TODO: These functions need to also work with the restaurant model to CRUD and verify domain ownership
+
+export const verifyCustomDomain = async (domain) => {
   return await postVerifyVercelDomain(domain)
 }
 
-export const vercelAddDomain = async (domain) => {
+export const createCustomDomain = async (domain) => {
   return await postVercelDomain(domain)
 }
 
-export const vercelUpdateDomain = async (domain) => {
+export const updateCustomDomain = async (domain) => {
   // TODO: This probably needs to be updated to delete, then add a new domain. There doesn't seem to be a way to update a domain outright.
   return await postVercelDomain(domain)
 }
 
-export const vercelRemoveDomain = async (domain) => {
+export const removeCustomDomain = async (domain) => {
   return await deleteVercelDomain(domain)
 }
 
-export const vercelCheckDomainAvailability = async (domain) => {
+export const checkCustomDomainAvailability = async (domain) => {
   return await getVercelDomain(domain)
 }
 
-export const vercelCheckDomainConfig = async (domain) => {
+export const customDomainCheckConfig = async (domain) => {
   return await getConfigVercelDomain(domain)
 }
 
-export const vercelCheckDomain = async (domain) => {
+export const checkCustomDomain = async (domain) => {
   const [configResponse, domainResponse] = await Promise.all([
-    vercelCheckDomainConfig(domain),
-    vercelCheckDomainAvailability(domain),
+    customDomainCheckConfig(domain),
+    checkCustomDomainAvailability(domain),
   ])
 
   const configJson = await configResponse
@@ -48,7 +50,7 @@ export const vercelCheckDomain = async (domain) => {
    */
   let verificationResponse = null
   if (!domainJson.verified) {
-    verificationResponse = await vercelCheckDomainConfig(domain)
+    verificationResponse = await customDomainCheckConfig(domain)
   }
 
   if (verificationResponse && verificationResponse.verified) {

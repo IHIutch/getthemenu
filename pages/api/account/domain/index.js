@@ -1,9 +1,9 @@
 import { resStatusType } from '@/utils/apiResponseTypes'
 import {
-  vercelAddDomain,
-  vercelRemoveDomain,
-  vercelUpdateDomain,
-} from '@/utils/vercel'
+  createCustomDomain,
+  removeCustomDomain,
+  updateCustomDomain,
+} from '@/utils/customDomain'
 
 export default async function handler(req, res) {
   const restrictedDomains = [
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     case 'POST':
       try {
         const { domain } = req.body
-        const data = await vercelAddDomain(domain)
+        const data = await createCustomDomain(domain)
 
         // Not sure if this will work with axios, might need to put in the catch block
         if (data.error?.code === 'forbidden') {
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
             .json({ error: 'You are not authorized to modify that domain.' })
         }
 
-        const data = await vercelUpdateDomain(domain)
+        const data = await updateCustomDomain(domain)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
             .json({ error: 'You are not authorized to delete that domain.' })
         }
 
-        const data = await vercelRemoveDomain(domain)
+        const data = await removeCustomDomain(domain)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
