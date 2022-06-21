@@ -1,5 +1,5 @@
-import { postVerifyVercelDomain } from '@/utils/axios/vercel'
 import { resStatusType } from '@/utils/types'
+import { vercelVerifyDomain } from '@/utils/vercel'
 
 export default async function handler(req, res) {
   const { method } = req
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     case 'POST':
       try {
         const { domain } = req.body
-        const data = await postVerifyVercelDomain(domain)
+        const data = await vercelVerifyDomain(domain)
 
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {

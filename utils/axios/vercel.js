@@ -75,7 +75,7 @@ export const postVerifyVercelDomain = async (domain) => {
   return data
 }
 
-export const getAvailabilityVercelDomain = async (domain) => {
+export const getVercelDomain = async (domain) => {
   const { data } = await axios
     .get(
       `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains/${domain}`,

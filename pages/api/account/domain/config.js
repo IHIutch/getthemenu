@@ -1,5 +1,5 @@
-import { getConfigVercelDomain } from '@/utils/axios/vercel'
 import { resStatusType } from '@/utils/types'
+import { vercelCheckDomainConfig } from '@/utils/vercel'
 
 export default async function handler(req, res) {
   const { method } = req
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     case 'POST':
       try {
         const { domain } = req.body
-        const data = await getConfigVercelDomain(domain)
+        const data = await vercelCheckDomainConfig(domain)
 
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
