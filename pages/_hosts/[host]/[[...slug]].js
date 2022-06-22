@@ -41,9 +41,8 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
     const restaurantJson = {
       '@type': 'Restaurant',
       url:
-        restaurant?.customDomain || restaurant?.customHost
-          ? `https://${restaurant.customHost}.getthemenu.io`
-          : '',
+        restaurant?.customDomain ||
+        `https://${restaurant.customHost}.getthemenu.io`,
       name: restaurant?.name || '',
       image: restaurant?.coverImage?.src || '',
       telephone: restaurant?.phone?.[0] || '',
@@ -112,9 +111,8 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
           description={restaurant?.description || ''}
           image={restaurant?.coverImage?.src || ''}
           url={
-            restaurant?.customDomain || restaurant?.customHost
-              ? `https://${restaurant.customHost}.getthemenu.io`
-              : ''
+            restaurant?.customDomain ||
+            `https://${restaurant.customHost}.getthemenu.io`
           }
         />
         {isSiteReady && (

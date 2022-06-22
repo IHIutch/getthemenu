@@ -12,7 +12,7 @@ export default function middleware(req) {
   const currentHost =
     process.env.NODE_ENV === 'production'
       ? hostname.replace(`.${process.env.NEXT_PUBLIC_HOSTNAME}`, '')
-      : process.env.TEST_HOSTNAME
+      : process.env.TEST_HOST
 
   // Prevent security issues – users should not be able to canonically access
   // the pages/sites folder and its respective contents. This can also be done
