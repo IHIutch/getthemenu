@@ -13,6 +13,7 @@
     "@chakra-ui/react": "^1.6.4",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@nikolovlazar/chakra-ui-prose": "^1.2.1",
     "@prisma/client": "^3.8.1",
     "@sentry/nextjs": "^6.5.0",
     "@stripe/stripe-js": "^1.31.0",

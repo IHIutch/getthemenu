@@ -48,6 +48,12 @@ export default function Homepage() {
           <NextLink href="/register" passHref>
             <Button as={Link}>Sign Up</Button>
           </NextLink>
+          <NextLink href="/terms-of-use" passHref>
+            <Link>Terms of Use</Link>
+          </NextLink>
+          <NextLink href="/privacy-policy" passHref>
+            <Link>Privacy Policy</Link>
+          </NextLink>
         </Stack>
       </Box>
     </>

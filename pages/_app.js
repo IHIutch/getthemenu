@@ -5,8 +5,24 @@ import customTheme from '@/customTheme'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import * as Fathom from 'fathom-client'
+import { withProse } from '@nikolovlazar/chakra-ui-prose'
 
-const theme = extendTheme(customTheme)
+const theme = extendTheme(
+  customTheme,
+  withProse({
+    baseStyle: {
+      a: {
+        textDecoration: 'underline',
+        fontWeight: 'semibold',
+      },
+      h5: {
+        fontWeight: 'semibold',
+        fontSize: 'md',
+        marginTop: '6',
+      },
+    },
+  })
+)
 
 export default function App({ Component, pageProps, err }) {
   const [queryClient] = useState(
