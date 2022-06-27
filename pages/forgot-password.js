@@ -18,10 +18,9 @@ import {
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
-
 import { useForm } from 'react-hook-form'
 import supabase from '@/utils/supabase'
-import SEO from '@/components/global/SEO'
+import { useSEO } from '@/utils/functions'
 
 export default function ResetPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -51,11 +50,13 @@ export default function ResetPassword() {
     }
   }
 
+  const seo = useSEO({
+    title: 'Forgot Password',
+  })
+
   return (
     <>
-      <Head>
-        <SEO title="Forgot Password" />
-      </Head>
+      <Head>{seo}</Head>
       <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>

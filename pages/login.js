@@ -21,7 +21,7 @@ import axios from 'redaxios'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useAuthUser } from '@/utils/react-query/user'
-import SEO from '@/components/global/SEO'
+import { useSEO } from '@/utils/functions'
 
 export default function Login() {
   const router = useRouter()
@@ -81,11 +81,13 @@ export default function Login() {
     }
   }
 
+  const seo = useSEO({
+    title: 'Log In',
+  })
+
   return (
     <>
-      <Head>
-        <SEO title="Log In" />
-      </Head>
+      <Head>{seo}</Head>
       <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
           <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>

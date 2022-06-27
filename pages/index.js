@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import supabase from '@/utils/supabase'
-import SEO from '@/components/global/SEO'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
@@ -20,7 +19,8 @@ import {
   Text,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
-import { Check, CheckCircle } from 'lucide-react'
+import { Check } from 'lucide-react'
+import { useSEO } from '@/utils/functions'
 
 export default function Homepage() {
   const router = useRouter()
@@ -53,15 +53,17 @@ export default function Homepage() {
     'Free updates',
   ]
 
+  const seo = useSEO({
+    title: 'GetTheMenu',
+    description: 'The platform built for both restaurants and their customers',
+    image: 'https://getthemenu.io/meta.png',
+    url: 'https://getthemenu.io',
+  })
+
   return (
     <>
       <Head>
-        <SEO
-          title="GetTheMenu"
-          description="The platform built for both restaurants and their customers"
-          image="https://getthemenu.io/meta.png"
-          url="https://getthemenu.io"
-        />
+        {seo}
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container h="full" maxW="container.lg">

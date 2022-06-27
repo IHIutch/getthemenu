@@ -1,7 +1,8 @@
+import Head from 'next/head'
 import React from 'react'
 
 export default function SEO({
-  title = '',
+  title = 'Log In',
   description = '',
   image = '',
   url = '',
@@ -57,14 +58,16 @@ export default function SEO({
     },
   ]
 
+  console.log({ title })
+
   return (
-    <>
-      <title>{title}</title>
+    <Head>
+      <title key="title">{title}</title>
       {attrs
         .filter((attr) => attr.content)
         .map((attr, idx) => (
           <meta key={idx} {...attr} />
         ))}
-    </>
+    </Head>
   )
 }

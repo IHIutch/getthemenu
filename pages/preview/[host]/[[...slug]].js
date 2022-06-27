@@ -7,9 +7,9 @@ import { useGetSections } from '@/utils/react-query/sections'
 import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
-import SEO from '@/components/global/SEO'
 import { prismaGetRestaurant } from '@/utils/prisma/restaurants'
 import BlurImage from '@/components/common/BlurImage'
+import { useSEO } from '@/utils/functions'
 
 export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   const menusQuery = { restaurantId: restaurant.id }
@@ -100,6 +100,15 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
     }
   }, [restaurant, menus, sections, menuItems])
 
+  const seo = useSEO({
+    title: restaurant?.name,
+    description: restaurant?.description || '',
+    image: restaurant?.coverImage?.src || '',
+    url:
+      restaurant?.customDomain ||
+      `https://${restaurant.customHost}.getthemenu.io`,
+  })
+
   const isSiteReady = useMemo(() => {
     return activeMenu && menus?.length > 0
   }, [activeMenu, menus])
@@ -107,16 +116,7 @@ export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
   return (
     <>
       <Head>
-        <SEO
-          title={restaurant?.name}
-          description={restaurant?.description || ''}
-          image={restaurant?.coverImage?.src || ''}
-          url={
-            restaurant?.customDomain || restaurant?.customHost
-              ? `https://${restaurant.customHost}.getthemenu.io`
-              : ''
-          }
-        />
+        {seo}
         {isSiteReady && (
           <script
             type="application/ld+json"
