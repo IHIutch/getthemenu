@@ -9,7 +9,6 @@ import {
   Circle,
   Container,
   Flex,
-  Grid,
   GridItem,
   Heading,
   Icon,
@@ -45,12 +44,12 @@ export default function Homepage() {
   }, [router])
 
   const features = [
-    '210+ Components',
-    'Unlimited projects',
-    'Unlimited users',
-    'Lifetime access',
+    'Simple menu editing',
+    'Easily manage your business details',
+    'Built-in analytics',
+    'No updates - ever',
+    'Premium SEO support',
     'Customer support',
-    'Free updates',
   ]
 
   const seo = useSEO({
@@ -68,105 +67,103 @@ export default function Homepage() {
       </Head>
       <Container h="full" maxW="container.lg">
         <Flex h="full" direction="column">
-          <Box py="12">
-            <Flex>
-              <Box mb="12">
-                <Heading as="h1" mb="2" fontSize="5xl" fontWeight="semibold">
-                  GetTheMenu
-                </Heading>
-                <Text fontSize="2xl" color="gray.600">
-                  The platform built for both restaurants and their customers
+          <Box textAlign="right" mt="2">
+            <Text>
+              Already Have an Account?{' '}
+              <NextLink href="/login" passHref>
+                <Link
+                  color="blue.500"
+                  fontWeight="semibold"
+                  textDecoration="underline"
+                >
+                  Log In
+                </Link>
+              </NextLink>
+            </Text>
+          </Box>
+          <Box textAlign="center" my="12">
+            <Heading as="h1" mb="2" fontSize="5xl" fontWeight="semibold">
+              GetTheMenu
+            </Heading>
+            <Text fontSize="2xl" color="gray.600">
+              Our goal is simple: Get your menu in front of customers as fast as
+              possible.
+            </Text>
+          </Box>
+          <Box textAlign="center">
+            <Heading
+              as="h2"
+              fontWeight="semibold"
+              color="blue.500"
+              textTransform="uppercase"
+              fontSize="xl"
+            >
+              Get Started Today
+            </Heading>
+            <Text color="gray.600" mt="2">
+              1 month{' '}
+              <Text as="span" fontWeight="semibold">
+                FREE
+              </Text>{' '}
+              trial, no credit card required!
+            </Text>
+            <Text
+              mt="6"
+              fontWeight="semibold"
+              textTransform="uppercase"
+              fontSize="lg"
+            >
+              Then
+            </Text>
+            <Flex direction="column" align="center" mt="-4">
+              <Flex align="flex-start">
+                <Text fontSize="3xl" fontWeight="bold" mt="3">
+                  $
                 </Text>
-              </Box>
-              <Box ml="auto">
-                <NextLink href="/login" passHref>
-                  <Button as={Link}>Log In</Button>
-                </NextLink>
-              </Box>
+                <Text fontSize="6xl" fontWeight="medium">
+                  20
+                </Text>
+              </Flex>
+              <Text mt="-4">per month</Text>
             </Flex>
-            <Grid templateColumns="repeat(12, 1fr)" gap="8">
-              <GridItem colSpan={{ base: '12', lg: '6' }}></GridItem>
-              <GridItem colSpan={{ base: '12', lg: '6' }}>
-                <Box bg="white" rounded="lg" shadow="base" w="full">
-                  <Flex p="6" align="center" borderBottomWidth="1px">
-                    <Box>
-                      <Heading
-                        as="h2"
-                        fontSize="2xl"
-                        fontWeight="semibold"
-                        mb="1"
-                      >
-                        Monthly Subscription
-                      </Heading>
-                      <Text color="gray.600">
-                        1 month{' '}
-                        <Text as="span" fontWeight="semibold">
-                          FREE
-                        </Text>{' '}
-                        trial, no credit card required!
-                      </Text>
-                    </Box>
-                    <Box ml="auto" pl="6">
-                      <Flex align="flex-end">
-                        <Flex align="flex-start">
-                          <Text fontSize="3xl" fontWeight="bold" mt="3">
-                            $
-                          </Text>
-                          <Text fontSize="6xl" fontWeight="medium">
-                            20
-                          </Text>
-                        </Flex>
-                        <Text mb="5" whiteSpace="nowrap">
-                          / month
-                        </Text>
-                      </Flex>
-                    </Box>
-                  </Flex>
-                  <Box p="6" borderBottomWidth="1px">
-                    <Box mb="8">
-                      <Heading
-                        as="h3"
-                        fontSize="lg"
-                        fontWeight="semibold"
-                        mb="1"
-                      >
-                        What&apos;s Included?
-                      </Heading>
-                      <Text color="gray.600">
-                        All you need to build your restuarant website!
-                      </Text>
-                    </Box>
-                    <SimpleGrid columns={2} spacing="4">
-                      {features.map((feature, idx) => (
-                        <GridItem
-                          key={idx}
-                          as={Stack}
-                          direction="row"
-                          alignItems="center"
-                        >
-                          <Circle bg="green.50" boxSize="6" p="1">
-                            <Icon color="green.600" as={Check} boxSize="full" />
-                          </Circle>
-                          <Text>{feature}</Text>
-                        </GridItem>
-                      ))}
-                    </SimpleGrid>
-                  </Box>
-                  <Box p="6">
-                    <NextLink href="/register" passHref>
-                      <Button
-                        as={Link}
-                        colorScheme="blue"
-                        size="lg"
-                        isFullWidth
-                      >
-                        Sign Up Today!
-                      </Button>
-                    </NextLink>
-                  </Box>
-                </Box>
-              </GridItem>
-            </Grid>
+          </Box>
+          <Box mt="8" textAlign="center">
+            <NextLink href="/register" passHref>
+              <Button as={Link} colorScheme="blue" size="lg" mb="4">
+                Create Your First Menu
+              </Button>
+            </NextLink>
+            <Text fontSize="xl">
+              Create your first menu and be online in minutes!
+            </Text>
+          </Box>
+          <Box maxW="container.lg" mx="auto" mt="24">
+            <Heading
+              as="h2"
+              fontWeight="semibold"
+              color="blue.500"
+              textTransform="uppercase"
+              fontSize="xl"
+              textAlign="center"
+              mb="4"
+            >
+              What You Get
+            </Heading>
+            <SimpleGrid columns={2} spacing="4">
+              {features.map((feature, idx) => (
+                <GridItem
+                  key={idx}
+                  as={Stack}
+                  direction="row"
+                  alignItems="center"
+                >
+                  <Circle bg="green.50" boxSize="6" p="1">
+                    <Icon color="green.600" as={Check} boxSize="full" />
+                  </Circle>
+                  <Text>{feature}</Text>
+                </GridItem>
+              ))}
+            </SimpleGrid>
           </Box>
           <Center mt="auto" w="full" py="4">
             <Stack direction="row" spacing="6">
