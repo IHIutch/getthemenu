@@ -269,45 +269,49 @@ export async function getServerSideProps({ params: { host }, query }) {
   delete restaurant.menuItems
 
   const menusQuery = { restaurantId: restaurant.id }
-  await queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
-    restaurant
-      ? {
-          ...restaurant,
-          createdAt: restaurant.createdAt.toISOString(),
-          updatedAt: restaurant.updatedAt.toISOString(),
-        }
-      : null
-  )
 
-  await queryClient.prefetchQuery(['menus', menusQuery], async () =>
-    menus
-      ? menus.map((i) => ({
-          ...i,
-          createdAt: i.createdAt.toISOString(),
-          updatedAt: i.updatedAt.toISOString(),
-        }))
-      : null
-  )
+  await Promise.all([
+    queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
+      restaurant
+        ? {
+            ...restaurant,
+            createdAt: restaurant.createdAt.toISOString(),
+            updatedAt: restaurant.updatedAt.toISOString(),
+          }
+        : null
+    ),
 
-  await queryClient.prefetchQuery(['sections', menusQuery], async () =>
-    sections
-      ? sections.map((i) => ({
-          ...i,
-          createdAt: i.createdAt.toISOString(),
-          updatedAt: i.updatedAt.toISOString(),
-        }))
-      : null
-  )
-  await queryClient.prefetchQuery(['menuItems', menusQuery], async () =>
-    menuItems
-      ? menuItems.map((i) => ({
-          ...i,
-          createdAt: i.createdAt.toISOString(),
-          updatedAt: i.updatedAt.toISOString(),
-          price: i.price ? i.price.toString() : '',
-        }))
-      : null
-  )
+    queryClient.prefetchQuery(['menus', menusQuery], async () =>
+      menus
+        ? menus.map((i) => ({
+            ...i,
+            createdAt: i.createdAt.toISOString(),
+            updatedAt: i.updatedAt.toISOString(),
+          }))
+        : null
+    ),
+
+    queryClient.prefetchQuery(['sections', menusQuery], async () =>
+      sections
+        ? sections.map((i) => ({
+            ...i,
+            createdAt: i.createdAt.toISOString(),
+            updatedAt: i.updatedAt.toISOString(),
+          }))
+        : null
+    ),
+
+    queryClient.prefetchQuery(['menuItems', menusQuery], async () =>
+      menuItems
+        ? menuItems.map((i) => ({
+            ...i,
+            createdAt: i.createdAt.toISOString(),
+            updatedAt: i.updatedAt.toISOString(),
+            price: i.price ? i.price.toString() : '',
+          }))
+        : null
+    ),
+  ])
 
   return {
     props: {

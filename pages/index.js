@@ -69,7 +69,7 @@ export default function Homepage() {
         <Flex h="full" direction="column">
           <Box textAlign="right" mt="2">
             <Text>
-              Already Have an Account?{' '}
+              Already have an account?{' '}
               <NextLink href="/login" passHref>
                 <Link
                   color="blue.500"
