@@ -284,9 +284,10 @@ export async function getServerSideProps({ params: { host }, query }) {
     queryClient.prefetchQuery(['menus', menusQuery], async () =>
       menus
         ? menus.map((i) => ({
-            ...i,
-            createdAt: i.createdAt.toISOString(),
-            updatedAt: i.updatedAt.toISOString(),
+            id: i.id,
+            title: i.title,
+            slug: i.slug,
+            position: i.position,
           }))
         : null
     ),
@@ -294,9 +295,10 @@ export async function getServerSideProps({ params: { host }, query }) {
     queryClient.prefetchQuery(['sections', menusQuery], async () =>
       sections
         ? sections.map((i) => ({
-            ...i,
-            createdAt: i.createdAt.toISOString(),
-            updatedAt: i.updatedAt.toISOString(),
+            id: i.id,
+            title: i.title,
+            description: i.description,
+            position: i.position,
           }))
         : null
     ),
@@ -304,9 +306,11 @@ export async function getServerSideProps({ params: { host }, query }) {
     queryClient.prefetchQuery(['menuItems', menusQuery], async () =>
       menuItems
         ? menuItems.map((i) => ({
-            ...i,
-            createdAt: i.createdAt.toISOString(),
-            updatedAt: i.updatedAt.toISOString(),
+            id: i.id,
+            title: i.title,
+            description: i.description,
+            image: i.image,
+            position: i.position,
             price: i.price ? i.price.toString() : '',
           }))
         : null
