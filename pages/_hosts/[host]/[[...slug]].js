@@ -2,24 +2,21 @@ import React, { useMemo } from 'react'
 import Head from 'next/head'
 import PublicLayout from '@/layouts/Public'
 import { dehydrate, QueryClient } from 'react-query'
-import { useGetMenus } from '@/utils/react-query/menus'
-import { useGetSections } from '@/utils/react-query/sections'
-import { useGetMenuItems } from '@/utils/react-query/menuItems'
 import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import { prismaGetRestaurant } from '@/utils/prisma/restaurants'
 import BlurImage from '@/components/common/BlurImage'
 import { useSEO } from '@/utils/functions'
 
-export default function RestaurantMenu({ restaurant, slug: initialSlug }) {
-  const menusQuery = { restaurantId: restaurant.id }
-
+export default function RestaurantMenu({
+  restaurant,
+  slug: initialSlug,
+  menus,
+  sections,
+  menuItems,
+}) {
   const { query } = useRouter()
   const slug = initialSlug === query?.slug?.[0] ? initialSlug : query?.slug?.[0]
-
-  const { data: menus } = useGetMenus(menusQuery)
-  const { data: sections } = useGetSections(menusQuery)
-  const { data: menuItems } = useGetMenuItems(menusQuery)
 
   const activeMenu = slug
     ? menus.find((menu) => menu.slug === slug)
@@ -270,52 +267,52 @@ export async function getServerSideProps({ params: { host }, query }) {
 
   const menusQuery = { restaurantId: restaurant.id }
 
-  await Promise.all([
-    queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
-      restaurant
-        ? {
-            ...restaurant,
-            createdAt: restaurant.createdAt.toISOString(),
-            updatedAt: restaurant.updatedAt.toISOString(),
-          }
-        : null
-    ),
+  // await Promise.all([
+  await queryClient.prefetchQuery(['restaurants', restaurantQuery], () =>
+    restaurant
+      ? {
+          ...restaurant,
+          createdAt: restaurant.createdAt.toISOString(),
+          updatedAt: restaurant.updatedAt.toISOString(),
+        }
+      : null
+  )
 
-    queryClient.prefetchQuery(['menus', menusQuery], async () =>
-      menus
-        ? menus.map((i) => ({
-            id: i.id,
-            title: i.title,
-            slug: i.slug,
-            position: i.position,
-          }))
-        : null
-    ),
+  // await queryClient.prefetchQuery(['menus', menusQuery], () =>
+  //   menus
+  //     ? menus.map((i) => ({
+  //         id: i.id,
+  //         title: i.title,
+  //         slug: i.slug,
+  //         position: i.position,
+  //       }))
+  //     : null
+  // )
 
-    queryClient.prefetchQuery(['sections', menusQuery], async () =>
-      sections
-        ? sections.map((i) => ({
-            id: i.id,
-            title: i.title,
-            description: i.description,
-            position: i.position,
-          }))
-        : null
-    ),
+  // await queryClient.prefetchQuery(['sections', menusQuery], () =>
+  //   sections
+  //     ? sections.map((i) => ({
+  //         id: i.id,
+  //         title: i.title,
+  //         description: i.description,
+  //         position: i.position,
+  //       }))
+  //     : null
+  // )
 
-    queryClient.prefetchQuery(['menuItems', menusQuery], async () =>
-      menuItems
-        ? menuItems.map((i) => ({
-            id: i.id,
-            title: i.title,
-            description: i.description,
-            image: i.image,
-            position: i.position,
-            price: i.price ? i.price.toString() : '',
-          }))
-        : null
-    ),
-  ])
+  // await queryClient.prefetchQuery(['menuItems', menusQuery], () =>
+  //   menuItems
+  //     ? menuItems.map((i) => ({
+  //         id: i.id,
+  //         title: i.title,
+  //         description: i.description,
+  //         image: i.image,
+  //         position: i.position,
+  //         price: i.price ? i.price.toString() : '',
+  //       }))
+  //     : null
+  // )
+  // // ])
 
   return {
     props: {
@@ -326,6 +323,29 @@ export async function getServerSideProps({ params: { host }, query }) {
         createdAt: restaurant.createdAt.toISOString(),
         updatedAt: restaurant.updatedAt.toISOString(),
       },
+      menus: menus?.map((i) => ({
+        id: i.id,
+        title: i.title,
+        slug: i.slug,
+        position: i.position,
+      })),
+      sections: sections?.map((i) => ({
+        id: i.id,
+        title: i.title,
+        description: i.description,
+        position: i.position,
+        menuId: i.menuId,
+      })),
+      menuItems: menuItems?.map((i) => ({
+        id: i.id,
+        title: i.title,
+        description: i.description,
+        image: i.image,
+        position: i.position,
+        price: i.price ? i.price.toString() : '',
+        menuId: i.menuId,
+        sectionId: i.sectionId,
+      })),
       dehydratedState: dehydrate(queryClient),
     },
   }
