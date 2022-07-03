@@ -7,6 +7,9 @@ import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import { prismaGetRestaurant } from '@/utils/prisma/restaurants'
 import BlurImage from '@/components/common/BlurImage'
 import { useSEO } from '@/utils/functions'
+import { prismaGetMenus } from '@/utils/prisma/menus'
+import { prismaGetSections } from '@/utils/prisma/sections'
+import { prismaGetMenuItems } from '@/utils/prisma/menuItems'
 
 export default function RestaurantMenu({
   restaurant,
@@ -241,7 +244,6 @@ export async function getServerSideProps({ params: { host }, query }) {
   const queryClient = new QueryClient()
 
   const slug = query?.slug?.[0] || null
-
   const restaurantQuery = { customHost: host }
   const restaurant = await prismaGetRestaurant(restaurantQuery)
 
@@ -250,7 +252,14 @@ export async function getServerSideProps({ params: { host }, query }) {
       notFound: true,
     }
   }
-  const menus = restaurant.menus
+
+  const menusQuery = { restaurantId: restaurant.id }
+  const [menus, sections, menuItems] = await Promise.all([
+    await prismaGetMenus(menusQuery),
+    prismaGetSections(menusQuery),
+    prismaGetMenuItems(menusQuery),
+  ])
+
   const activeMenu = menus.find((menu) => menu.slug === slug) || menus?.[0]
 
   if (menus?.length && !activeMenu) {
@@ -259,15 +268,6 @@ export async function getServerSideProps({ params: { host }, query }) {
     }
   }
 
-  const sections = restaurant.sections
-  const menuItems = restaurant.menuItems
-  delete restaurant.menus
-  delete restaurant.sections
-  delete restaurant.menuItems
-
-  const menusQuery = { restaurantId: restaurant.id }
-
-  // await Promise.all([
   await queryClient.prefetchQuery(['restaurants', restaurantQuery], () =>
     restaurant
       ? {
@@ -277,42 +277,6 @@ export async function getServerSideProps({ params: { host }, query }) {
         }
       : null
   )
-
-  // await queryClient.prefetchQuery(['menus', menusQuery], () =>
-  //   menus
-  //     ? menus.map((i) => ({
-  //         id: i.id,
-  //         title: i.title,
-  //         slug: i.slug,
-  //         position: i.position,
-  //       }))
-  //     : null
-  // )
-
-  // await queryClient.prefetchQuery(['sections', menusQuery], () =>
-  //   sections
-  //     ? sections.map((i) => ({
-  //         id: i.id,
-  //         title: i.title,
-  //         description: i.description,
-  //         position: i.position,
-  //       }))
-  //     : null
-  // )
-
-  // await queryClient.prefetchQuery(['menuItems', menusQuery], () =>
-  //   menuItems
-  //     ? menuItems.map((i) => ({
-  //         id: i.id,
-  //         title: i.title,
-  //         description: i.description,
-  //         image: i.image,
-  //         position: i.position,
-  //         price: i.price ? i.price.toString() : '',
-  //       }))
-  //     : null
-  // )
-  // // ])
 
   return {
     props: {
