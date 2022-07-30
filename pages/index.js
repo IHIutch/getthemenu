@@ -12,6 +12,7 @@ import {
   Circle,
   Container,
   Flex,
+  Grid,
   GridItem,
   Heading,
   Icon,
@@ -21,7 +22,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
-import { Check } from 'lucide-react'
+import { Check, ExternalLink } from 'lucide-react'
 import { useSEO } from '@/utils/functions'
 
 export default function Homepage() {
@@ -52,7 +53,7 @@ export default function Homepage() {
     'Built-in analytics',
     'No updates - ever',
     'Premium SEO support',
-    'Customer support',
+    'Personal customer support',
   ]
 
   const seo = useSEO({
@@ -70,6 +71,7 @@ export default function Homepage() {
       </Head>
       <Flex h="full" direction="column">
         <Alert
+          flexShrink="0"
           status="warning"
           display={{ base: 'block', lg: 'flex' }}
           justifyContent={{ lg: 'center' }}
@@ -81,97 +83,111 @@ export default function Homepage() {
             bring you an exciting new homepage. Coming soon!
           </AlertDescription>
         </Alert>
-        <Container maxW="container.lg">
-          <Box textAlign="right" mt="2">
-            <Text>
-              Already have an account?{' '}
-              <NextLink href="/login" passHref>
-                <Link
-                  color="blue.500"
-                  fontWeight="semibold"
-                  textDecoration="underline"
-                >
-                  Log In
-                </Link>
-              </NextLink>
+        <Container maxW="container.lg" mt="4">
+          <Flex mt="2" align="center" justify="flex-end">
+            <Text mr="2" fontWeight="medium">
+              Have an account?
             </Text>
-          </Box>
-          <Box textAlign="center" my="12">
-            <Heading as="h1" mb="2" fontSize="5xl" fontWeight="semibold">
-              GetTheMenu
-            </Heading>
-            <Text fontSize="2xl" color="gray.600">
-              Our goal is simple: Get your menu in front of customers as fast as
-              possible.
-            </Text>
-          </Box>
-          <Box textAlign="center">
-            <Heading
-              as="h2"
-              fontWeight="semibold"
-              color="blue.500"
-              textTransform="uppercase"
-              fontSize="xl"
-            >
-              Get Started Today
-            </Heading>
-            <Text color="gray.600" mt="2">
-              1 month{' '}
-              <Text as="span" fontWeight="semibold">
-                FREE
-              </Text>{' '}
-              trial, no credit card required!
-            </Text>
-            <Text
-              mt="6"
-              fontWeight="semibold"
-              textTransform="uppercase"
-              fontSize="lg"
-            >
-              Then
-            </Text>
-            <Flex direction="column" align="center" mt="-4">
-              <Flex align="flex-start">
-                <Text fontSize="3xl" fontWeight="bold" mt="3">
-                  $
-                </Text>
-                <Text fontSize="6xl" fontWeight="medium">
-                  20
-                </Text>
-              </Flex>
-              <Text mt="-4">per month</Text>
-            </Flex>
-          </Box>
-          <Box mt="8" textAlign="center">
-            <NextLink href="/register" passHref>
-              <Button as={Link} colorScheme="blue" size="lg" mb="4">
-                Create Your First Menu
+            <NextLink href="/login" passHref>
+              <Button as={Link} colorScheme="blue" variant="outline">
+                Log In
               </Button>
             </NextLink>
-            <Text fontSize="xl">
-              Create your first menu and be online in minutes!
-            </Text>
-          </Box>
+          </Flex>
+          <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6" mt="20">
+            <GridItem colSpan={{ md: '7' }}>
+              <Flex h="full" align="center">
+                <Box>
+                  <Text
+                    textTransform="uppercase"
+                    letterSpacing="wide"
+                    fontWeight="semibold"
+                    color="gray.500"
+                  >
+                    Early Access
+                  </Text>
+                  <Heading as="h1" fontSize="7xl" fontWeight="black">
+                    Get the Menu
+                  </Heading>
+                  <Text fontSize="3xl" color="gray.600" lineHeight="1.3">
+                    The platform built for getting your menu into customers
+                    hands{' '}
+                    <Text as="span" fontWeight="semibold" fontStyle="italic">
+                      as fast as possible
+                    </Text>
+                    .
+                  </Text>
+                </Box>
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={{ md: '5' }}>
+              <Box bg="white" shadow="md" rounded="lg" w="full" p="8">
+                <Box textAlign="center">
+                  <Box>
+                    <Heading
+                      as="h2"
+                      fontWeight="bold"
+                      letterSpacing="wider"
+                      color="blue.500"
+                      textTransform="uppercase"
+                      fontSize="2xl"
+                    >
+                      Get Started Today
+                    </Heading>
+                    <Text fontSize="lg" color="gray.500" fontWeight="medium">
+                      Be online in minutes!
+                    </Text>
+                  </Box>
+
+                  <Flex direction="column" align="center" mt="4">
+                    <Flex align="flex-start">
+                      <Text fontSize="3xl" fontWeight="bold" mt="3">
+                        $
+                      </Text>
+                      <Text fontSize="6xl" fontWeight="medium">
+                        20
+                      </Text>
+                    </Flex>
+                    <Text mt="-4">per month</Text>
+                  </Flex>
+                  <Box textAlign="center" mt="8">
+                    <Text color="gray.600">
+                      1 month{' '}
+                      <Text as="span" fontWeight="semibold">
+                        FREE
+                      </Text>{' '}
+                      trial, no credit card required!
+                    </Text>
+                  </Box>
+                  <NextLink href="/register" passHref>
+                    <Button as={Link} colorScheme="blue" mt="4" isFullWidth>
+                      Create Your First Menu
+                    </Button>
+                  </NextLink>
+                </Box>
+              </Box>
+            </GridItem>
+          </Grid>
         </Container>
-        <Box mt="24" bg="gray.200" py="12">
+        <Box mt="24" bg="gray.100" py="10">
           <Container maxW="container.lg" textAlign="center">
-            <Stack
-              direction={{ base: 'row', lg: 'row' }}
-              alignItems="center"
-              justifyContent="center"
+            <Heading as="h2" fontSize="4xl" fontWeight="black">
+              Not sure where to get started?
+            </Heading>
+            <Text fontSize="xl" color="gray.600">
+              We&apos;ve got you covered!
+            </Text>
+            <Button
+              mt="8"
+              as={Link}
+              size="lg"
+              colorScheme="blue"
+              href="https://whereslloyd.getthemenu.io?ref=example"
+              isExternal
             >
-              <Text fontSize="xl" fontWeight="semibold">
-                Need some inspiration?
-              </Text>
-              <Button
-                as={Link}
-                colorScheme="blue"
-                href="https://whereslloyd.getthemenu.io?ref=example"
-                isExternal
-              >
-                Check Out an Example
-              </Button>
-            </Stack>
+              Check Out an Example
+              <Icon ml="2" as={ExternalLink} />
+            </Button>
           </Container>
         </Box>
         <Container maxW="container.lg" mt="24">
@@ -180,13 +196,22 @@ export default function Homepage() {
             fontWeight="semibold"
             color="blue.500"
             textTransform="uppercase"
-            fontSize="xl"
+            fontSize="lg"
             textAlign="center"
-            mb="4"
+            letterSpacing="wide"
           >
             What You Get
           </Heading>
-          <Flex justify="center">
+          <Heading
+            as="h3"
+            fontSize="4xl"
+            fontWeight="black"
+            textAlign="center"
+            mt="2"
+          >
+            Make managing your website a breeze
+          </Heading>
+          <Flex justify="center" mt="12">
             <SimpleGrid columns={{ base: '1', md: '2' }} spacing="4">
               {features.map((feature, idx) => (
                 <GridItem
@@ -195,10 +220,10 @@ export default function Homepage() {
                   direction="row"
                   alignItems="center"
                 >
-                  <Circle bg="green.50" boxSize="6" p="1">
-                    <Icon color="green.600" as={Check} boxSize="full" />
+                  <Circle bg="blue.500" boxSize="6" p="1">
+                    <Icon color="white" as={Check} boxSize="full" />
                   </Circle>
-                  <Text>{feature}</Text>
+                  <Text fontSize="lg">{feature}</Text>
                 </GridItem>
               ))}
             </SimpleGrid>
