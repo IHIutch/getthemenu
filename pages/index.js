@@ -132,10 +132,10 @@ export default function Homepage() {
                       textTransform="uppercase"
                       fontSize="2xl"
                     >
-                      Get Started Today
+                      Start Today
                     </Heading>
                     <Text fontSize="lg" color="gray.500" fontWeight="medium">
-                      Be online in minutes!
+                      And be online in minutes!
                     </Text>
                   </Box>
 
