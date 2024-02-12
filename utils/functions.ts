@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import supabase from '@/utils/supabase'
 
-export const handleStructuredData = ({ restaurant, menus }) => {
+export const handleStructuredData = ({ restaurant, menus }: any) => {
   return {
     '@context': 'http://schema.org',
     '@type': 'Restaurant',
@@ -19,11 +19,11 @@ export const handleStructuredData = ({ restaurant, menus }) => {
       postalCode: restaurant.address.zip,
     },
     servesCuisine: ['American cuisine'],
-    hasMenu: menus.map((menu) => ({
+    hasMenu: menus.map((menu: any) => ({
       '@type': 'Menu',
       name: menu.title,
       // description: "Menu for in-restaurant dining only.",
-      hasMenuSection: menu.sections.map((section) => ({
+      hasMenuSection: menu.sections.map((section: any) => ({
         '@type': 'MenuSection',
         name: section.title,
         // description: "Appetizers and such",
@@ -34,8 +34,8 @@ export const handleStructuredData = ({ restaurant, menus }) => {
         //   availabilityStarts: "T8:22:00",
         // },
         hasMenuItem: menu.menuItems
-          .filter((i) => i.sectionId === section._id)
-          .map((item) => ({
+          .filter((i: any) => i.sectionId === section._id)
+          .map((item: any) => ({
             '@type': 'MenuItem',
             name: item.title,
             description: item.description,
@@ -51,7 +51,7 @@ export const handleStructuredData = ({ restaurant, menus }) => {
   }
 }
 
-export const formatDate = (val, format = 'MM/DD/YYYY') => {
+export const formatDate = (val: Date, format = 'MM/DD/YYYY') => {
   return dayjs(val).format(format)
 }
 
@@ -77,99 +77,35 @@ export const isDateInputSupported = () => {
   return input.value !== value
 }
 
-export const getPublicURL = (path) => {
+export const getPublicURL = (path: string) => {
   try {
     const { publicURL, error } = supabase.storage
       .from('public')
       .getPublicUrl(path)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return publicURL
-  } catch (err) {
-    console.log('Error downloading file: ', err.message)
+  } catch (error) {
+    console.log('Error downloading file: ', getErrorMessage(error))
   }
 }
 
-export const reorderList = (list = [], startIndex, endIndex) => {
+export const reorderList = (list = [], startIndex: number, endIndex: number) => {
   const temp = [...list]
   const [removed] = temp.splice(startIndex, 1)
   temp.splice(endIndex, 0, removed)
   return temp
 }
 
-export const formatTime = (time) => {
+export const formatTime = (time: string) => {
   const [hours, minutes] = time.split(':')
   return dayjs()
     .startOf('year')
-    .add(hours, 'hour')
-    .add(minutes, 'minute')
+    .add(Number(hours), 'hour')
+    .add(Number(minutes), 'minute')
     .format('h:mm A')
 }
 
-export const useSEO = ({
-  title = 'Log In',
-  description = '',
-  image = '',
-  url = '',
-}) => {
-  const attrs = [
-    {
-      name: 'title',
-      content: title,
-    },
-    {
-      name: 'description',
-      content: description,
-    },
-    {
-      property: 'og:type',
-      content: 'website',
-    },
-    {
-      property: 'og:title',
-      content: title,
-    },
-    {
-      property: 'og:url',
-      content: url,
-    },
-    {
-      property: 'og:description',
-      content: description,
-    },
-    {
-      property: 'og:image',
-      content: image,
-    },
-    {
-      property: 'twitter:card',
-      content: 'summary_large_image',
-    },
-    {
-      property: 'twitter:title',
-      content: title,
-    },
-    {
-      property: 'twitter:url',
-      content: url,
-    },
-    {
-      property: 'twitter:description',
-      content: description,
-    },
-    {
-      property: 'twitter:image',
-      content: image,
-    },
-  ]
-
-  return (
-    <>
-      <title key="title">{title}</title>
-      {attrs
-        .filter((attr) => attr.content)
-        .map((attr, idx) => (
-          <meta key={idx} {...attr} />
-        ))}
-    </>
-  )
+export function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  return String(error)
 }

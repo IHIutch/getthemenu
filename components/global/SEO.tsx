@@ -2,10 +2,15 @@ import Head from 'next/head'
 import React from 'react'
 
 export default function SEO({
-  title = 'Log In',
-  description = '',
-  image = '',
-  url = '',
+  title,
+  description,
+  image,
+  url,
+}: {
+  title: string,
+  description?: string,
+  image?: string,
+  url?: string
 }) {
   const attrs = [
     {
@@ -57,8 +62,6 @@ export default function SEO({
       content: image,
     },
   ]
-
-  console.log({ title })
 
   return (
     <Head>

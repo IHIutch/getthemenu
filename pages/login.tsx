@@ -15,22 +15,29 @@ import {
 } from '@chakra-ui/react'
 
 import Head from 'next/head'
-import supabase from '@/utils/supabase'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import axios from 'redaxios'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useAuthUser } from '@/utils/react-query/user'
-import { useSEO } from '@/utils/functions'
+import { getErrorMessage } from '@/utils/functions'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import SEO from '@/components/global/SEO'
+
+type FormValues = {
+  email: string
+  password: string
+}
 
 export default function Login() {
   const router = useRouter()
+  const supabaseClient = useSupabaseClient()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm<FormValues>()
 
   const {
     data: user,
@@ -49,48 +56,42 @@ export default function Login() {
     }
   }, [isUserLoading, router, user])
 
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN') {
-          await axios.post(`/api/auth/signin`, {
-            event,
-            session,
-          })
-          router.replace('/dashboard')
-        }
+  const { data: authListener } = supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        await axios.post(`/api/auth/signin`, {
+          event,
+          session,
+        })
+        router.replace('/dashboard')
       }
-    )
-
-    return () => {
-      authListener.unsubscribe()
     }
-  }, [router])
+  )
 
-  const onSubmit = async (form) => {
+  authListener.subscription.unsubscribe()
+
+  const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
       setIsSubmitting(true)
-      const { error } = await supabase.auth.signIn({
+      const { error } = await supabaseClient.auth.signInWithPassword({
         email: form.email,
         password: form.password,
       })
       if (error) throw new Error(error.message)
     } catch (error) {
       setIsSubmitting(false)
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
 
-  const seo = useSEO({
-    title: 'Log In',
-  })
-
   return (
     <>
-      <Head>{seo}</Head>
+      <Head>
+        <SEO title="Log In" />
+      </Head>
       <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>
+          <GridItem colStart={{ md: 4 }} colSpan={{ md: 6 }}>
             <Box mb="6" textAlign="center">
               <Heading as="h1" fontSize="4xl">
                 GetTheMenu
@@ -105,7 +106,7 @@ export default function Login() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl id="email" isInvalid={errors.email}>
+                    <FormControl id="email" isInvalid={!!errors.email}>
                       <FormLabel>Email address</FormLabel>
                       <Input
                         {...register('email', {
@@ -121,7 +122,7 @@ export default function Login() {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="password" isInvalid={errors.password}>
+                    <FormControl id="password" isInvalid={!!errors.password}>
                       <FormLabel>Password</FormLabel>
                       <Input
                         {...register('password', {
@@ -136,7 +137,7 @@ export default function Login() {
                       </FormErrorMessage>
                     </FormControl>
                   </GridItem>
-                  <GridItem d="flex">
+                  <GridItem display="flex">
                     <Flex align="center">
                       <Button
                         as={NextLink}
@@ -171,20 +172,3 @@ export default function Login() {
     </>
   )
 }
-
-// export async function getServerSideProps(req) {
-//   const user = await getLoggedUser(req)
-
-//   if (user) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: '/dashboard',
-//       },
-//     }
-//   }
-
-//   return {
-//     props: {},
-//   }
-// }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import * as React from 'react'
 import supabase from '@/utils/supabase'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -24,28 +24,24 @@ import {
 import NextLink from 'next/link'
 import { Check, ExternalLink } from 'lucide-react'
 import { useSEO } from '@/utils/functions'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 export default function Homepage() {
   const router = useRouter()
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          // TODO: This probably isn't right. Forgot password logs in a user, they can change their password from the settings page
-          return router.replace({
-            pathname: '/reset-password',
-            query: {
-              access_token: session.access_token,
-            },
-          })
-        }
-      }
-    )
-
-    return () => {
-      authListener.unsubscribe()
+  const supabaseClient = useSupabaseClient()
+  const { data: authListener } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      // TODO: This probably isn't right. Forgot password logs in a user, they can change their password from the settings page
+      return router.replace({
+        pathname: '/reset-password',
+        query: {
+          access_token: session?.access_token,
+        },
+      })
     }
-  }, [router])
+  })
+
+  authListener.subscription.unsubscribe()
 
   const features = [
     'Simple menu editing',
