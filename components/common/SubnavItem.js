@@ -12,15 +12,15 @@ export default function SubnavItem({ href, children }) {
   const [blue500] = useToken('colors', ['blue.500'])
 
   return (
-    <NextLink href={href} passHref>
-      <Link
-        fontWeight="semibold"
-        py="2"
-        boxShadow={isPathMatch(href) && `inset 0 -3px ${blue500}`}
-        color={isPathMatch(href) && 'blue.500'}
-      >
-        {children}
-      </Link>
-    </NextLink>
+    <Link
+      as={NextLink}
+      href={href}
+      fontWeight="semibold"
+      py="2"
+      boxShadow={isPathMatch(href) && `inset 0 -3px ${blue500}`}
+      color={isPathMatch(href) && 'blue.500'}
+    >
+      {children}
+    </Link>
   )
 }

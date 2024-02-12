@@ -138,16 +138,15 @@ export default function Login() {
                   </GridItem>
                   <GridItem d="flex">
                     <Flex align="center">
-                      <NextLink href={'/forgot-password'} passHref>
-                        <Button
-                          as={Link}
-                          variant="link"
-                          fontWeight="semibold"
-                          colorScheme="blue"
-                        >
-                          Forgot Password?
-                        </Button>
-                      </NextLink>
+                      <Button
+                        as={NextLink}
+                        href={'/forgot-password'}
+                        variant="link"
+                        fontWeight="semibold"
+                        colorScheme="blue"
+                      >
+                        Forgot Password?
+                      </Button>
                     </Flex>
                     <Button
                       ml="auto"
@@ -162,11 +161,9 @@ export default function Login() {
               </form>
             </Box>
             <Box textAlign="center" mt="6">
-              <NextLink href="/register" passHref>
-                <Button as={Link} colorScheme="blue" variant="link">
-                  Don&rsquo;t Have an Account? Register Now!
-                </Button>
-              </NextLink>
+              <Button as={NextLink} href="/register" colorScheme="blue" variant="link">
+                Don&rsquo;t Have an Account? Register Now!
+              </Button>
             </Box>
           </GridItem>
         </Grid>

@@ -73,11 +73,9 @@ export default function PrivacyPolicy() {
           <UnorderedList spacing="4" mb="8">
             <ListItem>
               Visit our website at{' '}
-              <NextLink href="/" passHref>
-                <Link textDecoration="underline" fontWeight="semibold">
-                  https://getthemenu.io
-                </Link>
-              </NextLink>
+              <Link as={NextLink} href="/" textDecoration="underline" fontWeight="semibold">
+                https://getthemenu.io
+              </Link>
               , or any website of ours that links to this privacy notice
             </ListItem>
             <ListItem>

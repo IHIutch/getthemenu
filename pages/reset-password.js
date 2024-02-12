@@ -116,16 +116,15 @@ export default function ResetPassword({ sessionUser }) {
                     )}
                     <GridItem d="flex">
                       <Flex align="center">
-                        <NextLink href={'/'} passHref>
-                          <Button
-                            as={Link}
-                            variant="link"
-                            fontWeight="semibold"
-                            colorScheme="blue"
-                          >
-                            Back to Login
-                          </Button>
-                        </NextLink>
+                        <Button
+                          as={NextLink}
+                          href="/"
+                          variant="link"
+                          fontWeight="semibold"
+                          colorScheme="blue"
+                        >
+                          Back to Login
+                        </Button>
                       </Flex>
                       <Button
                         ml="auto"

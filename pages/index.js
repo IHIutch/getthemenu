@@ -88,11 +88,9 @@ export default function Homepage() {
             <Text mr="2" fontWeight="medium">
               Have an account?
             </Text>
-            <NextLink href="/login" passHref>
-              <Button as={Link} colorScheme="blue" variant="outline">
-                Log In
-              </Button>
-            </NextLink>
+            <Button as={NextLink} href="/login" colorScheme="blue" variant="outline">
+              Log In
+            </Button>
           </Flex>
           <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6" mt="20">
             <GridItem colSpan={{ md: '7' }}>
@@ -159,11 +157,9 @@ export default function Homepage() {
                       trial, no credit card required!
                     </Text>
                   </Box>
-                  <NextLink href="/register" passHref>
-                    <Button as={Link} colorScheme="blue" mt="4" isFullWidth>
-                      Create Your First Menu
-                    </Button>
-                  </NextLink>
+                  <Button as={NextLink} href="/register" colorScheme="blue" mt="4" isFullWidth>
+                    Create Your First Menu
+                  </Button>
                 </Box>
               </Box>
             </GridItem>
@@ -232,16 +228,12 @@ export default function Homepage() {
         <Box mt="auto" w="full">
           <Center mt="12" py="4" bg="gray.200">
             <Stack direction="row" spacing="6">
-              <NextLink href="/terms-of-use" passHref>
-                <Link fontWeight="medium" textDecor="underline">
-                  Terms of Use
-                </Link>
-              </NextLink>
-              <NextLink href="/privacy-policy" passHref>
-                <Link fontWeight="medium" textDecor="underline">
-                  Privacy Policy
-                </Link>
-              </NextLink>
+              <Link as={NextLink} href="/terms-of-use" fontWeight="medium" textDecor="underline">
+                Terms of Use
+              </Link>
+              <Link as={NextLink} href="/privacy-policy" fontWeight="medium" textDecor="underline">
+                Privacy Policy
+              </Link>
             </Stack>
           </Center>
         </Box>

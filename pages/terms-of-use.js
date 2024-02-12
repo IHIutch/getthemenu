@@ -227,9 +227,7 @@ export default function TermsOfUse() {
                 our
               </Text>
               &quot;), concerning your access to and use of the{' '}
-              <NextLink href="/" passHref>
-                <Link>https://getthemenu.io</Link>
-              </NextLink>{' '}
+              <Link as={NextLink} href="/">https://getthemenu.io</Link>{' '}
               website as well as any other media form, media channel, mobile
               website or mobile application related, linked, or otherwise
               connected thereto (collectively, the &quot;Site&quot;). We are
@@ -787,9 +785,7 @@ export default function TermsOfUse() {
             <Text>
               We care about data privacy and security. By using the Site, you
               agree to be bound by our{' '}
-              <NextLink href="/privacy-policy" passHref>
-                <Link>Privacy Policy</Link>
-              </NextLink>{' '}
+              <Link as={NextLink} href="/privacy-policy">Privacy Policy</Link>{' '}
               posted on the Site, which is incorporated into these Terms of Use.
               Please be advised the Site is hosted in the United States. If you
               access the Site from any other region of the world with laws or

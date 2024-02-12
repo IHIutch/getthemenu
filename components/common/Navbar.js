@@ -97,40 +97,25 @@ export default function Navbar({ children, ...props }) {
             <Flex align="center">
               <Flex align="center" h="14">
                 <Heading as="h1" fontSize="lg">
-                  <NextLink href={'/dashboard'} passHref>
-                    <Link>GetTheMenu</Link>
-                  </NextLink>
+                  <Link as={NextLink} href={'/dashboard'}>GetTheMenu</Link>
                 </Heading>
               </Flex>
               <Box ml="auto">
                 <HStack>
                   {restaurant?.customHost && (
-                    <NextLink
-                      href={`https://${restaurant.customHost}.getthemenu.io`}
-                      passHref
-                    >
-                      <Button size="sm" as={Link} target="blank">
-                        View Site
-                      </Button>
-                    </NextLink>
+                    <Button size="sm" as={NextLink} href={`https://${restaurant.customHost}.getthemenu.io`} target="blank">
+                      View Site
+                    </Button>
                   )}
                   <Menu placement="bottom-end">
                     <MenuButton>
                       <Avatar size="sm" name={`${user && user.fullName}`} />
                     </MenuButton>
                     <MenuList boxShadow="lg">
-                      <NextLink href="/dashboard" passHref>
-                        <MenuItem as={Link}>Dashboard</MenuItem>
-                      </NextLink>
-                      <NextLink href="/account" passHref>
-                        <MenuItem as={Link}>Account Details</MenuItem>
-                      </NextLink>
-                      <MenuItem as="button" onClick={modalState.onOpen}>
-                        Feedback
-                      </MenuItem>
-                      <NextLink href="/logout" passHref>
-                        <MenuItem as={Link}>Log Out</MenuItem>
-                      </NextLink>
+                      <MenuItem as={NextLink} href="/dashboard">Dashboard</MenuItem>
+                      <MenuItem as={NextLink} href="/account">Account Details</MenuItem>
+                      <MenuItem as="button" onClick={modalState.onOpen}>Feedback</MenuItem>
+                      <MenuItem as={NextLink} href="/logout">Log Out</MenuItem>
                     </MenuList>
                   </Menu>
                 </HStack>

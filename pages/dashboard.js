@@ -96,8 +96,8 @@ export default function Dashboard() {
   const { mutate: handleReorderMenus } = useReorderMenus(
     restaurant?.id
       ? {
-          restaurantId: restaurant.id,
-        }
+        restaurantId: restaurant.id,
+      }
       : null
   )
 
@@ -272,20 +272,15 @@ export default function Dashboard() {
                                 <LinkBox>
                                   <Box>
                                     <Box pb="3" px="3" borderBottomWidth="1px">
-                                      <NextLink
-                                        passHref
-                                        href={`/menu/${menu.id}`}
-                                      >
-                                        <LinkOverlay>
-                                          <Heading
-                                            ml="2"
-                                            fontSize="2xl"
-                                            fontWeight="semibold"
-                                          >
-                                            {menu.title}
-                                          </Heading>
-                                        </LinkOverlay>
-                                      </NextLink>
+                                      <LinkOverlay as={NextLink} href={`/menu/${menu.id}`}>
+                                        <Heading
+                                          ml="2"
+                                          fontSize="2xl"
+                                          fontWeight="semibold"
+                                        >
+                                          {menu.title}
+                                        </Heading>
+                                      </LinkOverlay>
                                     </Box>
                                     <Flex p="3" justify="space-between">
                                       <Flex align="center">

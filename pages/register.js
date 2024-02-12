@@ -196,11 +196,9 @@ export default function Register() {
               </form>
             </Box>
             <Box textAlign="center" mt="6">
-              <NextLink href="/" passHref>
-                <Button as={Link} colorScheme="blue" variant="link">
-                  Have an Account? Log In Here!
-                </Button>
-              </NextLink>
+              <Button as={NextLink} href="/" colorScheme="blue" variant="link">
+                Have an Account? Log In Here!
+              </Button>
             </Box>
           </GridItem>
         </Grid>
