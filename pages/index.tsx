@@ -1,7 +1,5 @@
 import * as React from 'react'
-import supabase from '@/utils/supabase'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import {
   Alert,
   AlertDescription,
@@ -23,26 +21,9 @@ import {
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { Check, ExternalLink } from 'lucide-react'
-import { useSEO } from '@/utils/functions'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import SEO from '@/components/global/SEO'
 
 export default function Homepage() {
-  const router = useRouter()
-  const supabaseClient = useSupabaseClient()
-  const { data: authListener } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'PASSWORD_RECOVERY') {
-      // TODO: This probably isn't right. Forgot password logs in a user, they can change their password from the settings page
-      return router.replace({
-        pathname: '/reset-password',
-        query: {
-          access_token: session?.access_token,
-        },
-      })
-    }
-  })
-
-  authListener.subscription.unsubscribe()
-
   const features = [
     'Simple menu editing',
     'Easily manage your business details',
@@ -52,17 +33,14 @@ export default function Homepage() {
     'Personal customer support',
   ]
 
-  const seo = useSEO({
-    title: 'GetTheMenu',
-    description: 'The platform built for both restaurants and their customers',
-    image: 'https://getthemenu.io/meta.png',
-    url: 'https://getthemenu.io',
-  })
-
   return (
     <>
       <Head>
-        {seo}
+        <SEO
+          title='GetTheMenu'
+          description='The platform built for both restaurants and their customers'
+          image='https://getthemenu.io/meta.png'
+          url='https://getthemenu.io' />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex h="full" direction="column">
@@ -89,7 +67,7 @@ export default function Homepage() {
             </Button>
           </Flex>
           <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6" mt="20">
-            <GridItem colSpan={{ md: '7' }}>
+            <GridItem colSpan={{ md: 7 }}>
               <Flex h="full" align="center">
                 <Box>
                   <Text
@@ -114,7 +92,7 @@ export default function Homepage() {
                 </Box>
               </Flex>
             </GridItem>
-            <GridItem colSpan={{ md: '5' }}>
+            <GridItem colSpan={{ md: 5 }}>
               <Box bg="white" shadow="md" rounded="lg" w="full" p="8">
                 <Box textAlign="center">
                   <Box>
@@ -153,7 +131,7 @@ export default function Homepage() {
                       trial, no credit card required!
                     </Text>
                   </Box>
-                  <Button as={NextLink} href="/register" colorScheme="blue" mt="4" isFullWidth>
+                  <Button as={NextLink} href="/register" colorScheme="blue" mt="4" display="block">
                     Create Your First Menu
                   </Button>
                 </Box>
@@ -204,7 +182,7 @@ export default function Homepage() {
             Make managing your website a breeze
           </Heading>
           <Flex justify="center" mt="12">
-            <SimpleGrid columns={{ base: '1', md: '2' }} spacing="4">
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4">
               {features.map((feature, idx) => (
                 <GridItem
                   key={idx}
@@ -212,7 +190,7 @@ export default function Homepage() {
                   direction="row"
                   alignItems="center"
                 >
-                  <Circle bg="blue.500" boxSize="6" p="1">
+                  <Circle bg="blue.500" size="6" p="1">
                     <Icon color="white" as={Check} boxSize="full" />
                   </Circle>
                   <Text fontSize="lg">{feature}</Text>

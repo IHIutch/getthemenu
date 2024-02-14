@@ -1,19 +1,30 @@
 {
   "compilerOptions": {
+    /* Base Options: */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    /* If your code runs in the DOM: */
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
+    /* Strictness */
     "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
+    "noUncheckedIndexedAccess": true,
+    /* If NOT transpiling with TypeScript: */
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "module": "esnext",
+    "noEmit": true,
+    /* If transpiling with TypeScript: */
+    "sourceMap": true,
+    "outDir": "dist",
+    // Misc
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
@@ -25,7 +36,8 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "noImplicitAny": true,
   },
   "include": [
     "next-env.d.ts",

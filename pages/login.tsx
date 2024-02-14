@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import * as React from 'react'
 import {
   Box,
   Button,
@@ -10,7 +10,6 @@ import {
   GridItem,
   Heading,
   Input,
-  Link,
   Container,
 } from '@chakra-ui/react'
 
@@ -19,10 +18,11 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import axios from 'redaxios'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
-import { useAuthUser } from '@/utils/react-query/user'
 import { getErrorMessage } from '@/utils/functions'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import SEO from '@/components/global/SEO'
+import { createClientComponent } from '@/utils/supabase/component'
+import { GetServerSidePropsContext } from 'next'
+import { createClientServer } from '@/utils/supabase/server-props'
 
 type FormValues = {
   email: string
@@ -31,32 +31,16 @@ type FormValues = {
 
 export default function Login() {
   const router = useRouter()
-  const supabaseClient = useSupabaseClient()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const supabase = createClientComponent()
+
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>()
 
-  const {
-    data: user,
-    isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  // Doing this client side because of https://github.com/supabase/supabase/issues/3783
-  useEffect(() => {
-    if (!isUserLoading) {
-      if (user && user.restaurants?.length === 0) {
-        router.replace('/get-started')
-      } else if (user) {
-        router.replace('/dashboard')
-      }
-    }
-  }, [isUserLoading, router, user])
-
-  const { data: authListener } = supabaseClient.auth.onAuthStateChange(
+  const { data: authListener } = supabase.auth.onAuthStateChange(
     async (event, session) => {
       if (event === 'SIGNED_IN') {
         await axios.post(`/api/auth/signin`, {
@@ -73,7 +57,7 @@ export default function Login() {
   const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
       setIsSubmitting(true)
-      const { error } = await supabaseClient.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: form.email,
         password: form.password,
       })
@@ -171,4 +155,23 @@ export default function Login() {
       </Container>
     </>
   )
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClientServer(context)
+
+  const { data: { user: authedUser } } = await supabase.auth.getUser()
+
+  if (authedUser) {
+    return {
+      redirect: {
+        destination: '/dashboard',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {},
+  }
 }

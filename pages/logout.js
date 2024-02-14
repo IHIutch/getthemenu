@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import supabase from '@/utils/supabase'
 import axios from 'redaxios'
 import { useRouter } from 'next/router'
-import { useQueryClient } from 'react-query'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function SignOut() {
   const router = useRouter()

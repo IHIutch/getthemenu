@@ -1,15 +1,13 @@
-import { DehydratedState, Hydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { ReactQueryDevtools } from 'react-query/devtools'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import customTheme from '@/customTheme'
-import { useEffect, useState } from 'react'
-import { Router, useRouter } from 'next/router'
+import * as React from 'react'
+import { Router } from 'next/router'
 import * as Fathom from 'fathom-client'
 import { withProse } from '@nikolovlazar/chakra-ui-prose'
 import { AppProps } from 'next/app'
-import Error from 'next/error'
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
-import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
+import { trpc } from '@/utils/trpc/client'
+import { NextPage } from 'next'
 
 
 const theme = extendTheme(
@@ -35,50 +33,31 @@ Router.events.on('routeChangeComplete', (as, routeProps) => {
   }
 });
 
-interface WorkaroundAppProps extends AppProps<{
-  initialSession: Session
-  dehydratedState?: DehydratedState
-}> {
-  err?: Error;
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode
 }
 
-export default function App({ Component, pageProps, err }: WorkaroundAppProps) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  )
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
 
-  const router = useRouter()
+const App = ({ Component, pageProps, }: AppPropsWithLayout) => {
+  // Delete this when moving to app router
+  const getLayout =
+    Component.getLayout ?? ((page) => { page });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
       Fathom.load('DVZFRWML')
     }
-  }, [router.events])
-
-  const getLayout = Component.getLayout || ((page) => page)
-  const [supabaseClient] = useState(() => createPagesBrowserClient())
-
+  }, [])
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionContextProvider
-        supabaseClient={supabaseClient}
-        initialSession={pageProps.initialSession}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <ChakraProvider theme={theme}>
-            {/* Workaround for https://github.com/vercel/next.js/issues/8592 */}
-            {getLayout(<Component {...pageProps} err={err} />)}
-          </ChakraProvider>
-        </Hydrate>
-      </SessionContextProvider>
+    <ChakraProvider theme={theme}>
+      {getLayout(<Component {...pageProps} />)}
       <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    </ChakraProvider>
   )
 }
+
+export default trpc.withTRPC(App);

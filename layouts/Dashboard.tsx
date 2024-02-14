@@ -1,9 +1,11 @@
-import Navbar from '@/components/common/Navbar'
+import * as React from 'react'
 import SubnavItem from '@/components/common/SubnavItem'
 import { Box, HStack } from '@chakra-ui/react'
-import React from 'react'
+import Navbar from '@/components/common/Navbar'
+import { RouterOutputs } from '@/server'
 
-export default function DashboardLayout({ children }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <>
       <Navbar>

@@ -1,6 +1,6 @@
 import axios from 'redaxios'
 
-export const getMenuItems = async (params = null) => {
+export const getMenuItems = async (params: {}) => {
   const { data } = await axios
     .get(`/api/menuItems?`, {
       params,
@@ -11,21 +11,21 @@ export const getMenuItems = async (params = null) => {
   return data
 }
 
-export const getMenuItem = async (id) => {
+export const getMenuItem = async (id: number) => {
   const { data } = await axios.get(`/api/menuItems/${id}`).catch((res) => {
     throw new Error(res.data.error)
   })
   return data
 }
 
-export const postMenuItem = async (payload) => {
+export const postMenuItem = async (payload: {}) => {
   const { data } = await axios.post(`/api/menuItems`, payload).catch((res) => {
     throw new Error(res.data.error)
   })
   return data
 }
 
-export const putMenuItem = async (id, payload) => {
+export const putMenuItem = async (id: number, payload: {}) => {
   const { data } = await axios
     .put(`/api/menuItems/${id}`, payload)
     .catch((res) => {
@@ -34,7 +34,7 @@ export const putMenuItem = async (id, payload) => {
   return data
 }
 
-export const putMenuItemsReorder = async (payload) => {
+export const putMenuItemsReorder = async (payload: {}) => {
   const { data } = await axios
     .put(`/api/menuItems/reorder`, payload)
     .catch((res) => {
@@ -43,7 +43,7 @@ export const putMenuItemsReorder = async (payload) => {
   return data
 }
 
-export const deleteMenuItem = async (id) => {
+export const deleteMenuItem = async (id: number) => {
   const { data } = await axios.delete(`/api/menuItems/${id}`).catch((res) => {
     throw new Error(res.data.error)
   })

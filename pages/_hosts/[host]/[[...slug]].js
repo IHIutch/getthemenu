@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import Head from 'next/head'
 import PublicLayout from '@/layouts/Public'
-import { dehydrate, QueryClient } from 'react-query'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import { prismaGetRestaurant } from '@/utils/prisma/restaurants'
@@ -271,10 +271,10 @@ export async function getServerSideProps({ params: { host }, query }) {
   await queryClient.prefetchQuery(['restaurants', restaurantQuery], () =>
     restaurant
       ? {
-          ...restaurant,
-          createdAt: restaurant.createdAt.toISOString(),
-          updatedAt: restaurant.updatedAt.toISOString(),
-        }
+        ...restaurant,
+        createdAt: restaurant.createdAt.toISOString(),
+        updatedAt: restaurant.updatedAt.toISOString(),
+      }
       : null
   )
 

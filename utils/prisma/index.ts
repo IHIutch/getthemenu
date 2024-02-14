@@ -1,14 +1,18 @@
 import { PrismaClient } from '@prisma/client'
 
-let prisma
+const prismaGlobal = global as typeof global & {
+  prisma?: PrismaClient
+}
 
-if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient()
-} else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient()
-  }
-  prisma = global.prisma
+export const prisma: PrismaClient =
+  prismaGlobal.prisma ||
+  new PrismaClient({
+    log:
+      process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  })
+
+if (process.env.NODE_ENV !== 'production') {
+  prismaGlobal.prisma = prisma
 }
 
 prisma.$use(async (params, next) => {

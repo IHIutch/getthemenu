@@ -1,6 +1,6 @@
 import axios from 'redaxios'
 
-export const getRestaurants = async (params = null) => {
+export const getRestaurants = async (params: {}) => {
   const { data } = await axios
     .get(`/api/restaurants?`, {
       params,
@@ -11,14 +11,14 @@ export const getRestaurants = async (params = null) => {
   return data
 }
 
-export const getRestaurant = async (id) => {
+export const getRestaurant = async (id: string) => {
   const { data } = await axios.get(`/api/restaurants/${id}`).catch((res) => {
     throw new Error(res.data.error)
   })
   return data
 }
 
-export const postRestaurant = async (payload) => {
+export const postRestaurant = async (payload: {}) => {
   const { data } = await axios
     .post(`/api/restaurants`, payload)
     .catch((res) => {
@@ -27,7 +27,7 @@ export const postRestaurant = async (payload) => {
   return data
 }
 
-export const putRestaurant = async (id, payload) => {
+export const putRestaurant = async (id: string, payload: {}) => {
   const { data } = await axios
     .put(`/api/restaurants/${id}`, payload)
     .catch((res) => {
@@ -36,7 +36,7 @@ export const putRestaurant = async (id, payload) => {
   return data
 }
 
-export const deleteRestaurant = async (id) => {
+export const deleteRestaurant = async (id: string) => {
   const { data } = await axios.delete(`/api/restaurants/${id}`).catch((res) => {
     throw new Error(res.data.error)
   })

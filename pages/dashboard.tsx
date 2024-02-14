@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { postMenu } from '@/utils/axios/menus'
-import { formatDate, reorderList } from '@/utils/functions'
-import { useGetMenus, useReorderMenus } from '@/utils/react-query/menus'
+import { formatDate, getErrorMessage, reorderList } from '@/utils/functions'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { useAuthUser } from '@/utils/react-query/user'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Box,
   Button,
@@ -39,43 +37,51 @@ import {
   Icon,
   InputGroup,
   InputLeftAddon,
+  useControllableState,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import DashboardLayout from '@/layouts/Dashboard'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import slugify from 'slugify'
 import axios from 'redaxios'
 import { debounce } from 'lodash'
 import { GripHorizontal } from 'lucide-react'
-import { Draggable } from 'react-beautiful-dnd'
+import { Draggable, DropResult } from 'react-beautiful-dnd'
 import { Droppable } from 'react-beautiful-dnd'
 import { DragDropContext } from 'react-beautiful-dnd'
+import { MenuSchema } from '@/utils/zod'
+import { z } from 'zod'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { createCaller } from '@/utils/trpc/server'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { trpc } from '@/utils/trpc/client'
+import { appRouter } from '@/server'
+import SuperJSON from 'superjson'
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import { useGetAuthedUser } from '@/utils/react-query/users'
 
-export default function Dashboard() {
+
+type SlugMessage = {
+  type: 'success' | 'error',
+  message: string
+} | null
+
+const FormPayload = MenuSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAtAt: true,
+})
+
+type FormData = z.infer<typeof FormPayload>
+
+export default function Dashboard({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
   const modalState = useDisclosure()
-  const [isCreating, setIsCreating] = useState('')
   const [isCheckingSlug, setIsCheckingSlug] = useState(false)
-  const [slugMessage, setSlugMessage] = useState(null)
-
-  const {
-    data: user,
-    isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  // Doing this client side because of https://github.com/supabase/supabase/issues/3783
-  useEffect(() => {
-    if (!isUserLoading) {
-      if (!user) {
-        router.replace('/')
-      } else if (!user?.restaurants?.length) {
-        router.replace('/get-started')
-      }
-    }
-  }, [isUserLoading, router, user])
+  const [slugMessage, setSlugMessage] = useState<SlugMessage>(null)
 
   const {
     register,
@@ -84,41 +90,43 @@ export default function Dashboard() {
     setValue,
     watch,
     formState: { errors },
-  } = useForm()
+  } = useForm<FormData>({
+    resolver: zodResolver(FormPayload),
+  })
 
-  const { data: restaurant } = useGetRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
+  useGetAuthedUser({ initialData: user })
+  const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
+  const { data: menus = [] } = trpc.menu.getAllByRestaurantId.useQuery({
+    where: { restaurantId: restaurant?.id }
+  }, {
+    enabled: !!restaurant?.id
+  })
+  const { mutateAsync: handleReorderMenus } = trpc.menu.reorder.useMutation()
+  const { mutateAsync: handleCreateMenu, isPending } = trpc.menu.create.useMutation()
 
-  const { data: menus } = useGetMenus(
-    restaurant?.id ? { restaurantId: restaurant.id } : null
-  )
-  const { mutate: handleReorderMenus } = useReorderMenus(
-    restaurant?.id
-      ? {
-        restaurantId: restaurant.id,
-      }
-      : null
-  )
-
-  const onSubmit = async (form) => {
+  const onSubmit: SubmitHandler<FormData> = async (form) => {
     try {
-      setIsCreating(true)
-      const data = await postMenu({
-        title: form.title || '',
-        slug: form.slug || '',
-        restaurantId: user.restaurants[0].id,
+      const data = await handleCreateMenu({
+        payload: {
+          title: form.title,
+          slug: form.slug,
+          restaurantId: restaurant.id,
+        }
+      }, {
+        onSuccess() {
+          router.push(`/menu/${data.id}/edit`)
+        },
+        onError(error) {
+          throw new Error(getErrorMessage(error))
+        },
       })
-      if (data.error) throw new Error(data.error)
-      router.push(`/menu/${data.id}/edit`)
     } catch (error) {
-      setIsCreating(false)
       alert(error)
     }
   }
 
   const checkUniqueSlug = useCallback(
-    async (slug) => {
+    async (slug: string) => {
       try {
         setIsCheckingSlug(true)
         const testSlug = slugify(slug, {
@@ -151,7 +159,7 @@ export default function Dashboard() {
         }
         setIsCheckingSlug(false)
       } catch (error) {
-        alert(error.message)
+        alert(getErrorMessage(error))
       }
     },
     [restaurant?.id]
@@ -176,7 +184,7 @@ export default function Dashboard() {
   )
 
   const debouncedCheckUniqueSlug = useCallback(
-    (slug) => {
+    (slug: string) => {
       handleDebounce(slug)
     },
     [handleDebounce]
@@ -195,24 +203,26 @@ export default function Dashboard() {
     }
   }
 
-  const handleDragEnd = (result) => {
+  const handleDragEnd = (result: DropResult) => {
     const { source, destination } = result
     if (!destination) return // dropped outside the list
 
     const reorderedMenus = reorderList(
-      menus.sort((a, b) => a.position - b.position),
+      menus.sort((a, b) => (a.position || 0) - (b.position || 0)),
       source.index,
       destination.index
     )
-    handleReorderMenus(
-      reorderedMenus.map((menu, idx) => ({
+
+    handleReorderMenus({
+      payload: reorderedMenus.map((menu, idx) => ({
         id: Number(menu.id),
         position: idx,
       }))
+    }
     )
   }
   const sortedMenus = useMemo(() => {
-    return menus ? menus.sort((a, b) => a.position - b.position) : []
+    return menus ? menus.sort((a, b) => (a.position || 0) - (b.position || 0)) : []
   }, [menus])
 
   return (
@@ -230,7 +240,7 @@ export default function Dashboard() {
               </Button>
             </Box>
           </Flex>
-          {menus?.length ? (
+          {menus.length > 0 ? (
             <>
               <Box mb="4">
                 <Text fontSize="sm" color="gray.700">
@@ -284,8 +294,8 @@ export default function Dashboard() {
                                     </Box>
                                     <Flex p="3" justify="space-between">
                                       <Flex align="center">
-                                        <Circle boxSize="4" bg="green.100">
-                                          <Circle boxSize="2" bg="green.500" />
+                                        <Circle size={4} bg="green.100">
+                                          <Circle size={2} bg="green.500" />
                                         </Circle>
                                         <Text
                                           ml="2"
@@ -345,7 +355,7 @@ export default function Dashboard() {
             <ModalBody>
               <Grid w="100%" gap="4">
                 <GridItem>
-                  <FormControl id="title" isInvalid={errors.title}>
+                  <FormControl id="title" isInvalid={!!errors.title}>
                     <FormLabel>Menu Title</FormLabel>
                     <Input
                       {...register('title', {
@@ -359,7 +369,7 @@ export default function Dashboard() {
                   </FormControl>
                 </GridItem>
                 <GridItem>
-                  <FormControl id="slug" isInvalid={errors.title}>
+                  <FormControl id="slug" isInvalid={!!errors.title}>
                     <FormLabel>Menu Slug</FormLabel>
                     <InputGroup>
                       {(restaurant?.customHost || restaurant?.customDomain) && (
@@ -402,7 +412,7 @@ export default function Dashboard() {
                 <Button onClick={modalState.onClose}>Cancel</Button>
                 <Button
                   type="submit"
-                  isLoading={isCreating}
+                  isLoading={isPending}
                   loadingText="Creating..."
                   colorScheme="blue"
                   isDisabled={slugMessage?.type === 'error'}
@@ -418,29 +428,38 @@ export default function Dashboard() {
   )
 }
 
-Dashboard.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
+Dashboard.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</DashboardLayout>
 
-// export async function getServerSideProps(req) {
-//   const user = await getLoggedUser(req)
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClientServer(context)
 
-//   if (!user) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: '/',
-//       },
-//     }
-//   }
-//   if (user?.restaurants?.length) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: '/get-started',
-//       },
-//     }
-//   }
+  const caller = createCaller({ supabase })
 
-//   return {
-//     props: {},
-//   }
-// }
+  const user = await caller.user.getAuthedUser()
+
+  if (user.restaurants.length === 0) {
+    return {
+      redirect: {
+        destination: '/get-started',
+        permanent: false,
+      },
+    }
+  }
+
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: {
+      supabase
+    },
+    transformer: SuperJSON,
+  });
+
+  await helpers.user.getAuthedUser.prefetch()
+
+  return {
+    props: {
+      user,
+      trpcState: helpers.dehydrate(),
+    },
+  }
+}

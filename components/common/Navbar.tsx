@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import NextLink from 'next/link'
-import { useAuthUser } from '@/utils/react-query/user'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
 import {
   Avatar,
@@ -33,21 +32,29 @@ import {
   useDisclosure,
   useRadio,
   useRadioGroup,
+  UseRadioGroupProps,
+  UseRadioProps,
 } from '@chakra-ui/react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { postFeedback } from '@/utils/axios/feedback'
+import { useGetAuthedUser } from '@/utils/react-query/users'
 
-export default function Navbar({ children, ...props }) {
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-  const { data: restaurant } = useGetRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
+type FormValues = {
+  userId: string,
+  type: string,
+  comment: string,
+}
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export default function Navbar({
+  children,
+}: {
+  children: React.ReactNode,
+}) {
+
+  const { data: user } = useGetAuthedUser()
+  const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
+
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const modalState = useDisclosure()
 
@@ -56,19 +63,19 @@ export default function Navbar({ children, ...props }) {
     control,
     register,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormValues>({
     defaultValues: {
       type: 'idea',
     },
   })
 
-  const onSubmit = async (form) => {
+  const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
       setIsSubmitting(true)
       const data = await postFeedback({
-        userId: user.id || '',
-        type: form.type || '',
-        comment: form.comment || '',
+        userId: user?.id,
+        type: form.type,
+        comment: form.comment,
       })
       if (data.error) throw new Error(data.error)
       setIsSubmitting(false)
@@ -90,7 +97,6 @@ export default function Navbar({ children, ...props }) {
         top="0"
         w="100%"
         zIndex="1"
-        {...props}
       >
         <Container maxW="container.md">
           <Box>
@@ -139,7 +145,7 @@ export default function Navbar({ children, ...props }) {
                 </Text>
               </Box>
               <Grid gap="4">
-                <GridItem w="100%" d="flex" alignItems="center">
+                <GridItem w="100%" display="flex" alignItems="center">
                   <Controller
                     name="type"
                     control={control}
@@ -182,7 +188,7 @@ export default function Navbar({ children, ...props }) {
   )
 }
 
-const FeedbackButtons = (props) => {
+const FeedbackButtons = (props: UseRadioGroupProps) => {
   const options = [
     {
       value: 'idea',
@@ -223,17 +229,17 @@ const FeedbackButtons = (props) => {
   )
 }
 
-const FeedbackButton = (props) => {
-  const { getInputProps, getCheckboxProps } = useRadio(props)
+const FeedbackButton = ({ children, ...props }: { children: React.ReactNode } & UseRadioProps) => {
+  const { getInputProps, getRadioProps } = useRadio(props)
 
   const input = getInputProps()
-  const checkbox = getCheckboxProps()
+  const radio = getRadioProps()
 
   return (
     <Box as="label" flexGrow="1" maxW="24">
       <input {...input} />
       <Box
-        {...checkbox}
+        {...radio}
         cursor="pointer"
         borderWidth="1px"
         _checked={{
@@ -249,7 +255,7 @@ const FeedbackButton = (props) => {
         width="100%"
         rounded="md"
       >
-        {props.children}
+        {children}
       </Box>
     </Box>
   )

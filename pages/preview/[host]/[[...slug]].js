@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import Head from 'next/head'
 import PublicLayout from '@/layouts/Public'
-import { dehydrate, QueryClient } from 'react-query'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { useGetMenus } from '@/utils/react-query/menus'
 import { useGetSections } from '@/utils/react-query/sections'
 import { useGetMenuItems } from '@/utils/react-query/menuItems'
@@ -273,40 +273,40 @@ export async function getServerSideProps({ params: { host }, query }) {
   await queryClient.prefetchQuery(['restaurants', restaurantQuery], async () =>
     restaurant
       ? {
-          ...restaurant,
-          createdAt: restaurant.createdAt.toISOString(),
-          updatedAt: restaurant.updatedAt.toISOString(),
-        }
+        ...restaurant,
+        createdAt: restaurant.createdAt.toISOString(),
+        updatedAt: restaurant.updatedAt.toISOString(),
+      }
       : null
   )
 
   await queryClient.prefetchQuery(['menus', menusQuery], async () =>
     menus
       ? menus.map((i) => ({
-          ...i,
-          createdAt: i.createdAt.toISOString(),
-          updatedAt: i.updatedAt.toISOString(),
-        }))
+        ...i,
+        createdAt: i.createdAt.toISOString(),
+        updatedAt: i.updatedAt.toISOString(),
+      }))
       : null
   )
 
   await queryClient.prefetchQuery(['sections', menusQuery], async () =>
     sections
       ? sections.map((i) => ({
-          ...i,
-          createdAt: i.createdAt.toISOString(),
-          updatedAt: i.updatedAt.toISOString(),
-        }))
+        ...i,
+        createdAt: i.createdAt.toISOString(),
+        updatedAt: i.updatedAt.toISOString(),
+      }))
       : null
   )
   await queryClient.prefetchQuery(['menuItems', menusQuery], async () =>
     menuItems
       ? menuItems.map((i) => ({
-          ...i,
-          createdAt: i.createdAt.toISOString(),
-          updatedAt: i.updatedAt.toISOString(),
-          price: i.price ? i.price.toString() : '',
-        }))
+        ...i,
+        createdAt: i.createdAt.toISOString(),
+        updatedAt: i.updatedAt.toISOString(),
+        price: i.price ? i.price.toString() : '',
+      }))
       : null
   )
 

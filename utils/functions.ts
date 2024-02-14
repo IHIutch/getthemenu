@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import supabase from '@/utils/supabase'
+import { createClientComponent } from './supabase/component'
 
 export const handleStructuredData = ({ restaurant, menus }: any) => {
   return {
@@ -79,17 +79,18 @@ export const isDateInputSupported = () => {
 
 export const getPublicURL = (path: string) => {
   try {
-    const { publicURL, error } = supabase.storage
+    const supabase = createClientComponent()
+    const { data: publicUrl } = supabase.storage
       .from('public')
       .getPublicUrl(path)
-    if (error) throw new Error(error.message)
-    return publicURL
+    if (!publicUrl) throw new Error('Image not found')
+    return publicUrl
   } catch (error) {
     console.log('Error downloading file: ', getErrorMessage(error))
   }
 }
 
-export const reorderList = (list = [], startIndex: number, endIndex: number) => {
+export const reorderList = (list: any[], startIndex: number, endIndex: number) => {
   const temp = [...list]
   const [removed] = temp.splice(startIndex, 1)
   temp.splice(endIndex, 0, removed)
