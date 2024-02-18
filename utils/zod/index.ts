@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 export const UserSchema = z.object({
@@ -11,63 +12,46 @@ export const UserSchema = z.object({
     deletedAt: z.date().nullable().optional()
 })
 
+export const DAYS_OF_WEEK = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+] as const
+
+const HoursSchema = z.record(
+    z.union([z.enum(DAYS_OF_WEEK), z.string()]),
+    z.object({
+        isOpen: z.boolean(),
+        openTime: z.string(),
+        closeTime: z.string(),
+    }));
+
 export const RestaurantSchema = z.object({
     id: z.string().uuid(),
     userId: z.string().uuid(),
-    hours: z.object({
-        'Sunday': z.object({
-            isOpen: z.boolean(),
-            openTime: z.string(),
-            closeTime: z.string(),
-        }),
-        'Monday': z.object({
-            isOpen: z.boolean(),
-            openTime: z.string(),
-            closeTime: z.string(),
-        }),
-        'Tuesday': z.object({
-            isOpen: z.boolean(),
-            openTime: z.string(),
-            closeTime: z.string(),
-        }),
-        'Wednesday': z.object({
-            isOpen: z.boolean(),
-            openTime: z.string(),
-            closeTime: z.string(),
-        }),
-        'Thursday': z.object({
-            isOpen: z.boolean(),
-            openTime: z.string(),
-            closeTime: z.string(),
-        }),
-        'Friday': z.object({
-            isOpen: z.boolean(),
-            openTime: z.string(),
-            closeTime: z.string(),
-        }),
-        'Saturday': z.object({
-            isOpen: z.boolean(),
-            openTime: z.string(),
-            closeTime: z.string(),
-        }),
-    }).nullable().optional(),
+    name: z.string().nullable(),
+    hours: HoursSchema.optional(),
     address: z.object({
         streetAddress: z.string(),
         zip: z.string(),
         city: z.string(),
         state: z.string()
-    }).nullable().optional(),
-    phone: z.array(z.string()).nullable().optional(),
-    email: z.array(z.string().email()).nullable().optional(),
+    }),
+    phone: z.array(z.string()),
+    email: z.array(z.string().email()),
     coverImage: z.object({
         blurDataUrl: z.string().optional(),
         src: z.string().url()
-    }).nullable().optional(),
-    customHost: z.string().nullable().optional(),
-    customDomain: z.string().url().nullable().optional(),
+    }),
+    customHost: z.string().nullable(),
+    customDomain: z.string().url().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
-    deletedAt: z.date().nullable().optional(),
+    deletedAt: z.date().nullable(),
 })
 
 export const MenuSchema = z.object({

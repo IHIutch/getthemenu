@@ -1,10 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
-  getRestaurant,
   getRestaurants,
-  putRestaurant,
 } from '../axios/restaurants'
 import { trpc } from '../trpc/client'
+import { RouterInputs } from '@/server'
 
 export const useGetRestaurants = (params: {}) => {
   const { isPending, isError, isSuccess, data, error } = useQuery({
@@ -21,12 +20,12 @@ export const useGetRestaurants = (params: {}) => {
   }
 }
 
-export const useGetRestaurant = (id: string | undefined) => {
+export const useGetRestaurant = (id: string = '') => {
   const { isLoading, isError, isSuccess, data, error } =
-    trpc.restaurant.getById.useQuery({
-      where: { id },
-    },
-      { enabled: !!id })
+    trpc.restaurant.getById.useQuery(
+      { where: { id } },
+      { enabled: id !== '' }
+    )
   return {
     data,
     error,
@@ -36,8 +35,8 @@ export const useGetRestaurant = (id: string | undefined) => {
   }
 }
 
-export const useUpdateRestaurant = (params: {}) => {
-  const queryClient = useQueryClient()
+export const useUpdateRestaurant = (id: RouterInputs['restaurant']['getById']['where']['id'] = '') => {
+  const { restaurant: restaurantUtils } = trpc.useUtils()
   const {
     mutateAsync,
     isPending,
@@ -45,35 +44,42 @@ export const useUpdateRestaurant = (params: {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation({
-    mutationFn: async ({ id, payload }: { id: string, payload: {} }) => {
-      await putRestaurant(id, payload)
-    },
+  } = trpc.restaurant.update.useMutation({
+
     // When mutate is called:
-    onMutate: async ({ payload }) => {
+    onMutate: async ({ where: { id }, payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['restaurants', params]
+      await restaurantUtils.getById.cancel({
+        where: { id }
       })
-      const previous = queryClient.getQueryData(['restaurants', params])
-      queryClient.setQueryData(['restaurants', params], (old) => ({
-        ...old,
-        ...payload,
-      }))
+      const previous = restaurantUtils.getById.getData({
+        where: { id }
+      })
+
+      restaurantUtils.getById.setData({
+        where: { id }
+      }, (old) => {
+
+        return old ? {
+          ...old,
+          ...payload,
+          updatedAt: new Date()
+        } : undefined
+      })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
-    onError: (err, updated, context) => {
-      queryClient.setQueryData(['restaurants', params], context?.previous)
+    onError: (_err, _updated, context) => {
+      restaurantUtils.getById.setData({ where: { id } }, context?.previous)
     },
     // Always refetch after error or success:
-    onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['restaurants', params]
+    onSettled: (_updated) => {
+      restaurantUtils.getById.invalidate({
+        where: { id }
       })
     },
-  }
-  )
+  })
+
   return {
     mutateAsync,
     data,

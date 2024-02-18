@@ -97,7 +97,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
   useGetAuthedUser({ initialData: user })
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
   const { data: menus = [] } = trpc.menu.getAllByRestaurantId.useQuery({
-    where: { restaurantId: restaurant?.id }
+    where: { restaurantId: restaurant?.id || '' }
   }, {
     enabled: !!restaurant?.id
   })
@@ -110,7 +110,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
         payload: {
           title: form.title,
           slug: form.slug,
-          restaurantId: restaurant.id,
+          restaurantId: restaurant?.id || '',
         }
       }, {
         onSuccess() {
@@ -432,10 +432,15 @@ Dashboard.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</Dashbo
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: {
+      supabase
+    },
+    transformer: SuperJSON,
+  });
 
-  const caller = createCaller({ supabase })
-
-  const user = await caller.user.getAuthedUser()
+  const user = await helpers.user.getAuthedUser.fetch()
 
   if (user.restaurants.length === 0) {
     return {
@@ -445,16 +450,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     }
   }
-
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: {
-      supabase
-    },
-    transformer: SuperJSON,
-  });
-
-  await helpers.user.getAuthedUser.prefetch()
 
   return {
     props: {

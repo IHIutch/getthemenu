@@ -25,9 +25,9 @@ import {
   useGetRestaurant,
   useUpdateRestaurant,
 } from '@/utils/react-query/restaurants'
-import { useAuthUser } from '@/utils/react-query/user'
 import {
   Controller,
+  SubmitHandler,
   useFieldArray,
   useForm,
   useFormState,
@@ -35,8 +35,20 @@ import {
 import DashboardLayout from '@/layouts/Dashboard'
 import ImageDropzone from '@/components/common/ImageDropzone'
 import { postUpload } from '@/utils/axios/uploads'
+import { useGetAuthedUser } from '@/utils/react-query/users'
+import { DAYS_OF_WEEK } from '@/utils/zod'
+import { RouterOutputs, appRouter } from '@/server'
+import { getErrorMessage } from '@/utils/functions'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import SuperJSON from 'superjson'
 
-export default function Restaurant() {
+export default function Restaurant({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
+  useGetAuthedUser({ initialData: user })
+  const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
+
   return (
     <>
       <Head>
@@ -46,16 +58,24 @@ export default function Restaurant() {
       <Container maxW="container.md">
         <Stack spacing="6">
           <Box bg="white" rounded="md" shadow="base">
-            <Details />
+            {restaurant ?
+              <Details restaurant={restaurant} />
+              : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            <Contact />
+            {restaurant ?
+              <Contact restaurant={restaurant} />
+              : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            <Address />
+            {restaurant ?
+              <Address restaurant={restaurant} />
+              : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            <Hours />
+            {restaurant ?
+              <Hours restaurant={restaurant} />
+              : null}
           </Box>
         </Stack>
       </Container>
@@ -63,32 +83,26 @@ export default function Restaurant() {
   )
 }
 
-Restaurant.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
+Restaurant.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</DashboardLayout>
 
-const Details = () => {
+const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant?.id)
 
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  const { data: restaurant } = useGetRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
-
-  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    restaurant?.id || null
-  )
-
-  const defaultValues = useMemo(() => {
-    return {
-      name: restaurant?.name || '',
-      customHost: restaurant?.customHost || '',
-      coverImage: restaurant?.coverImage?.src || null,
+  const defaultValues: {
+    name: string | null,
+    customHost: string | null,
+    coverImage: {
+      src?: string,
+      file?: File | null
     }
-  }, [restaurant])
+  } = {
+    name: restaurant?.name,
+    customHost: restaurant?.customHost,
+    coverImage: {
+      src: restaurant.coverImage.src
+    },
+  }
 
   const {
     register,
@@ -96,41 +110,37 @@ const Details = () => {
     reset,
     control,
     formState: { errors, dirtyFields },
-  } = useForm({
-    defaultValues,
-  })
+  } = useForm<typeof defaultValues>({ defaultValues })
   const { isDirty } = useFormState({
     control,
   })
 
-  useEffect(() => {
-    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
-    reset(defaultValues)
-  }, [defaultValues, reset, restaurant])
-
-  const onSubmit = async (form) => {
+  const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
       setIsSubmitting(true)
       const payload = {
-        name: form?.name || '',
-        customHost: form?.customHost || '',
+        name: form.name,
+        customHost: form.customHost,
+        coverImage: {
+          src: form.coverImage.src || ''
+        }
       }
-      if (form?.coverImage && dirtyFields?.coverImage) {
-        const formData = new FormData()
-        formData.append('file', form.coverImage, form.coverImage.name)
 
-        payload.coverImage = await postUpload(formData)
-      } else if (form?.coverImage === null && dirtyFields?.coverImage) {
-        payload.coverImage = null
+      if (form?.coverImage && form.coverImage.file) {
+        const formData = new FormData()
+        formData.append('file', form.coverImage.file, form.coverImage.file.name)
+        payload.coverImage.src = await postUpload(formData)
       }
       await handleUpdateRestaurant({
-        id: user.restaurants[0].id,
+        where: {
+          id: restaurant.id,
+        },
         payload,
       })
       setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
 
@@ -145,7 +155,7 @@ const Details = () => {
         <Box p="6">
           <Grid w="100%" gap="4">
             <GridItem>
-              <FormControl isInvalid={errors.name}>
+              <FormControl isInvalid={!!errors.name}>
                 <FormLabel>Name</FormLabel>
                 <Input
                   {...register('name', {
@@ -156,7 +166,7 @@ const Details = () => {
               </FormControl>
             </GridItem>
             <GridItem>
-              <FormControl isInvalid={errors.customHost}>
+              <FormControl isInvalid={!!errors.customHost}>
                 <FormLabel>Unique URL</FormLabel>
                 <InputGroup>
                   <Input
@@ -174,14 +184,14 @@ const Details = () => {
               </FormControl>
             </GridItem>
             <GridItem>
-              <FormControl id="coverImage" isInvalid={errors.coverImage}>
+              <FormControl id="coverImage" isInvalid={!!errors.coverImage}>
                 <FormLabel>Cover Image</FormLabel>
-                <AspectRatio ratio={16 / 9} d="block">
+                <AspectRatio ratio={16 / 9} display="block">
                   <Controller
                     name="coverImage"
                     control={control}
-                    render={({ field }) => {
-                      return <ImageDropzone {...field} />
+                    render={({ field: { onChange, value } }) => {
+                      return <ImageDropzone onChange={onChange} value={value.src || ''} />
                     }}
                   />
                 </AspectRatio>
@@ -218,31 +228,16 @@ const Details = () => {
   )
 }
 
-const Address = () => {
+const Address = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant.id)
 
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  const { data: restaurant } = useGetRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
-
-  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
-
-  const defaultValues = useMemo(() => {
-    return {
-      streetAddress: restaurant?.address?.streetAddress || '',
-      city: restaurant?.address?.city || '',
-      state: restaurant?.address?.state || '',
-      zip: restaurant?.address?.zip || '',
-    }
-  }, [restaurant])
+  const defaultValues = {
+    streetAddress: restaurant?.address?.streetAddress || '',
+    city: restaurant?.address?.city || '',
+    state: restaurant?.address?.state || '',
+    zip: restaurant?.address?.zip || '',
+  }
 
   const {
     register,
@@ -250,23 +245,20 @@ const Address = () => {
     reset,
     control,
     formState: { errors },
-  } = useForm({
+  } = useForm<typeof defaultValues>({
     defaultValues,
   })
   const { isDirty } = useFormState({
     control,
   })
 
-  useEffect(() => {
-    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
-    reset(defaultValues)
-  }, [defaultValues, reset, restaurant])
-
-  const onSubmit = async (form) => {
+  const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
       setIsSubmitting(true)
       await handleUpdateRestaurant({
-        id: user.restaurants[0].id,
+        where: {
+          id: restaurant.id,
+        },
         payload: {
           address: {
             streetAddress: form?.streetAddress,
@@ -279,7 +271,7 @@ const Address = () => {
       setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
 
@@ -293,8 +285,8 @@ const Address = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
-            <GridItem colSpan={{ sm: '12' }}>
-              <FormControl isInvalid={errors.streetAddress}>
+            <GridItem colSpan={{ sm: 12 }}>
+              <FormControl isInvalid={!!errors.streetAddress}>
                 <FormLabel>Street Address</FormLabel>
                 <Input {...register('streetAddress')} type="text" />
                 <FormErrorMessage>
@@ -302,22 +294,22 @@ const Address = () => {
                 </FormErrorMessage>
               </FormControl>
             </GridItem>
-            <GridItem colSpan={{ sm: '12', md: '6' }}>
-              <FormControl isInvalid={errors.city}>
+            <GridItem colSpan={{ sm: 12, md: 6 }}>
+              <FormControl isInvalid={!!errors.city}>
                 <FormLabel>City</FormLabel>
                 <Input {...register('city')} type="text" />
                 <FormErrorMessage>{errors.city?.message}</FormErrorMessage>
               </FormControl>
             </GridItem>
-            <GridItem colSpan={{ sm: '6', md: '3' }}>
-              <FormControl isInvalid={errors.state}>
+            <GridItem colSpan={{ sm: 6, md: 3 }}>
+              <FormControl isInvalid={!!errors.state}>
                 <FormLabel>State</FormLabel>
                 <Input {...register('state')} type="text" />
                 <FormErrorMessage>{errors.state?.message}</FormErrorMessage>
               </FormControl>
             </GridItem>
-            <GridItem colSpan={{ sm: '6', md: '3' }}>
-              <FormControl isInvalid={errors.zip}>
+            <GridItem colSpan={{ sm: 6, md: 3 }}>
+              <FormControl isInvalid={!!errors.zip}>
                 <FormLabel>Postal Code</FormLabel>
                 <Input {...register('zip')} type="text" />
                 <FormErrorMessage>{errors.zip?.message}</FormErrorMessage>
@@ -351,64 +343,58 @@ const Address = () => {
   )
 }
 
-const Contact = () => {
+const Contact = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant?.id)
 
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  const { data: restaurant } = useGetRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
-
-  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    restaurant?.id || null
-  )
-
-  const defaultValues = useMemo(() => {
-    return {
-      phone: restaurant?.phone?.[0] || '',
-      email: restaurant?.email?.[0] || '',
-    }
-  }, [restaurant])
+  const defaultValues = {
+    phone: restaurant.phone.map(v => ({
+      value: v
+    })),
+    email: restaurant.email.map(v => ({
+      value: v
+    })),
+  }
 
   const {
     register,
     handleSubmit,
-    getValues,
     control,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<typeof defaultValues>({
     defaultValues,
   })
   const { isDirty } = useFormState({
     control,
   })
 
-  useEffect(() => {
-    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
-    reset(defaultValues)
-  }, [defaultValues, reset, restaurant])
+  const { fields: phoneFields } = useFieldArray({
+    control,
+    name: 'phone',
+  });
 
-  const onSubmit = async () => {
+  const { fields: emailFields } = useFieldArray({
+    control,
+    name: "email",
+  });
+
+  const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
-      const [phone, email] = getValues(['phone', 'email'])
       setIsSubmitting(true)
       await handleUpdateRestaurant({
-        id: user.restaurants[0].id,
+        where: {
+          id: restaurant.id,
+        },
         payload: {
-          phone: phone ? [phone] : [],
-          email: email ? [email] : [],
+          phone: form.phone.map(v => v.value),
+          email: form.email.map(v => v.value),
         },
       })
       setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
   return (
@@ -421,19 +407,27 @@ const Contact = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
-            <GridItem colSpan={{ sm: '6' }}>
-              <FormControl isInvalid={errors.phone}>
-                <FormLabel>Phone Number</FormLabel>
-                <Input {...register('phone')} type="text" />
-                <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
-              </FormControl>
+            <GridItem colSpan={{ sm: 6 }}>
+              <Stack>
+                {phoneFields.map((field, idx) => (
+                  <FormControl key={field.id} isInvalid={!!errors.phone}>
+                    <FormLabel>Phone Number</FormLabel>
+                    <Input {...register(`phone.${idx}.value` as const)} type="text" />
+                    <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
+                  </FormControl>
+                ))}
+              </Stack>
             </GridItem>
-            <GridItem colSpan={{ sm: '6' }}>
-              <FormControl isInvalid={errors.email}>
-                <FormLabel>Email</FormLabel>
-                <Input {...register('email')} type="email" />
-                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-              </FormControl>
+            <GridItem colSpan={{ sm: 6 }}>
+              <Stack>
+                {emailFields.map((field, idx) => (
+                  <FormControl key={field.id} isInvalid={!!errors.email}>
+                    <FormLabel>Email</FormLabel>
+                    <Input {...register(`email.${idx}.value` as const)} type="email" />
+                    <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+                  </FormControl>
+                ))}
+              </Stack>
             </GridItem>
           </Grid>
         </Box>
@@ -463,54 +457,27 @@ const Contact = () => {
   )
 }
 
-const Hours = () => {
+const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant.id)
 
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  const { data: restaurant } = useGetRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
-
-  const { mutate: handleUpdateRestaurant } = useUpdateRestaurant(
-    restaurant?.id || null
-  )
-
-  const defaultValues = useMemo(() => {
-    const daysOfWeek = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-    ]
-    return {
-      standardHours: daysOfWeek.map((day) => {
-        return {
-          label: day,
-          isOpen: restaurant?.hours?.[day]?.isOpen || false,
-          openTime: restaurant?.hours?.[day]?.openTime || '',
-          closeTime: restaurant?.hours?.[day]?.closeTime || '',
-        }
-      }),
-    }
-  }, [restaurant])
+  const defaultValues = {
+    standardHours: DAYS_OF_WEEK.map(day => ({
+      label: day,
+      isOpen: restaurant?.hours?.[day]?.isOpen || false,
+      openTime: restaurant?.hours?.[day]?.openTime || '',
+      closeTime: restaurant?.hours?.[day]?.closeTime || '',
+    }))
+  }
 
   const {
     register,
     handleSubmit,
-    getValues,
     reset,
     control,
     watch,
     formState: { errors },
-  } = useForm({
+  } = useForm<typeof defaultValues>({
     defaultValues,
   })
   const { isDirty } = useFormState({
@@ -522,16 +489,10 @@ const Hours = () => {
     name: 'standardHours',
   })
 
-  useEffect(() => {
-    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
-    reset(defaultValues)
-  }, [defaultValues, reset, restaurant])
-
-  const onSubmit = async () => {
+  const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
-      const [standardHours] = getValues(['standardHours'])
       setIsSubmitting(true)
-      const hours = standardHours.reduce((acc, day) => {
+      const hours = form.standardHours.reduce((acc, day) => {
         return {
           ...acc,
           [day.label]: {
@@ -542,7 +503,9 @@ const Hours = () => {
         }
       }, {})
       await handleUpdateRestaurant({
-        id: user.restaurants[0].id,
+        where: {
+          id: restaurant.id,
+        },
         payload: {
           hours,
         },
@@ -550,11 +513,11 @@ const Hours = () => {
       setIsSubmitting(false)
     } catch (error) {
       setIsSubmitting(false)
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
 
-  const watchField = (idx) => watch(`standardHours.${idx}.isOpen`)
+  const watchField = (idx: number) => watch(`standardHours.${idx}.isOpen`)
 
   return (
     <>
@@ -577,8 +540,8 @@ const Hours = () => {
                 gap="4"
               >
                 <GridItem
-                  colSpan={{ base: '6', lg: '3' }}
-                  d="flex"
+                  colSpan={{ base: 6, lg: 3 }}
+                  display="flex"
                   alignItems="center"
                   h={{ lg: '10' }}
                 >
@@ -587,12 +550,12 @@ const Hours = () => {
                   </Text>
                 </GridItem>
                 <GridItem
-                  colSpan={{ base: '6', lg: '3' }}
-                  d="flex"
+                  colSpan={{ base: 6, lg: 3 }}
+                  display="flex"
                   alignItems="center"
                   h={{ lg: '10' }}
                 >
-                  <FormControl d="flex" alignItems="center">
+                  <FormControl display="flex" alignItems="center">
                     <Switch {...register(`standardHours.${idx}.isOpen`)} />
                     <FormLabel ml="2" mb="0">
                       {watchField(idx) ? 'Open' : 'Closed'}
@@ -600,7 +563,7 @@ const Hours = () => {
                   </FormControl>
                 </GridItem>
                 {watchField(idx) && (
-                  <GridItem colSpan={{ base: '12', lg: '6' }}>
+                  <GridItem colSpan={{ base: 12, lg: 6 }}>
                     <HStack align="center">
                       <FormControl>
                         <FormLabel hidden>{field.label} Open Time</FormLabel>
@@ -608,7 +571,7 @@ const Hours = () => {
                           {...register(`standardHours.${idx}.openTime`)}
                           isRequired
                           type="time"
-                          // TODO: Add support for browsers that don't support time inputs
+                        // TODO: Add support for browsers that don't support time inputs
                         />
                       </FormControl>
                       <Text as="span">to</Text>
@@ -619,7 +582,7 @@ const Hours = () => {
                           // defaultValue={field.closeTime}
                           isRequired
                           type="time"
-                          // TODO: Add support for browsers that don't support time inputs
+                        // TODO: Add support for browsers that don't support time inputs
                         />
                       </FormControl>
                     </HStack>
@@ -653,4 +616,33 @@ const Hours = () => {
       </form>
     </>
   )
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClientServer(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: {
+      supabase
+    },
+    transformer: SuperJSON,
+  });
+
+  const user = await helpers.user.getAuthedUser.fetch()
+
+  if (user.restaurants.length === 0) {
+    return {
+      redirect: {
+        destination: '/get-started',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      user,
+      trpcState: helpers.dehydrate(),
+    },
+  }
 }

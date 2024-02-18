@@ -7,18 +7,23 @@ import {
   Input,
   Text,
 } from '@chakra-ui/react'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
+import React, { useCallback, useState } from 'react'
+import { FileWithPath, useDropzone } from 'react-dropzone'
 import { X } from 'lucide-react'
 
-export default function ImageDropzone({ onChange, value = '' }) {
+export default function ImageDropzone({ onChange, value = '' }: {
+  onChange: (val: File) => void,
+  value?: string
+}) {
   const [preview, setPreview] = useState(value)
-  const onDrop = useCallback(
-    (acceptedFiles) => {
-      onChange(acceptedFiles[0])
+  const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
+    if (acceptedFiles[0]) {
       const objectUrl = URL.createObjectURL(acceptedFiles[0])
+      onChange(acceptedFiles[0])
       setPreview(objectUrl)
-    },
+    }
+
+  },
     [onChange]
   )
 
@@ -35,7 +40,9 @@ export default function ImageDropzone({ onChange, value = '' }) {
     // isDragReject,
   } = useDropzone({
     onDrop,
-    accept: 'image/*',
+    accept: {
+      "image/*": [],
+    },
     multiple: false,
   })
 
@@ -44,6 +51,7 @@ export default function ImageDropzone({ onChange, value = '' }) {
       {preview ? (
         <Box position="relative" h="100%" w="100%">
           <IconButton
+            aria-label='Clear image'
             icon={<Icon boxSize="5" as={X} />}
             size="sm"
             position="absolute"
@@ -68,7 +76,7 @@ export default function ImageDropzone({ onChange, value = '' }) {
           cursor="pointer"
           {...getRootProps()}
         >
-          <Input {...getInputProps()} />
+          <input {...getInputProps()} />
           {isDragActive ? (
             <Text>Drop the files here ...</Text>
           ) : (

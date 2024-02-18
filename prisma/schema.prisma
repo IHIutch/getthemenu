@@ -51,7 +51,7 @@ model restaurants {
   coverImage   Json?       @db.Json
   customHost   String?     @unique @db.VarChar
   customDomain String?     @unique @db.VarChar
-  createdAt    DateTime?   @default(now()) @db.Timestamptz()
+  createdAt    DateTime    @default(now()) @db.Timestamptz()
   updatedAt    DateTime    @default(now()) @updatedAt @db.Timestamptz()
   deletedAt    DateTime?   @db.Timestamptz()
   users        users       @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)

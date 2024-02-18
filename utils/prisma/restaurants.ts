@@ -1,9 +1,8 @@
 import { Prisma } from '@prisma/client'
 import prisma from '@/utils/prisma'
-import { restaurantSchema } from '../joi/schemas'
 import { getErrorMessage } from '../functions'
 
-export const prismaGetRestaurants = async (where: Prisma.restaurantsWhereInput) => {
+export const prismaGetRestaurants = async ({ where }: { where: Prisma.restaurantsWhereInput }) => {
   try {
     return await prisma.restaurants.findMany({
       where,
@@ -13,9 +12,9 @@ export const prismaGetRestaurants = async (where: Prisma.restaurantsWhereInput) 
   }
 }
 
-export const prismaGetRestaurant = async (where: Prisma.restaurantsWhereUniqueInput) => {
+export const prismaGetRestaurant = async ({ where }: { where: Prisma.restaurantsWhereUniqueInput }) => {
   try {
-    return await prisma.restaurants.findUnique({
+    return prisma.restaurants.findUnique({
       where,
     })
   } catch (error) {
@@ -23,7 +22,7 @@ export const prismaGetRestaurant = async (where: Prisma.restaurantsWhereUniqueIn
   }
 }
 
-export const prismaPostRestaurant = async (payload: Prisma.restaurantsCreateInput) => {
+export const prismaCreateRestaurant = async ({ payload }: { payload: Prisma.restaurantsCreateInput }) => {
   try {
     return await prisma.restaurants.create({
       data: payload,
@@ -33,9 +32,8 @@ export const prismaPostRestaurant = async (payload: Prisma.restaurantsCreateInpu
   }
 }
 
-export const prismaPutRestaurant = async (where: Prisma.restaurantsWhereUniqueInput, payload: Prisma.restaurantsUpdateInput) => {
+export const prismaUpdateRestaurant = async ({ where, payload }: { where: Prisma.restaurantsWhereUniqueInput, payload: Prisma.restaurantsUpdateInput }) => {
   try {
-
     return await prisma.restaurants.update({
       data: payload,
       where,
@@ -45,7 +43,7 @@ export const prismaPutRestaurant = async (where: Prisma.restaurantsWhereUniqueIn
   }
 }
 
-export const prismaDeleteRestaurant = async (where: Prisma.restaurantsWhereUniqueInput) => {
+export const prismaDeleteRestaurant = async ({ where }: { where: Prisma.restaurantsWhereUniqueInput }) => {
   try {
     return await prisma.restaurants.delete({
       where,
