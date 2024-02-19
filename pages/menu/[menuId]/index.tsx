@@ -1,12 +1,12 @@
 import Head from 'next/head'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useForm, useFormState } from 'react-hook-form'
-import { useGetMenu, useUpdateMenu } from '@/utils/react-query/menus'
+import * as React from 'react'
+import { SubmitHandler, useForm, useFormState } from 'react-hook-form'
+import { useDeleteMenu, useGetMenu, useUpdateMenu } from '@/utils/react-query/menus'
 import slugify from 'slugify'
 import { debounce } from 'lodash'
 import axios from 'redaxios'
 import MenuLayout from '@/layouts/Menu'
-import router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import {
   Alert,
   AlertDialog,
@@ -36,11 +36,24 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react'
-import { useAuthUser } from '@/utils/react-query/user'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
 import { deleteMenu } from '@/utils/axios/menus'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { RouterOutputs, appRouter } from '@/server'
+import SuperJSON from 'superjson'
+import { useGetAuthedUser } from '@/utils/react-query/users'
+import { getErrorMessage } from '@/utils/functions'
 
-export default function MenuOverview() {
+export default function MenuOverview({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter()
+  const menuId = router.query?.menuId?.toString() ?? ""
+
+  useGetAuthedUser({ initialData: user })
+  const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
+  const { data: menu } = useGetMenu(Number(menuId))
+
   return (
     <>
       <Head>
@@ -49,10 +62,12 @@ export default function MenuOverview() {
       <Container maxW="container.md">
         <Stack spacing="6">
           <Box bg="white" rounded="md" shadow="base">
-            <DetailsSection />
+            {(menu && restaurant) ?
+              <DetailsSection menu={menu} restaurant={restaurant} />
+              : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            <DeleteSection />
+            {menu ? <DeleteSection menu={menu} /> : null}
           </Box>
         </Stack>
       </Container>
@@ -60,33 +75,27 @@ export default function MenuOverview() {
   )
 }
 
-const DetailsSection = () => {
-  const {
-    query: { menuId },
-  } = useRouter()
+type SlugMessageType = {
+  type: 'success' | 'error'
+  message: string
+} | null
 
-  const {
-    data: user,
-    // isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
+const DetailsSection = ({ menu, restaurant }: {
+  menu: RouterOutputs['menu']['getById'],
+  restaurant: RouterOutputs['restaurant']['getById']
+}) => {
 
-  const { data: restaurant } = useGetRestaurant(
-    user?.restaurants?.length ? user.restaurants[0].id : null
-  )
-  const [isCheckingSlug, setIsCheckingSlug] = useState(false)
-  const [slugMessage, setSlugMessage] = useState(null)
 
-  const { data: menu } = useGetMenu(menuId)
-  const { mutate: handleUpdateMenu, isLoading: isSubmitting } =
-    useUpdateMenu(menuId)
+  const [isCheckingSlug, setIsCheckingSlug] = React.useState(false)
+  const [slugMessage, setSlugMessage] = React.useState<SlugMessageType>(null)
 
-  const defaultValues = useMemo(() => {
-    return {
-      title: menu?.title || '',
-      slug: menu?.slug || '',
-    }
-  }, [menu])
+  const { mutateAsync: handleUpdateMenu, isPending } =
+    useUpdateMenu(menu.id)
+
+  const defaultValues = {
+    title: menu?.title || '',
+    slug: menu?.slug || '',
+  }
 
   const {
     register,
@@ -97,16 +106,11 @@ const DetailsSection = () => {
     watch,
     control,
     formState: { errors },
-  } = useForm()
+  } = useForm<typeof defaultValues>({ defaultValues })
 
   const { isDirty } = useFormState({
     control,
   })
-
-  useEffect(() => {
-    // Handles resetting the form to the default values after they're loaded in with React Query. Could probably also be handles showing an initial skeleton and swapping when the data is loaded.
-    reset(defaultValues)
-  }, [defaultValues, reset, menu])
 
   const handleSetSlug = async () => {
     const [title, slug] = getValues(['title', 'slug'])
@@ -121,8 +125,8 @@ const DetailsSection = () => {
     }
   }
 
-  const checkUniqueSlug = useCallback(
-    async (slug) => {
+  const checkUniqueSlug = React.useCallback(
+    async (slug: string) => {
       try {
         setIsCheckingSlug(true)
         const testSlug = slugify(slug, {
@@ -134,7 +138,7 @@ const DetailsSection = () => {
         } else if (testSlug !== slug) {
           setSlugMessage({
             type: 'error',
-            message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
+            message: 'Your slug is not valid. Please use only lowercase letters, numbers, and dashes.',
           })
         } else {
           const { data } = await axios.get('/api/menus', {
@@ -157,43 +161,45 @@ const DetailsSection = () => {
         }
         setIsCheckingSlug(false)
       } catch (error) {
-        alert(error.message)
+        alert(getErrorMessage(error))
       }
     },
     [menu?.restaurantId, menu?.slug]
   )
 
-  const handleDebounce = useMemo(
+  const handleDebounce = React.useMemo(
     () => debounce(checkUniqueSlug, 500),
     [checkUniqueSlug]
   )
 
-  const debouncedCheckUniqueSlug = useCallback(
-    (slug) => {
+  const debouncedCheckUniqueSlug = React.useCallback(
+    (slug: string) => {
       handleDebounce(slug)
     },
     [handleDebounce]
   )
 
   const watchSlug = watch('slug')
-  useEffect(() => {
+  React.useEffect(() => {
     if (watchSlug) {
       debouncedCheckUniqueSlug(watchSlug)
     }
   }, [debouncedCheckUniqueSlug, watchSlug])
 
-  const onSubmit = async (form) => {
+  const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
       const payload = {
         title: form.title || '',
         slug: slugify(form.slug || '', { lower: true, strict: true }),
       }
       await handleUpdateMenu({
-        id: menuId,
-        payload,
+        where: {
+          id: Number(menu.id)
+        },
+        payload
       })
     } catch (error) {
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
 
@@ -207,7 +213,7 @@ const DetailsSection = () => {
               <Input
                 {...register('title', {
                   required: 'This field is required',
-                })}
+                } as const)}
                 onBlur={handleSetSlug}
                 type="text"
                 autoComplete="off"
@@ -228,7 +234,7 @@ const DetailsSection = () => {
                 <Input
                   {...register('slug', {
                     required: 'This field is required',
-                  })}
+                  } as const)}
                   type="text"
                   autoComplete="off"
                 />
@@ -269,7 +275,7 @@ const DetailsSection = () => {
             isDisabled={
               !isDirty || isCheckingSlug || slugMessage?.type === 'error'
             }
-            isLoading={isSubmitting}
+            isLoading={isPending}
             loadingText="Saving..."
           >
             Save
@@ -280,25 +286,16 @@ const DetailsSection = () => {
   )
 }
 
-const DeleteSection = () => {
+const DeleteSection = ({ menu }: { menu: RouterOutputs['menu']['getById'], }) => {
   const router = useRouter()
-  const { menuId } = router.query
 
   const dialogState = useDisclosure()
-  const leastDestructiveRef = useRef()
+  const leastDestructiveRef = React.useRef(null)
 
-  const [isDeleting, setIsDeleting] = useState(false)
+  const { mutateAsync: handleDeleteMenu, isPending, isSuccess } = useDeleteMenu(menu.id)
 
-  const onDelete = async (form) => {
-    try {
-      setIsDeleting(true)
-      const data = await deleteMenu(menuId)
-      if (data.error) throw new Error(data.error)
-      router.replace('/dashboard')
-    } catch (error) {
-      setIsDeleting(false)
-      alert(error)
-    }
+  if (isSuccess) {
+    router.replace('/dashboard')
   }
 
   return (
@@ -352,8 +349,8 @@ const DeleteSection = () => {
                 </Button>
                 <Button
                   colorScheme="red"
-                  onClick={onDelete}
-                  isLoading={isDeleting}
+                  onClick={() => handleDeleteMenu({ where: { id: menu.id } })}
+                  isLoading={isPending}
                 >
                   Delete
                 </Button>
@@ -366,4 +363,33 @@ const DeleteSection = () => {
   )
 }
 
-MenuOverview.getLayout = (page) => <MenuLayout>{page}</MenuLayout>
+MenuOverview.getLayout = (page: React.ReactNode) => <MenuLayout>{page}</MenuLayout>
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClientServer(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: {
+      supabase
+    },
+    transformer: SuperJSON,
+  });
+
+  const user = await helpers.user.getAuthedUser.fetch()
+
+  if (user.restaurants.length === 0) {
+    return {
+      redirect: {
+        destination: '/get-started',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      user,
+      trpcState: helpers.dehydrate(),
+    },
+  }
+}
