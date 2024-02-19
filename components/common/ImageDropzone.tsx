@@ -12,7 +12,7 @@ import { FileWithPath, useDropzone } from 'react-dropzone'
 import { X } from 'lucide-react'
 
 export default function ImageDropzone({ onChange, value = '' }: {
-  onChange: (val: File) => void,
+  onChange: (val: File | undefined) => void,
   value?: string
 }) {
   const [preview, setPreview] = useState(value)
@@ -28,7 +28,7 @@ export default function ImageDropzone({ onChange, value = '' }: {
   )
 
   const handleClearImage = () => {
-    onChange(null)
+    onChange(undefined)
     setPreview('')
   }
 

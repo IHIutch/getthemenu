@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Grid,
   GridItem,
@@ -37,7 +37,7 @@ import ImageDropzone from '@/components/common/ImageDropzone'
 import { postUpload } from '@/utils/axios/uploads'
 import { useGetAuthedUser } from '@/utils/react-query/users'
 import { DAYS_OF_WEEK } from '@/utils/zod'
-import { RouterOutputs, appRouter } from '@/server'
+import { RouterInputs, RouterOutputs, appRouter } from '@/server'
 import { getErrorMessage } from '@/utils/functions'
 import { createClientServer } from '@/utils/supabase/server-props'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
@@ -85,6 +85,16 @@ export default function Restaurant({ user }: InferGetServerSidePropsType<typeof 
 
 Restaurant.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</DashboardLayout>
 
+type CoverImageType = {
+  type: 'old'
+  src: string,
+  blurDataURL?: string
+} | {
+  type: 'new'
+  file: File
+  src?: string,
+}
+
 const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant?.id)
@@ -92,14 +102,12 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   const defaultValues: {
     name: string | null,
     customHost: string | null,
-    coverImage: {
-      src?: string,
-      file?: File | null
-    }
+    coverImage: CoverImageType
   } = {
     name: restaurant?.name,
     customHost: restaurant?.customHost,
     coverImage: {
+      type: 'old',
       src: restaurant.coverImage.src
     },
   }
@@ -109,7 +117,7 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
     handleSubmit,
     reset,
     control,
-    formState: { errors, dirtyFields },
+    formState: { errors },
   } = useForm<typeof defaultValues>({ defaultValues })
   const { isDirty } = useFormState({
     control,
@@ -118,19 +126,22 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
       setIsSubmitting(true)
-      const payload = {
+      const payload: RouterInputs['restaurant']['update']['payload'] = {
         name: form.name,
         customHost: form.customHost,
-        coverImage: {
-          src: form.coverImage.src || ''
+      }
+
+      if (form?.coverImage && form.coverImage.type === 'new') {
+        const formData = new FormData()
+        formData.append('file', form.coverImage.file, form.coverImage.file.name)
+        const { src, blurDataUrl } = await postUpload(formData)
+
+        payload.coverImage = {
+          src,
+          blurDataUrl
         }
       }
 
-      if (form?.coverImage && form.coverImage.file) {
-        const formData = new FormData()
-        formData.append('file', form.coverImage.file, form.coverImage.file.name)
-        payload.coverImage.src = await postUpload(formData)
-      }
       await handleUpdateRestaurant({
         where: {
           id: restaurant.id,
@@ -191,7 +202,7 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
                     name="coverImage"
                     control={control}
                     render={({ field: { onChange, value } }) => {
-                      return <ImageDropzone onChange={onChange} value={value.src || ''} />
+                      return <ImageDropzone onChange={(val) => onChange({ type: 'new', file: val })} value={value.src || ''} />
                     }}
                   />
                 </AspectRatio>
