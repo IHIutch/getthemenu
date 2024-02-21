@@ -19,7 +19,21 @@ const nextConfig = {
         : 'http://localhost:3000',
   },
   images: {
-    domains: ['kvmdzdprqsxytiuvpxzo.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'kvmdzdprqsxytiuvpxzo.supabase.co',
+        port: ''
+      }
+    ],
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback.fs = false;
+      config.resolve.fallback.child_process = false;
+      config.resolve.fallback.async_hooks = false;
+    }
+    return config;
   },
 }
 

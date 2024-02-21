@@ -1,18 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  deleteSection,
-  getSection,
-  getSections,
-  postSection,
-  putSection,
-  putSectionsReorder,
-} from '../axios/sections'
+import { trpc } from '../trpc/client'
+import { RouterInputs } from '@/server'
 
-export const useGetSections = (params: {}) => {
-  const { isPending, isError, isSuccess, data, error } = useQuery({
-    queryKey: ['sections', params],
-    queryFn: async () => await getSections(params)
-  })
+
+export const useGetSections = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId'] = -1) => {
+  const { isPending, isError, isSuccess, data, error } = trpc.section.getAllByMenuId.useQuery(
+    { where: { menuId } },
+    { enabled: menuId !== -1 }
+  )
   return {
     data,
     error,
@@ -22,11 +16,11 @@ export const useGetSections = (params: {}) => {
   }
 }
 
-export const useGetSection = (id: number) => {
-  const { isPending, isError, isSuccess, data, error } = useQuery({
-    queryKey: ['sections', id],
-    queryFn: async () => await getSection(id)
-  })
+export const useGetSection = (id: RouterInputs['section']['getById']['where']['id'] = -1) => {
+  const { isPending, isError, isSuccess, data, error } = trpc.section.getById.useQuery(
+    { where: { id } },
+    { enabled: id !== -1 }
+  )
   return {
     data,
     error,
@@ -36,8 +30,9 @@ export const useGetSection = (id: number) => {
   }
 }
 
-export const useCreateSection = (params: {}) => {
-  const queryClient = useQueryClient()
+export const useCreateSection = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+  const { section: sectionUtils } = trpc.useUtils()
+
   const {
     mutateAsync,
     isPending,
@@ -45,82 +40,100 @@ export const useCreateSection = (params: {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation({
-    mutationFn: async (payload: {}) => await postSection(payload),
-    // When mutate is called:
-    onMutate: async (updated) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sections', params]
-      })
-      const previous = queryClient.getQueryData(['sections', params])
-      queryClient.setQueryData(['sections', params], (old) => {
-        return [...old, updated]
-      })
-      return { previous, updated }
-    },
-    // If the mutation fails, use the context we returned above
-    onError: (err, updated, context) => {
-      queryClient.setQueryData(['sections', params], context?.previous)
-    },
-    // Always refetch after error or success:
-    onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['sections', params]
-      })
-    },
-  })
-  return {
-    mutateAsync,
-    data,
-    error,
-    isPending,
-    isError,
-    isSuccess,
-  }
-}
-
-export const useUpdateSection = (params: {}) => {
-  const queryClient = useQueryClient()
-  const {
-    mutateAsync,
-    isPending,
-    isError,
-    isSuccess,
-    data,
-    error,
-  } = useMutation({
-    mutationFn: async ({ id, payload }: { id: number, payload: {} }) => {
-      await putSection(id, payload)
-    },
+  } = trpc.section.create.useMutation({
     // When mutate is called:
     onMutate: async ({ payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sections', params]
+      await sectionUtils.getAllByMenuId.cancel({
+        where: { menuId }
       })
-      const previous = queryClient.getQueryData(['sections', params])
-      queryClient.setQueryData(['sections', params], (old) => {
-        return old.map((o) => {
-          if (o.id === payload.id) {
+      const previous = sectionUtils.getAllByMenuId.getData({
+        where: { menuId }
+      })
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, (old) => {
+        return old ?
+          [...old,
+          {
+            ...payload,
+            id: -1,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null
+          }
+          ] : undefined
+      })
+      return { previous, updated: payload }
+    },
+    // If the mutation fails, use the context we returned above
+    onError: (err, updated, context) => {
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, context?.previous)
+    },
+    // Always refetch after error or success:
+    onSettled: (updated) => {
+      sectionUtils.getAllByMenuId.invalidate({
+        where: { menuId }
+      })
+    },
+  })
+  return {
+    mutateAsync,
+    data,
+    error,
+    isPending,
+    isError,
+    isSuccess,
+  }
+}
+
+export const useUpdateSection = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+  const { section: sectionUtils } = trpc.useUtils()
+
+  const {
+    mutateAsync,
+    isPending,
+    isError,
+    isSuccess,
+    data,
+    error,
+  } = trpc.section.update.useMutation({
+    // When mutate is called:
+    onMutate: async ({ where, payload }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await sectionUtils.getAllByMenuId.cancel({
+        where: { menuId }
+      })
+      const previous = sectionUtils.getAllByMenuId.getData({
+        where: { menuId }
+      })
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, (old) => {
+        return old ? old.map((o) => {
+          if (o.id === where.id) {
             return {
               ...o,
               ...payload,
             }
           }
           return o
-        })
+        }) : undefined
       })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
     onError: (err, updated, context) => {
-      queryClient.setQueryData(['sections', params], context?.previous)
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, context?.previous)
     },
     // Always refetch after error or success:
     onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['sections', params]
+      sectionUtils.getAllByMenuId.invalidate({
+        where: { menuId }
       })
     },
   }
@@ -135,8 +148,9 @@ export const useUpdateSection = (params: {}) => {
   }
 }
 
-export const useReorderSections = (params: {}) => {
-  const queryClient = useQueryClient()
+export const useReorderSections = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+  const { section: sectionUtils } = trpc.useUtils()
+
   const {
     mutateAsync,
     isPending,
@@ -144,35 +158,38 @@ export const useReorderSections = (params: {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation({
-    mutationFn: async (payload: {}) => {
-      await putSectionsReorder(payload)
-    },
+  } = trpc.section.reorder.useMutation({
     // When mutate is called:
-    onMutate: async (payload) => {
+    onMutate: async ({ payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sections', params]
+      await sectionUtils.getAllByMenuId.cancel({
+        where: { menuId }
       })
-      const previous = queryClient.getQueryData(['sections', params])
-      queryClient.setQueryData(['sections', params], (old) => {
-        return old.map((o) => {
+      const previous = sectionUtils.getAllByMenuId.getData({
+        where: { menuId }
+      })
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, (old) => {
+        return old ? old.map((o) => {
           return {
             ...o,
             ...(payload.find((p) => p.id === o.id) || {}),
           }
-        })
+        }) : undefined
       })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
     onError: (err, updated, context) => {
-      queryClient.setQueryData(['sections', params], context?.previous)
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, context?.previous)
     },
     // Always refetch after error or success:
     onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['sections', params]
+      sectionUtils.getAllByMenuId.invalidate({
+        where: { menuId }
       })
     },
   }
@@ -187,8 +204,9 @@ export const useReorderSections = (params: {}) => {
   }
 }
 
-export const useDeleteSection = (params: {}) => {
-  const queryClient = useQueryClient()
+export const useDeleteSection = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+  const { section: sectionUtils } = trpc.useUtils()
+
   const {
     mutateAsync,
     isPending,
@@ -196,28 +214,33 @@ export const useDeleteSection = (params: {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation({
-    mutationFn: async (id: number) => await deleteSection(id),
+  } = trpc.section.delete.useMutation({
     // When mutate is called:
-    onMutate: async (id) => {
+    onMutate: async ({ where }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sections', params]
+      await sectionUtils.getAllByMenuId.cancel({
+        where: { menuId }
       })
-      const previous = queryClient.getQueryData(['sections', params])
-      queryClient.setQueryData(['sections', params], (old) => {
-        return old.filter((o) => o.id !== id)
+      const previous = sectionUtils.getAllByMenuId.getData({
+        where: { menuId }
       })
-      return { previous, updated: id }
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, (old) => {
+        return old ? old.filter((o) => o.id !== where.id) : undefined
+      })
+      return { previous }
     },
     // If the mutation fails, use the context we returned above
     onError: (err, updated, context) => {
-      queryClient.setQueryData(['sections', params], context?.previous)
+      sectionUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, context?.previous)
     },
     // Always refetch after error or success:
     onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['sections', params]
+      sectionUtils.getAllByMenuId.invalidate({
+        where: { menuId }
       })
     },
   })

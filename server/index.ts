@@ -6,11 +6,15 @@ import { router } from '@/utils/trpc'
 import { menuRouter } from '@/server/routers/menu'
 import { userRouter } from './routers/user'
 import { restaurantRouter } from './routers/restaurant'
+import { sectionRouter } from './routers/sections'
+import { menuItemRouter } from './routers/menuItems'
 
 export const appRouter = router({
     menu: menuRouter,
     user: userRouter,
     restaurant: restaurantRouter,
+    menuItem: menuItemRouter,
+    section: sectionRouter,
 })
 
 // export type definition of API

@@ -37,7 +37,6 @@ import {
   Icon,
   InputGroup,
   InputLeftAddon,
-  useControllableState,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
@@ -54,13 +53,11 @@ import { DragDropContext } from 'react-beautiful-dnd'
 import { MenuSchema } from '@/utils/zod'
 import { z } from 'zod'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { createCaller } from '@/utils/trpc/server'
 import { createClientServer } from '@/utils/supabase/server-props'
 import { trpc } from '@/utils/trpc/client'
 import { appRouter } from '@/server'
 import SuperJSON from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server';
-import { useGetAuthedUser } from '@/utils/react-query/users'
 
 
 type SlugMessage = {
@@ -94,7 +91,6 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     resolver: zodResolver(FormPayload),
   })
 
-  useGetAuthedUser({ initialData: user })
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
   const { data: menus = [] } = trpc.menu.getAllByRestaurantId.useQuery({
     where: { restaurantId: restaurant?.id || '' }
@@ -108,8 +104,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     try {
       const data = await handleCreateMenu({
         payload: {
-          title: form.title,
-          slug: form.slug,
+          ...form,
           restaurantId: restaurant?.id || '',
         }
       }, {

@@ -13,7 +13,7 @@ model menuItems {
   sectionId    Int
   restaurantId String      @db.Uuid
   title        String?     @db.VarChar
-  price        Decimal?    @db.Money
+  price        Float?      @db.Real
   description  String?
   position     Int?        @db.SmallInt
   image        Json?       @db.Json

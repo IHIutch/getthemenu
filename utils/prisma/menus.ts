@@ -1,7 +1,5 @@
 import prisma from '@/utils/prisma'
-import { MenuSchema } from '../zod'
 import { getErrorMessage } from '../functions'
-import { MenuPostType, MenuReorderPostType } from '../axios/menus'
 import { Prisma } from '@prisma/client'
 
 export const prismaGetMenus = async ({ where }: { where: Prisma.menusWhereInput }) => {
@@ -71,7 +69,6 @@ export const prismaUpdateMenus = async ({ payload }: { payload: MenusUpdatePosit
 
 export const prismaDeleteMenu = async ({ where }: { where: Prisma.menusWhereUniqueInput }) => {
   try {
-    MenuSchema.parse(where)
     return await prisma.menus.delete({
       where,
     })

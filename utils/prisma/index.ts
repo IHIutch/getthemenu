@@ -15,6 +15,8 @@ if (process.env.NODE_ENV !== 'production') {
   prismaGlobal.prisma = prisma
 }
 
+prisma.$use
+
 prisma.$use(async (params, next) => {
   if (params.action === 'findUnique') {
     // Change to findFirst - you cannot filter

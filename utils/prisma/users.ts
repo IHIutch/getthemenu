@@ -1,13 +1,9 @@
 import prisma from '@/utils/prisma'
-import { userSchema } from '../joi/schemas'
 import { getErrorMessage } from '../functions'
-import { UserSchema } from '../zod'
-import { UserPostType } from '../axios/users'
 import { Prisma } from '@prisma/client'
 
-export const prismaGetUsers = async (where: { id: string }) => {
+export const prismaGetUsers = async ({ where }: { where: Prisma.usersWhereInput }) => {
   try {
-    UserSchema.parse(where)
     return await prisma.users.findMany({
       where,
       include: {
@@ -23,7 +19,7 @@ export const prismaGetUsers = async (where: { id: string }) => {
   }
 }
 
-export const prismaGetUser = async (where: Prisma.usersWhereUniqueInput) => {
+export const prismaGetUser = async ({ where }: { where: Prisma.usersWhereUniqueInput }) => {
   try {
     return await prisma.users.findUnique({
       where,
@@ -40,13 +36,8 @@ export const prismaGetUser = async (where: Prisma.usersWhereUniqueInput) => {
   }
 }
 
-interface UserPostWithIdType extends UserPostType {
-  id: string
-}
-
-export const prismaPostUser = async (payload: UserPostWithIdType) => {
+export const prismaCreateUser = async ({ payload }: { payload: Prisma.usersCreateInput }) => {
   try {
-    UserSchema.parse(payload)
     return await prisma.users.create({
       data: payload,
     })
@@ -55,10 +46,8 @@ export const prismaPostUser = async (payload: UserPostWithIdType) => {
   }
 }
 
-export const prismaPutUser = async (where: { id: string }, payload: UserPostType) => {
+export const prismaUpdateUser = async ({ where, payload }: { where: Prisma.usersWhereUniqueInput, payload: Prisma.usersUpdateInput }) => {
   try {
-    UserSchema.parse(where)
-    UserSchema.parse(payload)
     return await prisma.users.update({
       data: payload,
       where,
@@ -68,9 +57,8 @@ export const prismaPutUser = async (where: { id: string }, payload: UserPostType
   }
 }
 
-export const prismaDeleteUser = async (where: { id: string }) => {
+export const prismaDeleteUser = async ({ where }: { where: Prisma.usersWhereUniqueInput }) => {
   try {
-    UserSchema.parse(where)
     return await prisma.users.delete({
       where,
     })

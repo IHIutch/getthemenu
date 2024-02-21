@@ -292,7 +292,7 @@ const DeleteSection = ({ menu }: { menu: RouterOutputs['menu']['getById'], }) =>
   const dialogState = useDisclosure()
   const leastDestructiveRef = React.useRef(null)
 
-  const { mutateAsync: handleDeleteMenu, isPending, isSuccess } = useDeleteMenu(menu.id)
+  const { mutateAsync: handleDeleteMenu, isPending, isSuccess } = useDeleteMenu()
 
   if (isSuccess) {
     router.replace('/dashboard')

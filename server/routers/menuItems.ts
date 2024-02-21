@@ -1,40 +1,47 @@
 import { getErrorMessage } from "@/utils/functions";
-import { prismaCreateMenu, prismaDeleteMenu, prismaGetMenu, prismaGetMenus, prismaUpdateMenu, prismaUpdateMenus } from "@/utils/prisma/menus";
+import { prismaCreateMenuItem, prismaDeleteMenuItem, prismaGetMenuItem, prismaGetMenuItems, prismaUpdateMenuItem, prismaUpdateMenuItems } from "@/utils/prisma/menuItems";
 import { publicProcedure, router } from "@/utils/trpc";
-import { MenuSchema } from "@/utils/zod";
+import { MenuItemSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-export const menuRouter = router({
-  getAllByRestaurantId: publicProcedure.input(
+export const menuItemRouter = router({
+  getAllByMenuId: publicProcedure.input(
     z.object({
-      where: MenuSchema.pick({ restaurantId: true }),
+      where: MenuItemSchema.pick({ menuId: true })
     })
   ).query(async ({ input }) => {
     const { where } = input
-    const data = await prismaGetMenus({ where })
+    const data = await prismaGetMenuItems({ where })
     if (!data) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `No menus found with restaurantId: '${where.restaurantId}'`,
+        message: `No menuItems found with menuId: '${where.menuId}'`,
       })
     }
-    return data
+    const result = z.array(MenuItemSchema).safeParse(data)
+    if (!result.success) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: getErrorMessage(result.error),
+      })
+    }
+    return result.data
   }),
-  getById: publicProcedure.input(z.object({
-    where: MenuSchema.pick({ id: true })
-  })).query(async ({ input }) => {
+  getById: publicProcedure.input(
+    z.object({
+      where: MenuItemSchema.pick({ id: true })
+    })
+  ).query(async ({ input }) => {
     const { where } = input
-    const data = await prismaGetMenu({ where })
-
+    const data = await prismaGetMenuItem({ where })
     if (!data) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `No menu found with id: '${where.id}'`,
+        message: `No menuItem found with menuId: '${where.id}'`,
       })
     }
-
-    const result = MenuSchema.safeParse(data)
+    const result = MenuItemSchema.safeParse(data)
     if (!result.success) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
@@ -45,7 +52,7 @@ export const menuRouter = router({
   }),
   create: publicProcedure.input(
     z.object({
-      payload: MenuSchema.omit({
+      payload: MenuItemSchema.omit({
         id: true,
         createdAt: true,
         updatedAt: true,
@@ -54,12 +61,22 @@ export const menuRouter = router({
     })
   ).mutation(async ({ input }) => {
     const { payload } = input
-    const data = await prismaCreateMenu({
+    const data = await prismaCreateMenuItem({
       payload: {
         ...payload,
         restaurants: {
           connect: {
             id: payload.restaurantId
+          }
+        },
+        menus: {
+          connect: {
+            id: payload.menuId
+          }
+        },
+        sections: {
+          connect: {
+            id: payload.sectionId
           }
         }
       }
@@ -68,18 +85,17 @@ export const menuRouter = router({
   }),
   update: publicProcedure.input(
     z.object({
-      where: MenuSchema.pick({ id: true }),
-      payload: MenuSchema.omit({
+      where: MenuItemSchema.pick({ id: true }),
+      payload: MenuItemSchema.omit({
         id: true,
         createdAt: true,
         updatedAt: true,
         deletedAt: true
       }).partial()
     })
-
   ).mutation(async ({ input }) => {
     const { where, payload } = input
-    const data = prismaUpdateMenu({
+    const data = prismaUpdateMenuItem({
       where,
       payload
     })
@@ -88,7 +104,7 @@ export const menuRouter = router({
   reorder: publicProcedure.input(
     z.object({
       payload: z.array(
-        MenuSchema.pick({
+        MenuItemSchema.pick({
           id: true,
           position: true
         }).extend({
@@ -99,17 +115,17 @@ export const menuRouter = router({
     })
   ).mutation(async ({ input }) => {
     const { payload } = input
-    const data = await prismaUpdateMenus({ payload })
+    const data = await prismaUpdateMenuItems({ payload })
     return data
   }),
   delete: publicProcedure.input(
     z.object({
-      where: MenuSchema.pick({ id: true }),
+      where: MenuItemSchema.pick({ id: true }),
     })
 
   ).mutation(async ({ input }) => {
     const { where } = input
-    const data = prismaDeleteMenu({
+    const data = prismaDeleteMenuItem({
       where,
     })
     return data

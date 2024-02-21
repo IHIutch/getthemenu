@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { createClientComponent } from './supabase/component'
+import { DraggableLocation } from 'react-beautiful-dnd'
 
 export const handleStructuredData = ({ restaurant, menus }: any) => {
   return {
@@ -90,12 +91,49 @@ export const getPublicURL = (path: string) => {
   }
 }
 
-export const reorderList = (list: any[], startIndex: number, endIndex: number) => {
-  const temp = [...list]
-  const [removed] = temp.splice(startIndex, 1)
-  temp.splice(endIndex, 0, removed)
-  return temp
+// export const reorderList = (list: any[], startIndex: number, endIndex: number) => {
+//   const temp = [...list]
+//   const [removed] = temp.splice(startIndex, 1)
+//   temp.splice(endIndex, 0, removed)
+//   return temp
+// }
+
+export const reorderList = <Value>(
+  list: Value[],
+  startIndex: number,
+  finishIndex: number,
+) => {
+  if (startIndex === -1 || finishIndex === -1) {
+    return list;
+  }
+
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+
+  if (removed) result.splice(finishIndex, 0, removed);
+
+  return result;
 }
+
+export const move = <Value>(
+  sourceList: Value[],
+  destinationList: Value[],
+  source: DraggableLocation,
+  destination: DraggableLocation
+) => {
+
+  const resultSource = Array.from(sourceList);
+  const resultDestination = Array.from(destinationList);
+
+  const [removed] = resultSource.splice(source.index, 1);
+  if (removed) resultDestination.splice(destination.index, 0, removed);
+
+  return {
+    resultSource,
+    resultDestination,
+  };
+};
+
 
 export const formatTime = (time: string) => {
   const [hours, minutes] = time.split(':')

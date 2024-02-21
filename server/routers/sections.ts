@@ -1,51 +1,43 @@
-import { getErrorMessage } from "@/utils/functions";
-import { prismaCreateMenu, prismaDeleteMenu, prismaGetMenu, prismaGetMenus, prismaUpdateMenu, prismaUpdateMenus } from "@/utils/prisma/menus";
+import { prismaCreateSection, prismaDeleteSection, prismaGetSection, prismaGetSections, prismaUpdateSection, prismaUpdateSections } from "@/utils/prisma/sections";
 import { publicProcedure, router } from "@/utils/trpc";
-import { MenuSchema } from "@/utils/zod";
+import { SectionSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-export const menuRouter = router({
-  getAllByRestaurantId: publicProcedure.input(
+export const sectionRouter = router({
+  getAllByMenuId: publicProcedure.input(
     z.object({
-      where: MenuSchema.pick({ restaurantId: true }),
+      where: SectionSchema.pick({ menuId: true })
     })
   ).query(async ({ input }) => {
     const { where } = input
-    const data = await prismaGetMenus({ where })
+    const data = await prismaGetSections({ where })
     if (!data) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `No menus found with restaurantId: '${where.restaurantId}'`,
+        message: `No sections found with menuId: '${where.menuId}'`,
       })
     }
     return data
   }),
-  getById: publicProcedure.input(z.object({
-    where: MenuSchema.pick({ id: true })
-  })).query(async ({ input }) => {
+  getById: publicProcedure.input(
+    z.object({
+      where: SectionSchema.pick({ id: true })
+    })
+  ).query(async ({ input }) => {
     const { where } = input
-    const data = await prismaGetMenu({ where })
-
+    const data = await prismaGetSection({ where })
     if (!data) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `No menu found with id: '${where.id}'`,
+        message: `No section found with menuId: '${where.id}'`,
       })
     }
-
-    const result = MenuSchema.safeParse(data)
-    if (!result.success) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: getErrorMessage(result.error),
-      })
-    }
-    return result.data
+    return data
   }),
   create: publicProcedure.input(
     z.object({
-      payload: MenuSchema.omit({
+      payload: SectionSchema.omit({
         id: true,
         createdAt: true,
         updatedAt: true,
@@ -54,22 +46,27 @@ export const menuRouter = router({
     })
   ).mutation(async ({ input }) => {
     const { payload } = input
-    const data = await prismaCreateMenu({
+    const data = await prismaCreateSection({
       payload: {
         ...payload,
         restaurants: {
           connect: {
             id: payload.restaurantId
           }
-        }
+        },
+        menus: {
+          connect: {
+            id: payload.menuId
+          }
+        },
       }
     })
     return data
   }),
   update: publicProcedure.input(
     z.object({
-      where: MenuSchema.pick({ id: true }),
-      payload: MenuSchema.omit({
+      where: SectionSchema.pick({ id: true }),
+      payload: SectionSchema.omit({
         id: true,
         createdAt: true,
         updatedAt: true,
@@ -79,7 +76,7 @@ export const menuRouter = router({
 
   ).mutation(async ({ input }) => {
     const { where, payload } = input
-    const data = prismaUpdateMenu({
+    const data = prismaUpdateSection({
       where,
       payload
     })
@@ -88,7 +85,7 @@ export const menuRouter = router({
   reorder: publicProcedure.input(
     z.object({
       payload: z.array(
-        MenuSchema.pick({
+        SectionSchema.pick({
           id: true,
           position: true
         }).extend({
@@ -99,17 +96,17 @@ export const menuRouter = router({
     })
   ).mutation(async ({ input }) => {
     const { payload } = input
-    const data = await prismaUpdateMenus({ payload })
+    const data = await prismaUpdateSections({ payload })
     return data
   }),
   delete: publicProcedure.input(
     z.object({
-      where: MenuSchema.pick({ id: true }),
+      where: SectionSchema.pick({ id: true }),
     })
 
   ).mutation(async ({ input }) => {
     const { where } = input
-    const data = prismaDeleteMenu({
+    const data = prismaDeleteSection({
       where,
     })
     return data

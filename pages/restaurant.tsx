@@ -88,7 +88,7 @@ Restaurant.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</Dashb
 type CoverImageType = {
   type: 'old'
   src: string,
-  blurDataURL?: string
+  blurDataUrl?: string
 } | {
   type: 'new'
   file: File
@@ -108,7 +108,7 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
     customHost: restaurant?.customHost,
     coverImage: {
       type: 'old',
-      src: restaurant.coverImage.src
+      src: restaurant.coverImage?.src || ''
     },
   }
 
@@ -126,20 +126,25 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
       setIsSubmitting(true)
-      const payload: RouterInputs['restaurant']['update']['payload'] = {
-        name: form.name,
-        customHost: form.customHost,
-      }
 
+      let imageData
       if (form?.coverImage && form.coverImage.type === 'new') {
         const formData = new FormData()
         formData.append('file', form.coverImage.file, form.coverImage.file.name)
         const { src, blurDataUrl } = await postUpload(formData)
 
-        payload.coverImage = {
-          src,
-          blurDataUrl
+        imageData = {
+          coverImage: {
+            src,
+            blurDataUrl
+          }
         }
+      }
+
+      const payload = {
+        name: form.name,
+        customHost: form.customHost,
+        ...imageData
       }
 
       await handleUpdateRestaurant({
@@ -359,10 +364,10 @@ const Contact = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant?.id)
 
   const defaultValues = {
-    phone: restaurant.phone.map(v => ({
+    phone: (Array.isArray(restaurant.phone) ? restaurant.phone : []).map(v => ({
       value: v
     })),
-    email: restaurant.email.map(v => ({
+    email: (Array.isArray(restaurant.email) ? restaurant.email : []).map(v => ({
       value: v
     })),
   }

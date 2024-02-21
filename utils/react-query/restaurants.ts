@@ -1,26 +1,21 @@
-import { useQuery } from '@tanstack/react-query'
-import {
-  getRestaurants,
-} from '../axios/restaurants'
 import { trpc } from '../trpc/client'
 import { RouterInputs } from '@/server'
 
-export const useGetRestaurants = (params: {}) => {
-  const { isPending, isError, isSuccess, data, error } = useQuery({
-    queryKey: ['restaurants', params],
-    queryFn: async () => await getRestaurants(params),
-    enabled: !!params
-  })
-  return {
-    data,
-    error,
-    isPending,
-    isError,
-    isSuccess,
-  }
-}
+// export const useGetRestaurants = (userId: RouterInputs['restaurant']['getAllByUserId']['where']['userId'] = '') => {
+//   const { isPending, isError, isSuccess, data, error } = trpc.restaurant.getAllByMenuId.useQuery(
+//     { where: { userId } },
+//     { enabled: userId !== '' }
+//   )
+//   return {
+//     data,
+//     error,
+//     isPending,
+//     isError,
+//     isSuccess,
+//   }
+// }
 
-export const useGetRestaurant = (id: string = '') => {
+export const useGetRestaurant = (id: RouterInputs['restaurant']['getById']['where']['id'] = '') => {
   const { isLoading, isError, isSuccess, data, error } =
     trpc.restaurant.getById.useQuery(
       { where: { id } },
@@ -59,7 +54,6 @@ export const useUpdateRestaurant = (id: RouterInputs['restaurant']['getById']['w
       restaurantUtils.getById.setData({
         where: { id }
       }, (old) => {
-
         return old ? {
           ...old,
           ...payload,

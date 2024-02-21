@@ -1,19 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  deleteMenuItem,
-  getMenuItem,
-  getMenuItems,
-  postMenuItem,
-  putMenuItem,
-  putMenuItemsReorder,
-} from '../axios/menuItems'
+import { trpc } from '../trpc/client'
+import { RouterInputs } from '@/server'
+import { Decimal } from '@prisma/client/runtime/library'
 
-export const useGetMenuItems = (params = {}) => {
-  const { isPending, isError, isSuccess, data, error } = useQuery({
-    queryKey: ['menuItems', params],
-    queryFn: async () => await getMenuItems(params),
-    enabled: !!params,
-  })
+export const useGetMenuItems = (menuId: RouterInputs['menuItem']['getAllByMenuId']['where']['menuId'] = -1) => {
+  const { isPending, isError, isSuccess, data, error } = trpc.menuItem.getAllByMenuId.useQuery(
+    { where: { menuId } },
+    { enabled: menuId !== -1 }
+  )
   return {
     data,
     error,
@@ -23,13 +16,11 @@ export const useGetMenuItems = (params = {}) => {
   }
 }
 
-export const useGetMenuItem = (id: number) => {
-  const { isPending, isError, isSuccess, data, error } = useQuery({
-    queryKey: ['menuItems', id],
-    queryFn: async () => await getMenuItem(id),
-    enabled: !!id,
-
-  })
+export const useGetMenuItem = (id: RouterInputs['menuItem']['getById']['where']['id'] = -1) => {
+  const { isPending, isError, isSuccess, data, error } = trpc.menuItem.getById.useQuery(
+    { where: { id } },
+    { enabled: id !== -1 }
+  )
   return {
     data,
     error,
@@ -39,8 +30,9 @@ export const useGetMenuItem = (id: number) => {
   }
 }
 
-export const useCreateMenuItem = (params = {}) => {
-  const queryClient = useQueryClient()
+export const useCreateMenuItem = (menuId: RouterInputs['menuItem']['getAllByMenuId']['where']['menuId']) => {
+  const { menuItem: menuItemUtils } = trpc.useUtils()
+
   const {
     mutateAsync,
     isPending,
@@ -48,28 +40,42 @@ export const useCreateMenuItem = (params = {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation({
-    mutationFn: async (payload: {}) => await postMenuItem(payload),
+  } = trpc.menuItem.create.useMutation({
     // When mutate is called:
-    onMutate: async (updated) => {
+    onMutate: async ({ payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['menuItems', params]
+      await menuItemUtils.getAllByMenuId.cancel({
+        where: { menuId }
       })
-      const previous = queryClient.getQueryData(['menuItems', params])
-      queryClient.setQueryData(['menuItems', params], (old) => {
-        return [...old, updated]
+      const previous = menuItemUtils.getAllByMenuId.getData({
+        where: { menuId }
       })
-      return { previous, updated }
+      menuItemUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, (old) => {
+        return old ?
+          [...old, {
+            ...payload,
+            id: -1,
+            // price: new Decimal(payload?.price || ''),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null
+          }
+          ] : undefined
+      })
+      return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
     onError: (err, updated, context) => {
-      queryClient.setQueryData(['menuItems', params], context?.previous)
+      menuItemUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, context?.previous)
     },
     // Always refetch after error or success:
     onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['menuItems', params]
+      menuItemUtils.getAllByMenuId.invalidate({
+        where: { menuId }
       })
     },
   })
@@ -83,8 +89,9 @@ export const useCreateMenuItem = (params = {}) => {
   }
 }
 
-export const useUpdateMenuItem = (params: {}) => {
-  const queryClient = useQueryClient()
+export const useUpdateMenuItem = (menuId: RouterInputs['menuItem']['getAllByMenuId']['where']['menuId']) => {
+  const { menuItem: menuItemUtils } = trpc.useUtils()
+
   const {
     mutateAsync,
     isPending,
@@ -92,39 +99,43 @@ export const useUpdateMenuItem = (params: {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation(
+  } = trpc.menuItem.update.useMutation(
     {
-      mutationFn: async ({ id, payload }: { id: number, payload: {} }) => {
-        await putMenuItem(id, payload)
-      },
       // When mutate is called:
-      onMutate: async ({ payload }) => {
+      onMutate: async ({ where, payload }) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-        await queryClient.cancelQueries({
-          queryKey: ['menuItems', params]
+        await menuItemUtils.getAllByMenuId.cancel({
+          where: { menuId }
         })
-        const previous = queryClient.getQueryData(['menuItems', params])
-        queryClient.setQueryData(['menuItems', params], (old) => {
-          return old.map((o) => {
-            if (o.id === payload.id) {
+        const previous = menuItemUtils.getAllByMenuId.getData({
+          where: { menuId }
+        })
+        menuItemUtils.getAllByMenuId.setData({
+          where: { menuId }
+        }, (old) => {
+          return old ? old.map((o) => {
+            if (o.id === where.id) {
               return {
                 ...o,
                 ...payload,
+                // price: new Decimal(payload?.price || '')
               }
             }
             return o
-          })
+          }) : undefined
         })
         return { previous, updated: payload }
       },
       // If the mutation fails, use the context we returned above
       onError: (err, updated, context) => {
-        queryClient.setQueryData(['menuItems', params], context?.previous)
+        menuItemUtils.getAllByMenuId.setData({
+          where: { menuId }
+        }, context?.previous)
       },
       // Always refetch after error or success:
       onSettled: (updated) => {
-        queryClient.invalidateQueries({
-          queryKey: ['menuItems', params]
+        menuItemUtils.getAllByMenuId.invalidate({
+          where: { menuId }
         })
       },
     }
@@ -139,8 +150,9 @@ export const useUpdateMenuItem = (params: {}) => {
   }
 }
 
-export const useReorderMenuItems = (params = {}) => {
-  const queryClient = useQueryClient()
+export const useReorderMenuItems = (menuId: RouterInputs['menuItem']['getAllByMenuId']['where']['menuId']) => {
+  const { menuItem: menuItemUtils } = trpc.useUtils()
+
   const {
     mutateAsync,
     isPending,
@@ -148,39 +160,43 @@ export const useReorderMenuItems = (params = {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation({
-    mutationFn: async (payload: {}) => {
-      await putMenuItemsReorder(payload)
-    },
+  } = trpc.menuItem.reorder.useMutation({
+
     // When mutate is called:
-    onMutate: async (payload) => {
+    onMutate: async ({ payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['menuItems', params]
+      await menuItemUtils.getAllByMenuId.cancel({
+        where: { menuId }
       })
-      const previous = queryClient.getQueryData(['menuItems', params])
-      queryClient.setQueryData(['menuItems', params], (old) => {
-        return old.map((o) => {
+      const previous = menuItemUtils.getAllByMenuId.getData({
+        where: { menuId }
+      })
+      menuItemUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, (old) => {
+        return old ? old.map((o) => {
           return {
             ...o,
-            ...(payload.find((p) => p.id === o.id) || {}),
+            ...(payload.find((p) => p.id === o.id)),
           }
-        })
+        }) : undefined
       })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
     onError: (err, updated, context) => {
-      queryClient.setQueryData(['menuItems', params], context?.previous)
+      menuItemUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, context?.previous)
     },
     // Always refetch after error or success:
     onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['menuItems', params]
+      menuItemUtils.getAllByMenuId.invalidate({
+        where: { menuId }
       })
     },
-  }
-  )
+  })
+
   return {
     mutateAsync,
     data,
@@ -191,8 +207,9 @@ export const useReorderMenuItems = (params = {}) => {
   }
 }
 
-export const useDeleteMenuItem = (params = {}) => {
-  const queryClient = useQueryClient()
+export const useDeleteMenuItem = (menuId: RouterInputs['menuItem']['getAllByMenuId']['where']['menuId']) => {
+  const { menuItem: menuItemUtils } = trpc.useUtils()
+
   const {
     mutateAsync,
     isPending,
@@ -200,31 +217,35 @@ export const useDeleteMenuItem = (params = {}) => {
     isSuccess,
     data,
     error,
-  } = useMutation({
-    mutationFn: async (id: number) => await deleteMenuItem(id),
+  } = trpc.menuItem.delete.useMutation({
     // When mutate is called:
-    onMutate: async (id) => {
+    onMutate: async ({ where }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['menuItems', params]
+      await menuItemUtils.getAllByMenuId.cancel({
+        where: { menuId }
       })
-      const previous = queryClient.getQueryData(['menuItems', params])
-      queryClient.setQueryData(['menuItems', params], (old) => {
-        return old.filter((o) => o.id !== id)
+      const previous = menuItemUtils.getAllByMenuId.getData({ where: { menuId } })
+      menuItemUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, (old) => {
+        return old ? old.filter((o) => o.id !== where.id) : undefined
       })
-      return { previous, updated: id }
+      return { previous }
     },
     // If the mutation fails, use the context we returned above
     onError: (err, updated, context) => {
-      queryClient.setQueryData(['menuItems', params], context?.previous)
+      menuItemUtils.getAllByMenuId.setData({
+        where: { menuId }
+      }, context?.previous)
     },
     // Always refetch after error or success:
     onSettled: (updated) => {
-      queryClient.invalidateQueries({
-        queryKey: ['menuItems', params]
+      menuItemUtils.getAllByMenuId.invalidate({
+        where: { menuId }
       })
     },
   })
+
   return {
     mutateAsync,
     data,
