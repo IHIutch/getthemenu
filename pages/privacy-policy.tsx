@@ -17,17 +17,14 @@ import {
 } from '@chakra-ui/react'
 import { Prose } from '@nikolovlazar/chakra-ui-prose'
 import NextLink from 'next/link'
-import { useSEO } from '@/utils/functions'
 import Head from 'next/head'
 
 export default function PrivacyPolicy() {
-  const seo = useSEO({
-    title: 'Privacy Policy',
-  })
-
   return (
     <>
-      <Head>{seo}</Head>
+      <Head>
+        <title>Privacy Policy</title>
+      </Head>
       <Container w="full" maxW="container.md" my="12">
         <Box mb="8">
           <Heading as="h1" size="lg" mb="2">
@@ -1312,3 +1309,5 @@ export default function PrivacyPolicy() {
     </>
   )
 }
+
+PrivacyPolicy.getLayout = (page: React.ReactNode) => page

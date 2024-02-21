@@ -4,7 +4,7 @@ import {
   prismaPutSection,
 } from '@/utils/prisma/sections'
 import { resStatusType } from '@/utils/apiResponseTypes'
-import { withSentry } from '@sentry/nextjs'
+import { wrapApiHandlerWithSentry } from '@sentry/nextjs'
 
 const handler = async (req, res) => {
   const { method } = req
@@ -47,4 +47,4 @@ const handler = async (req, res) => {
   }
 }
 
-export default withSentry(handler)
+export default wrapApiHandlerWithSentry(handler)

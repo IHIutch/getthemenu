@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react'
-import supabase from '@/utils/supabase'
 import axios from 'redaxios'
 import { useRouter } from 'next/router'
 import { useQueryClient } from '@tanstack/react-query'
+import { createClientComponent } from '@/utils/supabase/component'
 
 export default function SignOut() {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const supabase = createClientComponent()
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -21,13 +22,11 @@ export default function SignOut() {
     )
 
     return () => {
-      authListener.unsubscribe()
+      authListener.subscription.unsubscribe()
     }
-  }, [queryClient, router])
+  }, [queryClient, router, supabase.auth])
 
-  useEffect(() => {
-    supabase.auth.signOut()
-  }, [])
+  supabase.auth.signOut()
 
   return <></>
 }

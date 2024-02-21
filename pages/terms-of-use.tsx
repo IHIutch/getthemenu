@@ -10,17 +10,14 @@ import {
 import { Prose } from '@nikolovlazar/chakra-ui-prose'
 import React from 'react'
 import NextLink from 'next/link'
-import { useSEO } from '@/utils/functions'
 import Head from 'next/head'
 
 export default function TermsOfUse() {
-  const seo = useSEO({
-    title: 'Terms of Use',
-  })
-
   return (
     <>
-      <Head>{seo}</Head>
+      <Head>
+        <title>Terms of Use</title>
+      </Head>
       <Container w="full" maxW="container.md" my="12">
         <Box mb="8">
           <Heading as="h1" size="lg" mb="2">
@@ -1140,3 +1137,5 @@ export default function TermsOfUse() {
     </>
   )
 }
+
+TermsOfUse.getLayout = (page: React.ReactNode) => page

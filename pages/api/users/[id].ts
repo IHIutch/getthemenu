@@ -1,6 +1,6 @@
 import { prismaGetUser } from '@/utils/prisma/users'
 import { resStatusType } from '@/utils/apiResponseTypes'
-import { withSentry } from '@sentry/nextjs'
+import { wrapApiHandlerWithSentry } from '@sentry/nextjs'
 import { getErrorMessage } from '@/utils/functions'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { string } from 'joi'
@@ -28,4 +28,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default withSentry(handler)
+export default wrapApiHandlerWithSentry(handler)

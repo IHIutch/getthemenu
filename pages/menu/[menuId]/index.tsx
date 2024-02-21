@@ -79,11 +79,15 @@ type SlugMessageType = {
   message: string
 } | null
 
+type FormData = {
+  title: string
+  slug: string
+}
+
 const DetailsSection = ({ menu, restaurant }: {
   menu: RouterOutputs['menu']['getById'],
   restaurant: RouterOutputs['restaurant']['getById']
 }) => {
-
 
   const [isCheckingSlug, setIsCheckingSlug] = React.useState(false)
   const [slugMessage, setSlugMessage] = React.useState<SlugMessageType>(null)
@@ -105,7 +109,7 @@ const DetailsSection = ({ menu, restaurant }: {
     watch,
     control,
     formState: { errors },
-  } = useForm<typeof defaultValues>({ defaultValues })
+  } = useForm<FormData>({ defaultValues })
 
   const { isDirty } = useFormState({
     control,
@@ -185,7 +189,7 @@ const DetailsSection = ({ menu, restaurant }: {
     }
   }, [debouncedCheckUniqueSlug, watchSlug])
 
-  const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
+  const onSubmit: SubmitHandler<FormData> = async (form) => {
     try {
       const payload = {
         title: form.title || '',

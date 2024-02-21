@@ -1,10 +1,10 @@
+import * as React from 'react'
 import DashboardLayout from '@/layouts/Dashboard'
-import { Container, Flex } from '@chakra-ui/layout'
-import React from 'react'
+import { Container, Flex, Text } from '@chakra-ui/react'
 
 export default function Analytics() {
   return (
-    <Container maxW="container.md">
+    <Container maxW="container.lg" py="24">
       <Flex
         bg="white"
         align="center"
@@ -13,10 +13,10 @@ export default function Analytics() {
         rounded="md"
         shadow="base"
       >
-        Coming Soon
+        <Text>Coming Soon</Text>
       </Flex>
     </Container>
   )
 }
 
-Analytics.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
+Analytics.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</DashboardLayout>

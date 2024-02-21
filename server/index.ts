@@ -1,6 +1,6 @@
 import {
-    type inferRouterInputs,
-    type inferRouterOutputs,
+  type inferRouterInputs,
+  type inferRouterOutputs,
 } from '@trpc/server'
 import { router } from '@/utils/trpc'
 import { menuRouter } from '@/server/routers/menu'
@@ -10,11 +10,12 @@ import { sectionRouter } from './routers/sections'
 import { menuItemRouter } from './routers/menuItems'
 
 export const appRouter = router({
-    menu: menuRouter,
-    user: userRouter,
-    restaurant: restaurantRouter,
-    menuItem: menuItemRouter,
-    section: sectionRouter,
+  menu: menuRouter,
+  user: userRouter,
+  restaurant: restaurantRouter,
+  menuItem: menuItemRouter,
+  section: sectionRouter,
+  verify: verifyRouter,
 })
 
 // export type definition of API

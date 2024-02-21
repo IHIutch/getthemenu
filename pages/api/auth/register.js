@@ -2,7 +2,7 @@ import { prismaPostUser } from '@/utils/prisma/users'
 import { createStripeCustomer } from '@/utils/stripe'
 import supabase from '@/utils/supabase'
 import { resStatusType } from '@/utils/apiResponseTypes'
-import { withSentry } from '@sentry/nextjs'
+import { wrapApiHandlerWithSentry } from '@sentry/nextjs'
 import dayjs from 'dayjs'
 
 const handler = async (req, res) => {
@@ -38,4 +38,4 @@ const handler = async (req, res) => {
   }
 }
 
-export default withSentry(handler)
+export default wrapApiHandlerWithSentry(handler)
