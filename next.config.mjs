@@ -15,12 +15,6 @@ const nextConfig = {
   experimental: {
     swcPlugins: [["next-superjson-plugin", {}]],
   },
-  env: {
-    BASE_URL:
-      process.env.NODE_ENV === 'production'
-        ? `https://${process.env.NEXT_PUBLIC_HOSTNAME}`
-        : 'http://localhost:3000',
-  },
   images: {
     remotePatterns: [
       {

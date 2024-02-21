@@ -32,9 +32,13 @@ export const env = createEnv({
   },
   shared: {
     NODE_ENV: z.enum(['development', 'test', 'production']),
+    BASE_URL: z.string().url()
   },
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    BASE_URL: process.env.NODE_ENV === 'production'
+      ? `https://${process.env.NEXT_PUBLIC_HOSTNAME}`
+      : `http://localhost:3000`,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_HOSTNAME: process.env.NEXT_PUBLIC_HOSTNAME,
