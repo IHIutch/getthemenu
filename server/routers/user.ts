@@ -36,11 +36,8 @@ export const userRouter = router({
     }
 
     return {
-      id: data.id,
-      fullName: data.fullName,
-      stripeSubscriptionId: data.stripeSubscriptionId,
-      stripeCustomerId: data.stripeCustomerId,
-      restaurants: data.restaurants
+      ...data,
+      email: authedUser.email
     }
   })
 })

@@ -37,7 +37,6 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { deleteMenu } from '@/utils/axios/menus'
 import { createClientServer } from '@/utils/supabase/server-props'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { createServerSideHelpers } from '@trpc/react-query/server'

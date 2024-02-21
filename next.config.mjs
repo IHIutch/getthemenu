@@ -12,6 +12,9 @@ const jiti = createJiti(new URL(import.meta.url).pathname);
 jiti("./utils/env");
 
 const nextConfig = {
+  experimental: {
+    swcPlugins: [["next-superjson-plugin", {}]],
+  },
   env: {
     BASE_URL:
       process.env.NODE_ENV === 'production'
@@ -34,7 +37,7 @@ const nextConfig = {
       config.resolve.fallback.async_hooks = false;
     }
     return config;
-  },
+  }
 }
 
 const sentryWebpackPluginOptions = {
