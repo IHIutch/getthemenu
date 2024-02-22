@@ -35,6 +35,7 @@ export default function Register() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const supabase = createClientComponent()
+
   const { mutateAsync: handleSetUpNewAccount } = trpc.user.setUpNewAccount.useMutation()
 
   const {

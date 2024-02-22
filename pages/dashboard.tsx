@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import * as React from 'react'
 
 import { formatDate, getErrorMessage, reorderList } from '@/utils/functions'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
@@ -44,8 +44,6 @@ import { useRouter } from 'next/router'
 import DashboardLayout from '@/layouts/Dashboard'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { slug as slugify } from 'github-slugger'
-import axios from 'redaxios'
-import { debounce } from 'lodash'
 import { GripHorizontal } from 'lucide-react'
 import { Draggable, DropResult } from 'react-beautiful-dnd'
 import { Droppable } from 'react-beautiful-dnd'
@@ -58,6 +56,7 @@ import { trpc } from '@/utils/trpc/client'
 import { appRouter } from '@/server'
 import SuperJSON from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server';
+import { useGetMenus } from '@/utils/react-query/menus'
 
 
 type SlugMessage = {
@@ -77,26 +76,21 @@ type FormData = z.infer<typeof FormPayload>
 export default function Dashboard({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
   const modalState = useDisclosure()
-  const [isCheckingSlug, setIsCheckingSlug] = useState(false)
-  const [slugMessage, setSlugMessage] = useState<SlugMessage>(null)
+  const [isCheckingSlug, setIsCheckingSlug] = React.useState(false)
+  const [slugMessage, setSlugMessage] = React.useState<SlugMessage>(null)
 
   const {
     register,
     handleSubmit,
     getValues,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(FormPayload),
   })
 
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
-  const { data: menus = [] } = trpc.menu.getAllByRestaurantId.useQuery({
-    where: { restaurantId: restaurant?.id || '' }
-  }, {
-    enabled: !!restaurant?.id
-  })
+  const { data: menus = [] } = useGetMenus(user?.restaurants[0]?.id)
   const { mutateAsync: handleReorderMenus } = trpc.menu.reorder.useMutation()
   const { mutateAsync: handleCreateMenu, isPending } = trpc.menu.create.useMutation()
 
@@ -120,71 +114,41 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     }
   }
 
-  const checkUniqueSlug = useCallback(
-    async (slug: string) => {
-      try {
-        setIsCheckingSlug(true)
-        const testSlug = slugify(slug, false)
-        if (testSlug !== slug) {
-          setSlugMessage({
-            type: 'error',
-            message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
-          })
-        } else {
-          const { data } = await axios.get('/api/menus', {
-            params: {
-              slug,
-              restaurantId: restaurant?.id,
-            },
-          })
-          if (data.length) {
-            setSlugMessage({
-              type: 'error',
-              message: `'${slug}' is already used.`,
-            })
-          } else {
-            setSlugMessage({
-              type: 'success',
-              message: `'${slug}' is available.`,
-            })
-          }
-        }
-        setIsCheckingSlug(false)
-      } catch (error) {
-        alert(getErrorMessage(error))
-      }
-    },
-    [restaurant?.id]
-  )
-
   const handleSetSlug = async () => {
     const [title, slug] = getValues(['title', 'slug'])
     if (title && !slug) {
       const newSlug = slugify(title, false)
       // const uniqueSlug = await getUniqueSlug(slug)
       setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
-      debouncedCheckUniqueSlug(newSlug)
+      checkUniqueSlug()
     }
   }
 
-  const handleDebounce = useMemo(
-    () => debounce(checkUniqueSlug, 500),
-    [checkUniqueSlug]
-  )
-
-  const debouncedCheckUniqueSlug = useCallback(
-    (slug: string) => {
-      handleDebounce(slug)
-    },
-    [handleDebounce]
-  )
-
-  const watchSlug = watch('slug')
-  useEffect(() => {
-    if (watchSlug) {
-      debouncedCheckUniqueSlug(watchSlug)
+  const checkUniqueSlug = () => {
+    const slug = getValues('slug')
+    const testSlug = slugify(slug || '', false)
+    if (!slug) {
+      setSlugMessage(null)
+    } else if (testSlug !== slug) {
+      setSlugMessage({
+        type: 'error',
+        message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
+      })
+    } else {
+      const isUsed = menus.some(m => m.slug === slug)
+      if (isUsed) {
+        setSlugMessage({
+          type: 'error',
+          message: `'${slug}' is already used.`,
+        })
+      } else {
+        setSlugMessage({
+          type: 'success',
+          message: `'${slug}' is available.`,
+        })
+      }
     }
-  }, [debouncedCheckUniqueSlug, watchSlug])
+  }
 
   const handleDragStart = () => {
     if (navigator.vibrate) {
@@ -210,7 +174,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     }
     )
   }
-  const sortedMenus = useMemo(() => {
+  const sortedMenus = React.useMemo(() => {
     return menus ? menus.sort((a, b) => (a.position || 0) - (b.position || 0)) : []
   }, [menus])
 
@@ -349,8 +313,8 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                     <Input
                       {...register('title', {
                         required: 'This field is required',
+                        onBlur: handleSetSlug
                       })}
-                      onBlur={handleSetSlug}
                       type="text"
                       autoComplete="off"
                     />
@@ -371,6 +335,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                       <Input
                         {...register('slug', {
                           required: 'This field is required',
+                          onChange: checkUniqueSlug
                         })}
                         type="text"
                         autoComplete="off"
