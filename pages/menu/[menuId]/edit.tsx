@@ -65,7 +65,7 @@ import ImageDropzone from '@/components/common/ImageDropzone'
 import MenuLayout from '@/layouts/Menu'
 import groupBy from 'lodash/groupBy'
 import BlurImage from '@/components/common/BlurImage'
-import { RouterInputs, RouterOutputs, appRouter } from '@/server'
+import { RouterOutputs, appRouter } from '@/server'
 import { createClientServer } from '@/utils/supabase/server-props'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import SuperJSON from 'superjson'
@@ -110,11 +110,10 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
     const { source, destination, type } = result
     if (!destination) return // dropped outside the list
 
+    console.log({ source, destination })
+
     const sectionListSource = groupedSectionItems[source.droppableId]
     const sectionListDestination = groupedSectionItems[destination.droppableId]
-
-    if (!sectionListSource) throw new Error('Section "source" items not found')
-    if (!sectionListDestination) throw new Error('Section "destination" items not found')
 
     if (type === 'SECTIONS') {
       const reorderedSections = reorderList(
@@ -129,8 +128,9 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
         }))
       })
     } else if (type === 'ITEMS') {
-      if (source.droppableId === destination.droppableId) {
+      if (!sectionListSource) throw new Error('Section "source" items not found')
 
+      if (source.droppableId === destination.droppableId) {
         const reorderedItems = reorderList(
           sectionListSource,
           source.index,
@@ -145,6 +145,9 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
       }
 
     } else {
+      if (!sectionListSource) throw new Error('Section "source" items not found')
+      if (!sectionListDestination) throw new Error('Section "destination" items not found')
+
       const { resultSource, resultDestination } = move(
         sectionListSource,
         sectionListDestination,
@@ -363,7 +366,7 @@ const MenuItemsContainer = ({
   const { data: menu } = useGetMenu(Number(menuId))
 
   return (
-    <Droppable droppableId={`${sectionId}`} type="ITEMS">
+    <Droppable droppableId={String(sectionId)} type="ITEMS">
       {(drop) => (
         <Box>
           <Stack
