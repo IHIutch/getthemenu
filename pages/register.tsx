@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import * as React from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import supabase from '@/utils/supabase'
 import axios from 'redaxios'
 import {
   Box,
@@ -16,63 +15,57 @@ import {
   Link,
   Container,
 } from '@chakra-ui/react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import NextLink from 'next/link'
-import { useAuthUser } from '@/utils/react-query/user'
+import { createClientComponent } from '@/utils/supabase/component'
+import { getErrorMessage } from '@/utils/functions'
+import { trpc } from '@/utils/trpc/client'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { createCaller } from '@/utils/trpc/server'
+import { GetServerSidePropsContext } from 'next'
+
+type FormValues = {
+  fullName: string,
+  email: string
+  'new-password': string,
+  'confirm-password': string
+}
 
 export default function Register() {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const sessionUser = supabase.auth.user()
-  const {
-    data: user,
-    isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser(sessionUser)
-
-  // Doing this client side because of https://github.com/supabase/supabase/issues/3783
-  useEffect(() => {
-    if (!isUserLoading) {
-      if (user && user.restaurants?.length === 0) {
-        router.replace('/get-started')
-      } else if (user) {
-        router.replace('/dashboard')
-      }
-    }
-  }, [isUserLoading, router, user])
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const supabase = createClientComponent()
+  const { mutateAsync: handleSetUpNewAccount } = trpc.user.setUpNewAccount.useMutation()
 
   const {
     register,
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm()
+  } = useForm<FormValues>()
 
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN') {
-          const fullName = getValues('fullName')
-          await axios.post(`/api/auth/register`, {
-            event,
-            session,
-            payload: {
-              // Any additional user data
-              fullName,
-            },
-          })
-          router.replace('/get-started')
-        }
+  const { data: authListener } = supabase.auth.onAuthStateChange(
+    async (event, session) => {
+      if (event === 'SIGNED_IN' && session && session.user.email) {
+        const fullName = getValues('fullName')
+        await handleSetUpNewAccount({
+          payload: {
+            id: session?.user.id,
+            email: session?.user.email,
+            fullName
+          }
+        }, {
+          onSuccess() {
+            router.replace('/get-started')
+          }
+        })
       }
-    )
-
-    return () => {
-      authListener.unsubscribe()
     }
-  }, [getValues, router])
+  )
 
-  const onSubmit = async (form) => {
+  authListener.subscription.unsubscribe()
+
+  const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
       setIsSubmitting(true)
       const { error } = await supabase.auth.signUp({
@@ -82,7 +75,7 @@ export default function Register() {
       if (error) throw new Error(error.message)
     } catch (error) {
       setIsSubmitting(false)
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
 
@@ -94,7 +87,7 @@ export default function Register() {
       </Head>
       <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>
+          <GridItem colStart={{ md: 4 }} colSpan={{ md: 6 }}>
             <Box mb="6" textAlign="center">
               <Heading as="h1" fontSize="4xl">
                 GetTheMenu
@@ -110,7 +103,7 @@ export default function Register() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl id="fullName" isInvalid={errors.email}>
+                    <FormControl id="fullName" isInvalid={!!errors.email}>
                       <FormLabel>Your Name</FormLabel>
                       <Input
                         {...register('fullName', {
@@ -126,7 +119,7 @@ export default function Register() {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="email" isInvalid={errors.email}>
+                    <FormControl id="email" isInvalid={!!errors.email}>
                       <FormLabel>Your Email</FormLabel>
                       <Input
                         {...register('email', {
@@ -136,13 +129,13 @@ export default function Register() {
                         autoComplete="email"
                         isRequired
                       />
-                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                      <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
                     <FormControl
                       id="password"
-                      isInvalid={errors['new-password']}
+                      isInvalid={!!errors['new-password']}
                     >
                       <FormLabel>Password</FormLabel>
                       <Input
@@ -161,7 +154,7 @@ export default function Register() {
                   <GridItem>
                     <FormControl
                       id="confirmPassword"
-                      isInvalid={errors['confirm-password']}
+                      isInvalid={!!errors['confirm-password']}
                     >
                       <FormLabel>Confirm Password</FormLabel>
                       <Input
@@ -185,8 +178,8 @@ export default function Register() {
                       ml="auto"
                       type="submit"
                       colorScheme="blue"
+                      w="full"
                       loadingText="Registering..."
-                      isFullWidth
                       isLoading={isSubmitting}
                     >
                       Register
@@ -207,19 +200,31 @@ export default function Register() {
   )
 }
 
-// export async function getServerSideProps(req) {
-//   const user = await getLoggedUser(req)
+Register.getLayout = (page: React.ReactNode) => page
 
-//   if (user) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: '/dashboard',
-//       },
-//     }
-//   }
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClientServer(context)
 
-//   return {
-//     props: {},
-//   }
-// }
+  const caller = createCaller({ supabase })
+  const user = await caller.user.getAuthedUser()
+
+  if (user.restaurants.length === 0) {
+    return {
+      redirect: {
+        destination: '/get-started',
+        permanent: false,
+      },
+    }
+  } else if (user.restaurants.length > 0) {
+    return {
+      redirect: {
+        destination: '/get-started',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {},
+  }
+}
