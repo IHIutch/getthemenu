@@ -131,7 +131,7 @@ export default function Homepage() {
                       trial, no credit card required!
                     </Text>
                   </Box>
-                  <Button as={NextLink} href="/register" colorScheme="blue" mt="4" display="block">
+                  <Button as={NextLink} href="/register" colorScheme="blue" mt="4" w="full">
                     Create Your First Menu
                   </Button>
                 </Box>
@@ -215,3 +215,5 @@ export default function Homepage() {
     </>
   )
 }
+
+Homepage.getLayout = (page: React.ReactNode) => page

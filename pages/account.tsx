@@ -129,15 +129,15 @@ const SiteDetails = ({ children }: { children?: React.ReactNode }) => {
       //     throw new Error(res.data.error)
       //   })
 
-      const { data: configData } = await axios
-        .post('/api/account/domain/config', {
-          domain,
-        })
-        .catch((res) => {
-          throw new Error(res.data.error)
-        })
+      // const { data: configData } = await axios
+      //   .post('/api/account/domain/config', {
+      //     domain,
+      //   })
+      //   .catch((res) => {
+      //     throw new Error(res.data.error)
+      //   })
 
-      console.log({ configData })
+      // console.log({ configData })
     } catch (error) {
       console.error(getErrorMessage(error))
     }

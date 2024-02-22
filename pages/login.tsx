@@ -23,6 +23,7 @@ import SEO from '@/components/global/SEO'
 import { createClientComponent } from '@/utils/supabase/component'
 import { GetServerSidePropsContext } from 'next'
 import { createClientServer } from '@/utils/supabase/server-props'
+import { createCaller } from '@/utils/trpc/server'
 
 type FormValues = {
   email: string
@@ -157,15 +158,25 @@ export default function Login() {
   )
 }
 
+Login.getLayout = (page: React.ReactNode) => page
+
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
 
-  const { data: { user: authedUser } } = await supabase.auth.getUser()
+  const caller = createCaller({ supabase })
+  const user = await caller.user.getAuthedUser()
 
-  if (authedUser) {
+  if (user.restaurants.length === 0) {
     return {
       redirect: {
-        destination: '/dashboard',
+        destination: '/get-started',
+        permanent: false,
+      },
+    }
+  } else if (user.restaurants.length > 0) {
+    return {
+      redirect: {
+        destination: '/get-started',
         permanent: false,
       },
     }

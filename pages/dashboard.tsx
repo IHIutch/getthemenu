@@ -116,7 +116,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
         },
       })
     } catch (error) {
-      alert(error)
+      alert(getErrorMessage(error))
     }
   }
 
