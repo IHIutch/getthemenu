@@ -1,13 +1,9 @@
-import React from 'react'
+import * as React from 'react'
 import NextLink from 'next/link'
 import { Link, useToken } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 
-export default function SubnavItem({ href, children }) {
-  const isPathMatch = (path) => {
-    return asPath === path
-  }
-
+export default function SubnavItem({ href, children }: { href: string, children: React.ReactNode }) {
   const { asPath } = useRouter()
   const [blue500] = useToken('colors', ['blue.500'])
 
@@ -17,8 +13,8 @@ export default function SubnavItem({ href, children }) {
       href={href}
       fontWeight="semibold"
       py="2"
-      boxShadow={isPathMatch(href) && `inset 0 -3px ${blue500}`}
-      color={isPathMatch(href) && 'blue.500'}
+      boxShadow={asPath === href ? `inset 0 -3px ${blue500}` : ''}
+      color={asPath === href ? 'blue.500' : ''}
     >
       {children}
     </Link>
