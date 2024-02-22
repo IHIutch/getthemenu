@@ -1,9 +1,7 @@
-import Head from 'next/head'
 import * as React from 'react'
+import Head from 'next/head'
 import { SubmitHandler, useForm, useFormState } from 'react-hook-form'
-import { useDeleteMenu, useGetMenu, useUpdateMenu } from '@/utils/react-query/menus'
-import { debounce } from 'lodash'
-import axios from 'redaxios'
+import { useDeleteMenu, useGetMenu, useGetMenus, useUpdateMenu } from '@/utils/react-query/menus'
 import MenuLayout from '@/layouts/Menu'
 import { useRouter } from 'next/router'
 import {
@@ -52,6 +50,7 @@ export default function MenuOverview({ user }: InferGetServerSidePropsType<typeo
   useGetAuthedUser({ initialData: user })
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
   const { data: menu } = useGetMenu(Number(menuId))
+  const { data: menus = [] } = useGetMenus(user?.restaurants[0]?.id)
 
   return (
     <>
@@ -62,7 +61,7 @@ export default function MenuOverview({ user }: InferGetServerSidePropsType<typeo
         <Stack spacing="6">
           <Box bg="white" rounded="md" shadow="base">
             {(menu && restaurant) ?
-              <DetailsSection menu={menu} restaurant={restaurant} />
+              <DetailsSection menu={menu} restaurant={restaurant} menus={menus} />
               : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
@@ -84,9 +83,14 @@ type FormData = {
   slug: string
 }
 
-const DetailsSection = ({ menu, restaurant }: {
+const DetailsSection = ({
+  menu,
+  restaurant,
+  menus
+}: {
   menu: RouterOutputs['menu']['getById'],
   restaurant: RouterOutputs['restaurant']['getById']
+  menus: RouterOutputs['menu']['getAllByRestaurantId']
 }) => {
 
   const [isCheckingSlug, setIsCheckingSlug] = React.useState(false)
@@ -106,7 +110,6 @@ const DetailsSection = ({ menu, restaurant }: {
     reset,
     getValues,
     setValue,
-    watch,
     control,
     formState: { errors },
   } = useForm<FormData>({ defaultValues })
@@ -120,67 +123,35 @@ const DetailsSection = ({ menu, restaurant }: {
     if (title && !slug) {
       const newSlug = slugify(title, false)
       setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
-      debouncedCheckUniqueSlug(newSlug)
+      checkUniqueSlug()
     }
   }
 
-  const checkUniqueSlug = React.useCallback(
-    async (slug: string) => {
-      try {
-        setIsCheckingSlug(true)
-        const testSlug = slugify(slug, false)
-        if (menu?.slug === slug) {
-          setSlugMessage(null)
-        } else if (testSlug !== slug) {
-          setSlugMessage({
-            type: 'error',
-            message: 'Your slug is not valid. Please use only lowercase letters, numbers, and dashes.',
-          })
-        } else {
-          const { data } = await axios.get('/api/menus', {
-            params: {
-              slug,
-              restaurantId: menu?.restaurantId,
-            },
-          })
-          if (data.length) {
-            setSlugMessage({
-              type: 'error',
-              message: `'${slug}' is already used.`,
-            })
-          } else {
-            setSlugMessage({
-              type: 'success',
-              message: `'${slug}' is available.`,
-            })
-          }
-        }
-        setIsCheckingSlug(false)
-      } catch (error) {
-        alert(getErrorMessage(error))
+  const checkUniqueSlug = () => {
+    const slug = getValues('slug')
+    const testSlug = slugify(slug || '', false)
+    if (!slug || slug === menu.slug) {
+      setSlugMessage(null)
+    } else if (testSlug !== slug) {
+      setSlugMessage({
+        type: 'error',
+        message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
+      })
+    } else {
+      const isUsed = menus.some(m => m.slug === slug)
+      if (isUsed) {
+        setSlugMessage({
+          type: 'error',
+          message: `'${slug}' is already used.`,
+        })
+      } else {
+        setSlugMessage({
+          type: 'success',
+          message: `'${slug}' is available.`,
+        })
       }
-    },
-    [menu?.restaurantId, menu?.slug]
-  )
-
-  const handleDebounce = React.useMemo(
-    () => debounce(checkUniqueSlug, 500),
-    [checkUniqueSlug]
-  )
-
-  const debouncedCheckUniqueSlug = React.useCallback(
-    (slug: string) => {
-      handleDebounce(slug)
-    },
-    [handleDebounce]
-  )
-
-  const watchSlug = watch('slug')
-  React.useEffect(() => {
-    if (watchSlug) {
-      debouncedCheckUniqueSlug(watchSlug)
     }
-  }, [debouncedCheckUniqueSlug, watchSlug])
+  }
 
   const onSubmit: SubmitHandler<FormData> = async (form) => {
     try {
@@ -209,8 +180,8 @@ const DetailsSection = ({ menu, restaurant }: {
               <Input
                 {...register('title', {
                   required: 'This field is required',
-                } as const)}
-                onBlur={handleSetSlug}
+                  onBlur: handleSetSlug
+                })}
                 type="text"
                 autoComplete="off"
               />
@@ -230,24 +201,24 @@ const DetailsSection = ({ menu, restaurant }: {
                 <Input
                   {...register('slug', {
                     required: 'This field is required',
-                  } as const)}
+                    onChange: checkUniqueSlug
+                  })}
                   type="text"
                   autoComplete="off"
                 />
               </InputGroup>
               <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
-              {isCheckingSlug && (
+              {isCheckingSlug ? (
                 <Alert status="info" mt="2">
                   <Spinner size="sm" />
                   <Text ml="2">Checking availability...</Text>
                 </Alert>
-              )}
-              {!isCheckingSlug && slugMessage && (
+              ) : !isCheckingSlug && slugMessage ? (
                 <Alert size="sm" status={slugMessage.type} mt="2">
                   <AlertIcon />
                   <Text ml="2">{slugMessage.message}</Text>
                 </Alert>
-              )}
+              ) : null}
               <FormHelperText>
                 Must be unique to your restaurant.
               </FormHelperText>
@@ -269,7 +240,7 @@ const DetailsSection = ({ menu, restaurant }: {
             colorScheme="blue"
             type="submit"
             isDisabled={
-              !isDirty || isCheckingSlug || slugMessage?.type === 'error'
+              !isDirty || slugMessage?.type === 'error'
             }
             isLoading={isPending}
             loadingText="Saving..."

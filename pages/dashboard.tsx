@@ -118,7 +118,6 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     const [title, slug] = getValues(['title', 'slug'])
     if (title && !slug) {
       const newSlug = slugify(title, false)
-      // const uniqueSlug = await getUniqueSlug(slug)
       setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
       checkUniqueSlug()
     }
@@ -342,18 +341,17 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                       />
                     </InputGroup>
                     <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
-                    {isCheckingSlug && (
+                    {isCheckingSlug ? (
                       <Alert status="info" mt="2">
                         <Spinner size="sm" />
                         <Text ml="2">Checking availability...</Text>
                       </Alert>
-                    )}
-                    {!isCheckingSlug && slugMessage && (
+                    ) : !isCheckingSlug && slugMessage ? (
                       <Alert size="sm" status={slugMessage.type} mt="2">
                         <AlertIcon />
                         <Text ml="2">{slugMessage.message}</Text>
                       </Alert>
-                    )}
+                    ) : null}
                     <FormHelperText>
                       Must be unique to your restaurant.
                     </FormHelperText>
