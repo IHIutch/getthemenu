@@ -95,3 +95,12 @@ export const MenuItemSchema = z.object({
   updatedAt: z.date(),
   deletedAt: z.date().nullable()
 })
+
+export const FeedbackSchema = z.object({
+  userId: z.string().uuid(),
+  type: z.string().nullable(),
+  comment: z.string().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().nullable()
+})

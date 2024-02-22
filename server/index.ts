@@ -9,6 +9,7 @@ import { restaurantRouter } from './routers/restaurant'
 import { sectionRouter } from './routers/sections'
 import { menuItemRouter } from './routers/menuItems'
 import { verifyRouter } from './routers/verify'
+import { feedbackRouter } from './routers/feedback'
 
 export const appRouter = router({
   menu: menuRouter,
@@ -17,6 +18,7 @@ export const appRouter = router({
   menuItem: menuItemRouter,
   section: sectionRouter,
   verify: verifyRouter,
+  feedback: feedbackRouter,
 })
 
 // export type definition of API

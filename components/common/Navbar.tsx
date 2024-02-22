@@ -36,8 +36,9 @@ import {
   UseRadioProps,
 } from '@chakra-ui/react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { postFeedback } from '@/utils/axios/feedback'
 import { useGetAuthedUser } from '@/utils/react-query/users'
+import { trpc } from '@/utils/trpc/client'
+import { getErrorMessage } from '@/utils/functions'
 
 type FormValues = {
   userId: string,
@@ -53,8 +54,7 @@ export default function Navbar({
 
   const { data: user } = useGetAuthedUser()
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
-
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const { mutateAsync: handleCreateFeedback, isPending: isSubmitting } = trpc.feedback.create.useMutation()
 
   const modalState = useDisclosure()
 
@@ -71,17 +71,19 @@ export default function Navbar({
 
   const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
-      setIsSubmitting(true)
-      const data = await postFeedback({
-        userId: user?.id,
-        type: form.type,
-        comment: form.comment,
+      await handleCreateFeedback({
+        payload: {
+          userId: user?.id || '',
+          type: form.type,
+          comment: form.comment,
+        }
+      }, {
+        onError(error) {
+          alert(getErrorMessage(error))
+        }
       })
-      if (data.error) throw new Error(data.error)
-      setIsSubmitting(false)
       modalState.onClose()
     } catch (error) {
-      setIsSubmitting(false)
       alert(error)
     }
   }
