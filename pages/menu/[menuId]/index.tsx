@@ -2,7 +2,6 @@ import Head from 'next/head'
 import * as React from 'react'
 import { SubmitHandler, useForm, useFormState } from 'react-hook-form'
 import { useDeleteMenu, useGetMenu, useUpdateMenu } from '@/utils/react-query/menus'
-import slugify from 'slugify'
 import { debounce } from 'lodash'
 import axios from 'redaxios'
 import MenuLayout from '@/layouts/Menu'
@@ -44,6 +43,7 @@ import { RouterOutputs, appRouter } from '@/server'
 import SuperJSON from 'superjson'
 import { useGetAuthedUser } from '@/utils/react-query/users'
 import { getErrorMessage } from '@/utils/functions'
+import { slug as slugify } from 'github-slugger'
 
 export default function MenuOverview({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
@@ -118,11 +118,7 @@ const DetailsSection = ({ menu, restaurant }: {
   const handleSetSlug = async () => {
     const [title, slug] = getValues(['title', 'slug'])
     if (title && !slug) {
-      const newSlug = slugify(title, {
-        lower: true,
-        strict: true,
-      })
-      // const uniqueSlug = await getUniqueSlug(newSlug)
+      const newSlug = slugify(title, false)
       setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
       debouncedCheckUniqueSlug(newSlug)
     }
@@ -132,10 +128,7 @@ const DetailsSection = ({ menu, restaurant }: {
     async (slug: string) => {
       try {
         setIsCheckingSlug(true)
-        const testSlug = slugify(slug, {
-          lower: true,
-          strict: true,
-        })
+        const testSlug = slugify(slug, false)
         if (menu?.slug === slug) {
           setSlugMessage(null)
         } else if (testSlug !== slug) {
@@ -193,7 +186,7 @@ const DetailsSection = ({ menu, restaurant }: {
     try {
       const payload = {
         title: form.title || '',
-        slug: slugify(form.slug || '', { lower: true, strict: true }),
+        slug: slugify(form.slug || '', false),
       }
       await handleUpdateMenu({
         where: {

@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 export const UserSchema = z.object({
@@ -30,24 +29,25 @@ const HoursSchema = z.record(
     closeTime: z.string(),
   }));
 
+export const CustomHostSchema = z.string().max(63)
 export const RestaurantSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   name: z.string().nullable(),
-  hours: HoursSchema.nullable(),
+  hours: HoursSchema.optional(),
   address: z.object({
     streetAddress: z.string(),
     zip: z.string(),
     city: z.string(),
     state: z.string()
-  }).nullable(),
-  phone: z.array(z.string()).nullable(),
-  email: z.array(z.string().email()).nullable(),
+  }).optional(),
+  phone: z.array(z.string()).optional(),
+  email: z.array(z.string().email()).optional(),
   coverImage: z.object({
     blurDataUrl: z.string().optional(),
     src: z.string().url()
-  }).nullable(),
-  customHost: z.string().nullable(),
+  }).optional(),
+  customHost: CustomHostSchema.nullable(),
   customDomain: z.string().url().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -90,7 +90,7 @@ export const MenuItemSchema = z.object({
   image: z.object({
     blurDataUrl: z.string().optional(),
     src: z.string().url()
-  }).nullable(),
+  }).optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable()

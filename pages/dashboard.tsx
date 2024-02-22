@@ -43,7 +43,7 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import DashboardLayout from '@/layouts/Dashboard'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import slugify from 'slugify'
+import { slug as slugify } from 'github-slugger'
 import axios from 'redaxios'
 import { debounce } from 'lodash'
 import { GripHorizontal } from 'lucide-react'
@@ -124,10 +124,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     async (slug: string) => {
       try {
         setIsCheckingSlug(true)
-        const testSlug = slugify(slug, {
-          lower: true,
-          strict: true,
-        })
+        const testSlug = slugify(slug, false)
         if (testSlug !== slug) {
           setSlugMessage({
             type: 'error',
@@ -163,11 +160,8 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
   const handleSetSlug = async () => {
     const [title, slug] = getValues(['title', 'slug'])
     if (title && !slug) {
-      const newSlug = slugify(title, {
-        lower: true,
-        strict: true,
-      })
-      // const uniqueSlug = await getUniqueSlug(newSlug)
+      const newSlug = slugify(title, false)
+      // const uniqueSlug = await getUniqueSlug(slug)
       setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
       debouncedCheckUniqueSlug(newSlug)
     }

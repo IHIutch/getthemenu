@@ -8,6 +8,7 @@ import { userRouter } from './routers/user'
 import { restaurantRouter } from './routers/restaurant'
 import { sectionRouter } from './routers/sections'
 import { menuItemRouter } from './routers/menuItems'
+import { verifyRouter } from './routers/verify'
 
 export const appRouter = router({
   menu: menuRouter,

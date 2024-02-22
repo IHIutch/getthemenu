@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import * as React from 'react'
 import Head from 'next/head'
-import axios from 'redaxios'
 import {
   Alert,
   AlertIcon,
@@ -20,36 +19,36 @@ import {
   Text,
   Container,
 } from '@chakra-ui/react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
-import slugify from 'slugify'
-import { debounce } from 'lodash'
-import { postRestaurant } from '@/utils/axios/restaurants'
-import { useAuthUser } from '@/utils/react-query/user'
+import debounce from 'lodash/debounce'
 import { useRouter } from 'next/router'
+import SuperJSON from 'superjson'
+import { appRouter } from '@/server'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { getErrorMessage } from '@/utils/functions'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { trpc } from '@/utils/trpc/client'
+import { slug as slugify } from 'github-slugger'
 
-export default function GetStarted() {
+const FormPayload = z.object({
+  restaurantName: z.string(),
+  customHost: z.string().max(63)
+})
+
+type FormData = z.infer<typeof FormPayload>
+
+type SlugMessageType = {
+  type: 'success' | 'error'
+  message: string
+} | null
+
+export default function GetStarted({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isCheckingSlug, setIsCheckingSlug] = useState(false)
-  const [slugMessage, setSlugMessage] = useState(null)
-
-  const {
-    data: user,
-    isLoading: isUserLoading,
-    // isError: isUserError,
-  } = useAuthUser()
-
-  // Doing this client side because of https://github.com/supabase/supabase/issues/3783
-  useEffect(() => {
-    if (!isUserLoading) {
-      if (!user) {
-        router.replace('/')
-      } else if (user?.restaurants?.length) {
-        router.replace('/dashboard')
-      }
-    }
-  }, [isUserLoading, router, user])
+  const [slugMessage, setSlugMessage] = React.useState<SlugMessageType>(null)
 
   const {
     register,
@@ -58,39 +57,19 @@ export default function GetStarted() {
     setValue,
     watch,
     formState: { errors },
-  } = useForm()
+  } = useForm<FormData>({
+    resolver: zodResolver(FormPayload)
+  })
 
-  const checkSimilarHost = async (customHost) => {
-    try {
-      const { data: hosts } = await axios.get(
-        `/api/verify/restaurants?customHost=${customHost}`
-      )
-      let count = 0
-      let suggestion = customHost
-      if (hosts) {
-        while (hosts.map((h) => h.customHost).includes(suggestion)) {
-          suggestion = `${customHost}-${count + 1}`
-          count++
-        }
-      }
-      debouncedCheckUniqueHost(suggestion)
-      return suggestion
-    } catch (error) {
-      alert(error)
-    }
-  }
+  const { mutateAsync: handleCheckCustomHost, isPending: isChecking } = trpc.verify.checkCustomHost.useMutation()
+  const { mutateAsync: handleCreateRestaurant, isPending: isSubmitting } = trpc.restaurant.create.useMutation()
 
-  const checkUniqueHost = useCallback(
-    async (customHost) => {
+  const debouncedCheckUniqueHost = React.useMemo(
+    () => debounce(async (customHost: string) => {
       try {
-        const testHost = slugify(customHost, {
-          lower: true,
-          strict: true,
-        })
-        setIsCheckingSlug(true)
-        if (!customHost) {
-          setSlugMessage(null)
-        } else if (testHost > 63) {
+        const testHost = slugify(customHost, false)
+
+        if (testHost.length > 63) {
           setSlugMessage({
             type: 'error',
             message: `Your URL is too long. Please shorten it to 63 characters or less.`,
@@ -101,13 +80,9 @@ export default function GetStarted() {
             message: `Your URL is not valid. Please use only lowercase letters, numbers, and dashes.`,
           })
         } else {
-          const { data } = await axios.get(
-            `/api/restaurants?customHost=${customHost}`,
-            {
-              customHost,
-            }
-          )
-          if (data.length) {
+          const suggestion = await handleCheckCustomHost({ customHost })
+
+          if (suggestion) {
             setSlugMessage({
               type: 'error',
               message: `Sorry, '${customHost}' is taken. Please choose another.`,
@@ -119,62 +94,56 @@ export default function GetStarted() {
             })
           }
         }
-        setIsCheckingSlug(false)
       } catch (error) {
-        setIsCheckingSlug(false)
-        alert(error.message)
+        alert(getErrorMessage(error))
       }
-    },
-    [setIsCheckingSlug]
+    }, 500),
+    [handleCheckCustomHost]
   )
 
-  const handleDebounce = useMemo(
-    () => debounce(checkUniqueHost, 500),
-    [checkUniqueHost]
-  )
-
-  const debouncedCheckUniqueHost = useCallback(
-    (customHost) => {
-      handleDebounce(customHost)
-    },
-    [handleDebounce]
-  )
-
-  const handleSetHost = async (e) => {
-    const [name, customHost] = getValues(['restaurantName', 'customHost'])
-    if (name && !customHost) {
-      // 63 is the max length of a customHost
-      const newHost = slugify(name.slice(0, 63), {
-        lower: true,
-        strict: true,
-      })
-      const uniqueHost = await checkSimilarHost(newHost)
-      setValue('customHost', uniqueHost, { shouldValidate: true })
+  const handleSetHost = async () => {
+    try {
+      const [name, customHost] = getValues(['restaurantName', 'customHost'])
+      if (name && !customHost) {
+        // 63 is the max length of a customHost
+        const newHost = slugify(name.slice(0, 63), false)
+        const suggestion = await handleCheckCustomHost({ customHost: newHost })
+        setValue('customHost', suggestion || newHost, { shouldDirty: true, shouldTouch: false })
+      }
+    } catch (error) {
+      alert(getErrorMessage(error))
     }
   }
 
-  const watchCustomHost = watch('customHost')
-  useEffect(() => {
-    if (watchCustomHost) {
-      debouncedCheckUniqueHost(watchCustomHost)
+  const checkUniqueHost = () => {
+    const customHost = getValues('customHost')
+    if (customHost) {
+      debouncedCheckUniqueHost(customHost)
     } else {
       setSlugMessage(null)
     }
-  }, [debouncedCheckUniqueHost, watchCustomHost])
+  }
 
-  const onSubmit = async (form) => {
+  const onSubmit: SubmitHandler<FormData> = async (form) => {
     try {
       const { restaurantName, customHost } = form
-      setIsSubmitting(true)
-      await postRestaurant({
-        userId: user.id,
-        name: restaurantName || '',
-        customHost: slugify(customHost || '', { lower: true, strict: true }),
+      await handleCreateRestaurant({
+        payload: {
+          userId: user.id,
+          name: restaurantName || '',
+          customHost: slugify(customHost || '', false),
+          customDomain: null
+        }
+      }, {
+        onSuccess() {
+          router.replace('/dashboard')
+        },
+        onError(error) {
+          throw new Error(getErrorMessage(error))
+        }
       })
-      router.replace('/dashboard')
     } catch (error) {
-      setIsSubmitting(false)
-      alert(error.message)
+      alert(getErrorMessage(error))
     }
   }
 
@@ -186,7 +155,7 @@ export default function GetStarted() {
       </Head>
       <Container maxW="container.lg" py="24">
         <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6">
-          <GridItem colStart={{ md: '4' }} colSpan={{ md: '6' }}>
+          <GridItem colStart={{ md: 4 }} colSpan={{ md: 6 }}>
             <Box bg="white" borderWidth="1px" rounded="md" p="8">
               <Box mb="8">
                 <Heading as="h1">Finish Your Account</Heading>
@@ -200,15 +169,15 @@ export default function GetStarted() {
                   <GridItem>
                     <FormControl
                       id="restaurantName"
-                      isInvalid={errors.restaurantName}
+                      isInvalid={!!errors.restaurantName}
                     >
                       <FormLabel>Restaurant Name</FormLabel>
                       <Input
                         {...register('restaurantName', {
                           required: 'This field is required',
+                          onBlur: handleSetHost,
                         })}
                         type="text"
-                        onBlur={handleSetHost}
                         autoComplete="off"
                       />
                       <FormErrorMessage>
@@ -217,12 +186,13 @@ export default function GetStarted() {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="customHost" isInvalid={errors.customHost}>
+                    <FormControl id="customHost" isInvalid={!!errors.customHost}>
                       <FormLabel>Choose a Unique URL</FormLabel>
                       <InputGroup>
                         <Input
                           {...register('customHost', {
                             required: 'This field is required',
+                            onChange: checkUniqueHost
                           })}
                           type="text"
                           autoComplete="off"
@@ -232,18 +202,17 @@ export default function GetStarted() {
                       <FormErrorMessage>
                         {errors.customHost?.message}
                       </FormErrorMessage>
-                      {isCheckingSlug && (
+                      {isChecking ? (
                         <Alert status="info" mt="2">
                           <Spinner size="sm" />
                           <Text ml="2">Checking availability...</Text>
                         </Alert>
-                      )}
-                      {!isCheckingSlug && slugMessage && (
+                      ) : !isChecking && slugMessage ? (
                         <Alert status={slugMessage.type} mt="2">
                           <AlertIcon />
                           <Text ml="2">{slugMessage.message}</Text>
                         </Alert>
-                      )}
+                      ) : null}
                       <FormHelperText>
                         This URL is where your restaurant will be publicly
                         accessible, it must be unique.
@@ -278,26 +247,33 @@ export default function GetStarted() {
   )
 }
 
-// export async function getServerSideProps(req) {
-//   const user = await getLoggedUser(req)
-//   if (!user) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: '/register',
-//       },
-//     }
-//   }
-//   if (user?.restaurants?.length) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: '/dashboard',
-//       },
-//     }
-//   }
+GetStarted.getLayout = (page: React.ReactNode) => page
 
-//   return {
-//     props: {},
-//   }
-// }
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClientServer(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: {
+      supabase
+    },
+    transformer: SuperJSON,
+  });
+
+  const user = await helpers.user.getAuthedUser.fetch()
+
+  if (user.restaurants.length > 0) {
+    return {
+      redirect: {
+        destination: '/dashboard',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      user,
+      trpcState: helpers.dehydrate(),
+    },
+  }
+}

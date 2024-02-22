@@ -1,5 +1,6 @@
 import { getErrorMessage } from "@/utils/functions";
-import { prismaGetRestaurant, prismaUpdateRestaurant } from "@/utils/prisma/restaurants";
+import { prismaCreateRestaurant, prismaGetRestaurant, prismaUpdateRestaurant } from "@/utils/prisma/restaurants";
+import { createClientApi } from "@/utils/supabase/api";
 import { publicProcedure, router } from "@/utils/trpc";
 import { RestaurantSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
@@ -28,6 +29,29 @@ export const restaurantRouter = router({
       })
     }
     return result.data
+  }),
+  create: publicProcedure.input(
+    z.object({
+      payload: RestaurantSchema.omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true
+      })
+    })
+  ).mutation(async ({ input }) => {
+    const { payload } = input
+    const data = await prismaCreateRestaurant({
+      payload: {
+        ...payload,
+        users: {
+          connect: {
+            id: payload.userId
+          }
+        }
+      }
+    })
+    return data
   }),
   update: publicProcedure.input(
     z.object({
