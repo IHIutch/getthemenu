@@ -34,19 +34,24 @@ export const RestaurantSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   name: z.string().nullable(),
-  hours: HoursSchema.optional(),
-  address: z.object({
-    streetAddress: z.string(),
-    zip: z.string(),
-    city: z.string(),
-    state: z.string()
-  }).optional(),
-  phone: z.array(z.string()).optional(),
-  email: z.array(z.string().email()).optional(),
-  coverImage: z.object({
-    blurDataUrl: z.string().optional(),
-    src: z.string().url()
-  }).optional(),
+  hours: z.preprocess(val => val === null ? undefined : val,
+    HoursSchema.optional()),
+  address: z.preprocess(val => val === null ? undefined : val,
+    z.object({
+      streetAddress: z.string(),
+      zip: z.string(),
+      city: z.string(),
+      state: z.string()
+    }).optional()),
+  phone: z.preprocess((val) => val === null ? undefined : val,
+    z.array(z.string()).optional()),
+  email: z.preprocess((val) => val === null ? undefined : val,
+    z.array(z.string().email()).optional()),
+  coverImage: z.preprocess((val) => val === null ? undefined : val,
+    z.object({
+      blurDataUrl: z.string().optional(),
+      src: z.string().url()
+    }).optional()),
   customHost: CustomHostSchema.nullable(),
   customDomain: z.string().url().nullable(),
   createdAt: z.date(),
@@ -87,10 +92,10 @@ export const MenuItemSchema = z.object({
   price: z.number().nullable(),
   description: z.string().nullable(),
   position: z.number().nullable(),
-  image: z.object({
+  image: z.preprocess(val => val === null ? undefined : val, z.object({
     blurDataUrl: z.string().optional(),
     src: z.string().url()
-  }).optional(),
+  }).optional()),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable()
