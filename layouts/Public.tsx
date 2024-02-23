@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion'
+import * as React from 'react'
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import {
   AspectRatio,
@@ -14,7 +14,6 @@ import {
   GridItem,
   Heading,
   Icon,
-  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -29,27 +28,38 @@ import {
   TabPanels,
   Tabs,
   Text,
+  chakra,
   useBreakpointValue,
   useDisclosure,
 } from '@chakra-ui/react'
-import NextLink from 'next/link'
+import NextLink, { type LinkProps as NextLinkProps } from 'next/link'
 import dayjs from 'dayjs'
 import { Phone, Clock } from 'lucide-react'
 import { formatTime } from '@/utils/functions'
 import BlurImage from '@/components/common/BlurImage'
+import { RouterOutputs } from '@/server'
+import { DAYS_OF_WEEK } from '@/utils/zod'
 
-export default function PublicLayout({ restaurant, menus, children }) {
+export default function PublicLayout({
+  restaurant,
+  menus,
+  children
+}: {
+  restaurant: RouterOutputs['restaurant']['getById'],
+  menus: RouterOutputs['menu']['getAllByRestaurantId'],
+  children: React.ReactNode
+}) {
   const modalState = useDisclosure()
   const { asPath, push, query } = useRouter()
 
   const slug = query?.slug?.[0] || ''
   const activeMenu = slug
-    ? menus.find((menu) => menu.slug === slug)
+    ? (menus || []).find((menu) => menu.slug === slug)
     : menus?.[0]
 
-  const [activeSlug, setActiveSlug] = useState(slug)
+  const [activeSlug, setActiveSlug] = React.useState(slug)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (activeSlug !== slug) {
       if (asPath.includes('preview')) {
         push(
@@ -69,8 +79,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
     }
   }, [activeSlug, slug, push, asPath, query.host])
 
-  const weekdayName = dayjs().format('dddd')
-  const isSiteReady = useMemo(() => {
+  const weekdayName = dayjs().format('dddd') as typeof DAYS_OF_WEEK[number]
+  const isSiteReady = React.useMemo(() => {
     return activeMenu && menus?.length > 0
   }, [activeMenu, menus])
 
@@ -87,10 +97,10 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       alt={restaurant?.name || ''}
                       src={restaurant?.coverImage?.src}
                       blurDataURL={restaurant?.coverImage?.blurDataURL}
-                      layout="fill"
-                      objectFit="cover"
+                      fill={true}
                       priority={true}
-                      placeholder="blur"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw"
+                      placeholder={restaurant?.coverImage?.blurDataURL ? "blur" : 'empty'}
                     />
                   ) : (
                     <Box boxSize="100%" bg="gray.400" />
@@ -128,15 +138,15 @@ export default function PublicLayout({ restaurant, menus, children }) {
                             <Icon as={Clock} />
                             {restaurant?.hours?.[weekdayName]?.isOpen ? (
                               <Text>
-                                {restaurant.hours?.[weekdayName]?.openTime &&
+                                {restaurant.hours?.[weekdayName]?.openTime ?
                                   formatTime(
-                                    restaurant.hours?.[weekdayName]?.openTime
-                                  )}{' '}
+                                    restaurant.hours?.[weekdayName]?.openTime || ''
+                                  ) : null}{' '}
                                 -{' '}
-                                {restaurant.hours?.[weekdayName]?.closeTime &&
+                                {restaurant.hours?.[weekdayName]?.closeTime ?
                                   formatTime(
-                                    restaurant.hours?.[weekdayName]?.closeTime
-                                  )}
+                                    restaurant.hours?.[weekdayName]?.closeTime || ''
+                                  ) : null}
                               </Text>
                             ) : (
                               <Text>Closed Today</Text>
@@ -144,7 +154,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                           </Stack>
                         </Flex>
                         {isSiteReady && (
-                          <Box d={{ lg: 'none' }} flexShrink="0">
+                          <Box display={{ lg: 'none' }} flexShrink="0">
                             <Button onClick={modalState.onOpen}>
                               View Details
                             </Button>
@@ -168,19 +178,19 @@ export default function PublicLayout({ restaurant, menus, children }) {
                 >
                   <Container maxW="container.lg" px={{ base: '2', lg: '4' }}>
                     <Grid templateColumns="repeat(12, 1fr)" gap="4">
-                      <GridItem colSpan={{ base: '12', lg: '7' }}>
+                      <GridItem colSpan={{ base: 12, lg: 7 }}>
                         <Stack direction="row" align="flex-end">
                           <FormControl flexGrow="1" id="menu">
                             <FormLabel mb="1">Select a Menu</FormLabel>
                             <Select
                               bg="white"
-                              value={activeMenu.slug}
+                              value={activeMenu?.slug || ''}
                               onChange={(e) => {
                                 setActiveSlug(e.target.value)
                               }}
                             >
                               {menus?.map((m) => (
-                                <option key={m.id} value={m.slug}>
+                                <option key={m.id} value={m.slug || ''}>
                                   {m.title}
                                 </option>
                               ))}
@@ -194,10 +204,10 @@ export default function PublicLayout({ restaurant, menus, children }) {
                 <Container maxW="container.lg">
                   <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">
                     <GridItem
-                      colSpan={{ base: '12', lg: '7' }}
+                      colSpan={{ base: 12, lg: 7 }}
                       position="relative"
                     >
-                      <AnimateSharedLayout type="crossfade">
+                      <LayoutGroup>
                         <AnimatePresence initial={false}>
                           <motion.main
                             key={asPath}
@@ -228,12 +238,12 @@ export default function PublicLayout({ restaurant, menus, children }) {
                             <Box py="4">{children}</Box>
                           </motion.main>
                         </AnimatePresence>
-                      </AnimateSharedLayout>
+                      </LayoutGroup>
                     </GridItem>
                     <GridItem
-                      d={{ base: 'none', lg: 'block' }}
-                      colSpan={{ base: '12', lg: '4' }}
-                      colStart={{ lg: '9' }}
+                      display={{ base: 'none', lg: 'block' }}
+                      colSpan={{ base: 12, lg: 4 }}
+                      colStart={{ lg: 9 }}
                     >
                       <Box position="sticky" top="28">
                         {restaurant?.hours && (
@@ -248,7 +258,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                 <Heading fontSize="lg">Contact</Heading>
                               </Box>
                               <Stack spacing="4" p="4" fontSize="sm">
-                                {restaurant?.phone?.length > 0 && (
+                                {restaurant?.phone && restaurant.phone.length > 0 ? (
                                   <Box>
                                     <Text fontWeight="semibold">Phone</Text>
                                     <Stack as="ul" spacing="1">
@@ -263,8 +273,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                       ))}
                                     </Stack>
                                   </Box>
-                                )}
-                                {restaurant?.address && (
+                                ) : null}
+                                {restaurant?.address ? (
                                   <Box>
                                     <Text as="dt" fontWeight="semibold">
                                       Address
@@ -276,8 +286,8 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                       {restaurant.address?.zip}
                                     </Text>
                                   </Box>
-                                )}
-                                {restaurant?.email?.length > 0 && (
+                                ) : null}
+                                {restaurant?.email && restaurant.email.length > 0 ? (
                                   <Box>
                                     <Text fontWeight="semibold">Email</Text>
                                     <Stack as="ul" spacing="1">
@@ -292,7 +302,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                       ))}
                                     </Stack>
                                   </Box>
-                                )}
+                                ) : null}
                               </Stack>
                             </Box>
                             <Box
@@ -305,15 +315,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                 <Heading fontSize="lg">Hours</Heading>
                               </Box>
                               <Stack spacing="3" py="3" fontSize="sm">
-                                {[
-                                  'Sunday',
-                                  'Monday',
-                                  'Tuesday',
-                                  'Wednesday',
-                                  'Thursday',
-                                  'Friday',
-                                  'Saturday',
-                                ].map((day) => (
+                                {DAYS_OF_WEEK.map((day) => (
                                   <Flex
                                     as="dl"
                                     key={day}
@@ -327,16 +329,16 @@ export default function PublicLayout({ restaurant, menus, children }) {
                                       </Text>
                                     </Box>
                                     <Box>
-                                      {restaurant.hours?.[day]?.isOpen ? (
+                                      {restaurant?.hours?.[day]?.isOpen ? (
                                         <Text as="dd">
                                           {restaurant.hours?.[day]?.openTime &&
                                             formatTime(
-                                              restaurant.hours?.[day]?.openTime
+                                              restaurant.hours?.[day]?.openTime || ''
                                             )}{' '}
                                           -{' '}
                                           {restaurant.hours?.[day]?.closeTime &&
                                             formatTime(
-                                              restaurant.hours?.[day]?.closeTime
+                                              restaurant.hours?.[day]?.closeTime || ''
                                             )}
                                         </Text>
                                       ) : (
@@ -373,9 +375,9 @@ export default function PublicLayout({ restaurant, menus, children }) {
           <Box as="footer" borderTopWidth="1px" py="6" mt="auto">
             <Text textAlign="center" fontWeight="medium" color="gray.600">
               Powered by{' '}
-              <Link as={NextLink} href={{ pathname: "https://getthemenu.io", query: { ref: query.host } }} color="blue.500" target="_blank">
+              <MagicLink href={{ pathname: "https://getthemenu.io", query: { ref: query.host } }} color="blue.500" target="_blank">
                 GetTheMenu
-              </Link>
+              </MagicLink>
             </Text>
           </Box>
         </Flex>
@@ -396,7 +398,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
               <TabPanels>
                 <TabPanel px="0">
                   <Stack spacing="4">
-                    {restaurant?.phone?.length > 0 && (
+                    {restaurant?.phone && restaurant.phone.length > 0 ? (
                       <Box>
                         <Text fontWeight="semibold">Phone</Text>
                         <Stack as="ul" spacing="1">
@@ -407,7 +409,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                           ))}
                         </Stack>
                       </Box>
-                    )}
+                    ) : null}
 
                     {restaurant?.address && (
                       <Box>
@@ -422,7 +424,7 @@ export default function PublicLayout({ restaurant, menus, children }) {
                       </Box>
                     )}
 
-                    {restaurant?.email?.length > 0 && (
+                    {restaurant?.email && restaurant?.email?.length > 0 ? (
                       <Box>
                         <Text fontWeight="semibold">Email</Text>
                         <Stack as="ul" spacing="1">
@@ -433,20 +435,12 @@ export default function PublicLayout({ restaurant, menus, children }) {
                           ))}
                         </Stack>
                       </Box>
-                    )}
+                    ) : null}
                   </Stack>
                 </TabPanel>
                 <TabPanel px="0">
                   <Stack spacing="3">
-                    {[
-                      'Sunday',
-                      'Monday',
-                      'Tuesday',
-                      'Wednesday',
-                      'Thursday',
-                      'Friday',
-                      'Saturday',
-                    ].map((day) => (
+                    {DAYS_OF_WEEK.map((day) => (
                       <Flex as="dl" key={day} justify="space-between" w="100%">
                         <Box>
                           <Text as="dt" fontWeight="semibold">
@@ -454,15 +448,15 @@ export default function PublicLayout({ restaurant, menus, children }) {
                           </Text>
                         </Box>
                         <Box>
-                          {restaurant.hours?.[day]?.isOpen ? (
+                          {restaurant?.hours?.[day]?.isOpen ? (
                             <Text as="dd">
                               {restaurant.hours?.[day]?.openTime &&
                                 formatTime(
-                                  restaurant.hours?.[day]?.openTime
+                                  restaurant.hours?.[day]?.openTime || ''
                                 )}{' '}
                               -{' '}
                               {restaurant.hours?.[day]?.closeTime &&
-                                formatTime(restaurant.hours?.[day]?.closeTime)}
+                                formatTime(restaurant.hours?.[day]?.closeTime || '')}
                             </Text>
                           ) : (
                             <Text as="dd">Closed</Text>
@@ -480,3 +474,9 @@ export default function PublicLayout({ restaurant, menus, children }) {
     </>
   )
 }
+
+// wrap the NextLink with Chakra UI's factory function
+const MagicLink = chakra<typeof NextLink, NextLinkProps>(NextLink, {
+  // ensure that you're forwarding all of the required props for your case
+  shouldForwardProp: (prop) => ['href', 'target', 'children',].includes(prop),
+})

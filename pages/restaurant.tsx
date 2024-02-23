@@ -88,7 +88,7 @@ Restaurant.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</Dashb
 type CoverImageType = {
   type: 'old'
   src: string,
-  blurDataUrl?: string
+  blurDataURL?: string
 } | {
   type: 'new'
   file: File
@@ -131,12 +131,12 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
       if (form?.coverImage && form.coverImage.type === 'new') {
         const formData = new FormData()
         formData.append('file', form.coverImage.file, form.coverImage.file.name)
-        const { src, blurDataUrl } = await postUpload(formData)
+        const { src, blurDataURL } = await postUpload(formData)
 
         imageData = {
           coverImage: {
             src,
-            blurDataUrl
+            blurDataURL
           }
         }
       }

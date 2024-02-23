@@ -14,7 +14,7 @@ export const prismaGetRestaurants = async ({ where }: { where: Prisma.restaurant
 
 export const prismaGetRestaurant = async ({ where }: { where: Prisma.restaurantsWhereUniqueInput }) => {
   try {
-    return prisma.restaurants.findUnique({
+    return await prisma.restaurants.findUnique({
       where,
     })
   } catch (error) {

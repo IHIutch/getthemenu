@@ -11,7 +11,7 @@ import { readFile } from 'fs/promises'
 
 export type UploadApiResponseType = {
   src: string;
-  blurDataUrl: string;
+  blurDataURL: string;
 }
 
 type ResponseData = UploadApiResponseType | {
@@ -61,13 +61,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) 
         if (error) throw new Error(getErrorMessage(error))
         if (!data) throw new Error('File upload failed')
 
-        const { base64: blurDataUrl } = await getPlaiceholder(fileContents, {
+        const { base64: blurDataURL } = await getPlaiceholder(fileContents, {
           size: 4,
         })
 
         res.status(resStatusType.SUCCESS).json({
           src: data.fullPath,
-          blurDataUrl
+          blurDataURL
         })
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })

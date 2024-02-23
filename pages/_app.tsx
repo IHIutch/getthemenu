@@ -44,7 +44,7 @@ type AppPropsWithLayout = AppProps & {
 const App = ({ Component, pageProps, }: AppPropsWithLayout) => {
   // Delete this when moving to app router
   const getLayout =
-    Component.getLayout ?? ((page) => { page });
+    Component.getLayout ?? ((page) => page);
 
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') {

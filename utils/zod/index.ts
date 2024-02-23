@@ -49,7 +49,7 @@ export const RestaurantSchema = z.object({
     z.array(z.string().email()).optional()),
   coverImage: z.preprocess((val) => val === null ? undefined : val,
     z.object({
-      blurDataUrl: z.string().optional(),
+      blurDataURL: z.string().optional(),
       src: z.string().url()
     }).optional()),
   customHost: CustomHostSchema.nullable(),
@@ -93,7 +93,7 @@ export const MenuItemSchema = z.object({
   description: z.string().nullable(),
   position: z.number().nullable(),
   image: z.preprocess(val => val === null ? undefined : val, z.object({
-    blurDataUrl: z.string().optional(),
+    blurDataURL: z.string().optional(),
     src: z.string().url()
   }).optional()),
   createdAt: z.date(),

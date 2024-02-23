@@ -451,9 +451,9 @@ const MenuItem = ({
           <BlurImage
             alt={menuItem.title || 'Menu Item'}
             src={menuItem.image.src}
-            blurDataURL={menuItem.image.blurDataUrl}
+            blurDataURL={menuItem.image.blurDataURL}
             fill={true}
-            placeholder={menuItem.image.blurDataUrl ? "blur" : 'empty'}
+            placeholder={menuItem.image.blurDataURL ? "blur" : 'empty'}
           />
         ) : (
           <Box boxSize="100%" bg="gray.100">
@@ -675,7 +675,7 @@ type DefaultValueMenuItemType = {
   image: {
     type: 'old'
     src: string,
-    blurDataUrl?: string
+    blurDataURL?: string
   } | {
     type: 'new'
     file: File
@@ -754,11 +754,11 @@ const MenuItemDrawer = ({
         const formData = new FormData()
         formData.append('file', form.image.file, form.image.file.name)
 
-        const { src, blurDataUrl } = await postUpload(formData)
+        const { src, blurDataURL } = await postUpload(formData)
         imageData = {
           image: {
             src,
-            blurDataUrl
+            blurDataURL
           }
         }
       }

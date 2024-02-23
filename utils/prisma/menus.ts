@@ -25,9 +25,9 @@ export const prismaGetMenu = async ({ where }: { where: Prisma.menusWhereUniqueI
   }
 }
 
-export const prismaCreateMenu = ({ payload }: { payload: Prisma.menusCreateInput }) => {
+export const prismaCreateMenu = async ({ payload }: { payload: Prisma.menusCreateInput }) => {
   try {
-    return prisma.menus.create({
+    return await prisma.menus.create({
       data: payload,
     })
   } catch (error) {
