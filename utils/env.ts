@@ -6,7 +6,7 @@ import { ZodError, z } from 'zod'
 export const env = createEnv({
   server: {
     // # Prisma
-    DB_CONNECTION_STRING: z.string().url(),
+    POSTGRES_PRISMA_URL: z.string().url(),
     // Stripe
     STRIPE_SECRET_KEY: z.string().min(1),
     STRIPE_SIGNING_SECRET: z.string().min(1),
