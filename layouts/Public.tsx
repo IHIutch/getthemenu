@@ -45,14 +45,14 @@ export default function PublicLayout({
   menus,
   children
 }: {
-  restaurant: RouterOutputs['restaurant']['getById'],
+  restaurant: Pick<RouterOutputs['restaurant']['getById'], 'coverImage' | 'name' | 'phone' | 'email' | 'hours' | 'address'>,
   menus: RouterOutputs['menu']['getAllByRestaurantId'],
   children: React.ReactNode
 }) {
   const modalState = useDisclosure()
-  const { asPath, push, query } = useRouter()
+  const router = useRouter()
 
-  const slug = query?.slug?.[0] || ''
+  const slug = router.query?.slug?.toString()
   const activeMenu = slug
     ? (menus || []).find((menu) => menu.slug === slug)
     : menus?.[0]
@@ -61,23 +61,9 @@ export default function PublicLayout({
 
   React.useEffect(() => {
     if (activeSlug !== slug) {
-      if (asPath.includes('preview')) {
-        push(
-          `/preview/${query.host}/${activeSlug}`,
-          `/preview/${query.host}/${activeSlug}`,
-          {
-            scroll: false,
-            shallow: true,
-          }
-        )
-      } else {
-        push(`/${activeSlug}`, `/${activeSlug}`, {
-          scroll: false,
-          shallow: true,
-        })
-      }
+      router.push(`/${activeSlug}`,)
     }
-  }, [activeSlug, slug, push, asPath, query.host])
+  }, [activeSlug, router, slug])
 
   const weekdayName = dayjs().format('dddd') as typeof DAYS_OF_WEEK[number]
   const isSiteReady = React.useMemo(() => {
@@ -99,7 +85,7 @@ export default function PublicLayout({
                       blurDataURL={restaurant?.coverImage?.blurDataURL}
                       fill={true}
                       priority={true}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw"
+                      sizes="100vw"
                       placeholder={restaurant?.coverImage?.blurDataURL ? "blur" : 'empty'}
                     />
                   ) : (
@@ -210,7 +196,7 @@ export default function PublicLayout({
                       <LayoutGroup>
                         <AnimatePresence initial={false}>
                           <motion.main
-                            key={asPath}
+                            key={router.asPath}
                             initial={'hidden'}
                             animate={'shown'}
                             exit={'hidden'}
@@ -375,7 +361,7 @@ export default function PublicLayout({
           <Box as="footer" borderTopWidth="1px" py="6" mt="auto">
             <Text textAlign="center" fontWeight="medium" color="gray.600">
               Powered by{' '}
-              <MagicLink href={{ pathname: "https://getthemenu.io", query: { ref: query.host } }} color="blue.500" target="_blank">
+              <MagicLink href={{ pathname: "https://getthemenu.io", query: { ref: router.query.host?.toString() } }} color="blue.500" target="_blank">
                 GetTheMenu
               </MagicLink>
             </Text>
@@ -478,5 +464,5 @@ export default function PublicLayout({
 // wrap the NextLink with Chakra UI's factory function
 const MagicLink = chakra<typeof NextLink, NextLinkProps>(NextLink, {
   // ensure that you're forwarding all of the required props for your case
-  shouldForwardProp: (prop) => ['href', 'target', 'children',].includes(prop),
+  shouldForwardProp: (prop) => ['href', 'target', 'children'].includes(prop),
 })

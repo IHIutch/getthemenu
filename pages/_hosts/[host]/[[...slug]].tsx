@@ -1,98 +1,93 @@
 import React, { useMemo } from 'react'
 import Head from 'next/head'
 import PublicLayout from '@/layouts/Public'
-import { useRouter } from 'next/router'
 import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import BlurImage from '@/components/common/BlurImage'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import prisma from '@/utils/prisma'
 import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from '@/utils/zod'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { appRouter } from '@/server'
-import SuperJSON from 'superjson'
 
 export default function RestaurantMenu({
   restaurant,
-  slug: initialSlug,
   menus,
   sections,
   menuItems,
   activeMenu
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-  // const structuredData = useMemo(() => {
-  //   const minPrice = Math.min(
-  //     ...(menuItems || []).map((mi) => mi?.price || 0)
-  //   ).toLocaleString('en-US', {
-  //     style: 'currency',
-  //     currency: 'USD',
-  //   })
-  //   const maxPrice = Math.max(
-  //     ...(menuItems || []).map((mi) => mi?.price || 0)
-  //   ).toLocaleString('en-US', {
-  //     style: 'currency',
-  //     currency: 'USD',
-  //   })
-  //   const restaurantJson = {
-  //     '@type': 'Restaurant',
-  //     url:
-  //       restaurant?.customDomain ||
-  //       `https://${restaurant.customHost}.getthemenu.io`,
-  //     name: restaurant?.name || '',
-  //     image: restaurant?.coverImage?.src || '',
-  //     telephone: restaurant?.phone?.[0] || '',
-  //     priceRange: `${minPrice} - ${maxPrice}`,
-  //     // description: restaurant?.description || '',
-  //     address: {
-  //       '@type': 'PostalAddress',
-  //       streetAddress: restaurant.address?.streetAddress || '',
-  //       addressLocality: restaurant.address?.city || '',
-  //       addressRegion: restaurant.address?.state || '',
-  //       postalCode: restaurant.address?.zip || '',
-  //     },
-  //     servesCuisine: ['American cuisine'],
-  //   }
-  //   const menusJson = {
-  //     hasMenu: (menus || []).map((m) => ({
-  //       '@type': 'Menu',
-  //       name: m?.title || '',
-  //       description: m?.description || '',
-  //       hasMenuSection: (sections || [])
-  //         .filter((s) => s.menuId === m.id)
-  //         .map((s) => ({
-  //           '@type': 'MenuSection',
-  //           name: s?.title,
-  //           description: s?.description || '',
-  //           hasMenuItem: (menuItems || [])
-  //             .filter((mi) => mi.sectionId === s.id)
-  //             .map((mi) => ({
-  //               '@type': 'MenuItem',
-  //               name: mi?.title || '',
-  //               description: mi?.description || '',
-  //               image: mi?.image?.src || '',
-  //               offers: [
-  //                 {
-  //                   '@type': 'Offer',
-  //                   price:
-  //                     (mi?.price || 0).toLocaleString('en-US', {
-  //                       style: 'currency',
-  //                       currency: 'USD',
-  //                     }) || '',
-  //                   priceCurrency: 'USD',
-  //                 },
-  //               ],
-  //               // suitableForDiet: ['http://schema.org/GlutenFreeDiet'],
-  //             })),
-  //         })),
-  //     })),
-  //   }
+  const structuredData = useMemo(() => {
+    const minPrice = Math.min(
+      ...(menuItems || []).map((mi) => mi?.price || 0)
+    ).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    })
+    const maxPrice = Math.max(
+      ...(menuItems || []).map((mi) => mi?.price || 0)
+    ).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    })
+    const restaurantJson = {
+      '@type': 'Restaurant',
+      url:
+        restaurant?.customDomain ||
+        `https://${restaurant.customHost}.getthemenu.io`,
+      name: restaurant?.name || '',
+      image: restaurant?.coverImage?.src || '',
+      telephone: restaurant?.phone?.[0] || '',
+      priceRange: `${minPrice} - ${maxPrice}`,
+      // description: restaurant?.description || '',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: restaurant.address?.streetAddress || '',
+        addressLocality: restaurant.address?.city || '',
+        addressRegion: restaurant.address?.state || '',
+        postalCode: restaurant.address?.zip || '',
+      },
+      servesCuisine: ['American cuisine'],
+    }
+    const menusJson = {
+      hasMenu: (menus || []).map((m) => ({
+        '@type': 'Menu',
+        name: m?.title || '',
+        description: m?.description || '',
+        hasMenuSection: (sections || [])
+          .filter((s) => s.menuId === m.id)
+          .map((s) => ({
+            '@type': 'MenuSection',
+            name: s?.title,
+            description: s?.description || '',
+            hasMenuItem: (menuItems || [])
+              .filter((mi) => mi.sectionId === s.id)
+              .map((mi) => ({
+                '@type': 'MenuItem',
+                name: mi?.title || '',
+                description: mi?.description || '',
+                image: mi?.image?.src || '',
+                offers: [
+                  {
+                    '@type': 'Offer',
+                    price:
+                      (mi?.price || 0).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }) || '',
+                    priceCurrency: 'USD',
+                  },
+                ],
+                // suitableForDiet: ['http://schema.org/GlutenFreeDiet'],
+              })),
+          })),
+      })),
+    }
 
-  //   return {
-  //     '@context': 'http://schema.org',
-  //     ...restaurantJson,
-  //     ...menusJson,
-  //   }
-  // }, [restaurant, menus, sections, menuItems])
+    return {
+      '@context': 'http://schema.org',
+      ...restaurantJson,
+      ...menusJson,
+    }
+  }, [restaurant, menus, sections, menuItems])
 
   // const seo = useSEO({
   //   title: restaurant?.name,
@@ -111,14 +106,12 @@ export default function RestaurantMenu({
     <>
       <Head>
         {/* {seo} */}
-        {/* {isSiteReady && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(structuredData),
-            }}
-          />
-        )} */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
       </Head>
       <PublicLayout
         restaurant={restaurant}
