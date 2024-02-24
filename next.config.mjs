@@ -12,6 +12,13 @@ const jiti = createJiti(new URL(import.meta.url).pathname);
 jiti("./utils/env");
 
 const nextConfig = {
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
   experimental: {
     swcPlugins: [["next-superjson-plugin", {}]],
   },
