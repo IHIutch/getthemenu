@@ -4,6 +4,7 @@ export default function BlurImage({ alt, ...props }: NextImageProps) {
   return (
     <NextImage
       alt={alt}
+      style={{ objectFit: "cover" }}
       {...props}
     />
   )
