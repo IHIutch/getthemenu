@@ -2,7 +2,6 @@ import { resStatusType } from '@/utils/apiResponseTypes'
 import formidable from 'formidable'
 import { v4 as uuidv4 } from 'uuid'
 import { getErrorMessage } from '@/utils/functions'
-import { wrapApiHandlerWithSentry } from '@sentry/nextjs'
 import { getPlaiceholder } from 'plaiceholder'
 import mime from 'mime'
 import { createClientApi } from '@/utils/supabase/api'
@@ -86,4 +85,4 @@ export const config = {
   },
 }
 
-export default wrapApiHandlerWithSentry(handler)
+export default handler

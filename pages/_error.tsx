@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 import type { NextPage } from "next";
 import type { ErrorProps } from "next/error";
 import Error from "next/error";
