@@ -1309,5 +1309,3 @@ export default function PrivacyPolicy() {
     </>
   )
 }
-
-PrivacyPolicy.getLayout = (page: React.ReactNode) => page

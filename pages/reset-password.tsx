@@ -148,8 +148,6 @@ export default function ResetPassword({ user }: InferGetServerSidePropsType<type
   )
 }
 
-ResetPassword.getLayout = (page: React.ReactNode) => page
-
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
   const helpers = createServerSideHelpers({

@@ -1,6 +1,11 @@
 import * as React from 'react'
 import DashboardLayout from '@/layouts/Dashboard'
 import { Container, Flex, Text } from '@chakra-ui/react'
+import { GetServerSidePropsContext } from 'next'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { appRouter } from '@/server'
+import SuperJSON from 'superjson'
 
 export default function Analytics() {
   return (
@@ -20,3 +25,39 @@ export default function Analytics() {
 }
 
 Analytics.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</DashboardLayout>
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClientServer(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: {
+      supabase
+    },
+    transformer: SuperJSON,
+  });
+
+  const user = await helpers.user.getAuthedUser.fetch()
+
+  if (!user) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+  } else if (user.restaurants.length === 0) {
+    return {
+      redirect: {
+        destination: '/get-started',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      user,
+      trpcState: helpers.dehydrate(),
+    },
+  }
+}

@@ -247,8 +247,6 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
   )
 }
 
-GetStarted.getLayout = (page: React.ReactNode) => page
-
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
   const helpers = createServerSideHelpers({
@@ -261,7 +259,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const user = await helpers.user.getAuthedUser.fetch()
 
-  if (user.restaurants.length > 0) {
+  if (!user) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+  } else if (user.restaurants.length > 0) {
     return {
       redirect: {
         destination: '/dashboard',

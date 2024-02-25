@@ -145,22 +145,20 @@ export default function Login() {
   )
 }
 
-Login.getLayout = (page: React.ReactNode) => page
-
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
 
   const caller = createCaller({ supabase })
   const user = await caller.user.getAuthedUser()
 
-  if (user.restaurants.length === 0) {
+  if (user && user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',
         permanent: false,
       },
     }
-  } else if (user.restaurants.length > 0) {
+  } else if (user && user.restaurants.length > 0) {
     return {
       redirect: {
         destination: '/get-started',

@@ -46,17 +46,14 @@ export const userRouter = router({
 
     const { data: { user: authedUser }, error } = await ctx.supabase.auth.getUser()
 
+    if (!authedUser) {
+      return null
+    }
+
     if (error) {
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: `getAuthedUser error: ${error}`,
-      })
-    }
-
-    if (!authedUser) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: `getAuthedUser error: authedUser not found`,
       })
     }
 

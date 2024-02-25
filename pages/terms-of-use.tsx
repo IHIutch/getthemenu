@@ -1137,5 +1137,3 @@ export default function TermsOfUse() {
     </>
   )
 }
-
-TermsOfUse.getLayout = (page: React.ReactNode) => page

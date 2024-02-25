@@ -215,5 +215,3 @@ export default function Homepage() {
     </>
   )
 }
-
-Homepage.getLayout = (page: React.ReactNode) => page

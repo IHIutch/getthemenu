@@ -101,46 +101,46 @@ const UserDetails = ({ user }: { user: RouterOutputs['user']['getAuthedUser'] })
 
 const SiteDetails = ({ children }: { children?: React.ReactNode }) => {
 
-  const handleCheckDomain = async (domain) => {
-    try {
-      // const { data: checkData } = await axios
-      //   .post('/api/account/domain/check', {
-      //     domain,
-      //   })
-      //   .catch((res) => {
-      //     throw new Error(res.data.error)
-      //   })
-      // const { data: verifyData } = await axios
-      //   .post('/api/account/domain/verify', {
-      //     domain,
-      //   })
-      //   .catch((res) => {
-      //     throw new Error(res.data.error)
-      //   })
+  // const handleCheckDomain = async (domain) => {
+  // try {
+  // const { data: checkData } = await axios
+  //   .post('/api/account/domain/check', {
+  //     domain,
+  //   })
+  //   .catch((res) => {
+  //     throw new Error(res.data.error)
+  //   })
+  // const { data: verifyData } = await axios
+  //   .post('/api/account/domain/verify', {
+  //     domain,
+  //   })
+  //   .catch((res) => {
+  //     throw new Error(res.data.error)
+  //   })
 
-      // console.log({ checkData, verifyData })
+  // console.log({ checkData, verifyData })
 
-      // const { data: createData } = await axios
-      //   .post('/api/account/domain', {
-      //     domain,
-      //   })
-      //   .catch((res) => {
-      //     throw new Error(res.data.error)
-      //   })
+  // const { data: createData } = await axios
+  //   .post('/api/account/domain', {
+  //     domain,
+  //   })
+  //   .catch((res) => {
+  //     throw new Error(res.data.error)
+  //   })
 
-      // const { data: configData } = await axios
-      //   .post('/api/account/domain/config', {
-      //     domain,
-      //   })
-      //   .catch((res) => {
-      //     throw new Error(res.data.error)
-      //   })
+  // const { data: configData } = await axios
+  //   .post('/api/account/domain/config', {
+  //     domain,
+  //   })
+  //   .catch((res) => {
+  //     throw new Error(res.data.error)
+  //   })
 
-      // console.log({ configData })
-    } catch (error) {
-      console.error(getErrorMessage(error))
-    }
-  }
+  // console.log({ configData })
+  //   } catch (error) {
+  //     console.error(getErrorMessage(error))
+  //   }
+  // }
 
   return (
     <>
@@ -462,7 +462,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const user = await helpers.user.getAuthedUser.fetch()
 
-  if (user.restaurants.length === 0) {
+  if (!user) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+  } else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',

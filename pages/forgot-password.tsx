@@ -135,5 +135,3 @@ export default function ForgotPassword() {
     </>
   )
 }
-
-ForgotPassword.getLayout = (page: React.ReactNode) => page
