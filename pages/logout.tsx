@@ -1,32 +1,30 @@
 import * as React from 'react'
-import axios from 'redaxios'
 import { useRouter } from 'next/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClientComponent } from '@/utils/supabase/component'
+import { getErrorMessage } from '@/utils/functions'
 
 export default function SignOut() {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const supabase = createClientComponent()
+  const queryClient = useQueryClient()
 
   React.useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        await axios.post(`/api/auth/signout`, {
-          event,
-          session,
-        })
+    const handleLogout = async () => {
+      try {
+        const { error } = await supabase.auth.signOut()
+        if (error) throw new Error(error.message)
         queryClient.clear()
-        router.replace('/')
+      } catch (error) {
+        alert(getErrorMessage(error))
       }
-    )
-
-    return () => {
-      authListener.subscription.unsubscribe()
     }
+
+    handleLogout()
+
+    router.replace('/login')
   }, [queryClient, router, supabase.auth])
 
-  supabase.auth.signOut()
 
   return <></>
 }

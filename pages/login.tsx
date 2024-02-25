@@ -41,20 +41,6 @@ export default function Login() {
     formState: { errors },
   } = useForm<FormValues>()
 
-  const { data: authListener } = supabase.auth.onAuthStateChange(
-    async (event, session) => {
-      if (event === 'SIGNED_IN') {
-        await axios.post(`/api/auth/signin`, {
-          event,
-          session,
-        })
-        router.replace('/dashboard')
-      }
-    }
-  )
-
-  authListener.subscription.unsubscribe()
-
   const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
       setIsSubmitting(true)
@@ -63,6 +49,7 @@ export default function Login() {
         password: form.password,
       })
       if (error) throw new Error(error.message)
+      router.push('/dashboard')
     } catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))

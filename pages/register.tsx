@@ -48,17 +48,7 @@ export default function Register() {
     async (event, session) => {
       if (event === 'SIGNED_IN' && session && session.user.email) {
         const fullName = getValues('fullName')
-        await handleSetUpNewAccount({
-          payload: {
-            id: session?.user.id,
-            email: session?.user.email,
-            fullName
-          }
-        }, {
-          onSuccess() {
-            router.replace('/get-started')
-          }
-        })
+
       }
     }
   )
@@ -68,11 +58,25 @@ export default function Register() {
   const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
       setIsSubmitting(true)
-      const { error } = await supabase.auth.signUp({
+      const { error, data: { user } } = await supabase.auth.signUp({
         email: form.email,
         password: form['new-password'],
       })
       if (error) throw new Error(error.message)
+
+      if (user) {
+        await handleSetUpNewAccount({
+          payload: {
+            id: user.id,
+            email: form.email,
+            fullName: form.fullName
+          }
+        }, {
+          onSuccess() {
+            router.replace('/get-started')
+          }
+        })
+      }
     } catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
