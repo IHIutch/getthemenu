@@ -52,6 +52,7 @@ export default function PublicLayout({
   const modalState = useDisclosure()
   const router = useRouter()
 
+  const host = router.query?.host
   const slug = router.query?.slug?.toString()
   const activeMenu = slug
     ? (menus || []).find((menu) => menu.slug === slug)
@@ -61,9 +62,9 @@ export default function PublicLayout({
 
   React.useEffect(() => {
     if (activeSlug !== slug) {
-      router.push(`/${activeSlug}`,)
+      host ? router.push(`/preview/${host}/${activeSlug}`) : router.push(`/${activeSlug}`)
     }
-  }, [activeSlug, router, slug])
+  }, [activeSlug, host, router, slug])
 
   const weekdayName = dayjs().format('dddd') as typeof DAYS_OF_WEEK[number]
   const isSiteReady = React.useMemo(() => {

@@ -228,15 +228,14 @@ export default function RestaurantMenu({
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-
-  // const helpers = createServerSideHelpers({
-  //   router: appRouter,
-  //   ctx: {},
-  //   transformer: SuperJSON,
-  // });
-
-  const host = String(context?.params?.host) || ''
+  const host = context?.query?.host
   const slug = context?.query?.slug?.[0] || null
+
+  if (!host) {
+    return {
+      notFound: true,
+    }
+  }
 
   const data = await prisma.restaurants.findUnique({
     where: {
@@ -260,6 +259,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       }
     }
   })
+
 
   if (!data || !data.menus) {
     return {
