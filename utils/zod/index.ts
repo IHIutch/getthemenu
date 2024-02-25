@@ -32,31 +32,27 @@ const HoursSchema = z.record(
 export const CustomHostSchema = z.string().max(63)
 
 export const ImageSchema = z.object({
-  blurDataURL: z.string(),
   src: z.string().url(),
+  blurDataURL: z.string(),
   height: z.number(),
   width: z.number(),
   hexColor: z.string()
-}).partial()
+})
 
 export const RestaurantSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   name: z.string().nullable(),
-  hours: z.preprocess(val => val === null ? undefined : val,
-    HoursSchema.optional()),
-  address: z.preprocess(val => val === null ? undefined : val,
-    z.object({
-      streetAddress: z.string(),
-      zip: z.string(),
-      city: z.string(),
-      state: z.string()
-    }).optional()),
-  phone: z.preprocess((val) => val === null ? undefined : val,
-    z.array(z.string()).optional()),
-  email: z.preprocess((val) => val === null ? undefined : val,
-    z.array(z.string().email()).optional()),
-  coverImage: z.preprocess((val) => val === null ? undefined : val, ImageSchema.optional()),
+  hours: HoursSchema.optional().transform(val => val ?? undefined),
+  address: z.object({
+    streetAddress: z.string(),
+    zip: z.string(),
+    city: z.string(),
+    state: z.string()
+  }).optional().transform(val => val ?? undefined),
+  phone: z.array(z.string()).optional().transform(val => val ?? undefined),
+  email: z.array(z.string().email()).optional().transform(val => val ?? undefined),
+  coverImage: ImageSchema.optional().transform(val => val ?? undefined),
   customHost: CustomHostSchema.nullable(),
   customDomain: z.string().url().nullable(),
   createdAt: z.date(),
@@ -96,8 +92,8 @@ export const MenuItemSchema = z.object({
   title: z.string().nullable(),
   price: z.number().nullable(),
   description: z.string().nullable(),
-  position: z.number().nullable(),
-  image: z.preprocess((val) => val === null ? undefined : val, ImageSchema.optional()),
+  position: z.coerce.number().nullable(),
+  image: ImageSchema.optional().transform(val => val ?? undefined),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable()

@@ -1,6 +1,5 @@
 import { getErrorMessage } from "@/utils/functions";
 import { prismaCreateRestaurant, prismaGetRestaurant, prismaUpdateRestaurant } from "@/utils/prisma/restaurants";
-import { createClientApi } from "@/utils/supabase/api";
 import { publicProcedure, router } from "@/utils/trpc";
 import { RestaurantSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
@@ -21,14 +20,9 @@ export const restaurantRouter = router({
       })
     }
 
-    const result = RestaurantSchema.safeParse(data)
-    if (!result.success) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: getErrorMessage(result.error),
-      })
-    }
-    return result.data
+    return RestaurantSchema.partial({
+      coverImage: true
+    }).parse(data)
   }),
   create: publicProcedure.input(
     z.object({

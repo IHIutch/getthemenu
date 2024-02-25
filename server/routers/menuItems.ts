@@ -19,14 +19,10 @@ export const menuItemRouter = router({
         message: `No menuItems found with menuId: '${where.menuId}'`,
       })
     }
-    const result = z.array(MenuItemSchema).safeParse(data)
-    if (!result.success) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: getErrorMessage(result.error),
-      })
-    }
-    return result.data
+
+    return z.array(MenuItemSchema.partial({
+      image: true
+    })).parse(data)
   }),
   getById: publicProcedure.input(
     z.object({
@@ -41,14 +37,9 @@ export const menuItemRouter = router({
         message: `No menuItem found with menuId: '${where.id}'`,
       })
     }
-    const result = MenuItemSchema.safeParse(data)
-    if (!result.success) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: getErrorMessage(result.error),
-      })
-    }
-    return result.data
+    return MenuItemSchema.partial({
+      image: true
+    }).parse(data)
   }),
   create: publicProcedure.input(
     z.object({
