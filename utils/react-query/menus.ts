@@ -111,7 +111,7 @@ export const useReorderMenus = (restaurantId: RouterInputs['menu']['getAllByRest
               ...o,
               ...(payload.find((p) => p.id === o.id)),
             }
-          }) : undefined
+          }).sort((a, b) => (a.position || 0) - (b.position || 0)) : undefined
         })
         return { previous, updated: payload }
       },

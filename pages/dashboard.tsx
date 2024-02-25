@@ -56,7 +56,7 @@ import { trpc } from '@/utils/trpc/client'
 import { appRouter } from '@/server'
 import SuperJSON from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server';
-import { useGetMenus } from '@/utils/react-query/menus'
+import { useGetMenus, useReorderMenus } from '@/utils/react-query/menus'
 
 
 type SlugMessage = {
@@ -91,7 +91,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
 
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
   const { data: menus = [] } = useGetMenus(user?.restaurants[0]?.id)
-  const { mutateAsync: handleReorderMenus } = trpc.menu.reorder.useMutation()
+  const { mutateAsync: handleReorderMenus } = useReorderMenus(user?.restaurants[0]?.id || '')
   const { mutateAsync: handleCreateMenu, isPending } = trpc.menu.create.useMutation()
 
   const onSubmit: SubmitHandler<FormData> = async (form) => {
@@ -160,7 +160,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     if (!destination) return // dropped outside the list
 
     const reorderedMenus = reorderList(
-      menus.sort((a, b) => (a.position || 0) - (b.position || 0)),
+      menus,
       source.index,
       destination.index
     )
@@ -170,8 +170,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
         id: Number(menu.id),
         position: idx,
       }))
-    }
-    )
+    })
   }
   const sortedMenus = React.useMemo(() => {
     return menus ? menus.sort((a, b) => (a.position || 0) - (b.position || 0)) : []

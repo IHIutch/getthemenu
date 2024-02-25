@@ -1,6 +1,5 @@
 import { trpc } from '../trpc/client'
 import { RouterInputs } from '@/server'
-import { Decimal } from '@prisma/client/runtime/library'
 
 export const useGetMenuItems = (menuId: RouterInputs['menuItem']['getAllByMenuId']['where']['menuId'] = -1) => {
   const { isPending, isError, isSuccess, data, error } = trpc.menuItem.getAllByMenuId.useQuery(
@@ -57,7 +56,6 @@ export const useCreateMenuItem = (menuId: RouterInputs['menuItem']['getAllByMenu
           [...old, {
             ...payload,
             id: -1,
-            // price: new Decimal(payload?.price || ''),
             createdAt: new Date(),
             updatedAt: new Date(),
             deletedAt: null
@@ -118,7 +116,6 @@ export const useUpdateMenuItem = (menuId: RouterInputs['menuItem']['getAllByMenu
               return {
                 ...o,
                 ...payload,
-                // price: new Decimal(payload?.price || '')
               }
             }
             return o
@@ -179,7 +176,7 @@ export const useReorderMenuItems = (menuId: RouterInputs['menuItem']['getAllByMe
             ...o,
             ...(payload.find((p) => p.id === o.id)),
           }
-        }) : undefined
+        }).sort((a, b) => (a.position || 0) - (b.position || 0)) : undefined
       })
       return { previous, updated: payload }
     },
