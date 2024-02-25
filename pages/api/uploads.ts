@@ -7,11 +7,11 @@ import mime from 'mime'
 import { createClientApi } from '@/utils/supabase/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { readFile } from 'fs/promises'
+import { z } from 'zod'
+import { ImageSchema } from '@/utils/zod'
 
-export type UploadApiResponseType = {
-  src: string;
-  blurDataURL: string;
-}
+
+export type UploadApiResponseType = z.infer<typeof ImageSchema>
 
 type ResponseData = UploadApiResponseType | {
   error: string;
@@ -60,13 +60,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) 
         if (error) throw new Error(getErrorMessage(error))
         if (!data) throw new Error('File upload failed')
 
-        const { base64: blurDataURL } = await getPlaiceholder(fileContents, {
+        const {
+          base64: blurDataURL,
+          metadata: {
+            height,
+            width,
+          },
+          color: {
+            hex
+          }
+        } = await getPlaiceholder(fileContents, {
           size: 4,
         })
 
         res.status(resStatusType.SUCCESS).json({
           src: data.fullPath,
-          blurDataURL
+          blurDataURL,
+          height,
+          width,
+          hexColor: hex
         })
       } catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })

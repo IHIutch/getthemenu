@@ -30,6 +30,15 @@ const HoursSchema = z.record(
   }));
 
 export const CustomHostSchema = z.string().max(63)
+
+export const ImageSchema = z.object({
+  blurDataURL: z.string(),
+  src: z.string().url(),
+  height: z.number(),
+  width: z.number(),
+  hexColor: z.string()
+}).partial()
+
 export const RestaurantSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
@@ -47,11 +56,7 @@ export const RestaurantSchema = z.object({
     z.array(z.string()).optional()),
   email: z.preprocess((val) => val === null ? undefined : val,
     z.array(z.string().email()).optional()),
-  coverImage: z.preprocess((val) => val === null ? undefined : val,
-    z.object({
-      blurDataURL: z.string().optional(),
-      src: z.string().url()
-    }).optional()),
+  coverImage: z.preprocess((val) => val === null ? undefined : val, ImageSchema.optional()),
   customHost: CustomHostSchema.nullable(),
   customDomain: z.string().url().nullable(),
   createdAt: z.date(),
@@ -92,10 +97,7 @@ export const MenuItemSchema = z.object({
   price: z.number().nullable(),
   description: z.string().nullable(),
   position: z.number().nullable(),
-  image: z.preprocess(val => val === null ? undefined : val, z.object({
-    blurDataURL: z.string().optional(),
-    src: z.string().url()
-  }).optional()),
+  image: z.preprocess((val) => val === null ? undefined : val, ImageSchema.optional()),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable()

@@ -110,14 +110,12 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
     const { source, destination, type } = result
     if (!destination) return // dropped outside the list
 
-    console.log({ source, destination })
-
     const sectionListSource = groupedSectionItems[source.droppableId]
     const sectionListDestination = groupedSectionItems[destination.droppableId]
 
     if (type === 'SECTIONS') {
       const reorderedSections = reorderList(
-        (sections || []).sort((a, b) => (a.position || 0) - (b.position || 0)),
+        sections,
         source.index,
         destination.index
       )
@@ -754,12 +752,9 @@ const MenuItemDrawer = ({
         const formData = new FormData()
         formData.append('file', form.image.file, form.image.file.name)
 
-        const { src, blurDataURL } = await postUpload(formData)
+        const data = await postUpload(formData)
         imageData = {
-          image: {
-            src,
-            blurDataURL
-          }
+          image: data
         }
       }
 

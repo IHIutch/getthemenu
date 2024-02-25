@@ -131,13 +131,10 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
       if (form?.coverImage && form.coverImage.type === 'new') {
         const formData = new FormData()
         formData.append('file', form.coverImage.file, form.coverImage.file.name)
-        const { src, blurDataURL } = await postUpload(formData)
+        const data = await postUpload(formData)
 
         imageData = {
-          coverImage: {
-            src,
-            blurDataURL
-          }
+          coverImage: data
         }
       }
 
