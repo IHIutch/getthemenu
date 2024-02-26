@@ -61,13 +61,11 @@ export default function PublicLayout({
     ? (menus || []).find((menu) => menu.slug === slug)
     : menus?.[0]
 
-  const [activeSlug, setActiveSlug] = React.useState(slug)
-
-  React.useEffect(() => {
-    if (activeSlug !== slug) {
-      isPreview ? router.push(`/preview/${host}/${activeSlug}`) : router.push(`/${activeSlug}`)
+  const handleMenuChange = (toMenuSlug: string) => {
+    if (toMenuSlug !== slug) {
+      isPreview ? router.push(`/preview/${host}/${toMenuSlug}`) : router.push(`/${toMenuSlug}`)
     }
-  }, [activeSlug, host, isPreview, router, slug])
+  }
 
   const weekdayName = dayjs().format('dddd') as typeof DAYS_OF_WEEK[number]
   const isSiteReady = React.useMemo(() => {
@@ -177,7 +175,7 @@ export default function PublicLayout({
                               bg="white"
                               value={activeMenu?.slug || ''}
                               onChange={(e) => {
-                                setActiveSlug(e.target.value)
+                                handleMenuChange(e.target.value)
                               }}
                             >
                               {menus?.map((m) => (
