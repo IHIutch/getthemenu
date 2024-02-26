@@ -33,10 +33,10 @@ export const CustomHostSchema = z.string().max(63)
 
 export const ImageSchema = z.object({
   src: z.string().url(),
-  blurDataURL: z.string(),
-  height: z.number(),
-  width: z.number(),
-  hexColor: z.string()
+  blurDataURL: z.string().optional(),
+  height: z.number().optional(),
+  width: z.number().optional(),
+  hexColor: z.string().optional()
 })
 
 export const RestaurantSchema = z.object({

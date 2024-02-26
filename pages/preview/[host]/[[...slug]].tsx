@@ -6,6 +6,7 @@ import BlurImage from '@/components/common/BlurImage'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import prisma from '@/utils/prisma'
 import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from '@/utils/zod'
+import { z } from 'zod'
 
 export default function RestaurantMenu({
   restaurant,
@@ -299,9 +300,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         customHost: data.customHost,
         customDomain: data.customDomain,
       }),
-      menus: data.menus.map(m => MenuSchema.parse(m)),
-      sections: data.sections.map(s => SectionSchema.parse(s)),
-      menuItems: data.menuItems.map(mi => MenuItemSchema.parse(mi)),
+      menus: z.array(MenuSchema).parse(data.menus),
+      sections: z.array(SectionSchema).parse(data.sections),
+      menuItems: z.array(MenuItemSchema).parse(data.menuItems),
       // trpcState: helpers.dehydrate(),
     },
   }
