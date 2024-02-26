@@ -39,6 +39,7 @@ import { formatTime } from '@/utils/functions'
 import BlurImage from '@/components/common/BlurImage'
 import { RouterOutputs } from '@/server'
 import { DAYS_OF_WEEK } from '@/utils/zod'
+import NextImage from 'next/image'
 
 export default function PublicLayout({
   restaurant,
@@ -80,13 +81,14 @@ export default function PublicLayout({
               <AspectRatio ratio={{ base: 4 / 3, sm: 21 / 9 }}>
                 <Box boxSize="100%">
                   {restaurant?.coverImage?.src ? (
-                    <BlurImage
+                    <NextImage
                       alt={restaurant?.name || ''}
                       src={restaurant?.coverImage?.src}
                       blurDataURL={restaurant?.coverImage?.blurDataURL}
                       fill={true}
                       priority={true}
                       sizes="100vw"
+                      style={{ objectFit: 'cover' }}
                       placeholder={restaurant?.coverImage?.blurDataURL ? "blur" : 'empty'}
                     />
                   ) : (
