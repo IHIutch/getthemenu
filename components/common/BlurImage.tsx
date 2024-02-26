@@ -31,8 +31,8 @@ export default function BlurImage(props: NextImageProps) {
         : null}
       <MagicImage
         src={props.src}
-        fill={true}
         alt={props.alt}
+        fill={true}
         onLoad={() => {
           setIsLoaded(true)
         }}

@@ -44,10 +44,12 @@ import NextImage from 'next/image'
 export default function PublicLayout({
   restaurant,
   menus,
+  isPreview = false,
   children
 }: {
   restaurant: Pick<RouterOutputs['restaurant']['getById'], 'coverImage' | 'name' | 'phone' | 'email' | 'hours' | 'address'>,
   menus: RouterOutputs['menu']['getAllByRestaurantId'],
+  isPreview: boolean,
   children: React.ReactNode
 }) {
   const modalState = useDisclosure()
@@ -63,9 +65,9 @@ export default function PublicLayout({
 
   React.useEffect(() => {
     if (activeSlug !== slug) {
-      host ? router.push(`/preview/${host}/${activeSlug}`) : router.push(`/${activeSlug}`)
+      isPreview ? router.push(`/preview/${host}/${activeSlug}`) : router.push(`/${activeSlug}`)
     }
-  }, [activeSlug, host, router, slug])
+  }, [activeSlug, host, isPreview, router, slug])
 
   const weekdayName = dayjs().format('dddd') as typeof DAYS_OF_WEEK[number]
   const isSiteReady = React.useMemo(() => {

@@ -117,6 +117,7 @@ export default function RestaurantMenu({
       <PublicLayout
         restaurant={restaurant}
         menus={menus}
+        isPreview={true}
       >
         {activeMenu && (
           <Stack>
