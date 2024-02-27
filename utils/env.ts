@@ -22,8 +22,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
     NEXT_PUBLIC_SUPABASE_URL: z.string().min(1).url(),
     // # Misc
-    NEXT_PUBLIC_HOSTNAME: z.string().min(1),
-
+    NEXT_PUBLIC_ROOT_DOMAIN: z.string().min(1),
     // # Sentry
     NEXT_PUBLIC_SENTRY_DSN: z.string().min(1),
     // # Stripe
@@ -36,11 +35,11 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     BASE_URL: process.env.NODE_ENV === 'production'
-      ? `https://${process.env.NEXT_PUBLIC_HOSTNAME}`
+      ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
       : `http://localhost:3000`,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_HOSTNAME: process.env.NEXT_PUBLIC_HOSTNAME,
+    NEXT_PUBLIC_ROOT_DOMAIN: process.env.NEXT_PUBLIC_ROOT_DOMAIN,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   },

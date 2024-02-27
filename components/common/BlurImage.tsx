@@ -1,3 +1,5 @@
+'use client'
+
 import { Box, chakra, Image, Img } from "@chakra-ui/react";
 import NextImage, { type ImageProps as NextImageProps } from "next/image";
 import { useState } from "react";
@@ -12,20 +14,19 @@ export default function BlurImage(props: NextImageProps) {
   const [isLoaded, setIsLoaded] = useState(false)
 
   return (
-    <Box h="full" w="full" position="relative">
+    <Box boxSize="full" position="relative">
       {props.blurDataURL?.startsWith('data') ?
         <>
           <Img
             alt={props.alt}
             src={props.blurDataURL}
             objectFit="cover"
-            h="full"
-            w="full"
+            boxSize="full"
+            filter="auto"
           />
           <Box
             position="absolute"
-            h="full"
-            w="full"
+            boxSize="full"
             backdropFilter="blur(24px)" />
         </>
         : null}
@@ -39,8 +40,7 @@ export default function BlurImage(props: NextImageProps) {
         loading="lazy"
         transition="all 0.15s ease"
         position="absolute"
-        h="full"
-        w="full"
+        boxSize="full"
         objectFit="cover"
         sizes={props.sizes}
         sx={isLoaded ? {
