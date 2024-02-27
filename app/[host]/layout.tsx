@@ -10,9 +10,12 @@ import Content from "./_components/content";
 import { Box, Container, Flex, Grid, GridItem, Stack } from "@chakra-ui/react";
 import MenuSelector from "./_components/menu-selector";
 import Hours from "./_components/hours";
+import { env } from "@/utils/env";
 
-export async function generateMetadata({ params }: { params: { host: string } }): Promise<Metadata | null> {
+export async function generateMetadata({ params }: { params: { host: string, slug: string | string[] | undefined } }): Promise<Metadata | null> {
   const host = decodeURIComponent(params.host);
+  const slug = decodeURIComponent(params.slug?.toString() || '');
+
   const data = await prisma.restaurants.findUnique({
     where: {
       customHost: host
@@ -55,8 +58,10 @@ export async function generateMetadata({ params }: { params: { host: string } })
   }
 
   const { name: title, coverImage: image } = result.data
+  const menu = MenuSchema.parse(slug ? data.menus.find(m => m.slug === slug) : data.menus.shift())
 
   return {
+    metadataBase: new URL(`https://${host}.${env.NEXT_PUBLIC_ROOT_DOMAIN}`),
     title,
     openGraph: {
       title: title || '',
@@ -67,7 +72,9 @@ export async function generateMetadata({ params }: { params: { host: string } })
       title: title || '',
       images: [image?.src || ''],
     },
-
+    alternates: {
+      canonical: `https://${host}.${env.NEXT_PUBLIC_ROOT_DOMAIN}/${menu.slug}`
+    }
   }
 }
 
@@ -139,7 +146,7 @@ export default async function HostLayout({
       />
       <LayoutSkeleton
         header={<Header restaurant={result.data} />}
-        menuSelector={<MenuSelector menus={result.data.menus || []} slug={slug} />}
+        menuSelector={<MenuSelector menus={result.data.menus || []} />}
         content={<Content>{children}</Content>}
         contact={<Contact restaurant={result.data} />}
         hours={<Hours restaurant={result.data} />} />
