@@ -5,7 +5,6 @@ import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import BlurImage from '@/components/common/BlurImage';
 import { MenuItemSchema, MenuSchema, SectionSchema } from '@/utils/zod';
 import { z } from 'zod';
-import MenuSelector from './_components/menu-selector';
 
 export default async function MenuPage({
   params,
@@ -49,7 +48,6 @@ export default async function MenuPage({
 
   return (
     <Stack>
-      <MenuSelector menus={data.menus} slug={slug} />
       <Box>
         <Heading as="h2" fontSize="3xl" mb="4">
           {menu?.title}

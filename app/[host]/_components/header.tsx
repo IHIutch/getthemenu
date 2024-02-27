@@ -24,14 +24,13 @@ const Restaurant = RestaurantSchema.pick({
 type RestaurantType = z.infer<typeof Restaurant>
 
 export default function Header({ restaurant }: { restaurant: RestaurantType }) {
-  const router = useRouter()
   const modalState = useDisclosure()
 
   const weekdayName = dayjs().format('dddd') as typeof DAYS_OF_WEEK[number]
   return (
     <>
       <AspectRatio ratio={{ base: 4 / 3, sm: 21 / 9 }}>
-        <Box boxSize="100%">
+        <Box boxSize="full">
           {restaurant?.coverImage?.src ? (
             <NextImage
               alt={restaurant?.name || ''}
@@ -40,17 +39,17 @@ export default function Header({ restaurant }: { restaurant: RestaurantType }) {
               fill={true}
               priority={true}
               sizes="100vw"
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'cover', height: '100%', width: '100%' }}
               placeholder={restaurant?.coverImage?.blurDataURL?.startsWith('data') ? "blur" : 'empty'}
             />
           ) : (
-            <Box boxSize="100%" bg="gray.400" />
+            <Box boxSize="full" bg="gray.400" />
           )}
           <Flex
             position="absolute"
             bottom="0"
             left="0"
-            w="100%"
+            w="full"
             pt="8"
             pb="6"
             bgGradient="linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2) 20%, rgba(0, 0, 0, 0.9))"

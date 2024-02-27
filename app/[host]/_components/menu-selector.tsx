@@ -4,7 +4,7 @@ import { MenuSchema } from '@/utils/zod'
 import { Box, Container, FormControl, FormLabel, Grid, GridItem, Select, Stack } from '@chakra-ui/react'
 import React from 'react'
 import { z } from 'zod'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const Menus = z.array(MenuSchema)
@@ -12,12 +12,14 @@ type MenusType = z.infer<typeof Menus>
 
 
 
-export default function MenuSelector({ menus, slug }: { menus: MenusType, slug: string }) {
+export default function MenuSelector({ menus }: { menus: MenusType }) {
   const router = useRouter()
+  const slug = usePathname()?.toString().replace('/', '')
 
   const handleMenuChange = (toMenuSlug: string) => {
     router.push(`/${toMenuSlug}`)
   }
+
 
   return (
     <Box
@@ -32,12 +34,7 @@ export default function MenuSelector({ menus, slug }: { menus: MenusType, slug: 
         <Grid templateColumns="repeat(12, 1fr)" gap="4">
           <GridItem colSpan={{ base: 12, lg: 7 }}>
             <Stack direction="row" align="flex-end">
-              {menus.map((m) => (
-                <Link key={m.id} href={'/' + m.slug || ''}>
-                  {m.title}
-                </Link>
-              ))}
-              {/* <FormControl flexGrow="1" id="menu">
+              <FormControl flexGrow="1" id="menu">
                 <FormLabel mb="1">Select a Menu</FormLabel>
                 <Select
                   bg="white"
@@ -52,7 +49,7 @@ export default function MenuSelector({ menus, slug }: { menus: MenusType, slug: 
                     </option>
                   ))}
                 </Select>
-              </FormControl> */}
+              </FormControl>
             </Stack>
           </GridItem>
         </Grid>

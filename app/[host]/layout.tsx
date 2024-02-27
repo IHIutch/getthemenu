@@ -140,7 +140,7 @@ export default async function HostLayout({
       <LayoutSkeleton
         header={<Header restaurant={result.data} />}
         menuSelector={<MenuSelector menus={result.data.menus || []} slug={slug} />}
-        content={<Content slug={slug}>{children}</Content>}
+        content={<Content>{children}</Content>}
         contact={<Contact restaurant={result.data} />}
         hours={<Hours restaurant={result.data} />} />
     </>
@@ -163,8 +163,8 @@ const LayoutSkeleton = ({
   return (
     <Box position="fixed" boxSize="full" overflow="auto">
       <Flex minHeight="100vh" direction="column" w="full">
-        <Box>{header}</Box>
-        <Box>{menuSelector}</Box>
+        {header}
+        {menuSelector}
         <Box bg="gray.50">
           <Container maxW="container.lg">
             <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">

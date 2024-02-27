@@ -2,14 +2,17 @@
 
 import { Box } from '@chakra-ui/react'
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion'
+import { usePathname } from 'next/navigation'
 import * as React from 'react'
 
-export default function Content({ slug, children }: { slug: string, children: React.ReactNode }) {
+export default function Content({ children }: { children: React.ReactNode }) {
+  const key = usePathname()?.toString()
+
   return (
     <LayoutGroup>
       <AnimatePresence initial={false}>
         <motion.main
-          key={slug}
+          key={key}
           initial={'hidden'}
           animate={'shown'}
           exit={'hidden'}
@@ -28,7 +31,7 @@ export default function Content({ slug, children }: { slug: string, children: Re
             },
           }}
           transition={{
-            type: 'easeInOut',
+            type: 'easeIn',
           }}
           style={{
             width: '100%',
