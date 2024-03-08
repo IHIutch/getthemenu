@@ -7,10 +7,11 @@ import { z } from "zod";
 import Header from "./_components/header";
 import Contact from "./_components/contact";
 import Content from "./_components/content";
-import { Box, Container, Flex, Grid, GridItem, Stack } from "@chakra-ui/react";
+import { Box, Container, Flex, Grid, GridItem, Link, Stack, Text } from "@chakra-ui/react";
 import MenuSelector from "./_components/menu-selector";
 import Hours from "./_components/hours";
 import { env } from "@/utils/env";
+import NextLink from "next/link"
 
 export async function generateMetadata({ params }: { params: { host: string, slug: string | string[] | undefined } }): Promise<Metadata | null> {
   const host = decodeURIComponent(params.host);
@@ -149,9 +150,24 @@ export default async function HostLayout({
         menuSelector={<MenuSelector menus={result.data.menus || []} />}
         content={<Content>{children}</Content>}
         contact={<Contact restaurant={result.data} />}
-        hours={<Hours restaurant={result.data} />} />
+        hours={<Hours restaurant={result.data} />}
+        footer={<Footer host={host} />}
+      />
     </>
   );
+}
+
+const Footer = ({ host }: { host: string }) => {
+  return (
+    <Box as="footer" borderTopWidth="1px" py="6" mt="auto">
+      <Text textAlign="center" fontWeight="medium" color="gray.600">
+        Powered by{' '}
+        <Link as={NextLink} href={`https://getthemenu.io?ref=${host}`} color="blue.500" target="_blank">
+          GetTheMenu
+        </Link>
+      </Text>
+    </Box>
+  )
 }
 
 const LayoutSkeleton = ({
@@ -159,20 +175,22 @@ const LayoutSkeleton = ({
   menuSelector,
   contact,
   hours,
-  content
+  content,
+  footer
 }: {
   header: React.ReactNode,
   menuSelector: React.ReactNode,
   contact: React.ReactNode,
   hours: React.ReactNode,
   content: React.ReactNode,
+  footer: React.ReactNode,
 }) => {
   return (
-    <Box position="fixed" boxSize="full" overflow="auto">
+    <Box position="fixed" boxSize="full" overflow="auto" bg="gray.50">
       <Flex minHeight="100vh" direction="column" w="full">
         {header}
         {menuSelector}
-        <Box bg="gray.50">
+        <Box >
           <Container maxW="container.lg">
             <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">
               <GridItem
@@ -196,6 +214,7 @@ const LayoutSkeleton = ({
             </Grid>
           </Container>
         </Box>
+        {footer}
       </Flex>
     </Box>
   )
