@@ -2,13 +2,7 @@ import { Box, Flex, Heading, Link, Text, VStack } from '@chakra-ui/react'
 import NextLink from 'next/link';
 import React from 'react'
 
-export default function MenuNotFound({
-  params,
-}: {
-  params: { host: string; };
-}) {
-
-  console.log({ params })
+export default function MenuNotFound() {
 
   return (
     <VStack w="full">
