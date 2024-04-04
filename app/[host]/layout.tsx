@@ -28,11 +28,21 @@ export default async function HostLayout({
       customHost: host
     },
     include: {
+      menuItems: {
+        orderBy: {
+          position: 'asc'
+        }
+      },
       menus: {
         orderBy: {
           position: 'asc'
         }
       },
+      sections: {
+        orderBy: {
+          position: 'asc'
+        }
+      }
     }
   })
 
