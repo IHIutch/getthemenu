@@ -1,4 +1,3 @@
-import { Providers } from "./providers";
 
 export default function RootLayout({
   children,
@@ -8,7 +7,7 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body>
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   )
