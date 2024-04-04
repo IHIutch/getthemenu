@@ -1,7 +1,6 @@
-import { getErrorMessage, getStructuredData } from "@/utils/functions";
+import { getErrorMessage } from "@/utils/functions";
 import prisma from "@/utils/prisma";
-import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from "@/utils/zod";
-import { Metadata } from "next";
+import { MenuSchema, RestaurantSchema } from "@/utils/zod";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import Header from "./_components/header";
@@ -10,74 +9,9 @@ import Content from "./_components/content";
 import { Box, Container, Flex, Grid, GridItem, Link, Stack, Text } from "@chakra-ui/react";
 import MenuSelector from "./_components/menu-selector";
 import Hours from "./_components/hours";
-import { env } from "@/utils/env";
 import NextLink from "next/link"
 
-export async function generateMetadata({ params }: { params: { host: string, slug: string | string[] | undefined } }): Promise<Metadata | null> {
-  const host = decodeURIComponent(params.host);
-  const slug = decodeURIComponent(params.slug?.toString() || '');
 
-  const data = await prisma.restaurants.findUnique({
-    where: {
-      customHost: host
-    },
-    include: {
-      menuItems: {
-        orderBy: {
-          position: 'asc'
-        }
-      },
-      menus: {
-        orderBy: {
-          position: 'asc'
-        }
-      },
-      sections: {
-        orderBy: {
-          position: 'asc'
-        }
-      }
-    }
-  })
-
-  if (!data) {
-    return null;
-  }
-  const result = RestaurantSchema.pick({
-    name: true,
-    hours: true,
-    address: true,
-    phone: true,
-    email: true,
-    coverImage: true,
-    customHost: true,
-    customDomain: true,
-  }).safeParse(data)
-
-  if (!result.success) {
-    return null
-  }
-
-  const { name: title, coverImage: image } = result.data
-  const menu = MenuSchema.parse(slug ? data.menus.find(m => m.slug === slug) : data.menus.shift())
-
-  return {
-    metadataBase: new URL(`https://${host}.${env.NEXT_PUBLIC_ROOT_DOMAIN}`),
-    title,
-    openGraph: {
-      title: title || '',
-      images: [image?.src || ''],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: title || '',
-      images: [image?.src || ''],
-    },
-    alternates: {
-      canonical: `https://${host}.${env.NEXT_PUBLIC_ROOT_DOMAIN}/${menu.slug}`
-    }
-  }
-}
 
 export default async function HostLayout({
   params,
@@ -88,28 +22,17 @@ export default async function HostLayout({
 }) {
 
   const host = decodeURIComponent(params.host);
-  const slug = decodeURIComponent(params.slug?.toString() || '');
 
   const data = await prisma.restaurants.findUnique({
     where: {
       customHost: host
     },
     include: {
-      menuItems: {
-        orderBy: {
-          position: 'asc'
-        }
-      },
       menus: {
         orderBy: {
           position: 'asc'
         }
       },
-      sections: {
-        orderBy: {
-          position: 'asc'
-        }
-      }
     }
   })
 
@@ -128,32 +51,21 @@ export default async function HostLayout({
     customDomain: true,
   }).extend({
     menus: z.array(MenuSchema).optional(),
-    sections: z.array(SectionSchema).optional(),
-    menuItems: z.array(MenuItemSchema).optional()
   }).safeParse(data)
 
   if (!result.success) {
     throw Error(getErrorMessage(result.error))
   }
 
-  const ldJson = getStructuredData(result.data)
-
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
-        suppressHydrationWarning
-      />
-      <LayoutSkeleton
-        header={<Header restaurant={result.data} />}
-        menuSelector={<MenuSelector menus={result.data.menus || []} />}
-        content={<Content>{children}</Content>}
-        contact={<Contact restaurant={result.data} />}
-        hours={<Hours restaurant={result.data} />}
-        footer={<Footer host={host} />}
-      />
-    </>
+    <LayoutSkeleton
+      header={<Header restaurant={result.data} />}
+      menuSelector={<MenuSelector menus={result.data.menus || []} />}
+      content={<Content>{children}</Content>}
+      contact={<Contact restaurant={result.data} />}
+      hours={<Hours restaurant={result.data} />}
+      footer={<Footer host={host} />}
+    />
   );
 }
 
