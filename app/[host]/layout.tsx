@@ -14,7 +14,25 @@ export default async function HostLayout({
   const data = await prisma.restaurants.findUnique({
     where: {
       customHost: host
-    }})
+    },
+    include: {
+      menuItems: {
+        orderBy: {
+          position: 'asc'
+        }
+      },
+      menus: {
+        orderBy: {
+          position: 'asc'
+        }
+      },
+      sections: {
+        orderBy: {
+          position: 'asc'
+        }
+      }
+    }
+  })
 
   if (!data) {
     notFound()
