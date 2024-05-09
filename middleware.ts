@@ -11,6 +11,8 @@ export const config = {
      * 4. all root files inside /public (e.g. /favicon.ico)
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Sentry
+    "/((?!monitoring)$)"
   ],
 };
 
@@ -51,7 +53,8 @@ export default async function middleware(req: NextRequest) {
   // rewrite root application to `/home` folder
   if (
     host === "localhost:3000" ||
-    host === env.NEXT_PUBLIC_ROOT_DOMAIN
+    host === env.NEXT_PUBLIC_ROOT_DOMAIN ||
+    url.pathname === '/monitoring'
   ) {
     return NextResponse.rewrite(
       new URL(`${path === "/" ? "" : path}`, req.url),
