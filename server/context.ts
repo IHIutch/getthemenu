@@ -1,10 +1,11 @@
 import { createClientApi } from '@/utils/supabase/api';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import type * as trpcNext from '@trpc/server/adapters/next';
 
 interface CreateInnerContextOptions extends Partial<trpcNext.CreateNextContextOptions> {
-  // session: Session | null
-  supabase?: SupabaseClient
+  session: {
+    user: User | null
+  }
 }
 
 /**
@@ -30,7 +31,17 @@ export async function createContext(
 
   const supabase = createClientApi(opts.req, opts.res);
 
-  return await createContextInner({
-    supabase
+  // Always use getUser() on the server: https://github.com/orgs/supabase/discussions/4400#discussioncomment-7944647
+  const { data } = await supabase.auth.getUser()
+
+  const contextInner = await createContextInner({
+    session: {
+      user: data.user
+    }
   });
+  return {
+    ...contextInner,
+    req: opts.req,
+    res: opts.res,
+  };
 }

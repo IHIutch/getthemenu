@@ -1,12 +1,11 @@
-import { getErrorMessage } from "@/utils/functions";
 import { prismaCreateRestaurant, prismaGetRestaurant, prismaUpdateRestaurant } from "@/utils/prisma/restaurants";
-import { publicProcedure, router } from "@/utils/trpc";
+import { authedProcedure, router } from "@/utils/trpc";
 import { RestaurantSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const restaurantRouter = router({
-  getById: publicProcedure.input(
+  getById: authedProcedure.input(
     z.object({
       where: RestaurantSchema.pick({ id: true })
     })
@@ -24,7 +23,7 @@ export const restaurantRouter = router({
       coverImage: true
     }).parse(data)
   }),
-  create: publicProcedure.input(
+  create: authedProcedure.input(
     z.object({
       payload: RestaurantSchema.omit({
         id: true,
@@ -47,7 +46,7 @@ export const restaurantRouter = router({
     })
     return data
   }),
-  update: publicProcedure.input(
+  update: authedProcedure.input(
     z.object({
       where: RestaurantSchema.pick({ id: true }),
       payload: RestaurantSchema.omit({

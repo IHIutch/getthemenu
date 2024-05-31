@@ -1,5 +1,5 @@
 import { prismaCreateUser, prismaGetUser } from "@/utils/prisma/users";
-import { publicProcedure, router } from "@/utils/trpc";
+import { authedProcedure, router } from "@/utils/trpc";
 import { UserSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
 import { createStripeCustomer } from '@/utils/stripe'
@@ -7,7 +7,7 @@ import { z } from "zod";
 import dayjs from "dayjs";
 
 export const userRouter = router({
-  setUpNewAccount: publicProcedure.input(
+  setUpNewAccount: authedProcedure.input(
     z.object({
       payload: UserSchema.pick({
         fullName: true,
@@ -36,27 +36,8 @@ export const userRouter = router({
       }
     })
   }),
-  getAuthedUser: publicProcedure.query(async ({ ctx }) => {
-    if (!ctx.supabase) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: `supabase not passed to ctx`,
-      })
-    }
-
-    const { data: { user: authedUser }, error } = await ctx.supabase.auth.getUser()
-
-    if (!authedUser) {
-      return null
-    }
-
-    if (error) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: `getAuthedUser error: ${error}`,
-      })
-    }
-
+  getAuthedUser: authedProcedure.query(async ({ ctx }) => {
+    const authedUser = ctx.session.user
     const data = await prismaGetUser({ where: { id: authedUser.id } })
     if (!data) {
       throw new TRPCError({

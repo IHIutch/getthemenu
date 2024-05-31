@@ -1,11 +1,11 @@
 import { prismaCreateSection, prismaDeleteSection, prismaGetSection, prismaGetSections, prismaUpdateSection, prismaUpdateSections } from "@/utils/prisma/sections";
-import { publicProcedure, router } from "@/utils/trpc";
+import { authedProcedure, router } from "@/utils/trpc";
 import { SectionSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const sectionRouter = router({
-  getAllByMenuId: publicProcedure.input(
+  getAllByMenuId: authedProcedure.input(
     z.object({
       where: SectionSchema.pick({ menuId: true })
     })
@@ -20,7 +20,7 @@ export const sectionRouter = router({
     }
     return data
   }),
-  getById: publicProcedure.input(
+  getById: authedProcedure.input(
     z.object({
       where: SectionSchema.pick({ id: true })
     })
@@ -35,7 +35,7 @@ export const sectionRouter = router({
     }
     return data
   }),
-  create: publicProcedure.input(
+  create: authedProcedure.input(
     z.object({
       payload: SectionSchema.omit({
         id: true,
@@ -63,7 +63,7 @@ export const sectionRouter = router({
     })
     return data
   }),
-  update: publicProcedure.input(
+  update: authedProcedure.input(
     z.object({
       where: SectionSchema.pick({ id: true }),
       payload: SectionSchema.omit({
@@ -82,7 +82,7 @@ export const sectionRouter = router({
     })
     return data
   }),
-  reorder: publicProcedure.input(
+  reorder: authedProcedure.input(
     z.object({
       payload: z.array(
         SectionSchema.pick({
@@ -99,7 +99,7 @@ export const sectionRouter = router({
     const data = await prismaUpdateSections({ payload })
     return data
   }),
-  delete: publicProcedure.input(
+  delete: authedProcedure.input(
     z.object({
       where: SectionSchema.pick({ id: true }),
     })

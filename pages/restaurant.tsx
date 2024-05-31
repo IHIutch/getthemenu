@@ -633,10 +633,14 @@ const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
+  const { data } = await supabase.auth.getUser()
+
   const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: {
-      supabase
+      session: {
+        user: data.user
+      }
     },
     transformer: SuperJSON,
   });

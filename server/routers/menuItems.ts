@@ -1,12 +1,11 @@
-import { getErrorMessage } from "@/utils/functions";
 import { prismaCreateMenuItem, prismaDeleteMenuItem, prismaGetMenuItem, prismaGetMenuItems, prismaUpdateMenuItem, prismaUpdateMenuItems } from "@/utils/prisma/menuItems";
-import { publicProcedure, router } from "@/utils/trpc";
+import { authedProcedure, router } from "@/utils/trpc";
 import { MenuItemSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const menuItemRouter = router({
-  getAllByMenuId: publicProcedure.input(
+  getAllByMenuId: authedProcedure.input(
     z.object({
       where: MenuItemSchema.pick({ menuId: true })
     })
@@ -24,7 +23,7 @@ export const menuItemRouter = router({
       image: true
     })).parse(data)
   }),
-  getById: publicProcedure.input(
+  getById: authedProcedure.input(
     z.object({
       where: MenuItemSchema.pick({ id: true })
     })
@@ -41,7 +40,7 @@ export const menuItemRouter = router({
       image: true
     }).parse(data)
   }),
-  create: publicProcedure.input(
+  create: authedProcedure.input(
     z.object({
       payload: MenuItemSchema.omit({
         id: true,
@@ -74,7 +73,7 @@ export const menuItemRouter = router({
     })
     return data
   }),
-  update: publicProcedure.input(
+  update: authedProcedure.input(
     z.object({
       where: MenuItemSchema.pick({ id: true }),
       payload: MenuItemSchema.omit({
@@ -92,7 +91,7 @@ export const menuItemRouter = router({
     })
     return data
   }),
-  reorder: publicProcedure.input(
+  reorder: authedProcedure.input(
     z.object({
       payload: z.array(
         MenuItemSchema.pick({
@@ -109,7 +108,7 @@ export const menuItemRouter = router({
     const data = await prismaUpdateMenuItems({ payload })
     return data
   }),
-  delete: publicProcedure.input(
+  delete: authedProcedure.input(
     z.object({
       where: MenuItemSchema.pick({ id: true }),
     })

@@ -2,7 +2,6 @@ import { AppRouter } from '@/server';
 import { httpBatchLink, loggerLink } from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
 import SuperJSON from 'superjson';
-import { ssrPrepass } from '@trpc/next/ssrPrepass'
 
 function getBaseUrl() {
   if (typeof window !== 'undefined')

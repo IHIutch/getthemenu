@@ -1,10 +1,10 @@
-import { publicProcedure, router } from "@/utils/trpc";
+import { authedProcedure, router } from "@/utils/trpc";
 import { FeedbackSchema } from "@/utils/zod";
 import { z } from "zod";
 import { prismaCreateFeedback } from "@/utils/prisma/feedback";
 
 export const feedbackRouter = router({
-  create: publicProcedure.input(
+  create: authedProcedure.input(
     z.object({
       payload: FeedbackSchema.omit({
         createdAt: true,

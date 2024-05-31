@@ -1,11 +1,11 @@
 import prisma from "@/utils/prisma";
-import { publicProcedure, router } from "@/utils/trpc";
+import { authedProcedure, router } from "@/utils/trpc";
 import { z } from "zod";
 import GithubSlugger from 'github-slugger'
 import { CustomHostSchema } from "@/utils/zod";
 
 export const verifyRouter = router({
-  checkCustomHost: publicProcedure.input(z.object({
+  checkCustomHost: authedProcedure.input(z.object({
     customHost: CustomHostSchema
   })
   ).mutation(async ({ input }) => {
@@ -35,7 +35,7 @@ export const verifyRouter = router({
 
     return suggestion === customHost ? '' : suggestion
   }),
-  checkCustomDomain: publicProcedure.input(z.object({
+  checkCustomDomain: authedProcedure.input(z.object({
     customDomain: z.string().url()
   })).mutation(async ({ input }) => {
     const { customDomain } = input
