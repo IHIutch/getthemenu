@@ -24,16 +24,40 @@ export default async function MenuPage({
     },
     include: {
       menuItems: {
+        select: {
+          id: true,
+          menuId: true,
+          sectionId: true,
+          title: true,
+          price: true,
+          description: true,
+          position: true,
+          image: true,
+        },
         orderBy: {
           position: 'asc'
         }
       },
       menus: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          position: true,
+          description: true,
+        },
         orderBy: {
           position: 'asc'
         }
       },
       sections: {
+        select: {
+          id: true,
+          menuId: true,
+          title: true,
+          position: true,
+          description: true,
+        },
         orderBy: {
           position: 'asc'
         }
@@ -45,34 +69,44 @@ export default async function MenuPage({
     notFound()
   }
 
-  const activeMenu = slug ? data.menus.find(m => m.slug === slug) : data.menus.shift()
-
-  if (!activeMenu) {
-    notFound()
-  }
-
-  const menu = MenuSchema.parse(activeMenu)
-  const sections = z.array(SectionSchema).parse(data.sections.filter(s => s.menuId === menu?.id))
-  const menuItems = z.array(MenuItemSchema).parse(data.menuItems.filter(mi => mi.menuId === menu?.id))
-
-  const result = RestaurantSchema.pick({
-    name: true,
-    hours: true,
-    address: true,
-    phone: true,
-    email: true,
-    coverImage: true,
-    customHost: true,
-    customDomain: true,
+  const result = RestaurantSchema.omit({
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true
   }).extend({
-    menus: z.array(MenuSchema).optional(),
-    sections: z.array(SectionSchema).optional(),
-    menuItems: z.array(MenuItemSchema).optional()
+    menus: z.array(MenuSchema.omit({
+      restaurantId: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true
+    })),
+    sections: z.array(SectionSchema.omit({
+      restaurantId: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true
+    })),
+    menuItems: z.array(MenuItemSchema.omit({
+      restaurantId: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true
+    }))
   }).safeParse(data)
 
   if (!result.success) {
     throw Error(getErrorMessage(result.error))
   }
+
+  const activeMenu = slug ? result.data.menus.find(m => m.slug === slug) : data.menus.shift()
+
+  if (!activeMenu) {
+    notFound()
+  }
+
+  const menu = activeMenu
+  const sections = result.data.sections.filter(s => s.menuId === menu?.id)
+  const menuItems = result.data.menuItems.filter(mi => mi.menuId === menu?.id)
 
   const ldJson = getStructuredData(result.data)
 

@@ -4,19 +4,29 @@ import { DraggableLocation } from 'react-beautiful-dnd'
 import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from './zod'
 import { z } from 'zod'
 
-const StructuredDataSchema = RestaurantSchema.pick({
-  name: true,
-  hours: true,
-  address: true,
-  phone: true,
-  email: true,
-  coverImage: true,
-  customHost: true,
-  customDomain: true,
+const StructuredDataSchema = RestaurantSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true
 }).extend({
-  menus: z.array(MenuSchema).optional(),
-  sections: z.array(SectionSchema).optional(),
-  menuItems: z.array(MenuItemSchema).optional()
+  menus: z.array(MenuSchema.omit({
+    restaurantId: true,
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true
+  })),
+  sections: z.array(SectionSchema.omit({
+    restaurantId: true,
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true
+  })),
+  menuItems: z.array(MenuItemSchema.omit({
+    restaurantId: true,
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true
+  }))
 })
 
 type StructuredDataType = z.infer<typeof StructuredDataSchema>
