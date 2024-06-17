@@ -3,8 +3,15 @@ import { createClientComponent } from './supabase/component'
 import { DraggableLocation } from 'react-beautiful-dnd'
 import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from './zod'
 import { z } from 'zod'
+import prisma from './prisma'
+import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
 
 const StructuredDataSchema = RestaurantSchema.omit({
+  id: true,
+  userId: true,
+  customHost: true,
+  customDomain: true,
   createdAt: true,
   updatedAt: true,
   deletedAt: true
@@ -193,3 +200,95 @@ export function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message
   return String(error)
 }
+
+export const getRestaurantDisplayData = unstable_cache(async (host: string) => {
+  const data = await prisma.restaurants.findUnique({
+    where: {
+      customHost: host
+    },
+    select: {
+      name: true,
+      address: true,
+      hours: true,
+      coverImage: true,
+      menuItems: {
+        select: {
+          id: true,
+          menuId: true,
+          sectionId: true,
+          title: true,
+          price: true,
+          description: true,
+          position: true,
+          image: true,
+        },
+        orderBy: {
+          position: 'asc'
+        }
+      },
+      menus: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          position: true,
+          description: true,
+        },
+        orderBy: {
+          position: 'asc'
+        }
+      },
+      sections: {
+        select: {
+          id: true,
+          menuId: true,
+          title: true,
+          position: true,
+          description: true,
+        },
+        orderBy: {
+          position: 'asc'
+        }
+      }
+    }
+  })
+
+  if (!data) {
+    return null;
+  }
+
+  const result = RestaurantSchema.omit({
+    id: true,
+    userId: true,
+    customHost: true,
+    customDomain: true,
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true
+  }).extend({
+    menus: z.array(MenuSchema.omit({
+      restaurantId: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true
+    })),
+    sections: z.array(SectionSchema.omit({
+      restaurantId: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true
+    })),
+    menuItems: z.array(MenuItemSchema.omit({
+      restaurantId: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true
+    }))
+  }).safeParse(data)
+
+  if (!result.success) {
+    throw Error(getErrorMessage(result.error))
+  }
+
+  return result.data
+})

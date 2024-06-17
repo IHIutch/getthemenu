@@ -6,7 +6,7 @@ import BlurImage from '@/components/common/BlurImage';
 import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from '@/utils/zod';
 import { z } from 'zod';
 import { Metadata } from 'next';
-import { getErrorMessage, getStructuredData } from '@/utils/functions';
+import { getErrorMessage, getRestaurantDisplayData, getStructuredData } from '@/utils/functions';
 import { env } from '@/utils/env';
 
 export default async function MenuPage({
@@ -18,97 +18,23 @@ export default async function MenuPage({
   const host = decodeURIComponent(params.host);
   const slug = decodeURIComponent(params.slug?.toString() || '');
 
-  const data = await prisma.restaurants.findUnique({
-    where: {
-      customHost: host
-    },
-    include: {
-      menuItems: {
-        select: {
-          id: true,
-          menuId: true,
-          sectionId: true,
-          title: true,
-          price: true,
-          description: true,
-          position: true,
-          image: true,
-        },
-        orderBy: {
-          position: 'asc'
-        }
-      },
-      menus: {
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          position: true,
-          description: true,
-        },
-        orderBy: {
-          position: 'asc'
-        }
-      },
-      sections: {
-        select: {
-          id: true,
-          menuId: true,
-          title: true,
-          position: true,
-          description: true,
-        },
-        orderBy: {
-          position: 'asc'
-        }
-      }
-    }
-  })
+  const data = await getRestaurantDisplayData(host)
 
   if (!data) {
     notFound()
   }
 
-  const result = RestaurantSchema.omit({
-    createdAt: true,
-    updatedAt: true,
-    deletedAt: true
-  }).extend({
-    menus: z.array(MenuSchema.omit({
-      restaurantId: true,
-      createdAt: true,
-      updatedAt: true,
-      deletedAt: true
-    })),
-    sections: z.array(SectionSchema.omit({
-      restaurantId: true,
-      createdAt: true,
-      updatedAt: true,
-      deletedAt: true
-    })),
-    menuItems: z.array(MenuItemSchema.omit({
-      restaurantId: true,
-      createdAt: true,
-      updatedAt: true,
-      deletedAt: true
-    }))
-  }).safeParse(data)
-
-  if (!result.success) {
-    throw Error(getErrorMessage(result.error))
-  }
-
-  const activeMenu = slug ? result.data.menus.find(m => m.slug === slug) : data.menus.shift()
+  const activeMenu = slug ? data.menus.find(m => m.slug === slug) : data.menus.shift()
 
   if (!activeMenu) {
     notFound()
   }
 
   const menu = activeMenu
-  const sections = result.data.sections.filter(s => s.menuId === menu?.id)
-  const menuItems = result.data.menuItems.filter(mi => mi.menuId === menu?.id)
+  const sections = data.sections.filter(s => s.menuId === menu?.id)
+  const menuItems = data.menuItems.filter(mi => mi.menuId === menu?.id)
 
-  const ldJson = getStructuredData(result.data)
+  const ldJson = getStructuredData(data)
 
   return (
     <>
@@ -228,49 +154,15 @@ export async function generateMetadata({ params }: { params: { host: string, slu
   const host = decodeURIComponent(params.host);
   const slug = decodeURIComponent(params.slug?.toString() || '');
 
-  const data = await prisma.restaurants.findUnique({
-    where: {
-      customHost: host
-    },
-    include: {
-      menuItems: {
-        orderBy: {
-          position: 'asc'
-        }
-      },
-      menus: {
-        orderBy: {
-          position: 'asc'
-        }
-      },
-      sections: {
-        orderBy: {
-          position: 'asc'
-        }
-      }
-    }
-  })
-
+  const data = await getRestaurantDisplayData(host)
   if (!data) {
     return null;
   }
-  const result = RestaurantSchema.pick({
-    name: true,
-    hours: true,
-    address: true,
-    phone: true,
-    email: true,
-    coverImage: true,
-    customHost: true,
-    customDomain: true,
-  }).safeParse(data)
 
-  if (!result.success) {
-    return null
-  }
-
-  const { name: title, coverImage: image } = result.data
-  const menu = MenuSchema.parse(slug ? data.menus.find(m => m.slug === slug) : data.menus.shift())
+  const { name: title, coverImage: image } = data
+  const menu = MenuSchema.pick({
+    slug: true
+  }).parse(slug ? data.menus.find(m => m.slug === slug) : data.menus.shift())
 
   return {
     metadataBase: new URL(`https://${host}.${env.NEXT_PUBLIC_ROOT_DOMAIN}`),
