@@ -1,7 +1,9 @@
+import { checkCustomDomain } from '@/utils/customDomain'
 import { resStatusType } from '@/utils/apiResponseTypes'
-import { customDomainCheckConfig } from '@/utils/customDomain'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { getErrorMessage } from '@/utils/functions'
 
-export default async function handler(req, res) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req
 
   //   TODO: Go here for a complete example https://github.com/vercel/examples/blob/main/solutions/domains-api/pages/api/check-domain.js
@@ -9,12 +11,13 @@ export default async function handler(req, res) {
     case 'POST':
       try {
         const { domain } = req.body
-        const data = await customDomainCheckConfig(domain)
+
+        const data = await checkCustomDomain(domain)
 
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
         console.log({ error })
-        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
+        res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
       break
 
@@ -23,3 +26,5 @@ export default async function handler(req, res) {
       res.status(resStatusType.NOT_ALLOWED).end(`Method ${method} Not Allowed`)
   }
 }
+
+export default handler

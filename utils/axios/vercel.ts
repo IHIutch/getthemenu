@@ -1,6 +1,6 @@
 import axios from 'redaxios'
 
-export const postVercelDomain = async (domain) => {
+export const postVercelDomain = async (domain: string) => {
   const { data } = await axios
     .post(
       `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains`,
@@ -20,7 +20,7 @@ export const postVercelDomain = async (domain) => {
   return data
 }
 
-export const patchVercelDomain = async (domain) => {
+export const patchVercelDomain = async (domain: string) => {
   const { data } = await axios
     .patch(
       `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains`,
@@ -40,7 +40,7 @@ export const patchVercelDomain = async (domain) => {
   return data
 }
 
-export const deleteVercelDomain = async (domain) => {
+export const deleteVercelDomain = async (domain: string) => {
   const { data } = await axios
     .delete(
       `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains/${domain}`,
@@ -57,7 +57,7 @@ export const deleteVercelDomain = async (domain) => {
   return data
 }
 
-export const postVerifyVercelDomain = async (domain) => {
+export const postVerifyVercelDomain = async (domain: string) => {
   const { data } = await axios
     .post(
       `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains/${domain}/verify`,
@@ -75,7 +75,7 @@ export const postVerifyVercelDomain = async (domain) => {
   return data
 }
 
-export const getVercelDomain = async (domain) => {
+export const getVercelDomain = async (domain: string) => {
   const { data } = await axios
     .get(
       `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains/${domain}`,
@@ -92,7 +92,7 @@ export const getVercelDomain = async (domain) => {
   return data
 }
 
-export const getConfigVercelDomain = async (domain) => {
+export const getConfigVercelDomain = async (domain: string) => {
   const { data } = await axios
     .get(`https://api.vercel.com/v6/domains/${domain}/config`, {
       headers: {

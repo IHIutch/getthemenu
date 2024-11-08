@@ -1,5 +1,5 @@
 import { prismaCreateUser, prismaGetUser } from "@/utils/prisma/users";
-import { authedProcedure, router } from "@/utils/trpc";
+import { authedProcedure, publicProcedure, router } from "@/utils/trpc";
 import { UserSchema } from "@/utils/zod";
 import { TRPCError } from "@trpc/server";
 import { createStripeCustomer } from '@/utils/stripe'
@@ -36,19 +36,23 @@ export const userRouter = router({
       }
     })
   }),
-  getAuthedUser: authedProcedure.query(async ({ ctx }) => {
+  getAuthedUser: publicProcedure.query(async ({ ctx }) => {
     const authedUser = ctx.session.user
-    const data = await prismaGetUser({ where: { id: authedUser.id } })
-    if (!data) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: `getAuthedUser error: No user found with id '${authedUser.id}'`,
-      })
-    }
 
-    return {
-      ...data,
-      email: authedUser.email
+    if (authedUser) {
+      const data = await prismaGetUser({ where: { id: authedUser.id } })
+      if (!data) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `getAuthedUser error: No user found with id '${authedUser.id}'`,
+        })
+      }
+
+      return {
+        ...data,
+        email: authedUser.email
+      }
     }
+    return null
   })
 })

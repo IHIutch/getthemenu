@@ -290,6 +290,8 @@ const CustomDomainForm = ({ restaurant }: { restaurant: RouterOutputs['restauran
 
 const Subscription = ({ prices, user }: { prices?: PriceType[], user: RouterOutputs['user']['getAuthedUser'] }) => {
 
+  const [selectedPrice, setSelectedPrice] = React.useState('')
+
   const router = useRouter()
 
   const loadCustomerPortal = async () => {
@@ -319,7 +321,8 @@ const Subscription = ({ prices, user }: { prices?: PriceType[], user: RouterOutp
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: 'priceId',
-    defaultValue: prices?.[0]?.id || '',
+    // defaultValue: ,
+    onChange: setSelectedPrice,
   })
   const group = getRootProps()
 
@@ -344,14 +347,14 @@ const Subscription = ({ prices, user }: { prices?: PriceType[], user: RouterOutp
             onSubmit={(e) => {
               e.preventDefault()
               // console.log(e.target.priceId.value)
-              loadCheckout(e.target.priceId.value)
+              loadCheckout(selectedPrice)
             }}
           >
             <VStack {...group} spacing="-1px" mb="3">
               {(prices || []).map((price) => {
                 const radio = getRadioProps({ value: price.id })
                 return (
-                  <CompoundRadio {...radio} key={price.id}>
+                  <CompoundRadio {...radio} key={price.id} value={price.id} isRequired>
                     <Text fontWeight="semibold" fontSize="lg">
                       {price.label || price.name}
                     </Text>

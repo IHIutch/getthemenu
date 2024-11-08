@@ -164,7 +164,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const user = await helpers.user.getAuthedUser.fetch()
 
-  if (user.restaurants.length === 0) {
+  if (user?.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',

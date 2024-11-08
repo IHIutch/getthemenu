@@ -4,8 +4,10 @@ import {
   removeCustomDomain,
   updateCustomDomain,
 } from '@/utils/customDomain'
+import { getErrorMessage } from '@/utils/functions'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handler(req, res) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const restrictedDomains = [
     '*.getthemenu.io',
     'getthemenu.io',
@@ -29,7 +31,7 @@ export default async function handler(req, res) {
 
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
+        res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
       break
 
@@ -46,7 +48,7 @@ export default async function handler(req, res) {
         const data = await updateCustomDomain(domain)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
+        res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
 
       break
@@ -64,7 +66,7 @@ export default async function handler(req, res) {
         const data = await removeCustomDomain(domain)
         res.status(resStatusType.SUCCESS).json(data)
       } catch (error) {
-        res.status(resStatusType.BAD_REQUEST).json({ error: error.message })
+        res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
       break
 
@@ -73,3 +75,5 @@ export default async function handler(req, res) {
       res.status(resStatusType.NOT_ALLOWED).end(`Method ${method} Not Allowed`)
   }
 }
+
+export default handler

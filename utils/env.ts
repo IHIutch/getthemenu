@@ -7,6 +7,7 @@ export const env = createEnv({
   server: {
     // # Prisma
     POSTGRES_PRISMA_URL: z.string().url(),
+    POSTGRES_URL_NON_POOLING: z.string().url(),
     // Stripe
     STRIPE_SECRET_KEY: z.string().min(1),
     STRIPE_SIGNING_SECRET: z.string().min(1),

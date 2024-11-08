@@ -68,7 +68,7 @@ const FormPayload = MenuSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  deletedAtAt: true,
+  deletedAt: true,
 })
 
 type FormData = z.infer<typeof FormPayload>

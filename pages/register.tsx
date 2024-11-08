@@ -206,8 +206,13 @@ export default function Register() {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
+  const { data } = await supabase.auth.getUser()
 
-  const caller = createCaller({ supabase })
+  const caller = createCaller({
+    session: {
+      user: data.user
+    }
+  })
   const user = await caller.user.getAuthedUser()
 
   if (!user) {
