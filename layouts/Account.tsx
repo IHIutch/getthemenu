@@ -1,7 +1,7 @@
-import * as React from 'react'
 import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
 import { Box, HStack } from '@chakra-ui/react'
+import * as React from 'react'
 
 export default function AccountLayout({ children }: { children?: React.ReactNode }) {
   return (

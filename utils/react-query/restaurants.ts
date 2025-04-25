@@ -1,5 +1,5 @@
+import type { RouterInputs } from '@/server'
 import { trpc } from '../trpc/client'
-import { RouterInputs } from '@/server'
 
 // export const useGetRestaurants = (userId: RouterInputs['restaurant']['getAllByUserId']['where']['userId'] = '') => {
 //   const { isPending, isError, isSuccess, data, error } = trpc.restaurant.getAllByMenuId.useQuery(
@@ -15,11 +15,11 @@ import { RouterInputs } from '@/server'
 //   }
 // }
 
-export const useGetRestaurant = (id: RouterInputs['restaurant']['getById']['where']['id'] = '') => {
-  const { isLoading, isError, isSuccess, data, error } =
-    trpc.restaurant.getById.useQuery(
+export function useGetRestaurant(id: RouterInputs['restaurant']['getById']['where']['id'] = '') {
+  const { isLoading, isError, isSuccess, data, error }
+    = trpc.restaurant.getById.useQuery(
       { where: { id } },
-      { enabled: id !== '' }
+      { enabled: id !== '' },
     )
   return {
     data,
@@ -30,7 +30,7 @@ export const useGetRestaurant = (id: RouterInputs['restaurant']['getById']['wher
   }
 }
 
-export const useUpdateRestaurant = (id: RouterInputs['restaurant']['getById']['where']['id'] = '') => {
+export function useUpdateRestaurant(id: RouterInputs['restaurant']['getById']['where']['id'] = '') {
   const { restaurant: restaurantUtils } = trpc.useUtils()
   const {
     mutateAsync,
@@ -45,20 +45,22 @@ export const useUpdateRestaurant = (id: RouterInputs['restaurant']['getById']['w
     onMutate: async ({ where: { id }, payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await restaurantUtils.getById.cancel({
-        where: { id }
+        where: { id },
       })
       const previous = restaurantUtils.getById.getData({
-        where: { id }
+        where: { id },
       })
 
       restaurantUtils.getById.setData({
-        where: { id }
+        where: { id },
       }, (old) => {
-        return old ? {
-          ...old,
-          ...payload,
-          updatedAt: new Date()
-        } : undefined
+        return old
+          ? {
+              ...old,
+              ...payload,
+              updatedAt: new Date(),
+            }
+          : undefined
       })
       return { previous, updated: payload }
     },
@@ -69,7 +71,7 @@ export const useUpdateRestaurant = (id: RouterInputs['restaurant']['getById']['w
     // Always refetch after error or success:
     onSettled: (_updated) => {
       restaurantUtils.getById.invalidate({
-        where: { id }
+        where: { id },
       })
     },
   })

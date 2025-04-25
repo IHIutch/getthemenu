@@ -1,23 +1,23 @@
-import React from 'react'
 import {
   Box,
   Container,
-  UnorderedList,
+  Heading,
+  Link,
   ListItem,
   Table,
-  Thead,
-  Tr,
-  Th,
   Tbody,
   Td,
-  Heading,
   Text,
-  Link,
+  Th,
+  Thead,
+  Tr,
+  UnorderedList,
   VStack,
 } from '@chakra-ui/react'
 import { Prose } from '@nikolovlazar/chakra-ui-prose'
-import NextLink from 'next/link'
 import Head from 'next/head'
+import NextLink from 'next/link'
+import React from 'react'
 
 export default function PrivacyPolicy() {
   return (
@@ -33,7 +33,8 @@ export default function PrivacyPolicy() {
           <Text>
             <Text as="span" fontWeight="semibold">
               Last updated:
-            </Text>{' '}
+            </Text>
+            {' '}
             June 25, 2022
           </Text>
         </Box>
@@ -69,7 +70,8 @@ export default function PrivacyPolicy() {
           </Text>
           <UnorderedList spacing="4" mb="8">
             <ListItem>
-              Visit our website at{' '}
+              Visit our website at
+              {' '}
               <Link as={NextLink} href="/" textDecoration="underline" fontWeight="semibold">
                 https://getthemenu.io
               </Link>
@@ -83,11 +85,13 @@ export default function PrivacyPolicy() {
           <Text>
             <Text as="span" fontWeight="semibold">
               Questions or concerns?
-            </Text>{' '}
+            </Text>
+            {' '}
             Reading this privacy notice will help you understand your privacy
             rights and choices. If you do not agree with our policies and
             practices, please do not use our Services. If you still have any
-            questions or concerns, please contact us at{' '}
+            questions or concerns, please contact us at
+            {' '}
             <Link
               textDecoration="underline"
               fontWeight="semibold"
@@ -106,10 +110,12 @@ export default function PrivacyPolicy() {
             This summary provides key points from our privacy notice, but you
             can find out more details about any of these topics by clicking the
             link following each key point or by using our table of contents
-            below to find the section you are looking for. You can also click{' '}
+            below to find the section you are looking for. You can also click
+            {' '}
             <Link textDecoration="underline" fontWeight="semibold" href="#toc">
               here
-            </Link>{' '}
+            </Link>
+            {' '}
             to go directly to our table of contents.
           </Text>
         </Box>
@@ -123,14 +129,16 @@ export default function PrivacyPolicy() {
                 When you visit, use, or navigate our Services, we may process
                 personal information depending on how you interact with
                 GetTheMenu and the Services, the choices you make, and the
-                products and features you use. Click{' '}
+                products and features you use. Click
+                {' '}
                 <Link
                   textDecoration="underline"
                   fontWeight="semibold"
                   href="#personalinfo"
                 >
                   here
-                </Link>{' '}
+                </Link>
+                {' '}
                 to learn more.
               </dd>
             </Box>
@@ -156,14 +164,16 @@ export default function PrivacyPolicy() {
                 prevention, and to comply with law. We may also process your
                 information for other purposes with your consent. We process
                 your information only when we have a valid legal reason to do
-                so. Click{' '}
+                so. Click
+                {' '}
                 <Link
                   textDecoration="underline"
                   fontWeight="semibold"
                   href="#2-how-do-we-process-your-information"
                 >
                   here
-                </Link>{' '}
+                </Link>
+                {' '}
                 to learn more.
               </dd>
             </Box>
@@ -174,14 +184,16 @@ export default function PrivacyPolicy() {
               </Text>
               <dd>
                 We may share information in specific situations and with
-                specific third parties. Click{' '}
+                specific third parties. Click
+                {' '}
                 <Link
                   textDecoration="underline"
                   fontWeight="semibold"
                   href="#3-when-and-with-whom-do-we-share-your-personal-information"
                 >
                   here
-                </Link>{' '}
+                </Link>
+                {' '}
                 to learn more.
               </dd>
             </Box>
@@ -197,14 +209,16 @@ export default function PrivacyPolicy() {
                 promise or guarantee that hackers, cybercriminals, or other
                 unauthorized third parties will not be able to defeat our
                 security and improperly collect, access, steal, or modify your
-                information. Click{' '}
+                information. Click
+                {' '}
                 <Link
                   textDecoration="underline"
                   fontWeight="semibold"
                   href="#6-how-do-we-keep-your-information-safe"
                 >
                   here
-                </Link>{' '}
+                </Link>
+                {' '}
                 to learn more.
               </dd>
             </Box>
@@ -215,14 +229,16 @@ export default function PrivacyPolicy() {
               <dd>
                 Depending on where you are located geographically, the
                 applicable privacy law may mean you have certain rights
-                regarding your personal information. Click{' '}
+                regarding your personal information. Click
+                {' '}
                 <Link
                   textDecoration="underline"
                   fontWeight="semibold"
                   href="#8-what-are-your-privacy-rights"
                 >
                   here
-                </Link>{' '}
+                </Link>
+                {' '}
                 to learn more.
               </dd>
             </Box>
@@ -231,7 +247,8 @@ export default function PrivacyPolicy() {
                 How do you exercise your rights?
               </Text>
               <dd>
-                The easiest way to exercise your rights by contacting us at{' '}
+                The easiest way to exercise your rights by contacting us at
+                {' '}
                 <Link
                   textDecoration="underline"
                   fontWeight="semibold"
@@ -246,7 +263,11 @@ export default function PrivacyPolicy() {
           </VStack>
           <Text>
             Want to learn more about what GetTheMenu does with any information
-            we collect? Click <Link href="#toc">here</Link> to review the notice
+            we collect? Click
+            {' '}
+            <Link href="#toc">here</Link>
+            {' '}
+            to review the notice
             in full.
           </Text>
         </Box>
@@ -372,7 +393,8 @@ export default function PrivacyPolicy() {
                 </Heading>
                 <Text>
                   <Text as="span" fontWeight="semibold">
-                    In Short:{' '}
+                    In Short:
+                    {' '}
                   </Text>
                   We collect personal information that you provide to us.
                 </Text>
@@ -422,7 +444,8 @@ export default function PrivacyPolicy() {
                       (such as a credit card number), and the security code
                       associated with your payment instrument. All payment data
                       is stored by Paddle. You may find their privacy notice
-                      link(s) here:{' '}
+                      link(s) here:
+                      {' '}
                       <Link
                         href="https://www.paddle.com/legal/privacy"
                         isExternal
@@ -442,10 +465,12 @@ export default function PrivacyPolicy() {
                       using your existing social media account details, like
                       your Facebook, Twitter, or other social media account. If
                       you choose to register in this way, we will collect the
-                      information described in the section called{' '}
+                      information described in the section called
+                      {' '}
                       <Link href="#4-how-do-we-handle-your-social-logins">
                         &quot;How Do We Handle Your Social Logins?&quot;
-                      </Link>{' '}
+                      </Link>
+                      {' '}
                       below.
                     </dd>
                   </Box>
@@ -460,7 +485,8 @@ export default function PrivacyPolicy() {
                 <Heading as="h3">Information automatically collected</Heading>
                 <Text>
                   <Text as="span" fontWeight="semibold">
-                    In Short:{' '}
+                    In Short:
+                    {' '}
                   </Text>
                   Some information — such as your Internet Protocol (IP) address
                   and/or browser and device characteristics — is collected
@@ -545,7 +571,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 <Text as="span" fontWeight="semibold">
-                  In Short:{' '}
+                  In Short:
+                  {' '}
                 </Text>
                 We process your information to provide, improve, and administer
                 our Services, communicate with you, for security and fraud
@@ -613,7 +640,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 <Text as="span" fontWeight="semibold">
-                  In Short:{' '}
+                  In Short:
+                  {' '}
                 </Text>
                 We may share information in specific situations described in
                 this section and/or with the following third parties.
@@ -642,7 +670,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 <Text as="span" fontWeight="semibold">
-                  In Short:{' '}
+                  In Short:
+                  {' '}
                 </Text>
                 If you choose to register or log in to our services using a
                 social media account, we may have access to certain information
@@ -677,7 +706,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 <Text as="span" fontWeight="semibold">
-                  In Short:{' '}
+                  In Short:
+                  {' '}
                 </Text>
                 We keep your information for as long as necessary to fulfill the
                 purposes outlined in this privacy notice unless otherwise
@@ -708,7 +738,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 <Text as="span" fontWeight="semibold">
-                  In Short:{' '}
+                  In Short:
+                  {' '}
                 </Text>
                 We aim to protect your personal information through a system of
                 organizational and technical security measures.
@@ -736,7 +767,8 @@ export default function PrivacyPolicy() {
               <Text>
                 <Text>
                   <Text as="span" fontWeight="semibold">
-                    In Short:{' '}
+                    In Short:
+                    {' '}
                   </Text>
                   We do not knowingly collect data from or market to children
                   under 18 years of age.
@@ -765,7 +797,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 <Text as="span" fontWeight="semibold">
-                  In Short:{' '}
+                  In Short:
+                  {' '}
                 </Text>
                 You may review, change, or terminate your account at any time.
               </Text>
@@ -773,7 +806,8 @@ export default function PrivacyPolicy() {
                 If you are located in the EEA or UK and you believe we are
                 unlawfully processing your personal information, you also have
                 the right to complain to your local data protection supervisory
-                authority. You can find their contact details here:{' '}
+                authority. You can find their contact details here:
+                {' '}
                 <Link
                   href="https://ec.europa.eu/justice/data-protection/bodies/authorities/index_en.htm"
                   isExternal
@@ -784,7 +818,8 @@ export default function PrivacyPolicy() {
               </Text>
               <Text>
                 If you are located in Switzerland, the contact details for the
-                data protection authorities are available here:{' '}
+                data protection authorities are available here:
+                {' '}
                 <Link
                   href="https://www.edoeb.admin.ch/edoeb/en/home.html"
                   isExternal
@@ -801,10 +836,12 @@ export default function PrivacyPolicy() {
                   depending on the applicable law, you have the right to
                   withdraw your consent at any time. You can withdraw your
                   consent at any time by contacting us by using the contact
-                  details provided in the section{' '}
+                  details provided in the section
+                  {' '}
                   <Link href="#12-how-can-you-contact-us-about-this-notice">
                     &quot;How Can You Contact Us About This Notice?&quot;
-                  </Link>{' '}
+                  </Link>
+                  {' '}
                   below.
                 </Text>
                 <Text>
@@ -823,10 +860,12 @@ export default function PrivacyPolicy() {
                   You can unsubscribe from our marketing and promotional
                   communications at any time by clicking on the unsubscribe link
                   in the emails that we send, or by contacting us using the
-                  details provided in the section{' '}
+                  details provided in the section
+                  {' '}
                   <Link href="#12-how-can-you-contact-us-about-this-notice">
                     &quot;How Can You Contact Us About This Notice?&quot;
-                  </Link>{' '}
+                  </Link>
+                  {' '}
                   below. You will then be removed from the marketing lists.
                   However, we may still communicate with you — for example, to
                   send you service-related messages that are necessary for the
@@ -847,7 +886,8 @@ export default function PrivacyPolicy() {
                   our files to prevent fraud, troubleshoot problems, assist with
                   any investigations, enforce our legal terms and/or comply with
                   applicable legal requirements. If you have questions or
-                  comments about your privacy rights, you may email us at{' '}
+                  comments about your privacy rights, you may email us at
+                  {' '}
                   <Link href="mailto:info@getthemenu.io">
                     info@getthemenu.io
                   </Link>
@@ -883,7 +923,8 @@ export default function PrivacyPolicy() {
               <Text>
                 <Text>
                   <Text as="span" fontWeight="semibold">
-                    In Short:{' '}
+                    In Short:
+                    {' '}
                   </Text>
                   Yes, if you are a resident of California, you are granted
                   specific rights regarding access to your personal information.
@@ -932,7 +973,8 @@ export default function PrivacyPolicy() {
                 <Text>
                   <Text>
                     All other individuals are defined as
-                    &quot;non-residents.&quot;{' '}
+                    &quot;non-residents.&quot;
+                    {' '}
                   </Text>
                   <Text>
                     If this definition of &quot;resident&quot; applies to you,
@@ -950,7 +992,11 @@ export default function PrivacyPolicy() {
                 <Table>
                   <Thead>
                     <Tr>
-                      <Th>Category</Th> <Th>Examples</Th> <Th>Collected</Th>
+                      <Th>Category</Th>
+                      {' '}
+                      <Th>Examples</Th>
+                      {' '}
+                      <Th>Collected</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -1076,7 +1122,8 @@ export default function PrivacyPolicy() {
                     practices can be found in this privacy notice.
                   </Text>
                   <Text>
-                    You may contact us by email at{' '}
+                    You may contact us by email at
+                    {' '}
                     <Link href="mailto:info@getthemenu.io">
                       info@getthemenu.io
                     </Link>
@@ -1243,7 +1290,8 @@ export default function PrivacyPolicy() {
                     </ListItem>
                   </UnorderedList>
                   <Text>
-                    To exercise these rights, you can contact us by email at{' '}
+                    To exercise these rights, you can contact us by email at
+                    {' '}
                     <Link href="mailto:info@getthemenu.io">
                       info@getthemenu.io
                     </Link>
@@ -1260,7 +1308,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 <Text as="span" fontWeight="semibold">
-                  In Short:{' '}
+                  In Short:
+                  {' '}
                 </Text>
                 Yes, we will update this notice as necessary to stay compliant
                 with relevant laws.
@@ -1282,7 +1331,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text>
                 If you have questions or comments about this notice, you may
-                email us at{' '}
+                email us at
+                {' '}
                 <Link href="mailto:info@getthemenu.io">info@getthemenu.io</Link>
               </Text>
             </Box>
@@ -1299,8 +1349,10 @@ export default function PrivacyPolicy() {
                 right to request access to the personal information we collect
                 from you, change that information, or delete it. To request to
                 review, update, or delete your personal information, please
-                email us at{' '}
-                <Link href="mailto:info@getthemenu">info@getthemenu</Link>.
+                email us at
+                {' '}
+                <Link href="mailto:info@getthemenu">info@getthemenu</Link>
+                .
               </Text>
             </Box>
           </Prose>

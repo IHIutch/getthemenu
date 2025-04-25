@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type { GetServerSidePropsContext } from 'next'
 import DashboardLayout from '@/layouts/Dashboard'
-import { Container, Flex, Text } from '@chakra-ui/react'
-import { GetServerSidePropsContext } from 'next'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { Container, Flex, Text } from '@chakra-ui/react'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import * as React from 'react'
 import SuperJSON from 'superjson'
 
 export default function Analytics() {
@@ -34,11 +34,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 
@@ -49,7 +49,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length === 0) {
+  }
+  else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',

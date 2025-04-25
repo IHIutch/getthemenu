@@ -3,14 +3,14 @@ import {
   Container,
   Heading,
   Link,
-  UnorderedList,
   ListItem,
   Text,
+  UnorderedList,
 } from '@chakra-ui/react'
 import { Prose } from '@nikolovlazar/chakra-ui-prose'
-import React from 'react'
-import NextLink from 'next/link'
 import Head from 'next/head'
+import NextLink from 'next/link'
+import React from 'react'
 
 export default function TermsOfUse() {
   return (
@@ -26,7 +26,8 @@ export default function TermsOfUse() {
           <Text>
             <Text as="span" fontWeight="semibold">
               Last updated:
-            </Text>{' '}
+            </Text>
+            {' '}
             June 25, 2022
           </Text>
         </Box>
@@ -223,8 +224,10 @@ export default function TermsOfUse() {
               <Text as="span" fontWeight="semibold">
                 our
               </Text>
-              &quot;), concerning your access to and use of the{' '}
-              <Link as={NextLink} href="/">https://getthemenu.io</Link>{' '}
+              &quot;), concerning your access to and use of the
+              {' '}
+              <Link as={NextLink} href="/">https://getthemenu.io</Link>
+              {' '}
               website as well as any other media form, media channel, mobile
               website or mobile application related, linked, or otherwise
               connected thereto (collectively, the &quot;Site&quot;). We are
@@ -383,8 +386,10 @@ export default function TermsOfUse() {
               All purchases are non-refundable. You can cancel your subscription
               at any time by logging into your account. Your cancellation will
               take effect at the end of the current paid term. If you are
-              unsatisfied with our services, please email us at{' '}
-              <Link href="mailto:info@getthemenu">info@getthemenu</Link>.
+              unsatisfied with our services, please email us at
+              {' '}
+              <Link href="mailto:info@getthemenu">info@getthemenu</Link>
+              .
             </Text>
           </Box>
           <Box>
@@ -781,8 +786,10 @@ export default function TermsOfUse() {
             </Heading>
             <Text>
               We care about data privacy and security. By using the Site, you
-              agree to be bound by our{' '}
-              <Link as={NextLink} href="/privacy-policy">Privacy Policy</Link>{' '}
+              agree to be bound by our
+              {' '}
+              <Link as={NextLink} href="/privacy-policy">Privacy Policy</Link>
+              {' '}
               posted on the Site, which is incorporated into these Terms of Use.
               Please be advised the Site is hosted in the United States. If you
               access the Site from any other region of the world with laws or
@@ -1129,7 +1136,10 @@ export default function TermsOfUse() {
             <Text>
               In order to resolve a complaint regarding the Site or to receive
               further information regarding use of the Site, please contact us
-              at <Link href="mailto:info@getthemenu">info@getthemenu</Link>.
+              at
+              {' '}
+              <Link href="mailto:info@getthemenu">info@getthemenu</Link>
+              .
             </Text>
           </Box>
         </Prose>

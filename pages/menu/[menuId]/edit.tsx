@@ -1,47 +1,16 @@
-import * as React from 'react'
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea,
-  Heading,
-  Flex,
-  Text,
-  IconButton,
-  Icon,
-  useDisclosure,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-  Stack,
-  ButtonGroup,
-  AspectRatio,
-  Image,
-  Container,
-  Center,
-  StackDivider,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
+import type { RouterOutputs } from '@/server'
+import type {
   UseDisclosureReturn,
 } from '@chakra-ui/react'
-import Head from 'next/head'
-import { MoreVertical, Trash2, Camera, GripHorizontal } from 'lucide-react'
-import { useRouter } from 'next/router'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import type { DropResult } from 'react-beautiful-dnd'
+import type { SubmitHandler } from 'react-hook-form'
+import BlurImage from '@/components/common/BlurImage'
+import ImageDropzone from '@/components/common/ImageDropzone'
+import MenuLayout from '@/layouts/Menu'
+import { appRouter } from '@/server'
+import { postUpload } from '@/utils/axios/uploads'
+import { move, reorderList } from '@/utils/functions'
 import {
   useCreateMenuItem,
   useDeleteMenuItem,
@@ -50,7 +19,6 @@ import {
   useUpdateMenuItem,
 } from '@/utils/react-query/menuItems'
 import { useGetMenu } from '@/utils/react-query/menus'
-import { DragDropContext, Draggable, DropResult, Droppable } from 'react-beautiful-dnd'
 import {
   useCreateSection,
   useDeleteSection,
@@ -58,25 +26,61 @@ import {
   useReorderSections,
   useUpdateSection,
 } from '@/utils/react-query/sections'
-import { move, reorderList } from '@/utils/functions'
-import { postUpload } from '@/utils/axios/uploads'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import ImageDropzone from '@/components/common/ImageDropzone'
-import MenuLayout from '@/layouts/Menu'
-import groupBy from 'lodash/groupBy'
-import BlurImage from '@/components/common/BlurImage'
-import { RouterOutputs, appRouter } from '@/server'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import SuperJSON from 'superjson'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { useGetAuthedUser } from '@/utils/react-query/users'
+import { createClientServer } from '@/utils/supabase/server-props'
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  AspectRatio,
+  Box,
+  Button,
+  ButtonGroup,
+  Center,
+  Container,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  Icon,
+  IconButton,
+  Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Stack,
+  StackDivider,
+  Text,
+  Textarea,
+  useDisclosure,
+} from '@chakra-ui/react'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import groupBy from 'lodash/groupBy'
+import { Camera, GripHorizontal, MoreVertical, Trash2 } from 'lucide-react'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import { Controller, useForm } from 'react-hook-form'
+import SuperJSON from 'superjson'
 
 export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   useGetAuthedUser({ initialData: user })
 
   const router = useRouter()
-  const menuId = router.query?.menuId?.toString() ?? ""
+  const menuId = router.query?.menuId?.toString() ?? ''
 
   const drawerState = useDisclosure()
   const [drawerType, setDrawerType] = React.useState<React.ReactNode>(null)
@@ -99,7 +103,7 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
 
   const groupedSectionItems = groupBy(
     (menuItems || []).sort((a, b) => (a.position || 0) - (b.position || 0)),
-    'sectionId'
+    'sectionId',
   )
 
   const sortedSections = React.useMemo(() => {
@@ -108,7 +112,8 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
 
   const handleDragEnd = (result: DropResult) => {
     const { source, destination, type } = result
-    if (!destination) return // dropped outside the list
+    if (!destination)
+      return // dropped outside the list
 
     const sectionListSource = groupedSectionItems[source.droppableId]
     const sectionListDestination = groupedSectionItems[destination.droppableId]
@@ -117,40 +122,44 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
       const reorderedSections = reorderList(
         sections,
         source.index,
-        destination.index
+        destination.index,
       )
       handleReorderSections({
         payload: reorderedSections.map((s, idx) => ({
           id: Number(s.id),
           position: idx,
-        }))
+        })),
       })
-    } else if (type === 'ITEMS') {
-      if (!sectionListSource) throw new Error('Section "source" items not found')
+    }
+    else if (type === 'ITEMS') {
+      if (!sectionListSource)
+        throw new Error('Section "source" items not found')
 
       if (source.droppableId === destination.droppableId) {
         const reorderedItems = reorderList(
           sectionListSource,
           source.index,
-          destination.index
+          destination.index,
         )
         handleReorderMenuItems({
           payload: reorderedItems.map((i, idx) => ({
             id: Number(i.id),
             position: idx,
-          }))
+          })),
         })
       }
-
-    } else {
-      if (!sectionListSource) throw new Error('Section "source" items not found')
-      if (!sectionListDestination) throw new Error('Section "destination" items not found')
+    }
+    else {
+      if (!sectionListSource)
+        throw new Error('Section "source" items not found')
+      if (!sectionListDestination)
+        throw new Error('Section "destination" items not found')
 
       const { resultSource, resultDestination } = move(
         sectionListSource,
         sectionListDestination,
         source,
-        destination
+        destination,
       )
 
       const newSource = resultSource.map((i, idx) => ({
@@ -163,10 +172,10 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
           id: Number(i.id),
           position: idx,
           sectionId: Number(destination.droppableId),
-        })
+        }),
       )
       handleReorderMenuItems({
-        payload: newSource.concat(newDestination)
+        payload: newSource.concat(newDestination),
       })
     }
   }
@@ -177,156 +186,161 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
         <title>{menu?.title}</title>
       </Head>
       <Container maxW="container.md" px={{ base: '2', lg: '4' }}>
-        {sections.length > 0 && groupedSectionItems ? (
-          <DragDropContext
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-          >
-            <Droppable droppableId="sectionWrapper" type="SECTIONS">
-              {(drop) => (
-                <Stack spacing="8" ref={drop.innerRef} {...drop.droppableProps}>
-                  {sortedSections.map((s, idx) => (
-                    <Draggable
-                      key={`${s.id}`}
-                      draggableId={`${s.id}`}
-                      index={idx}
-                    >
-                      {(drag, snapshot) => (
-                        <Box ref={drag.innerRef} {...drag.draggableProps}>
-                          <Box
-                            bg="white"
-                            rounded="md"
-                            shadow={snapshot.isDragging ? 'lg' : 'base'}
-                            transform={
-                              snapshot.isDragging ? 'scale(1.04)' : 'none'
-                            }
-                            transition="all 0.1s ease"
-                          >
-                            <Center {...drag.dragHandleProps}>
-                              <Icon
-                                color="gray.500"
-                                boxSize="5"
-                                as={GripHorizontal}
-                              />
-                            </Center>
-                            <Flex
-                              pb="6"
-                              px="4"
-                              borderBottomWidth="1px"
-                              align="center"
-                              w="100%"
-                            >
-                              <Box>
-                                <Heading fontSize="2xl" fontWeight="semibold">
-                                  {s.title}
-                                </Heading>
-                                {s.description && (
-                                  <Text
-                                    color="gray.600"
-                                    mt="1"
-                                    whiteSpace="pre-line"
-                                  >
-                                    {s.description}
-                                  </Text>
-                                )}
-                              </Box>
-                              <Box ml="auto">
-                                <IconButton
-                                  aria-label='Edit section'
-                                  ml="2"
-                                  size="xs"
-                                  variant="outline"
-                                  icon={
-                                    <Icon
-                                      boxSize="5"
-                                      as={MoreVertical}
-                                      onClick={() =>
-                                        menu ? handleDrawerOpen(
-                                          <SectionDrawer
-                                            menu={menu}
-                                            section={s}
-                                            handleDrawerClose={
-                                              drawerState.onClose
-                                            }
-                                          />
-                                        ) : null
-                                      }
-                                    />
-                                  }
-                                />
-                              </Box>
-                            </Flex>
-                            <Box>
-                              <MenuItemsContainer
-                                sectionId={s.id}
-                                items={groupedSectionItems[s.id] || []}
-                                handleDrawerOpen={handleDrawerOpen}
-                                drawerState={drawerState}
-                              />
-                            </Box>
-                            <Flex px="4" py="3" borderTopWidth="1px">
-                              <Button
-                                colorScheme="blue"
-                                onClick={() =>
-                                  menu ? handleDrawerOpen(
-                                    <MenuItemDrawer
-                                      menu={menu}
-                                      section={s}
-                                      position={
-                                        groupedSectionItems?.[s.id]?.length || 0
-                                      }
-                                      handleDrawerClose={drawerState.onClose}
-                                    />
-                                  ) : null
-                                }
-                              >
-                                Add Item
-                              </Button>
-                            </Flex>
-                          </Box>
-                        </Box>
-                      )}
-                    </Draggable>
-                  ))}
-                  <Box bg="gray.50">{drop.placeholder}</Box>
-                </Stack>
-              )}
-            </Droppable>
-          </DragDropContext>
-        ) : (
-          <Box>
-            <Center
-              borderWidth="2px"
-              borderColor="gray.200"
-              bg="gray.100"
-              py="8"
-              px="4"
-              rounded="lg"
-            >
-              <Text
-                fontSize="xl"
-                fontWeight="medium"
-                color="gray.600"
-                textAlign="center"
+        {sections.length > 0 && groupedSectionItems
+          ? (
+              <DragDropContext
+                onDragEnd={handleDragEnd}
+                onDragStart={handleDragStart}
               >
-                Get started by adding a section to your menu.
-              </Text>
-            </Center>
-          </Box>
-        )}
+                <Droppable droppableId="sectionWrapper" type="SECTIONS">
+                  {drop => (
+                    <Stack spacing="8" ref={drop.innerRef} {...drop.droppableProps}>
+                      {sortedSections.map((s, idx) => (
+                        <Draggable
+                          key={`${s.id}`}
+                          draggableId={`${s.id}`}
+                          index={idx}
+                        >
+                          {(drag, snapshot) => (
+                            <Box ref={drag.innerRef} {...drag.draggableProps}>
+                              <Box
+                                bg="white"
+                                rounded="md"
+                                shadow={snapshot.isDragging ? 'lg' : 'base'}
+                                transform={
+                                  snapshot.isDragging ? 'scale(1.04)' : 'none'
+                                }
+                                transition="all 0.1s ease"
+                              >
+                                <Center {...drag.dragHandleProps}>
+                                  <Icon
+                                    color="gray.500"
+                                    boxSize="5"
+                                    as={GripHorizontal}
+                                  />
+                                </Center>
+                                <Flex
+                                  pb="6"
+                                  px="4"
+                                  borderBottomWidth="1px"
+                                  align="center"
+                                  w="100%"
+                                >
+                                  <Box>
+                                    <Heading fontSize="2xl" fontWeight="semibold">
+                                      {s.title}
+                                    </Heading>
+                                    {s.description && (
+                                      <Text
+                                        color="gray.600"
+                                        mt="1"
+                                        whiteSpace="pre-line"
+                                      >
+                                        {s.description}
+                                      </Text>
+                                    )}
+                                  </Box>
+                                  <Box ml="auto">
+                                    <IconButton
+                                      aria-label="Edit section"
+                                      ml="2"
+                                      size="xs"
+                                      variant="outline"
+                                      icon={(
+                                        <Icon
+                                          boxSize="5"
+                                          as={MoreVertical}
+                                          onClick={() =>
+                                            menu
+                                              ? handleDrawerOpen(
+                                                  <SectionDrawer
+                                                    menu={menu}
+                                                    section={s}
+                                                    handleDrawerClose={
+                                                      drawerState.onClose
+                                                    }
+                                                  />,
+                                                )
+                                              : null}
+                                        />
+                                      )}
+                                    />
+                                  </Box>
+                                </Flex>
+                                <Box>
+                                  <MenuItemsContainer
+                                    sectionId={s.id}
+                                    items={groupedSectionItems[s.id] || []}
+                                    handleDrawerOpen={handleDrawerOpen}
+                                    drawerState={drawerState}
+                                  />
+                                </Box>
+                                <Flex px="4" py="3" borderTopWidth="1px">
+                                  <Button
+                                    colorScheme="blue"
+                                    onClick={() =>
+                                      menu
+                                        ? handleDrawerOpen(
+                                            <MenuItemDrawer
+                                              menu={menu}
+                                              section={s}
+                                              position={
+                                                groupedSectionItems?.[s.id]?.length || 0
+                                              }
+                                              handleDrawerClose={drawerState.onClose}
+                                            />,
+                                          )
+                                        : null}
+                                  >
+                                    Add Item
+                                  </Button>
+                                </Flex>
+                              </Box>
+                            </Box>
+                          )}
+                        </Draggable>
+                      ))}
+                      <Box bg="gray.50">{drop.placeholder}</Box>
+                    </Stack>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            )
+          : (
+              <Box>
+                <Center
+                  borderWidth="2px"
+                  borderColor="gray.200"
+                  bg="gray.100"
+                  py="8"
+                  px="4"
+                  rounded="lg"
+                >
+                  <Text
+                    fontSize="xl"
+                    fontWeight="medium"
+                    color="gray.600"
+                    textAlign="center"
+                  >
+                    Get started by adding a section to your menu.
+                  </Text>
+                </Center>
+              </Box>
+            )}
         <Box py="8">
           <Button
             variant="outline"
             colorScheme="blue"
             onClick={() =>
-              menu ? handleDrawerOpen(
-                <SectionDrawer
-                  menu={menu}
-                  position={sortedSections.length}
-                  handleDrawerClose={drawerState.onClose}
-                />
-              ) : null
-            }
+              menu
+                ? handleDrawerOpen(
+                    <SectionDrawer
+                      menu={menu}
+                      position={sortedSections.length}
+                      handleDrawerClose={drawerState.onClose}
+                    />,
+                  )
+                : null}
           >
             Add Section
           </Button>
@@ -346,18 +360,17 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
 
 MenuEdit.getLayout = (page: React.ReactNode) => <MenuLayout>{page}</MenuLayout>
 
-const MenuItemsContainer = ({
+function MenuItemsContainer({
   items,
   handleDrawerOpen,
   drawerState,
   sectionId,
 }: {
-  items: RouterOutputs['menuItem']['getAllByMenuId'],
-  handleDrawerOpen: (content: React.ReactNode) => void,
-  drawerState: UseDisclosureReturn,
+  items: RouterOutputs['menuItem']['getAllByMenuId']
+  handleDrawerOpen: (content: React.ReactNode) => void
+  drawerState: UseDisclosureReturn
   sectionId: number
-}) => {
-
+}) {
   const router = useRouter()
   const { menuId } = router.query
 
@@ -365,7 +378,7 @@ const MenuItemsContainer = ({
 
   return (
     <Droppable droppableId={String(sectionId)} type="ITEMS">
-      {(drop) => (
+      {drop => (
         <Box>
           <Stack
             spacing="0"
@@ -373,50 +386,56 @@ const MenuItemsContainer = ({
             {...drop.droppableProps}
             divider={<StackDivider />}
           >
-            {items?.length > 0 ? (
-              items.map((menuItem, idx) => (
-                <Box key={`${sectionId}-${menuItem.id}`}>
-                  <Draggable
-                    draggableId={`${sectionId}-${menuItem.id}`}
-                    index={idx}
-                  >
-                    {(drag, snapshot) => (
-                      <Box ref={drag.innerRef} {...drag.draggableProps}>
-                        <Box
-                          borderRadius="md"
-                          bg="white"
-                          shadow={snapshot.isDragging ? 'md' : 'none'}
-                          transform={
-                            snapshot.isDragging ? 'scale(1.02)' : 'none'
-                          }
-                          transition="all 0.1s ease"
-                        >
-                          <Center {...drag.dragHandleProps}>
-                            <Icon
-                              color="gray.500"
-                              boxSize="5"
-                              as={GripHorizontal}
-                            />
-                          </Center>
-                          <Box pb="4" px="4">
-                            {menu ? <MenuItem
-                              menu={menu}
-                              menuItem={menuItem}
-                              handleDrawerOpen={handleDrawerOpen}
-                              drawerState={drawerState}
-                            /> : null}
+            {items?.length > 0
+              ? (
+                  items.map((menuItem, idx) => (
+                    <Box key={`${sectionId}-${menuItem.id}`}>
+                      <Draggable
+                        draggableId={`${sectionId}-${menuItem.id}`}
+                        index={idx}
+                      >
+                        {(drag, snapshot) => (
+                          <Box ref={drag.innerRef} {...drag.draggableProps}>
+                            <Box
+                              borderRadius="md"
+                              bg="white"
+                              shadow={snapshot.isDragging ? 'md' : 'none'}
+                              transform={
+                                snapshot.isDragging ? 'scale(1.02)' : 'none'
+                              }
+                              transition="all 0.1s ease"
+                            >
+                              <Center {...drag.dragHandleProps}>
+                                <Icon
+                                  color="gray.500"
+                                  boxSize="5"
+                                  as={GripHorizontal}
+                                />
+                              </Center>
+                              <Box pb="4" px="4">
+                                {menu
+                                  ? (
+                                      <MenuItem
+                                        menu={menu}
+                                        menuItem={menuItem}
+                                        handleDrawerOpen={handleDrawerOpen}
+                                        drawerState={drawerState}
+                                      />
+                                    )
+                                  : null}
+                              </Box>
+                            </Box>
                           </Box>
-                        </Box>
-                      </Box>
-                    )}
-                  </Draggable>
-                </Box>
-              ))
-            ) : (
-              <Center p="4">
-                <Text color="gray.600">Add an item to this section</Text>
-              </Center>
-            )}
+                        )}
+                      </Draggable>
+                    </Box>
+                  ))
+                )
+              : (
+                  <Center p="4">
+                    <Text color="gray.600">Add an item to this section</Text>
+                  </Center>
+                )}
             {drop.placeholder}
           </Stack>
         </Box>
@@ -425,17 +444,17 @@ const MenuItemsContainer = ({
   )
 }
 
-const MenuItem = ({
+function MenuItem({
   menu,
   menuItem,
   handleDrawerOpen,
-  drawerState
+  drawerState,
 }: {
-  menu: RouterOutputs['menu']['getById'],
-  menuItem: RouterOutputs['menuItem']['getAllByMenuId'][number],
-  handleDrawerOpen: (content: React.ReactNode) => void,
+  menu: RouterOutputs['menu']['getById']
+  menuItem: RouterOutputs['menuItem']['getAllByMenuId'][number]
+  handleDrawerOpen: (content: React.ReactNode) => void
   drawerState: UseDisclosureReturn
-}) => {
+}) {
   return (
     <Flex alignItems="flex-start">
       <AspectRatio
@@ -445,19 +464,21 @@ const MenuItem = ({
         rounded="sm"
         overflow="hidden"
       >
-        {menuItem.image ? (
-          <BlurImage
-            alt={menuItem.title || 'Menu Item'}
-            src={menuItem.image.src}
-            blurDataURL={menuItem.image.blurDataURL}
-            fill={true}
-            placeholder={menuItem.image.blurDataURL ? "blur" : 'empty'}
-          />
-        ) : (
-          <Box boxSize="100%" bg="gray.100">
-            <Icon color="gray.400" boxSize="5" as={Camera} />
-          </Box>
-        )}
+        {menuItem.image
+          ? (
+              <BlurImage
+                alt={menuItem.title || 'Menu Item'}
+                src={menuItem.image.src}
+                blurDataURL={menuItem.image.blurDataURL}
+                fill={true}
+                placeholder={menuItem.image.blurDataURL ? 'blur' : 'empty'}
+              />
+            )
+          : (
+              <Box boxSize="100%" bg="gray.100">
+                <Icon color="gray.400" boxSize="5" as={Camera} />
+              </Box>
+            )}
       </AspectRatio>
       <Box flexGrow="1" ml="4">
         <Flex>
@@ -479,25 +500,26 @@ const MenuItem = ({
           </Box>
           <Box>
             <IconButton
-              aria-label='Open menu item drawer'
+              aria-label="Open menu item drawer"
               ml="2"
               size="xs"
               variant="outline"
-              icon={
+              icon={(
                 <Icon
                   boxSize="5"
                   as={MoreVertical}
                   onClick={() =>
-                    menu ? handleDrawerOpen(
-                      <MenuItemDrawer
-                        menu={menu}
-                        menuItem={menuItem}
-                        handleDrawerClose={drawerState.onClose}
-                      />
-                    ) : null
-                  }
+                    menu
+                      ? handleDrawerOpen(
+                          <MenuItemDrawer
+                            menu={menu}
+                            menuItem={menuItem}
+                            handleDrawerClose={drawerState.onClose}
+                          />,
+                        )
+                      : null}
                 />
-              }
+              )}
             />
           </Box>
         </Flex>
@@ -506,27 +528,27 @@ const MenuItem = ({
   )
 }
 
-type DefaultValueSectionType = {
-  title: string,
+interface DefaultValueSectionType {
+  title: string
   description: string
 }
 
-const SectionDrawer = ({
+function SectionDrawer({
   position,
   section,
   menu,
-  handleDrawerClose
+  handleDrawerClose,
 }: {
-  position: number,
-  section?: undefined,
-  menu: RouterOutputs['menu']['getById'],
+  position: number
+  section?: undefined
+  menu: RouterOutputs['menu']['getById']
   handleDrawerClose: () => void
 } | {
-  position?: undefined,
-  section: RouterOutputs['section']['getAllByMenuId'][number],
-  menu: RouterOutputs['menu']['getById'],
+  position?: undefined
+  section: RouterOutputs['section']['getAllByMenuId'][number]
+  menu: RouterOutputs['menu']['getById']
   handleDrawerClose: () => void
-}) => {
+}) {
   const router = useRouter()
   const { menuId } = router.query
 
@@ -541,18 +563,19 @@ const SectionDrawer = ({
 
   const {
     register,
-    handleSubmit
+    handleSubmit,
   } = useForm<DefaultValueSectionType>({ defaultValues })
 
   const { mutateAsync: handleUpdateSection, isSuccess: isUpdateSuccess } = useUpdateSection(Number(menuId))
   const { mutateAsync: handleCreateSection, isSuccess: isCreateSuccess } = useCreateSection(Number(menuId))
-  const { mutateAsync: handleDeleteSection, isPending: isDeleting, isSuccess: isDeleteSuccess } =
-    useDeleteSection(Number(menuId))
+  const { mutateAsync: handleDeleteSection, isPending: isDeleting, isSuccess: isDeleteSuccess }
+    = useDeleteSection(Number(menuId))
 
   const onDelete = () => {
-    if (!section) return
+    if (!section)
+      return
     handleDeleteSection({
-      where: { id: section.id }
+      where: { id: section.id },
     })
   }
 
@@ -564,28 +587,29 @@ const SectionDrawer = ({
   }, [dialogState, handleDrawerClose, isDeleteSuccess])
 
   React.useEffect(() => {
-    if (isUpdateSuccess || isCreateSuccess) handleDrawerClose()
+    if (isUpdateSuccess || isCreateSuccess)
+      handleDrawerClose()
   }, [handleDrawerClose, isCreateSuccess, isUpdateSuccess])
-
 
   const onSubmit: SubmitHandler<DefaultValueSectionType> = async (form) => {
     try {
       setIsSubmitting(true)
       section
         ? handleUpdateSection({
-          where: { id: section.id },
-          payload: form,
-        })
+            where: { id: section.id },
+            payload: form,
+          })
         : handleCreateSection({
-          payload: {
-            ...form,
-            position,
-            menuId: menu?.id,
-            restaurantId: menu?.restaurantId,
-          }
-        })
+            payload: {
+              ...form,
+              position,
+              menuId: menu?.id,
+              restaurantId: menu?.restaurantId,
+            },
+          })
       setIsSubmitting(false)
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(error)
     }
@@ -666,39 +690,39 @@ const SectionDrawer = ({
   )
 }
 
-type DefaultValueMenuItemType = {
-  title: string,
-  price: string,
+interface DefaultValueMenuItemType {
+  title: string
+  price: string
   description: string
   image: {
     type: 'old'
-    src: string,
+    src: string
     blurDataURL?: string
   } | {
     type: 'new'
     file: File
-    src?: string,
+    src?: string
   }
 }
 
-const MenuItemDrawer = ({
+function MenuItemDrawer({
   position,
   section,
   menuItem,
   handleDrawerClose,
 }: {
-  position: number,
-  section: RouterOutputs['section']['getAllByMenuId'][number],
-  menuItem?: undefined,
-  menu: RouterOutputs['menu']['getById'],
+  position: number
+  section: RouterOutputs['section']['getAllByMenuId'][number]
+  menuItem?: undefined
+  menu: RouterOutputs['menu']['getById']
   handleDrawerClose: () => void
 } | {
-  position?: undefined,
-  section?: undefined,
-  menuItem: RouterOutputs['menuItem']['getAllByMenuId'][number],
-  menu: RouterOutputs['menu']['getById'],
+  position?: undefined
+  section?: undefined
+  menuItem: RouterOutputs['menuItem']['getAllByMenuId'][number]
+  menu: RouterOutputs['menu']['getById']
   handleDrawerClose: () => void
-}) => {
+}) {
   const router = useRouter()
   const { menuId } = router.query
 
@@ -712,7 +736,7 @@ const MenuItemDrawer = ({
     description: menuItem?.description || '',
     image: {
       type: 'old',
-      src: menuItem?.image?.src || ''
+      src: menuItem?.image?.src || '',
     },
   }
 
@@ -724,8 +748,8 @@ const MenuItemDrawer = ({
 
   const { mutateAsync: handleUpdateMenuItem, isSuccess: isUpdateSuccess } = useUpdateMenuItem(Number(menuId))
   const { mutateAsync: handleCreateMenuItem, isSuccess: isCreateSuccess } = useCreateMenuItem(Number(menuId))
-  const { mutateAsync: handleDeleteMenuItem, isPending: isDeleting, isSuccess: isDeleteSuccess } =
-    useDeleteMenuItem(Number(menuId))
+  const { mutateAsync: handleDeleteMenuItem, isPending: isDeleting, isSuccess: isDeleteSuccess }
+    = useDeleteMenuItem(Number(menuId))
 
   React.useEffect(() => {
     if (isDeleteSuccess) {
@@ -735,11 +759,13 @@ const MenuItemDrawer = ({
   }, [dialogState, handleDrawerClose, isDeleteSuccess])
 
   React.useEffect(() => {
-    if (isUpdateSuccess || isCreateSuccess) handleDrawerClose()
+    if (isUpdateSuccess || isCreateSuccess)
+      handleDrawerClose()
   }, [handleDrawerClose, isCreateSuccess, isUpdateSuccess])
 
   const onDelete = () => {
-    if (!menuItem) return
+    if (!menuItem)
+      return
     handleDeleteMenuItem({ where: { id: menuItem.id } })
   }
 
@@ -754,7 +780,7 @@ const MenuItemDrawer = ({
 
         const data = await postUpload(formData)
         imageData = {
-          image: data
+          image: data,
         }
       }
 
@@ -766,21 +792,22 @@ const MenuItemDrawer = ({
       }
       menuItem
         ? handleUpdateMenuItem({
-          where: { id: menuItem.id },
-          payload,
-        })
+            where: { id: menuItem.id },
+            payload,
+          })
         : handleCreateMenuItem({
-          payload: {
-            ...payload,
-            position,
-            sectionId: section.id,
-            menuId: section.menuId,
-            restaurantId: section.restaurantId,
-          }
-        })
+            payload: {
+              ...payload,
+              position,
+              sectionId: section.id,
+              menuId: section.menuId,
+              restaurantId: section.restaurantId,
+            },
+          })
 
       setIsSubmitting(false)
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(error)
     }
@@ -801,7 +828,7 @@ const MenuItemDrawer = ({
                   name="image"
                   control={control}
                   render={({ field: { onChange, value } }) => {
-                    return <ImageDropzone onChange={(val) => onChange({ type: 'new', file: val })} value={value.src || ''} />
+                    return <ImageDropzone onChange={val => onChange({ type: 'new', file: val })} value={value.src || ''} />
                   }}
                 />
               </AspectRatio>
@@ -822,7 +849,7 @@ const MenuItemDrawer = ({
               render={({ field: { value, ...field } }) => (
                 <NumberInput
                   {...field}
-                  value={value ? '$' + value : ''}
+                  value={value ? `$${value}` : ''}
                   precision={2}
                   step={0.01}
                   min={0}
@@ -897,17 +924,17 @@ const MenuItemDrawer = ({
   )
 }
 
-const MenuItemDeleteDialog = ({
+function MenuItemDeleteDialog({
   leastDestructiveRef,
   onClose,
   onDelete,
   isDeleting,
 }: {
-  leastDestructiveRef: React.RefObject<HTMLButtonElement>,
-  onClose: UseDisclosureReturn['onClose'],
-  onDelete: () => void,
-  isDeleting: boolean,
-}) => {
+  leastDestructiveRef: React.RefObject<HTMLButtonElement>
+  onClose: UseDisclosureReturn['onClose']
+  onDelete: () => void
+  isDeleting: boolean
+}) {
   return (
     <>
       <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -933,17 +960,17 @@ const MenuItemDeleteDialog = ({
   )
 }
 
-const SectionDeleteDialog = ({
+function SectionDeleteDialog({
   leastDestructiveRef,
   onClose,
   onDelete,
   isDeleting,
 }: {
-  leastDestructiveRef: React.RefObject<HTMLButtonElement>,
-  onClose: UseDisclosureReturn['onClose'],
-  onDelete: () => void,
-  isDeleting: boolean,
-}) => {
+  leastDestructiveRef: React.RefObject<HTMLButtonElement>
+  onClose: UseDisclosureReturn['onClose']
+  onDelete: () => void
+  isDeleting: boolean
+}) {
   return (
     <>
       <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -953,7 +980,8 @@ const SectionDeleteDialog = ({
       <AlertDialogBody>
         <Text mb="4">
           Are you sure you want to delete this section? Deleting a section also
-          deletes{' '}
+          deletes
+          {' '}
           <Text as="em" fontWeight="semibold">
             all the items it contains
           </Text>
@@ -984,11 +1012,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 
@@ -999,7 +1027,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length === 0) {
+  }
+  else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',
@@ -1015,4 +1044,3 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   }
 }
-

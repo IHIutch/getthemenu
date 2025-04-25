@@ -7,9 +7,9 @@ export default function SEO({
   image,
   url,
 }: {
-  title: string,
-  description?: string,
-  image?: string,
+  title: string
+  description?: string
+  image?: string
   url?: string
 }) {
   const attrs = [
@@ -67,7 +67,7 @@ export default function SEO({
     <Head>
       <title key="title">{title}</title>
       {attrs
-        .filter((attr) => attr.content)
+        .filter(attr => attr.content)
         .map((attr, idx) => (
           <meta key={idx} {...attr} />
         ))}

@@ -1,16 +1,13 @@
-"use client"
+'use client'
 
 import { MenuSchema } from '@/utils/zod'
 import { Box, Container, FormControl, FormLabel, Grid, GridItem, Select, Stack } from '@chakra-ui/react'
+import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 import { z } from 'zod'
-import { usePathname, useRouter } from 'next/navigation'
-import Link from 'next/link'
 
-const Menus = z.array(MenuSchema)
-type MenusType = z.infer<typeof Menus>
-
-
+const _Menus = z.array(MenuSchema)
+type MenusType = z.infer<typeof _Menus>
 
 export default function MenuSelector({ menus }: { menus: MenusType }) {
   const router = useRouter()
@@ -19,7 +16,6 @@ export default function MenuSelector({ menus }: { menus: MenusType }) {
   const handleMenuChange = (toMenuSlug: string) => {
     router.push(`/${toMenuSlug}`)
   }
-
 
   return (
     <Box
@@ -43,7 +39,7 @@ export default function MenuSelector({ menus }: { menus: MenusType }) {
                     handleMenuChange(e.target.value)
                   }}
                 >
-                  {menus.map((m) => (
+                  {menus.map(m => (
                     <option key={m.id} value={m.slug || ''}>
                       {m.title}
                     </option>

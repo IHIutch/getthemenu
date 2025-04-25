@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import type { SubmitHandler } from 'react-hook-form'
+import { env } from '@/utils/env'
+import { getErrorMessage } from '@/utils/functions'
+import { createClientComponent } from '@/utils/supabase/component'
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
+  Container,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -10,20 +16,14 @@ import {
   GridItem,
   Heading,
   Input,
-  Link,
-  Container,
   Text,
-  Alert,
-  AlertIcon,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { createClientComponent } from '@/utils/supabase/component'
-import { getErrorMessage } from '@/utils/functions'
-import { env } from '@/utils/env'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
 
-type FormData = {
+interface FormData {
   email: string
 }
 
@@ -38,8 +38,8 @@ export default function ForgotPassword() {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      email: ''
-    }
+      email: '',
+    },
   })
 
   const onSubmit: SubmitHandler<FormData> = async (form) => {
@@ -49,12 +49,14 @@ export default function ForgotPassword() {
         form.email,
         {
           redirectTo: `${env.BASE_URL}/reset-password`,
-        }
+        },
       )
-      if (error) throw new Error(error.message)
+      if (error)
+        throw new Error(error.message)
       setIsSubmitting(false)
       setSuccess(true)
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -109,7 +111,7 @@ export default function ForgotPassword() {
                     <Flex align="center">
                       <Button
                         as={NextLink}
-                        href={'/'}
+                        href="/"
                         variant="link"
                         fontWeight="semibold"
                         colorScheme="blue"

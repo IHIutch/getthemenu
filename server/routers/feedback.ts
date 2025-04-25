@@ -1,7 +1,7 @@
-import { authedProcedure, router } from "@/utils/trpc";
-import { FeedbackSchema } from "@/utils/zod";
-import { z } from "zod";
-import { prismaCreateFeedback } from "@/utils/prisma/feedback";
+import { prismaCreateFeedback } from '@/utils/prisma/feedback'
+import { authedProcedure, router } from '@/utils/trpc'
+import { FeedbackSchema } from '@/utils/zod'
+import { z } from 'zod'
 
 export const feedbackRouter = router({
   create: authedProcedure.input(
@@ -9,9 +9,9 @@ export const feedbackRouter = router({
       payload: FeedbackSchema.omit({
         createdAt: true,
         updatedAt: true,
-        deletedAt: true
-      })
-    })
+        deletedAt: true,
+      }),
+    }),
   ).mutation(async ({ input }) => {
     const { payload } = input
     const data = await prismaCreateFeedback({
@@ -19,11 +19,11 @@ export const feedbackRouter = router({
         ...payload,
         users: {
           connect: {
-            id: payload.userId
-          }
-        }
-      }
+            id: payload.userId,
+          },
+        },
+      },
     })
     return data
-  })
+  }),
 })

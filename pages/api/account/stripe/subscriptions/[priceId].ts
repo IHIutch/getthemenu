@@ -1,10 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { resStatusType } from '@/utils/apiResponseTypes'
 import { prismaGetUser } from '@/utils/prisma/users'
 import { createStripeCheckoutSession } from '@/utils/stripe'
 import { createClientApi } from '@/utils/supabase/api'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClientApi(req, res)
   const { data } = await supabase.auth.getUser()
 

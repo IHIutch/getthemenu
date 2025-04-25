@@ -1,14 +1,14 @@
-import { prismaCreateSection, prismaDeleteSection, prismaGetSection, prismaGetSections, prismaUpdateSection, prismaUpdateSections } from "@/utils/prisma/sections";
-import { authedProcedure, router } from "@/utils/trpc";
-import { SectionSchema } from "@/utils/zod";
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { prismaCreateSection, prismaDeleteSection, prismaGetSection, prismaGetSections, prismaUpdateSection, prismaUpdateSections } from '@/utils/prisma/sections'
+import { authedProcedure, router } from '@/utils/trpc'
+import { SectionSchema } from '@/utils/zod'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 export const sectionRouter = router({
   getAllByMenuId: authedProcedure.input(
     z.object({
-      where: SectionSchema.pick({ menuId: true })
-    })
+      where: SectionSchema.pick({ menuId: true }),
+    }),
   ).query(async ({ input }) => {
     const { where } = input
     const data = await prismaGetSections({ where })
@@ -22,8 +22,8 @@ export const sectionRouter = router({
   }),
   getById: authedProcedure.input(
     z.object({
-      where: SectionSchema.pick({ id: true })
-    })
+      where: SectionSchema.pick({ id: true }),
+    }),
   ).query(async ({ input }) => {
     const { where } = input
     const data = await prismaGetSection({ where })
@@ -41,9 +41,9 @@ export const sectionRouter = router({
         id: true,
         createdAt: true,
         updatedAt: true,
-        deletedAt: true
-      })
-    })
+        deletedAt: true,
+      }),
+    }),
   ).mutation(async ({ input }) => {
     const { payload } = input
     const data = await prismaCreateSection({
@@ -51,15 +51,15 @@ export const sectionRouter = router({
         ...payload,
         restaurants: {
           connect: {
-            id: payload.restaurantId
-          }
+            id: payload.restaurantId,
+          },
         },
         menus: {
           connect: {
-            id: payload.menuId
-          }
+            id: payload.menuId,
+          },
         },
-      }
+      },
     })
     return data
   }),
@@ -70,15 +70,15 @@ export const sectionRouter = router({
         id: true,
         createdAt: true,
         updatedAt: true,
-        deletedAt: true
-      }).partial()
-    })
+        deletedAt: true,
+      }).partial(),
+    }),
 
   ).mutation(async ({ input }) => {
     const { where, payload } = input
     const data = prismaUpdateSection({
       where,
-      payload
+      payload,
     })
     return data
   }),
@@ -87,13 +87,13 @@ export const sectionRouter = router({
       payload: z.array(
         SectionSchema.pick({
           id: true,
-          position: true
+          position: true,
         }).extend({
           id: z.number().positive(),
-          position: z.number()
-        })
-      )
-    })
+          position: z.number(),
+        }),
+      ),
+    }),
   ).mutation(async ({ input }) => {
     const { payload } = input
     const data = await prismaUpdateSections({ payload })
@@ -102,7 +102,7 @@ export const sectionRouter = router({
   delete: authedProcedure.input(
     z.object({
       where: SectionSchema.pick({ id: true }),
-    })
+    }),
 
   ).mutation(async ({ input }) => {
     const { where } = input

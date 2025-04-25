@@ -1,6 +1,12 @@
-import * as React from 'react'
-import NextLink from 'next/link'
+import type {
+  UseRadioGroupProps,
+  UseRadioProps,
+} from '@chakra-ui/react'
+import type { SubmitHandler } from 'react-hook-form'
+import { getErrorMessage } from '@/utils/functions'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
+import { useGetAuthedUser } from '@/utils/react-query/users'
+import { trpc } from '@/utils/trpc/client'
 import {
   Avatar,
   Box,
@@ -32,26 +38,22 @@ import {
   useDisclosure,
   useRadio,
   useRadioGroup,
-  UseRadioGroupProps,
-  UseRadioProps,
 } from '@chakra-ui/react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { useGetAuthedUser } from '@/utils/react-query/users'
-import { trpc } from '@/utils/trpc/client'
-import { getErrorMessage } from '@/utils/functions'
+import NextLink from 'next/link'
+import * as React from 'react'
+import { Controller, useForm } from 'react-hook-form'
 
-type FormValues = {
-  userId: string,
-  type: string,
-  comment: string,
+interface FormValues {
+  userId: string
+  type: string
+  comment: string
 }
 
 export default function Navbar({
   children,
 }: {
-  children: React.ReactNode,
+  children: React.ReactNode
 }) {
-
   const { data: user } = useGetAuthedUser()
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
   const { mutateAsync: handleCreateFeedback, isPending: isSubmitting } = trpc.feedback.create.useMutation()
@@ -76,14 +78,15 @@ export default function Navbar({
           userId: user?.id || '',
           type: form.type,
           comment: form.comment,
-        }
+        },
       }, {
         onError(error) {
           alert(getErrorMessage(error))
-        }
+        },
       })
       modalState.onClose()
-    } catch (error) {
+    }
+    catch (error) {
       alert(error)
     }
   }
@@ -105,7 +108,7 @@ export default function Navbar({
             <Flex align="center">
               <Flex align="center" h="14">
                 <Heading as="h1" fontSize="lg">
-                  <Link as={NextLink} href={'/dashboard'}>GetTheMenu</Link>
+                  <Link as={NextLink} href="/dashboard">GetTheMenu</Link>
                 </Heading>
               </Flex>
               <Box ml="auto">
@@ -190,7 +193,7 @@ export default function Navbar({
   )
 }
 
-const FeedbackButtons = (props: UseRadioGroupProps) => {
+function FeedbackButtons(props: UseRadioGroupProps) {
   const options = [
     {
       value: 'idea',
@@ -231,7 +234,7 @@ const FeedbackButtons = (props: UseRadioGroupProps) => {
   )
 }
 
-const FeedbackButton = ({ children, ...props }: { children: React.ReactNode } & UseRadioProps) => {
+function FeedbackButton({ children, ...props }: { children: React.ReactNode } & UseRadioProps) {
   const { getInputProps, getRadioProps } = useRadio(props)
 
   const input = getInputProps()

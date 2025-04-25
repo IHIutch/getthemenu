@@ -1,9 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { resStatusType } from '@/utils/apiResponseTypes'
 import { verifyCustomDomain } from '@/utils/customDomain'
 import { getErrorMessage } from '@/utils/functions'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
   switch (method) {
@@ -13,7 +13,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const data = await verifyCustomDomain(domain)
 
         res.status(resStatusType.SUCCESS).json(data)
-      } catch (error) {
+      }
+      catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
       break

@@ -1,11 +1,13 @@
-import * as React from 'react'
-import { AnimatePresence, LayoutGroup, motion } from 'framer-motion'
-import { useRouter } from 'next/router'
+import type { RouterOutputs } from '@/server'
+import type { LinkProps as NextLinkProps } from 'next/link'
+import { formatTime } from '@/utils/functions'
+import { DAYS_OF_WEEK } from '@/utils/zod'
 import {
   AspectRatio,
   Box,
   Button,
   Center,
+  chakra,
   Container,
   Flex,
   FormControl,
@@ -28,28 +30,32 @@ import {
   TabPanels,
   Tabs,
   Text,
-  chakra,
   useBreakpointValue,
   useDisclosure,
 } from '@chakra-ui/react'
-import NextLink, { type LinkProps as NextLinkProps } from 'next/link'
 import dayjs from 'dayjs'
-import { Phone, Clock } from 'lucide-react'
-import { formatTime } from '@/utils/functions'
-import BlurImage from '@/components/common/BlurImage'
-import { RouterOutputs } from '@/server'
-import { DAYS_OF_WEEK } from '@/utils/zod'
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion'
+import { Clock, Phone } from 'lucide-react'
 import NextImage from 'next/image'
+import NextLink from 'next/link'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+
+// wrap the NextLink with Chakra UI's factory function
+const MagicLink = chakra<typeof NextLink, NextLinkProps>(NextLink, {
+  // ensure that you're forwarding all of the required props for your case
+  shouldForwardProp: prop => ['href', 'target', 'children'].includes(prop),
+})
 
 export default function PublicLayout({
   restaurant,
   menus,
   isPreview = false,
-  children
+  children,
 }: {
-  restaurant: Pick<RouterOutputs['restaurant']['getById'], 'coverImage' | 'name' | 'phone' | 'email' | 'hours' | 'address'>,
-  menus: RouterOutputs['menu']['getAllByRestaurantId'],
-  isPreview: boolean,
+  restaurant: Pick<RouterOutputs['restaurant']['getById'], 'coverImage' | 'name' | 'phone' | 'email' | 'hours' | 'address'>
+  menus: RouterOutputs['menu']['getAllByRestaurantId']
+  isPreview: boolean
   children: React.ReactNode
 }) {
   const modalState = useDisclosure()
@@ -58,7 +64,7 @@ export default function PublicLayout({
   const host = router.query?.host
   const slug = router.query?.slug?.toString()
   const activeMenu = slug
-    ? (menus || []).find((menu) => menu.slug === slug)
+    ? (menus || []).find(menu => menu.slug === slug)
     : menus?.[0]
 
   const handleMenuChange = (toMenuSlug: string) => {
@@ -80,20 +86,22 @@ export default function PublicLayout({
             <Box>
               <AspectRatio ratio={{ base: 4 / 3, sm: 21 / 9 }}>
                 <Box boxSize="100%">
-                  {restaurant?.coverImage?.src ? (
-                    <NextImage
-                      alt={restaurant?.name || ''}
-                      src={restaurant?.coverImage?.src}
-                      blurDataURL={restaurant?.coverImage?.blurDataURL}
-                      fill={true}
-                      priority={true}
-                      sizes="100vw"
-                      style={{ objectFit: 'cover' }}
-                      placeholder={restaurant?.coverImage?.blurDataURL ? "blur" : 'empty'}
-                    />
-                  ) : (
-                    <Box boxSize="100%" bg="gray.400" />
-                  )}
+                  {restaurant?.coverImage?.src
+                    ? (
+                        <NextImage
+                          alt={restaurant?.name || ''}
+                          src={restaurant?.coverImage?.src}
+                          blurDataURL={restaurant?.coverImage?.blurDataURL}
+                          fill={true}
+                          priority={true}
+                          sizes="100vw"
+                          style={{ objectFit: 'cover' }}
+                          placeholder={restaurant?.coverImage?.blurDataURL ? 'blur' : 'empty'}
+                        />
+                      )
+                    : (
+                        <Box boxSize="100%" bg="gray.400" />
+                      )}
                   <Flex
                     position="absolute"
                     bottom="0"
@@ -125,21 +133,27 @@ export default function PublicLayout({
                           )}
                           <Stack direction="row" align="center" py="1">
                             <Icon as={Clock} />
-                            {restaurant?.hours?.[weekdayName]?.isOpen ? (
-                              <Text>
-                                {restaurant.hours?.[weekdayName]?.openTime ?
-                                  formatTime(
-                                    restaurant.hours?.[weekdayName]?.openTime || ''
-                                  ) : null}{' '}
-                                -{' '}
-                                {restaurant.hours?.[weekdayName]?.closeTime ?
-                                  formatTime(
-                                    restaurant.hours?.[weekdayName]?.closeTime || ''
-                                  ) : null}
-                              </Text>
-                            ) : (
-                              <Text>Closed Today</Text>
-                            )}
+                            {restaurant?.hours?.[weekdayName]?.isOpen
+                              ? (
+                                  <Text>
+                                    {restaurant.hours?.[weekdayName]?.openTime
+                                      ? formatTime(
+                                          restaurant.hours?.[weekdayName]?.openTime || '',
+                                        )
+                                      : null}
+                                    {' '}
+                                    -
+                                    {' '}
+                                    {restaurant.hours?.[weekdayName]?.closeTime
+                                      ? formatTime(
+                                          restaurant.hours?.[weekdayName]?.closeTime || '',
+                                        )
+                                      : null}
+                                  </Text>
+                                )
+                              : (
+                                  <Text>Closed Today</Text>
+                                )}
                           </Stack>
                         </Flex>
                         {isSiteReady && (
@@ -155,216 +169,235 @@ export default function PublicLayout({
                 </Box>
               </AspectRatio>
             </Box>
-            {isSiteReady ? (
-              <>
-                <Box
-                  position="sticky"
-                  top="0"
-                  borderBottomWidth="1px"
-                  py="4"
-                  bg="gray.50"
-                  zIndex="1"
-                >
-                  <Container maxW="container.lg" px={{ base: '2', lg: '4' }}>
-                    <Grid templateColumns="repeat(12, 1fr)" gap="4">
-                      <GridItem colSpan={{ base: 12, lg: 7 }}>
-                        <Stack direction="row" align="flex-end">
-                          <FormControl flexGrow="1" id="menu">
-                            <FormLabel mb="1">Select a Menu</FormLabel>
-                            <Select
-                              bg="white"
-                              value={activeMenu?.slug || ''}
-                              onChange={(e) => {
-                                handleMenuChange(e.target.value)
-                              }}
-                            >
-                              {menus?.map((m) => (
-                                <option key={m.id} value={m.slug || ''}>
-                                  {m.title}
-                                </option>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </Stack>
-                      </GridItem>
-                    </Grid>
-                  </Container>
-                </Box>
-                <Container maxW="container.lg">
-                  <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">
-                    <GridItem
-                      colSpan={{ base: 12, lg: 7 }}
-                      position="relative"
+            {isSiteReady
+              ? (
+                  <>
+                    <Box
+                      position="sticky"
+                      top="0"
+                      borderBottomWidth="1px"
+                      py="4"
+                      bg="gray.50"
+                      zIndex="1"
                     >
-                      <LayoutGroup>
-                        <AnimatePresence initial={false}>
-                          <motion.main
-                            key={router.asPath}
-                            initial={'hidden'}
-                            animate={'shown'}
-                            exit={'hidden'}
-                            variants={{
-                              hidden: {
-                                opacity: 0,
-                                x: 0,
-                                y: 50,
-                                position: 'absolute',
-                              },
-                              shown: {
-                                opacity: 1,
-                                x: 0,
-                                y: 0,
-                                position: 'relative',
-                              },
-                            }}
-                            transition={{
-                              type: 'easeInOut',
-                            }}
-                            style={{
-                              width: '100%',
-                            }}
-                          >
-                            <Box py="4">{children}</Box>
-                          </motion.main>
-                        </AnimatePresence>
-                      </LayoutGroup>
-                    </GridItem>
-                    <GridItem
-                      display={{ base: 'none', lg: 'block' }}
-                      colSpan={{ base: 12, lg: 4 }}
-                      colStart={{ lg: 9 }}
-                    >
-                      <Box position="sticky" top="28">
-                        {restaurant?.hours && (
-                          <Stack pt="4" spacing="8">
-                            <Box
-                              bg="white"
-                              shadow="sm"
-                              rounded="md"
-                              borderWidth="1px"
-                            >
-                              <Box p="4" borderBottomWidth="1px">
-                                <Heading fontSize="lg">Contact</Heading>
-                              </Box>
-                              <Stack spacing="4" p="4" fontSize="sm">
-                                {restaurant?.phone && restaurant.phone.length > 0 ? (
-                                  <Box>
-                                    <Text fontWeight="semibold">Phone</Text>
-                                    <Stack as="ul" spacing="1">
-                                      {restaurant.phone.map((phone, idx) => (
-                                        <Text
-                                          as="li"
-                                          key={idx}
-                                          listStyleType="none"
-                                        >
-                                          {phone}
-                                        </Text>
-                                      ))}
-                                    </Stack>
+                      <Container maxW="container.lg" px={{ base: '2', lg: '4' }}>
+                        <Grid templateColumns="repeat(12, 1fr)" gap="4">
+                          <GridItem colSpan={{ base: 12, lg: 7 }}>
+                            <Stack direction="row" align="flex-end">
+                              <FormControl flexGrow="1" id="menu">
+                                <FormLabel mb="1">Select a Menu</FormLabel>
+                                <Select
+                                  bg="white"
+                                  value={activeMenu?.slug || ''}
+                                  onChange={(e) => {
+                                    handleMenuChange(e.target.value)
+                                  }}
+                                >
+                                  {menus?.map(m => (
+                                    <option key={m.id} value={m.slug || ''}>
+                                      {m.title}
+                                    </option>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </Stack>
+                          </GridItem>
+                        </Grid>
+                      </Container>
+                    </Box>
+                    <Container maxW="container.lg">
+                      <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">
+                        <GridItem
+                          colSpan={{ base: 12, lg: 7 }}
+                          position="relative"
+                        >
+                          <LayoutGroup>
+                            <AnimatePresence initial={false}>
+                              <motion.main
+                                key={router.asPath}
+                                initial="hidden"
+                                animate="shown"
+                                exit="hidden"
+                                variants={{
+                                  hidden: {
+                                    opacity: 0,
+                                    x: 0,
+                                    y: 50,
+                                    position: 'absolute',
+                                  },
+                                  shown: {
+                                    opacity: 1,
+                                    x: 0,
+                                    y: 0,
+                                    position: 'relative',
+                                  },
+                                }}
+                                transition={{
+                                  type: 'easeInOut',
+                                }}
+                                style={{
+                                  width: '100%',
+                                }}
+                              >
+                                <Box py="4">{children}</Box>
+                              </motion.main>
+                            </AnimatePresence>
+                          </LayoutGroup>
+                        </GridItem>
+                        <GridItem
+                          display={{ base: 'none', lg: 'block' }}
+                          colSpan={{ base: 12, lg: 4 }}
+                          colStart={{ lg: 9 }}
+                        >
+                          <Box position="sticky" top="28">
+                            {restaurant?.hours && (
+                              <Stack pt="4" spacing="8">
+                                <Box
+                                  bg="white"
+                                  shadow="sm"
+                                  rounded="md"
+                                  borderWidth="1px"
+                                >
+                                  <Box p="4" borderBottomWidth="1px">
+                                    <Heading fontSize="lg">Contact</Heading>
                                   </Box>
-                                ) : null}
-                                {restaurant?.address ? (
-                                  <Box>
-                                    <Text as="dt" fontWeight="semibold">
-                                      Address
-                                    </Text>
-                                    <Text as="dd">
-                                      {restaurant.address?.streetAddress} <br />
-                                      {restaurant.address?.city},{' '}
-                                      {restaurant.address?.state}{' '}
-                                      {restaurant.address?.zip}
-                                    </Text>
+                                  <Stack spacing="4" p="4" fontSize="sm">
+                                    {restaurant?.phone && restaurant.phone.length > 0
+                                      ? (
+                                          <Box>
+                                            <Text fontWeight="semibold">Phone</Text>
+                                            <Stack as="ul" spacing="1">
+                                              {restaurant.phone.map((phone, idx) => (
+                                                <Text
+                                                  as="li"
+                                                  key={idx}
+                                                  listStyleType="none"
+                                                >
+                                                  {phone}
+                                                </Text>
+                                              ))}
+                                            </Stack>
+                                          </Box>
+                                        )
+                                      : null}
+                                    {restaurant?.address
+                                      ? (
+                                          <Box>
+                                            <Text as="dt" fontWeight="semibold">
+                                              Address
+                                            </Text>
+                                            <Text as="dd">
+                                              {restaurant.address?.streetAddress}
+                                              {' '}
+                                              <br />
+                                              {restaurant.address?.city}
+                                              ,
+                                              {' '}
+                                              {restaurant.address?.state}
+                                              {' '}
+                                              {restaurant.address?.zip}
+                                            </Text>
+                                          </Box>
+                                        )
+                                      : null}
+                                    {restaurant?.email && restaurant.email.length > 0
+                                      ? (
+                                          <Box>
+                                            <Text fontWeight="semibold">Email</Text>
+                                            <Stack as="ul" spacing="1">
+                                              {restaurant.email.map((email, idx) => (
+                                                <Text
+                                                  as="li"
+                                                  key={idx}
+                                                  listStyleType="none"
+                                                >
+                                                  {email}
+                                                </Text>
+                                              ))}
+                                            </Stack>
+                                          </Box>
+                                        )
+                                      : null}
+                                  </Stack>
+                                </Box>
+                                <Box
+                                  bg="white"
+                                  shadow="sm"
+                                  rounded="md"
+                                  borderWidth="1px"
+                                >
+                                  <Box p="4" borderBottomWidth="1px">
+                                    <Heading fontSize="lg">Hours</Heading>
                                   </Box>
-                                ) : null}
-                                {restaurant?.email && restaurant.email.length > 0 ? (
-                                  <Box>
-                                    <Text fontWeight="semibold">Email</Text>
-                                    <Stack as="ul" spacing="1">
-                                      {restaurant.email.map((email, idx) => (
-                                        <Text
-                                          as="li"
-                                          key={idx}
-                                          listStyleType="none"
-                                        >
-                                          {email}
-                                        </Text>
-                                      ))}
-                                    </Stack>
-                                  </Box>
-                                ) : null}
+                                  <Stack spacing="3" py="3" fontSize="sm">
+                                    {DAYS_OF_WEEK.map(day => (
+                                      <Flex
+                                        as="dl"
+                                        key={day}
+                                        justify="space-between"
+                                        px="4"
+                                        w="100%"
+                                      >
+                                        <Box>
+                                          <Text as="dt" fontWeight="semibold">
+                                            {day}
+                                            :
+                                          </Text>
+                                        </Box>
+                                        <Box>
+                                          {restaurant?.hours?.[day]?.isOpen
+                                            ? (
+                                                <Text as="dd">
+                                                  {restaurant.hours?.[day]?.openTime
+                                                    && formatTime(
+                                                      restaurant.hours?.[day]?.openTime || '',
+                                                    )}
+                                                  {' '}
+                                                  -
+                                                  {' '}
+                                                  {restaurant.hours?.[day]?.closeTime
+                                                    && formatTime(
+                                                      restaurant.hours?.[day]?.closeTime || '',
+                                                    )}
+                                                </Text>
+                                              )
+                                            : (
+                                                <Text as="dd">Closed</Text>
+                                              )}
+                                        </Box>
+                                      </Flex>
+                                    ))}
+                                  </Stack>
+                                </Box>
                               </Stack>
-                            </Box>
-                            <Box
-                              bg="white"
-                              shadow="sm"
-                              rounded="md"
-                              borderWidth="1px"
-                            >
-                              <Box p="4" borderBottomWidth="1px">
-                                <Heading fontSize="lg">Hours</Heading>
-                              </Box>
-                              <Stack spacing="3" py="3" fontSize="sm">
-                                {DAYS_OF_WEEK.map((day) => (
-                                  <Flex
-                                    as="dl"
-                                    key={day}
-                                    justify="space-between"
-                                    px="4"
-                                    w="100%"
-                                  >
-                                    <Box>
-                                      <Text as="dt" fontWeight="semibold">
-                                        {day}:
-                                      </Text>
-                                    </Box>
-                                    <Box>
-                                      {restaurant?.hours?.[day]?.isOpen ? (
-                                        <Text as="dd">
-                                          {restaurant.hours?.[day]?.openTime &&
-                                            formatTime(
-                                              restaurant.hours?.[day]?.openTime || ''
-                                            )}{' '}
-                                          -{' '}
-                                          {restaurant.hours?.[day]?.closeTime &&
-                                            formatTime(
-                                              restaurant.hours?.[day]?.closeTime || ''
-                                            )}
-                                        </Text>
-                                      ) : (
-                                        <Text as="dd">Closed</Text>
-                                      )}
-                                    </Box>
-                                  </Flex>
-                                ))}
-                              </Stack>
-                            </Box>
-                          </Stack>
-                        )}
-                      </Box>
-                    </GridItem>
-                  </Grid>
-                </Container>
-              </>
-            ) : (
-              <Center h="96">
-                <Box textAlign="center">
-                  <Text fontSize="5xl" mb="4">
-                    🚧
-                  </Text>
-                  <Heading size="lg" fontWeight="semibold" mb="4">
-                    Looks like this site is under construction.
-                  </Heading>
-                  <Text fontSize="lg" color="gray.600">
-                    Check back soon!
-                  </Text>
-                </Box>
-              </Center>
-            )}
+                            )}
+                          </Box>
+                        </GridItem>
+                      </Grid>
+                    </Container>
+                  </>
+                )
+              : (
+                  <Center h="96">
+                    <Box textAlign="center">
+                      <Text fontSize="5xl" mb="4">
+                        🚧
+                      </Text>
+                      <Heading size="lg" fontWeight="semibold" mb="4">
+                        Looks like this site is under construction.
+                      </Heading>
+                      <Text fontSize="lg" color="gray.600">
+                        Check back soon!
+                      </Text>
+                    </Box>
+                  </Center>
+                )}
           </Box>
           <Box as="footer" borderTopWidth="1px" py="6" mt="auto">
             <Text textAlign="center" fontWeight="medium" color="gray.600">
-              Powered by{' '}
-              <MagicLink href={{ pathname: "https://getthemenu.io", query: { ref: router.query.host?.toString() } }} color="blue.500" target="_blank">
+              Powered by
+              {' '}
+              <MagicLink href={{ pathname: 'https://getthemenu.io', query: { ref: router.query.host?.toString() } }} color="blue.500" target="_blank">
                 GetTheMenu
               </MagicLink>
             </Text>
@@ -387,18 +420,20 @@ export default function PublicLayout({
               <TabPanels>
                 <TabPanel px="0">
                   <Stack spacing="4">
-                    {restaurant?.phone && restaurant.phone.length > 0 ? (
-                      <Box>
-                        <Text fontWeight="semibold">Phone</Text>
-                        <Stack as="ul" spacing="1">
-                          {restaurant.phone.map((phone, idx) => (
-                            <Text as="li" key={idx} listStyleType="none">
-                              {phone}
-                            </Text>
-                          ))}
-                        </Stack>
-                      </Box>
-                    ) : null}
+                    {restaurant?.phone && restaurant.phone.length > 0
+                      ? (
+                          <Box>
+                            <Text fontWeight="semibold">Phone</Text>
+                            <Stack as="ul" spacing="1">
+                              {restaurant.phone.map((phone, idx) => (
+                                <Text as="li" key={idx} listStyleType="none">
+                                  {phone}
+                                </Text>
+                              ))}
+                            </Stack>
+                          </Box>
+                        )
+                      : null}
 
                     {restaurant?.address && (
                       <Box>
@@ -406,50 +441,63 @@ export default function PublicLayout({
                           Address
                         </Text>
                         <Text as="dd">
-                          {restaurant.address?.streetAddress} <br />
-                          {restaurant.address?.city},{' '}
-                          {restaurant.address?.state} {restaurant.address?.zip}
+                          {restaurant.address?.streetAddress}
+                          {' '}
+                          <br />
+                          {restaurant.address?.city}
+                          ,
+                          {' '}
+                          {restaurant.address?.state}
+                          {' '}
+                          {restaurant.address?.zip}
                         </Text>
                       </Box>
                     )}
 
-                    {restaurant?.email && restaurant?.email?.length > 0 ? (
-                      <Box>
-                        <Text fontWeight="semibold">Email</Text>
-                        <Stack as="ul" spacing="1">
-                          {restaurant.email.map((email, idx) => (
-                            <Text as="li" key={idx} listStyleType="none">
-                              {email}
-                            </Text>
-                          ))}
-                        </Stack>
-                      </Box>
-                    ) : null}
+                    {restaurant?.email && restaurant?.email?.length > 0
+                      ? (
+                          <Box>
+                            <Text fontWeight="semibold">Email</Text>
+                            <Stack as="ul" spacing="1">
+                              {restaurant.email.map((email, idx) => (
+                                <Text as="li" key={idx} listStyleType="none">
+                                  {email}
+                                </Text>
+                              ))}
+                            </Stack>
+                          </Box>
+                        )
+                      : null}
                   </Stack>
                 </TabPanel>
                 <TabPanel px="0">
                   <Stack spacing="3">
-                    {DAYS_OF_WEEK.map((day) => (
+                    {DAYS_OF_WEEK.map(day => (
                       <Flex as="dl" key={day} justify="space-between" w="100%">
                         <Box>
                           <Text as="dt" fontWeight="semibold">
-                            {day}:
+                            {day}
+                            :
                           </Text>
                         </Box>
                         <Box>
-                          {restaurant?.hours?.[day]?.isOpen ? (
-                            <Text as="dd">
-                              {restaurant.hours?.[day]?.openTime &&
-                                formatTime(
-                                  restaurant.hours?.[day]?.openTime || ''
-                                )}{' '}
-                              -{' '}
-                              {restaurant.hours?.[day]?.closeTime &&
-                                formatTime(restaurant.hours?.[day]?.closeTime || '')}
-                            </Text>
-                          ) : (
-                            <Text as="dd">Closed</Text>
-                          )}
+                          {restaurant?.hours?.[day]?.isOpen
+                            ? (
+                                <Text as="dd">
+                                  {restaurant.hours?.[day]?.openTime
+                                    && formatTime(
+                                      restaurant.hours?.[day]?.openTime || '',
+                                    )}
+                                  {' '}
+                                  -
+                                  {' '}
+                                  {restaurant.hours?.[day]?.closeTime
+                                    && formatTime(restaurant.hours?.[day]?.closeTime || '')}
+                                </Text>
+                              )
+                            : (
+                                <Text as="dd">Closed</Text>
+                              )}
                         </Box>
                       </Flex>
                     ))}
@@ -463,9 +511,3 @@ export default function PublicLayout({
     </>
   )
 }
-
-// wrap the NextLink with Chakra UI's factory function
-const MagicLink = chakra<typeof NextLink, NextLinkProps>(NextLink, {
-  // ensure that you're forwarding all of the required props for your case
-  shouldForwardProp: (prop) => ['href', 'target', 'children'].includes(prop),
-})

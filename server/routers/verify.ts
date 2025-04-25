@@ -1,13 +1,13 @@
-import prisma from "@/utils/prisma";
-import { authedProcedure, router } from "@/utils/trpc";
-import { z } from "zod";
+import prisma from '@/utils/prisma'
+import { authedProcedure, router } from '@/utils/trpc'
+import { CustomHostSchema } from '@/utils/zod'
 import GithubSlugger from 'github-slugger'
-import { CustomHostSchema } from "@/utils/zod";
+import { z } from 'zod'
 
 export const verifyRouter = router({
   checkCustomHost: authedProcedure.input(z.object({
-    customHost: CustomHostSchema
-  })
+    customHost: CustomHostSchema,
+  }),
   ).mutation(async ({ input }) => {
     const { customHost } = input
     const data = await prisma.restaurants.findMany({
@@ -16,18 +16,19 @@ export const verifyRouter = router({
           startsWith: customHost,
         },
         NOT: {
-          customHost: 'www'
-        }
+          customHost: 'www',
+        },
       },
       select: {
-        customHost: true
-      }
+        customHost: true,
+      },
     })
 
     const slugger = new GithubSlugger()
 
-    data.forEach(d => {
-      if (!d.customHost) return
+    data.forEach((d) => {
+      if (!d.customHost)
+        return
       return slugger.slug(d.customHost)
     })
 
@@ -36,7 +37,7 @@ export const verifyRouter = router({
     return suggestion === customHost ? '' : suggestion
   }),
   checkCustomDomain: authedProcedure.input(z.object({
-    customDomain: z.string().url()
+    customDomain: z.string().url(),
   })).mutation(async ({ input }) => {
     const { customDomain } = input
     const data = await prisma.restaurants.findMany({
@@ -45,13 +46,13 @@ export const verifyRouter = router({
           startsWith: customDomain,
         },
         NOT: {
-          customDomain: 'getthemenu.io'
-        }
+          customDomain: 'getthemenu.io',
+        },
       },
       select: {
-        customDomain: true
-      }
+        customDomain: true,
+      },
     })
     return data
-  })
+  }),
 })

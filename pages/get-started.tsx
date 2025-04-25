@@ -1,10 +1,16 @@
-import * as React from 'react'
-import Head from 'next/head'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import type { SubmitHandler } from 'react-hook-form'
+import { appRouter } from '@/server'
+import { getErrorMessage } from '@/utils/functions'
+
+import { createClientServer } from '@/utils/supabase/server-props'
+import { trpc } from '@/utils/trpc/client'
 import {
   Alert,
   AlertIcon,
   Box,
   Button,
+  Container,
   FormControl,
   FormErrorMessage,
   FormHelperText,
@@ -17,26 +23,21 @@ import {
   InputRightAddon,
   Spinner,
   Text,
-  Container,
 } from '@chakra-ui/react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-
-import debounce from 'lodash/debounce'
-import { useRouter } from 'next/router'
-import SuperJSON from 'superjson'
-import { appRouter } from '@/server'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { getErrorMessage } from '@/utils/functions'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { trpc } from '@/utils/trpc/client'
+import { createServerSideHelpers } from '@trpc/react-query/server'
 import { slug as slugify } from 'github-slugger'
+import debounce from 'lodash/debounce'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
+import SuperJSON from 'superjson'
+import { z } from 'zod'
 
 const FormPayload = z.object({
   restaurantName: z.string(),
-  customHost: z.string().max(63)
+  customHost: z.string().max(63),
 })
 
 type FormData = z.infer<typeof FormPayload>
@@ -55,10 +56,9 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
     handleSubmit,
     getValues,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(FormPayload)
+    resolver: zodResolver(FormPayload),
   })
 
   const { mutateAsync: handleCheckCustomHost, isPending: isChecking } = trpc.verify.checkCustomHost.useMutation()
@@ -74,12 +74,14 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
             type: 'error',
             message: `Your URL is too long. Please shorten it to 63 characters or less.`,
           })
-        } else if (testHost !== customHost) {
+        }
+        else if (testHost !== customHost) {
           setSlugMessage({
             type: 'error',
             message: `Your URL is not valid. Please use only lowercase letters, numbers, and dashes.`,
           })
-        } else {
+        }
+        else {
           const suggestion = await handleCheckCustomHost({ customHost })
 
           if (suggestion) {
@@ -87,18 +89,20 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
               type: 'error',
               message: `Sorry, '${customHost}' is taken. Please choose another.`,
             })
-          } else {
+          }
+          else {
             setSlugMessage({
               type: 'success',
               message: `'${customHost}' is available!`,
             })
           }
         }
-      } catch (error) {
+      }
+      catch (error) {
         alert(getErrorMessage(error))
       }
     }, 500),
-    [handleCheckCustomHost]
+    [handleCheckCustomHost],
   )
 
   const handleSetHost = async () => {
@@ -110,7 +114,8 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
         const suggestion = await handleCheckCustomHost({ customHost: newHost })
         setValue('customHost', suggestion || newHost, { shouldDirty: true, shouldTouch: false })
       }
-    } catch (error) {
+    }
+    catch (error) {
       alert(getErrorMessage(error))
     }
   }
@@ -119,7 +124,8 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
     const customHost = getValues('customHost')
     if (customHost) {
       debouncedCheckUniqueHost(customHost)
-    } else {
+    }
+    else {
       setSlugMessage(null)
     }
   }
@@ -132,17 +138,18 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
           userId: user.id,
           name: restaurantName || '',
           customHost: slugify(customHost || '', false),
-          customDomain: null
-        }
+          customDomain: null,
+        },
       }, {
         onSuccess() {
           router.replace('/dashboard')
         },
         onError(error) {
           throw new Error(getErrorMessage(error))
-        }
+        },
       })
-    } catch (error) {
+    }
+    catch (error) {
       alert(getErrorMessage(error))
     }
   }
@@ -192,7 +199,7 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
                         <Input
                           {...register('customHost', {
                             required: 'This field is required',
-                            onChange: checkUniqueHost
+                            onChange: checkUniqueHost,
                           })}
                           type="text"
                           autoComplete="off"
@@ -202,17 +209,21 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
                       <FormErrorMessage>
                         {errors.customHost?.message}
                       </FormErrorMessage>
-                      {isChecking ? (
-                        <Alert status="info" mt="2">
-                          <Spinner size="sm" />
-                          <Text ml="2">Checking availability...</Text>
-                        </Alert>
-                      ) : !isChecking && slugMessage ? (
-                        <Alert status={slugMessage.type} mt="2">
-                          <AlertIcon />
-                          <Text ml="2">{slugMessage.message}</Text>
-                        </Alert>
-                      ) : null}
+                      {isChecking
+                        ? (
+                            <Alert status="info" mt="2">
+                              <Spinner size="sm" />
+                              <Text ml="2">Checking availability...</Text>
+                            </Alert>
+                          )
+                        : !isChecking && slugMessage
+                            ? (
+                                <Alert status={slugMessage.type} mt="2">
+                                  <AlertIcon />
+                                  <Text ml="2">{slugMessage.message}</Text>
+                                </Alert>
+                              )
+                            : null}
                       <FormHelperText>
                         This URL is where your restaurant will be publicly
                         accessible, it must be unique.
@@ -255,11 +266,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 
@@ -270,7 +281,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length > 0) {
+  }
+  else if (user.restaurants.length > 0) {
     return {
       redirect: {
         destination: '/dashboard',

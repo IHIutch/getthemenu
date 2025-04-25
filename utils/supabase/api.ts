@@ -1,5 +1,6 @@
-import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
-import { type NextApiRequest, type NextApiResponse } from 'next'
+import type { CookieOptions } from '@supabase/ssr'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { createServerClient, serialize } from '@supabase/ssr'
 import { env } from '../env'
 
 export function createClientApi(req: NextApiRequest, res: NextApiResponse) {
@@ -18,7 +19,7 @@ export function createClientApi(req: NextApiRequest, res: NextApiResponse) {
           res.setHeader('Set-Cookie', serialize(name, '', options))
         },
       },
-    }
+    },
   )
 
   return supabase

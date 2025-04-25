@@ -1,11 +1,10 @@
+import type { RouterInputs } from '@/server'
 import { trpc } from '../trpc/client'
-import { RouterInputs } from '@/server'
 
-
-export const useGetSections = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId'] = -1) => {
+export function useGetSections(menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId'] = -1) {
   const { isPending, isError, isSuccess, data, error } = trpc.section.getAllByMenuId.useQuery(
     { where: { menuId } },
-    { enabled: menuId !== -1 }
+    { enabled: menuId !== -1 },
   )
   return {
     data,
@@ -16,10 +15,10 @@ export const useGetSections = (menuId: RouterInputs['section']['getAllByMenuId']
   }
 }
 
-export const useGetSection = (id: RouterInputs['section']['getById']['where']['id'] = -1) => {
+export function useGetSection(id: RouterInputs['section']['getById']['where']['id'] = -1) {
   const { isPending, isError, isSuccess, data, error } = trpc.section.getById.useQuery(
     { where: { id } },
-    { enabled: id !== -1 }
+    { enabled: id !== -1 },
   )
   return {
     data,
@@ -30,7 +29,7 @@ export const useGetSection = (id: RouterInputs['section']['getById']['where']['i
   }
 }
 
-export const useCreateSection = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+export function useCreateSection(menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) {
   const { section: sectionUtils } = trpc.useUtils()
 
   const {
@@ -45,37 +44,36 @@ export const useCreateSection = (menuId: RouterInputs['section']['getAllByMenuId
     onMutate: async ({ payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await sectionUtils.getAllByMenuId.cancel({
-        where: { menuId }
+        where: { menuId },
       })
       const previous = sectionUtils.getAllByMenuId.getData({
-        where: { menuId }
+        where: { menuId },
       })
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, (old) => {
-        return old ?
-          [...old,
-          {
-            ...payload,
-            id: -1,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            deletedAt: null
-          }
-          ] : undefined
+        return old
+          ? [...old, {
+              ...payload,
+              id: -1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              deletedAt: null,
+            }]
+          : undefined
       })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
-    onError: (err, updated, context) => {
+    onError: (_err, _updated, context) => {
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, context?.previous)
     },
     // Always refetch after error or success:
-    onSettled: (updated) => {
+    onSettled: (_updated) => {
       sectionUtils.getAllByMenuId.invalidate({
-        where: { menuId }
+        where: { menuId },
       })
     },
   })
@@ -89,7 +87,7 @@ export const useCreateSection = (menuId: RouterInputs['section']['getAllByMenuId
   }
 }
 
-export const useUpdateSection = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+export function useUpdateSection(menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) {
   const { section: sectionUtils } = trpc.useUtils()
 
   const {
@@ -104,39 +102,41 @@ export const useUpdateSection = (menuId: RouterInputs['section']['getAllByMenuId
     onMutate: async ({ where, payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await sectionUtils.getAllByMenuId.cancel({
-        where: { menuId }
+        where: { menuId },
       })
       const previous = sectionUtils.getAllByMenuId.getData({
-        where: { menuId }
+        where: { menuId },
       })
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, (old) => {
-        return old ? old.map((o) => {
-          if (o.id === where.id) {
-            return {
-              ...o,
-              ...payload,
-            }
-          }
-          return o
-        }) : undefined
+        return old
+          ? old.map((o) => {
+              if (o.id === where.id) {
+                return {
+                  ...o,
+                  ...payload,
+                }
+              }
+              return o
+            })
+          : undefined
       })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
-    onError: (err, updated, context) => {
+    onError: (_err, _updated, context) => {
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, context?.previous)
     },
     // Always refetch after error or success:
-    onSettled: (updated) => {
+    onSettled: (_updated) => {
       sectionUtils.getAllByMenuId.invalidate({
-        where: { menuId }
+        where: { menuId },
       })
     },
-  }
+  },
   )
   return {
     mutateAsync,
@@ -148,7 +148,7 @@ export const useUpdateSection = (menuId: RouterInputs['section']['getAllByMenuId
   }
 }
 
-export const useReorderSections = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+export function useReorderSections(menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) {
   const { section: sectionUtils } = trpc.useUtils()
 
   const {
@@ -163,36 +163,38 @@ export const useReorderSections = (menuId: RouterInputs['section']['getAllByMenu
     onMutate: async ({ payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await sectionUtils.getAllByMenuId.cancel({
-        where: { menuId }
+        where: { menuId },
       })
       const previous = sectionUtils.getAllByMenuId.getData({
-        where: { menuId }
+        where: { menuId },
       })
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, (old) => {
-        return old ? old.map((o) => {
-          return {
-            ...o,
-            ...(payload.find((p) => p.id === o.id) || {}),
-          }
-        }) : undefined
+        return old
+          ? old.map((o) => {
+              return {
+                ...o,
+                ...(payload.find(p => p.id === o.id) || {}),
+              }
+            })
+          : undefined
       })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
-    onError: (err, updated, context) => {
+    onError: (_err, _updated, context) => {
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, context?.previous)
     },
     // Always refetch after error or success:
-    onSettled: (updated) => {
+    onSettled: (_updated) => {
       sectionUtils.getAllByMenuId.invalidate({
-        where: { menuId }
+        where: { menuId },
       })
     },
-  }
+  },
   )
   return {
     mutateAsync,
@@ -204,7 +206,7 @@ export const useReorderSections = (menuId: RouterInputs['section']['getAllByMenu
   }
 }
 
-export const useDeleteSection = (menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) => {
+export function useDeleteSection(menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId']) {
   const { section: sectionUtils } = trpc.useUtils()
 
   const {
@@ -219,28 +221,28 @@ export const useDeleteSection = (menuId: RouterInputs['section']['getAllByMenuId
     onMutate: async ({ where }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await sectionUtils.getAllByMenuId.cancel({
-        where: { menuId }
+        where: { menuId },
       })
       const previous = sectionUtils.getAllByMenuId.getData({
-        where: { menuId }
+        where: { menuId },
       })
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, (old) => {
-        return old ? old.filter((o) => o.id !== where.id) : undefined
+        return old ? old.filter(o => o.id !== where.id) : undefined
       })
       return { previous }
     },
     // If the mutation fails, use the context we returned above
-    onError: (err, updated, context) => {
+    onError: (_err, _updated, context) => {
       sectionUtils.getAllByMenuId.setData({
-        where: { menuId }
+        where: { menuId },
       }, context?.previous)
     },
     // Always refetch after error or success:
-    onSettled: (updated) => {
+    onSettled: (_updated) => {
       sectionUtils.getAllByMenuId.invalidate({
-        where: { menuId }
+        where: { menuId },
       })
     },
   })

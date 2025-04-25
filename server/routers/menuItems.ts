@@ -1,14 +1,14 @@
-import { prismaCreateMenuItem, prismaDeleteMenuItem, prismaGetMenuItem, prismaGetMenuItems, prismaUpdateMenuItem, prismaUpdateMenuItems } from "@/utils/prisma/menuItems";
-import { authedProcedure, router } from "@/utils/trpc";
-import { MenuItemSchema } from "@/utils/zod";
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { prismaCreateMenuItem, prismaDeleteMenuItem, prismaGetMenuItem, prismaGetMenuItems, prismaUpdateMenuItem, prismaUpdateMenuItems } from '@/utils/prisma/menuItems'
+import { authedProcedure, router } from '@/utils/trpc'
+import { MenuItemSchema } from '@/utils/zod'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 export const menuItemRouter = router({
   getAllByMenuId: authedProcedure.input(
     z.object({
-      where: MenuItemSchema.pick({ menuId: true })
-    })
+      where: MenuItemSchema.pick({ menuId: true }),
+    }),
   ).query(async ({ input }) => {
     const { where } = input
     const data = await prismaGetMenuItems({ where })
@@ -20,13 +20,13 @@ export const menuItemRouter = router({
     }
 
     return z.array(MenuItemSchema.partial({
-      image: true
+      image: true,
     })).parse(data)
   }),
   getById: authedProcedure.input(
     z.object({
-      where: MenuItemSchema.pick({ id: true })
-    })
+      where: MenuItemSchema.pick({ id: true }),
+    }),
   ).query(async ({ input }) => {
     const { where } = input
     const data = await prismaGetMenuItem({ where })
@@ -37,7 +37,7 @@ export const menuItemRouter = router({
       })
     }
     return MenuItemSchema.partial({
-      image: true
+      image: true,
     }).parse(data)
   }),
   create: authedProcedure.input(
@@ -46,9 +46,9 @@ export const menuItemRouter = router({
         id: true,
         createdAt: true,
         updatedAt: true,
-        deletedAt: true
-      })
-    })
+        deletedAt: true,
+      }),
+    }),
   ).mutation(async ({ input }) => {
     const { payload } = input
     const data = await prismaCreateMenuItem({
@@ -56,20 +56,20 @@ export const menuItemRouter = router({
         ...payload,
         restaurants: {
           connect: {
-            id: payload.restaurantId
-          }
+            id: payload.restaurantId,
+          },
         },
         menus: {
           connect: {
-            id: payload.menuId
-          }
+            id: payload.menuId,
+          },
         },
         sections: {
           connect: {
-            id: payload.sectionId
-          }
-        }
-      }
+            id: payload.sectionId,
+          },
+        },
+      },
     })
     return data
   }),
@@ -80,14 +80,14 @@ export const menuItemRouter = router({
         id: true,
         createdAt: true,
         updatedAt: true,
-        deletedAt: true
-      }).partial()
-    })
+        deletedAt: true,
+      }).partial(),
+    }),
   ).mutation(async ({ input }) => {
     const { where, payload } = input
     const data = prismaUpdateMenuItem({
       where,
-      payload
+      payload,
     })
     return data
   }),
@@ -96,13 +96,13 @@ export const menuItemRouter = router({
       payload: z.array(
         MenuItemSchema.pick({
           id: true,
-          position: true
+          position: true,
         }).extend({
           id: z.number().positive(),
-          position: z.number()
-        })
-      )
-    })
+          position: z.number(),
+        }),
+      ),
+    }),
   ).mutation(async ({ input }) => {
     const { payload } = input
     const data = await prismaUpdateMenuItems({ payload })
@@ -111,7 +111,7 @@ export const menuItemRouter = router({
   delete: authedProcedure.input(
     z.object({
       where: MenuItemSchema.pick({ id: true }),
-    })
+    }),
 
   ).mutation(async ({ input }) => {
     const { where } = input

@@ -1,19 +1,37 @@
-import * as React from 'react'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 
+import type { DropResult } from 'react-beautiful-dnd'
+import type { SubmitHandler } from 'react-hook-form'
+import type { z } from 'zod'
+import DashboardLayout from '@/layouts/Dashboard'
+import { appRouter } from '@/server'
 import { formatDate, getErrorMessage, reorderList } from '@/utils/functions'
+import { useGetMenus, useReorderMenus } from '@/utils/react-query/menus'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { trpc } from '@/utils/trpc/client'
+import { MenuSchema } from '@/utils/zod'
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   ButtonGroup,
   Center,
   Circle,
+  Container,
   Flex,
   FormControl,
+  FormErrorMessage,
+  FormHelperText,
   FormLabel,
+  Grid,
+  GridItem,
   Heading,
+  Icon,
   Input,
+  InputGroup,
+  InputLeftAddon,
   LinkBox,
   LinkOverlay,
   Modal,
@@ -23,44 +41,25 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   Stack,
   Text,
   useDisclosure,
-  Container,
-  FormErrorMessage,
-  Grid,
-  GridItem,
-  Alert,
-  Spinner,
-  FormHelperText,
-  AlertIcon,
-  Icon,
-  InputGroup,
-  InputLeftAddon,
 } from '@chakra-ui/react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { slug as slugify } from 'github-slugger'
+import { GripHorizontal } from 'lucide-react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import DashboardLayout from '@/layouts/Dashboard'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { slug as slugify } from 'github-slugger'
-import { GripHorizontal } from 'lucide-react'
-import { Draggable, DropResult } from 'react-beautiful-dnd'
-import { Droppable } from 'react-beautiful-dnd'
-import { DragDropContext } from 'react-beautiful-dnd'
-import { MenuSchema } from '@/utils/zod'
-import { z } from 'zod'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { trpc } from '@/utils/trpc/client'
-import { appRouter } from '@/server'
+import * as React from 'react'
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import { useForm } from 'react-hook-form'
 import SuperJSON from 'superjson'
-import { createServerSideHelpers } from '@trpc/react-query/server';
-import { useGetMenus, useReorderMenus } from '@/utils/react-query/menus'
-
 
 type SlugMessage = {
-  type: 'success' | 'error',
+  type: 'success' | 'error'
   message: string
 } | null
 
@@ -76,7 +75,7 @@ type FormData = z.infer<typeof FormPayload>
 export default function Dashboard({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
   const modalState = useDisclosure()
-  const [isCheckingSlug, setIsCheckingSlug] = React.useState(false)
+  const [isCheckingSlug, _setIsCheckingSlug] = React.useState(false)
   const [slugMessage, setSlugMessage] = React.useState<SlugMessage>(null)
 
   const {
@@ -100,7 +99,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
         payload: {
           ...form,
           restaurantId: restaurant?.id || '',
-        }
+        },
       }, {
         onSuccess() {
           router.push(`/menu/${data.id}/edit`)
@@ -109,8 +108,38 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
           throw new Error(getErrorMessage(error))
         },
       })
-    } catch (error) {
+    }
+    catch (error) {
       alert(getErrorMessage(error))
+    }
+  }
+
+  const checkUniqueSlug = () => {
+    const slug = getValues('slug')
+    const testSlug = slugify(slug || '', false)
+    if (!slug) {
+      setSlugMessage(null)
+    }
+    else if (testSlug !== slug) {
+      setSlugMessage({
+        type: 'error',
+        message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
+      })
+    }
+    else {
+      const isUsed = menus.some(m => m.slug === slug)
+      if (isUsed) {
+        setSlugMessage({
+          type: 'error',
+          message: `'${slug}' is already used.`,
+        })
+      }
+      else {
+        setSlugMessage({
+          type: 'success',
+          message: `'${slug}' is available.`,
+        })
+      }
     }
   }
 
@@ -123,32 +152,6 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     }
   }
 
-  const checkUniqueSlug = () => {
-    const slug = getValues('slug')
-    const testSlug = slugify(slug || '', false)
-    if (!slug) {
-      setSlugMessage(null)
-    } else if (testSlug !== slug) {
-      setSlugMessage({
-        type: 'error',
-        message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
-      })
-    } else {
-      const isUsed = menus.some(m => m.slug === slug)
-      if (isUsed) {
-        setSlugMessage({
-          type: 'error',
-          message: `'${slug}' is already used.`,
-        })
-      } else {
-        setSlugMessage({
-          type: 'success',
-          message: `'${slug}' is available.`,
-        })
-      }
-    }
-  }
-
   const handleDragStart = () => {
     if (navigator.vibrate) {
       navigator.vibrate(75)
@@ -157,19 +160,20 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
 
   const handleDragEnd = (result: DropResult) => {
     const { source, destination } = result
-    if (!destination) return // dropped outside the list
+    if (!destination)
+      return // dropped outside the list
 
     const reorderedMenus = reorderList(
       menus,
       source.index,
-      destination.index
+      destination.index,
     )
 
     handleReorderMenus({
       payload: reorderedMenus.map((menu, idx) => ({
         id: Number(menu.id),
         position: idx,
-      }))
+      })),
     })
   }
   const sortedMenus = React.useMemo(() => {
@@ -191,110 +195,113 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
               </Button>
             </Box>
           </Flex>
-          {menus.length > 0 ? (
-            <>
-              <Box mb="4">
-                <Text fontSize="sm" color="gray.700">
-                  Your first ordered menu will automatically be set as your
-                  homepage.
-                </Text>
-              </Box>
-              <DragDropContext
-                onDragEnd={handleDragEnd}
-                onDragStart={handleDragStart}
-              >
-                <Droppable droppableId="menuWrapper">
-                  {(drop) => (
-                    <Stack ref={drop.innerRef} {...drop.droppableProps}>
-                      {sortedMenus.map((menu, idx) => (
-                        <Draggable
-                          draggableId={`${menu.id}`}
-                          key={`${menu.id}`}
-                          index={idx}
-                        >
-                          {(drag, snapshot) => (
-                            <Box ref={drag.innerRef} {...drag.draggableProps}>
-                              <Box
-                                bg="white"
-                                rounded="md"
-                                shadow={snapshot.isDragging ? 'lg' : 'base'}
-                                transform={
-                                  snapshot.isDragging ? 'scale(1.04)' : 'none'
-                                }
-                                transition="all 0.1s ease"
-                              >
-                                <Center {...drag.dragHandleProps}>
-                                  <Icon
-                                    color="gray.500"
-                                    boxSize="5"
-                                    as={GripHorizontal}
-                                  />
-                                </Center>
-                                <LinkBox>
-                                  <Box>
-                                    <Box pb="3" px="3" borderBottomWidth="1px">
-                                      <LinkOverlay as={NextLink} href={`/menu/${menu.id}`}>
-                                        <Heading
-                                          ml="2"
-                                          fontSize="2xl"
-                                          fontWeight="semibold"
-                                        >
-                                          {menu.title}
-                                        </Heading>
-                                      </LinkOverlay>
-                                    </Box>
-                                    <Flex p="3" justify="space-between">
-                                      <Flex align="center">
-                                        <Circle size={4} bg="green.100">
-                                          <Circle size={2} bg="green.500" />
-                                        </Circle>
-                                        <Text
-                                          ml="2"
-                                          lineHeight="1.2"
-                                          fontWeight="semibold"
-                                          color="green.600"
-                                        >
-                                          Live
-                                        </Text>
-                                      </Flex>
+          {menus.length > 0
+            ? (
+                <>
+                  <Box mb="4">
+                    <Text fontSize="sm" color="gray.700">
+                      Your first ordered menu will automatically be set as your
+                      homepage.
+                    </Text>
+                  </Box>
+                  <DragDropContext
+                    onDragEnd={handleDragEnd}
+                    onDragStart={handleDragStart}
+                  >
+                    <Droppable droppableId="menuWrapper">
+                      {drop => (
+                        <Stack ref={drop.innerRef} {...drop.droppableProps}>
+                          {sortedMenus.map((menu, idx) => (
+                            <Draggable
+                              draggableId={`${menu.id}`}
+                              key={`${menu.id}`}
+                              index={idx}
+                            >
+                              {(drag, snapshot) => (
+                                <Box ref={drag.innerRef} {...drag.draggableProps}>
+                                  <Box
+                                    bg="white"
+                                    rounded="md"
+                                    shadow={snapshot.isDragging ? 'lg' : 'base'}
+                                    transform={
+                                      snapshot.isDragging ? 'scale(1.04)' : 'none'
+                                    }
+                                    transition="all 0.1s ease"
+                                  >
+                                    <Center {...drag.dragHandleProps}>
+                                      <Icon
+                                        color="gray.500"
+                                        boxSize="5"
+                                        as={GripHorizontal}
+                                      />
+                                    </Center>
+                                    <LinkBox>
                                       <Box>
-                                        <Text
-                                          fontWeight="semibold"
-                                          color="gray.600"
-                                          fontSize="sm"
-                                        >
-                                          Published:{' '}
-                                          {formatDate(menu.createdAt)}
-                                        </Text>
+                                        <Box pb="3" px="3" borderBottomWidth="1px">
+                                          <LinkOverlay as={NextLink} href={`/menu/${menu.id}`}>
+                                            <Heading
+                                              ml="2"
+                                              fontSize="2xl"
+                                              fontWeight="semibold"
+                                            >
+                                              {menu.title}
+                                            </Heading>
+                                          </LinkOverlay>
+                                        </Box>
+                                        <Flex p="3" justify="space-between">
+                                          <Flex align="center">
+                                            <Circle size={4} bg="green.100">
+                                              <Circle size={2} bg="green.500" />
+                                            </Circle>
+                                            <Text
+                                              ml="2"
+                                              lineHeight="1.2"
+                                              fontWeight="semibold"
+                                              color="green.600"
+                                            >
+                                              Live
+                                            </Text>
+                                          </Flex>
+                                          <Box>
+                                            <Text
+                                              fontWeight="semibold"
+                                              color="gray.600"
+                                              fontSize="sm"
+                                            >
+                                              Published:
+                                              {' '}
+                                              {formatDate(menu.createdAt)}
+                                            </Text>
+                                          </Box>
+                                        </Flex>
                                       </Box>
-                                    </Flex>
+                                    </LinkBox>
                                   </Box>
-                                </LinkBox>
-                              </Box>
-                            </Box>
-                          )}
-                        </Draggable>
-                      ))}
-                      <Box bg="gray.50">{drop.placeholder}</Box>
-                    </Stack>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </>
-          ) : (
-            <Center
-              borderWidth="2px"
-              borderColor="gray.200"
-              bg="gray.100"
-              py="8"
-              px="4"
-              rounded="lg"
-            >
-              <Text fontSize="xl" fontWeight="medium" color="gray.600">
-                Get started by creating your first menu.
-              </Text>
-            </Center>
-          )}
+                                </Box>
+                              )}
+                            </Draggable>
+                          ))}
+                          <Box bg="gray.50">{drop.placeholder}</Box>
+                        </Stack>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                </>
+              )
+            : (
+                <Center
+                  borderWidth="2px"
+                  borderColor="gray.200"
+                  bg="gray.100"
+                  py="8"
+                  px="4"
+                  rounded="lg"
+                >
+                  <Text fontSize="xl" fontWeight="medium" color="gray.600">
+                    Get started by creating your first menu.
+                  </Text>
+                </Center>
+              )}
         </Box>
       </Container>
       <Modal isOpen={modalState.isOpen} onClose={modalState.onClose}>
@@ -311,7 +318,7 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                     <Input
                       {...register('title', {
                         required: 'This field is required',
-                        onBlur: handleSetSlug
+                        onBlur: handleSetSlug,
                       })}
                       type="text"
                       autoComplete="off"
@@ -333,24 +340,28 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                       <Input
                         {...register('slug', {
                           required: 'This field is required',
-                          onChange: checkUniqueSlug
+                          onChange: checkUniqueSlug,
                         })}
                         type="text"
                         autoComplete="off"
                       />
                     </InputGroup>
                     <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
-                    {isCheckingSlug ? (
-                      <Alert status="info" mt="2">
-                        <Spinner size="sm" />
-                        <Text ml="2">Checking availability...</Text>
-                      </Alert>
-                    ) : !isCheckingSlug && slugMessage ? (
-                      <Alert size="sm" status={slugMessage.type} mt="2">
-                        <AlertIcon />
-                        <Text ml="2">{slugMessage.message}</Text>
-                      </Alert>
-                    ) : null}
+                    {isCheckingSlug
+                      ? (
+                          <Alert status="info" mt="2">
+                            <Spinner size="sm" />
+                            <Text ml="2">Checking availability...</Text>
+                          </Alert>
+                        )
+                      : !isCheckingSlug && slugMessage
+                          ? (
+                              <Alert size="sm" status={slugMessage.type} mt="2">
+                                <AlertIcon />
+                                <Text ml="2">{slugMessage.message}</Text>
+                              </Alert>
+                            )
+                          : null}
                     <FormHelperText>
                       Must be unique to your restaurant.
                     </FormHelperText>
@@ -389,11 +400,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 
@@ -404,7 +415,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length === 0) {
+  }
+  else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',

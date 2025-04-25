@@ -1,53 +1,51 @@
+import type { DraggableLocation } from 'react-beautiful-dnd'
 import dayjs from 'dayjs'
-import { createClientComponent } from './supabase/component'
-import { DraggableLocation } from 'react-beautiful-dnd'
-import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from './zod'
+import { unstable_cache } from 'next/cache'
 import { z } from 'zod'
 import prisma from './prisma'
-import { cache } from 'react'
-import { unstable_cache } from 'next/cache'
+import { createClientComponent } from './supabase/component'
+import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from './zod'
 
-const StructuredDataSchema = RestaurantSchema.omit({
+const _StructuredDataSchema = RestaurantSchema.omit({
   id: true,
   userId: true,
   customHost: true,
   customDomain: true,
   createdAt: true,
   updatedAt: true,
-  deletedAt: true
+  deletedAt: true,
 }).extend({
   menus: z.array(MenuSchema.omit({
     restaurantId: true,
     createdAt: true,
     updatedAt: true,
-    deletedAt: true
+    deletedAt: true,
   })),
   sections: z.array(SectionSchema.omit({
     restaurantId: true,
     createdAt: true,
     updatedAt: true,
-    deletedAt: true
+    deletedAt: true,
   })),
   menuItems: z.array(MenuItemSchema.omit({
     restaurantId: true,
     createdAt: true,
     updatedAt: true,
-    deletedAt: true
-  }))
+    deletedAt: true,
+  })),
 })
 
-type StructuredDataType = z.infer<typeof StructuredDataSchema>
+type StructuredDataType = z.infer<typeof _StructuredDataSchema>
 
-export const getStructuredData = (restaurant: StructuredDataType) => {
-
+export function getStructuredData(restaurant: StructuredDataType) {
   const minPrice = Math.min(
-    ...(restaurant.menuItems || []).map((mi) => mi?.price || 0)
+    ...(restaurant.menuItems || []).map(mi => mi?.price || 0),
   ).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
   })
   const maxPrice = Math.max(
-    ...(restaurant.menuItems || []).map((mi) => mi?.price || 0)
+    ...(restaurant.menuItems || []).map(mi => mi?.price || 0),
   ).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -56,29 +54,29 @@ export const getStructuredData = (restaurant: StructuredDataType) => {
   return {
     '@context': 'http://schema.org',
     '@type': 'Restaurant',
-    url: 'http://www.thisisarestaurant.com',
-    name: restaurant.name || '',
-    image: restaurant.coverImage?.src || '',
-    telephone: restaurant.phone?.[0] || '',
-    priceRange: `${minPrice} - ${maxPrice}`,
-    description: 'a description of this business',
-    address: {
+    'url': 'http://www.thisisarestaurant.com',
+    'name': restaurant.name || '',
+    'image': restaurant.coverImage?.src || '',
+    'telephone': restaurant.phone?.[0] || '',
+    'priceRange': `${minPrice} - ${maxPrice}`,
+    'description': 'a description of this business',
+    'address': {
       '@type': 'PostalAddress',
-      streetAddress: restaurant.address?.streetAddress || '',
-      addressLocality: restaurant.address?.city || '',
-      addressRegion: restaurant.address?.state || '',
-      postalCode: restaurant.address?.zip || '',
+      'streetAddress': restaurant.address?.streetAddress || '',
+      'addressLocality': restaurant.address?.city || '',
+      'addressRegion': restaurant.address?.state || '',
+      'postalCode': restaurant.address?.zip || '',
     },
-    servesCuisine: ['American cuisine'],
-    hasMenu: (restaurant?.menus || []).map((menu: any) => ({
+    'servesCuisine': ['American cuisine'],
+    'hasMenu': (restaurant?.menus || []).map((menu: any) => ({
       '@type': 'Menu',
-      name: menu.title || '',
+      'name': menu.title || '',
       // description: "Menu for in-restaurant dining only.",
-      hasMenuSection: (restaurant?.sections || [])
-        .filter((section) => section.menuId === menu.id)
-        .map((section) => ({
+      'hasMenuSection': (restaurant?.sections || [])
+        .filter(section => section.menuId === menu.id)
+        .map(section => ({
           '@type': 'MenuSection',
-          name: section.title || '',
+          'name': section.title || '',
           // description: "Appetizers and such",
           // image: "https://thisisarestaurant.com/starter_dishes.jpg",
           // offers: {
@@ -86,16 +84,16 @@ export const getStructuredData = (restaurant: StructuredDataType) => {
           //   availabilityEnds: "T8:22:00",
           //   availabilityStarts: "T8:22:00",
           // },
-          hasMenuItem: (restaurant?.menuItems || [])
-            .filter((item) => item.sectionId === section.id)
-            .map((item) => ({
+          'hasMenuItem': (restaurant?.menuItems || [])
+            .filter(item => item.sectionId === section.id)
+            .map(item => ({
               '@type': 'MenuItem',
-              name: item.title || '',
-              description: item.description || '',
-              offers: {
+              'name': item.title || '',
+              'description': item.description || '',
+              'offers': {
                 '@type': 'Offer',
-                price: item.price,
-                priceCurrency: 'USD',
+                'price': item.price,
+                'priceCurrency': 'USD',
               },
               // suitableForDiet: "http://schema.org/GlutenFreeDiet",
             })),
@@ -104,41 +102,45 @@ export const getStructuredData = (restaurant: StructuredDataType) => {
   }
 }
 
-export const formatDate = (val: Date, format = 'MM/DD/YYYY') => {
+export function formatDate(val: Date, format = 'MM/DD/YYYY') {
   return dayjs(val).format(format)
 }
 
-export const isTimeInputSupported = () => {
-  if (typeof window == 'undefined') return false
+export function isTimeInputSupported() {
+  if (typeof window == 'undefined')
+    return false
 
-  var input = document.createElement('input')
-  var value = 'a'
+  const input = document.createElement('input')
+  const value = 'a'
   input.setAttribute('type', 'time')
   input.setAttribute('value', value)
   // console.log('time', input.value, value)
   return input.value !== value
 }
 
-export const isDateInputSupported = () => {
-  if (typeof window == 'undefined') return false
+export function isDateInputSupported() {
+  if (typeof window == 'undefined')
+    return false
 
-  var input = document.createElement('input')
-  var value = 'a'
+  const input = document.createElement('input')
+  const value = 'a'
   input.setAttribute('type', 'date')
   input.setAttribute('value', value)
   // console.log('date', input.value, value)
   return input.value !== value
 }
 
-export const getPublicURL = (path: string) => {
+export function getPublicURL(path: string) {
   try {
     const supabase = createClientComponent()
     const { data: publicUrl } = supabase.storage
       .from('public')
       .getPublicUrl(path)
-    if (!publicUrl) throw new Error('Image not found')
+    if (!publicUrl)
+      throw new Error('Image not found')
     return publicUrl
-  } catch (error) {
+  }
+  catch (error) {
     console.log('Error downloading file: ', getErrorMessage(error))
   }
 }
@@ -150,44 +152,35 @@ export const getPublicURL = (path: string) => {
 //   return temp
 // }
 
-export const reorderList = <Value>(
-  list: Value[],
-  startIndex: number,
-  finishIndex: number,
-) => {
+export function reorderList<Value>(list: Value[], startIndex: number, finishIndex: number) {
   if (startIndex === -1 || finishIndex === -1) {
-    return list;
+    return list
   }
 
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
 
-  if (removed) result.splice(finishIndex, 0, removed);
+  if (removed)
+    result.splice(finishIndex, 0, removed)
 
-  return result;
+  return result
 }
 
-export const move = <Value>(
-  sourceList: Value[],
-  destinationList: Value[],
-  source: DraggableLocation,
-  destination: DraggableLocation
-) => {
+export function move<Value>(sourceList: Value[], destinationList: Value[], source: DraggableLocation, destination: DraggableLocation) {
+  const resultSource = Array.from(sourceList)
+  const resultDestination = Array.from(destinationList)
 
-  const resultSource = Array.from(sourceList);
-  const resultDestination = Array.from(destinationList);
-
-  const [removed] = resultSource.splice(source.index, 1);
-  if (removed) resultDestination.splice(destination.index, 0, removed);
+  const [removed] = resultSource.splice(source.index, 1)
+  if (removed)
+    resultDestination.splice(destination.index, 0, removed)
 
   return {
     resultSource,
     resultDestination,
-  };
-};
+  }
+}
 
-
-export const formatTime = (time: string) => {
+export function formatTime(time: string) {
   const [hours, minutes] = time.split(':')
   return dayjs()
     .startOf('year')
@@ -197,14 +190,15 @@ export const formatTime = (time: string) => {
 }
 
 export function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message
+  if (error instanceof Error)
+    return error.message
   return String(error)
 }
 
 export const getRestaurantDisplayData = unstable_cache(async (host: string) => {
   const data = await prisma.restaurants.findUnique({
     where: {
-      customHost: host
+      customHost: host,
     },
     select: {
       name: true,
@@ -223,8 +217,8 @@ export const getRestaurantDisplayData = unstable_cache(async (host: string) => {
           image: true,
         },
         orderBy: {
-          position: 'asc'
-        }
+          position: 'asc',
+        },
       },
       menus: {
         select: {
@@ -235,8 +229,8 @@ export const getRestaurantDisplayData = unstable_cache(async (host: string) => {
           description: true,
         },
         orderBy: {
-          position: 'asc'
-        }
+          position: 'asc',
+        },
       },
       sections: {
         select: {
@@ -247,14 +241,14 @@ export const getRestaurantDisplayData = unstable_cache(async (host: string) => {
           description: true,
         },
         orderBy: {
-          position: 'asc'
-        }
-      }
-    }
+          position: 'asc',
+        },
+      },
+    },
   })
 
   if (!data) {
-    return null;
+    return null
   }
 
   const result = RestaurantSchema.omit({
@@ -264,30 +258,30 @@ export const getRestaurantDisplayData = unstable_cache(async (host: string) => {
     customDomain: true,
     createdAt: true,
     updatedAt: true,
-    deletedAt: true
+    deletedAt: true,
   }).extend({
     menus: z.array(MenuSchema.omit({
       restaurantId: true,
       createdAt: true,
       updatedAt: true,
-      deletedAt: true
+      deletedAt: true,
     })),
     sections: z.array(SectionSchema.omit({
       restaurantId: true,
       createdAt: true,
       updatedAt: true,
-      deletedAt: true
+      deletedAt: true,
     })),
     menuItems: z.array(MenuItemSchema.omit({
       restaurantId: true,
       createdAt: true,
       updatedAt: true,
-      deletedAt: true
-    }))
+      deletedAt: true,
+    })),
   }).safeParse(data)
 
   if (!result.success) {
-    throw Error(getErrorMessage(result.error))
+    throw new Error(getErrorMessage(result.error))
   }
 
   return result.data

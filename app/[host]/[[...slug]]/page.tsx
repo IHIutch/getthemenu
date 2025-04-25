@@ -1,23 +1,21 @@
+import type { Metadata } from 'next'
+import BlurImage from '@/components/common/BlurImage'
+import { env } from '@/utils/env'
+import { getRestaurantDisplayData, getStructuredData } from '@/utils/functions'
+import { MenuSchema } from '@/utils/zod'
+import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { notFound } from 'next/navigation'
 import * as React from 'react'
-import prisma from '@/utils/prisma'
-import { notFound } from 'next/navigation';
-import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react';
-import BlurImage from '@/components/common/BlurImage';
-import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from '@/utils/zod';
-import { z } from 'zod';
-import { Metadata } from 'next';
-import { getErrorMessage, getRestaurantDisplayData, getStructuredData } from '@/utils/functions';
-import { env } from '@/utils/env';
 
 export default async function MenuPage(
   props: {
-    params: Promise<{ host: string; slug: string | string[] | undefined }>;
-  }
+    params: Promise<{ host: string, slug: string | string[] | undefined }>
+  },
 ) {
-  const params = await props.params;
+  const params = await props.params
 
-  const host = decodeURIComponent(params.host);
-  const slug = decodeURIComponent(params.slug?.toString() || '');
+  const host = decodeURIComponent(params.host)
+  const slug = decodeURIComponent(params.slug?.toString() || '')
 
   const data = await getRestaurantDisplayData(host)
 
@@ -54,8 +52,8 @@ export default async function MenuPage(
           {sections && (
             <Stack spacing="16">
               {sections
-                .filter((section) => section.menuId === menu.id)
-                .map((section) => (
+                .filter(section => section.menuId === menu.id)
+                .map(section => (
                   <Box key={section.id}>
                     <Box mb="6">
                       <Heading as="h3" fontSize="2xl" fontWeight="semibold">
@@ -76,8 +74,8 @@ export default async function MenuPage(
                     {menuItems && (
                       <Stack spacing="4">
                         {menuItems
-                          .filter((item) => item.sectionId === section.id)
-                          .map((item) => (
+                          .filter(item => item.sectionId === section.id)
+                          .map(item => (
                             <Box
                               key={item.id}
                               borderWidth="1px"
@@ -98,7 +96,7 @@ export default async function MenuPage(
                                     blurDataURL={item?.image?.blurDataURL}
                                     fill={true}
                                     sizes="570px"
-                                    placeholder={item?.image?.blurDataURL ? "blur" : 'empty'}
+                                    placeholder={item?.image?.blurDataURL ? 'blur' : 'empty'}
                                   />
                                 </AspectRatio>
                               )}
@@ -122,7 +120,7 @@ export default async function MenuPage(
                                         {
                                           style: 'currency',
                                           currency: 'USD',
-                                        }
+                                        },
                                       )}
                                     </Text>
                                   )}
@@ -152,20 +150,20 @@ export default async function MenuPage(
 }
 
 export async function generateMetadata(
-  props: { params: Promise<{ host: string, slug: string | string[] | undefined }> }
+  props: { params: Promise<{ host: string, slug: string | string[] | undefined }> },
 ): Promise<Metadata | null> {
-  const params = await props.params;
-  const host = decodeURIComponent(params.host);
-  const slug = decodeURIComponent(params.slug?.toString() || '');
+  const params = await props.params
+  const host = decodeURIComponent(params.host)
+  const slug = decodeURIComponent(params.slug?.toString() || '')
 
   const data = await getRestaurantDisplayData(host)
   if (!data) {
-    return null;
+    return null
   }
 
   const { name: title, coverImage: image } = data
   const menu = MenuSchema.pick({
-    slug: true
+    slug: true,
   }).parse(slug ? data.menus.find(m => m.slug === slug) : data.menus.shift())
 
   return {
@@ -176,12 +174,12 @@ export async function generateMetadata(
       images: [image?.src || ''],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: title || '',
       images: [image?.src || ''],
     },
     alternates: {
-      canonical: `https://${host}.${env.NEXT_PUBLIC_ROOT_DOMAIN}/${menu.slug}`
-    }
+      canonical: `https://${host}.${env.NEXT_PUBLIC_ROOT_DOMAIN}/${menu.slug}`,
+    },
   }
 }

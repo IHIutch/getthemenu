@@ -1,9 +1,13 @@
-import * as React from 'react'
-import Head from 'next/head'
-import { SubmitHandler, useForm, useFormState } from 'react-hook-form'
-import { useDeleteMenu, useGetMenu, useGetMenus, useUpdateMenu } from '@/utils/react-query/menus'
+import type { RouterOutputs } from '@/server'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import type { SubmitHandler } from 'react-hook-form'
 import MenuLayout from '@/layouts/Menu'
-import { useRouter } from 'next/router'
+import { appRouter } from '@/server'
+import { getErrorMessage } from '@/utils/functions'
+import { useDeleteMenu, useGetMenu, useGetMenus, useUpdateMenu } from '@/utils/react-query/menus'
+import { useGetRestaurant } from '@/utils/react-query/restaurants'
+import { useGetAuthedUser } from '@/utils/react-query/users'
+import { createClientServer } from '@/utils/supabase/server-props'
 import {
   Alert,
   AlertDialog,
@@ -33,19 +37,17 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react'
-import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { createServerSideHelpers } from '@trpc/react-query/server'
-import { RouterOutputs, appRouter } from '@/server'
-import SuperJSON from 'superjson'
-import { useGetAuthedUser } from '@/utils/react-query/users'
-import { getErrorMessage } from '@/utils/functions'
 import { slug as slugify } from 'github-slugger'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+import { useForm, useFormState } from 'react-hook-form'
+import SuperJSON from 'superjson'
 
 export default function MenuOverview({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
-  const menuId = router.query?.menuId?.toString() ?? ""
+  const menuId = router.query?.menuId?.toString() ?? ''
 
   useGetAuthedUser({ initialData: user })
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
@@ -60,8 +62,8 @@ export default function MenuOverview({ user }: InferGetServerSidePropsType<typeo
       <Container maxW="container.md">
         <Stack spacing="6">
           <Box bg="white" rounded="md" shadow="base">
-            {(menu && restaurant) ?
-              <DetailsSection menu={menu} restaurant={restaurant} menus={menus} />
+            {(menu && restaurant)
+              ? <DetailsSection menu={menu} restaurant={restaurant} menus={menus} />
               : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
@@ -78,26 +80,25 @@ type SlugMessageType = {
   message: string
 } | null
 
-type FormData = {
+interface FormData {
   title: string
   slug: string
 }
 
-const DetailsSection = ({
+function DetailsSection({
   menu,
   restaurant,
-  menus
+  menus,
 }: {
-  menu: RouterOutputs['menu']['getById'],
+  menu: RouterOutputs['menu']['getById']
   restaurant: RouterOutputs['restaurant']['getById']
   menus: RouterOutputs['menu']['getAllByRestaurantId']
-}) => {
-
-  const [isCheckingSlug, setIsCheckingSlug] = React.useState(false)
+}) {
+  const [isCheckingSlug, _setIsCheckingSlug] = React.useState(false)
   const [slugMessage, setSlugMessage] = React.useState<SlugMessageType>(null)
 
-  const { mutateAsync: handleUpdateMenu, isPending } =
-    useUpdateMenu(menu.id)
+  const { mutateAsync: handleUpdateMenu, isPending }
+    = useUpdateMenu(menu.id)
 
   const defaultValues = {
     title: menu?.title || '',
@@ -118,38 +119,41 @@ const DetailsSection = ({
     control,
   })
 
-  const handleSetSlug = async () => {
-    const [title, slug] = getValues(['title', 'slug'])
-    if (title && !slug) {
-      const newSlug = slugify(title, false)
-      setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
-      checkUniqueSlug()
-    }
-  }
-
   const checkUniqueSlug = () => {
     const slug = getValues('slug')
     const testSlug = slugify(slug || '', false)
     if (!slug || slug === menu.slug) {
       setSlugMessage(null)
-    } else if (testSlug !== slug) {
+    }
+    else if (testSlug !== slug) {
       setSlugMessage({
         type: 'error',
         message: `Your slug is not valid. Please use only lowercase letters, numbers, and dashes.`,
       })
-    } else {
+    }
+    else {
       const isUsed = menus.some(m => m.slug === slug)
       if (isUsed) {
         setSlugMessage({
           type: 'error',
           message: `'${slug}' is already used.`,
         })
-      } else {
+      }
+      else {
         setSlugMessage({
           type: 'success',
           message: `'${slug}' is available.`,
         })
       }
+    }
+  }
+
+  const handleSetSlug = async () => {
+    const [title, slug] = getValues(['title', 'slug'])
+    if (title && !slug) {
+      const newSlug = slugify(title, false)
+      setValue('slug', newSlug, { shouldValidate: true, shouldDirty: true })
+      checkUniqueSlug()
     }
   }
 
@@ -161,11 +165,12 @@ const DetailsSection = ({
       }
       await handleUpdateMenu({
         where: {
-          id: Number(menu.id)
+          id: Number(menu.id),
         },
-        payload
+        payload,
       })
-    } catch (error) {
+    }
+    catch (error) {
       alert(getErrorMessage(error))
     }
   }
@@ -180,7 +185,7 @@ const DetailsSection = ({
               <Input
                 {...register('title', {
                   required: 'This field is required',
-                  onBlur: handleSetSlug
+                  onBlur: handleSetSlug,
                 })}
                 type="text"
                 autoComplete="off"
@@ -201,24 +206,28 @@ const DetailsSection = ({
                 <Input
                   {...register('slug', {
                     required: 'This field is required',
-                    onChange: checkUniqueSlug
+                    onChange: checkUniqueSlug,
                   })}
                   type="text"
                   autoComplete="off"
                 />
               </InputGroup>
               <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
-              {isCheckingSlug ? (
-                <Alert status="info" mt="2">
-                  <Spinner size="sm" />
-                  <Text ml="2">Checking availability...</Text>
-                </Alert>
-              ) : !isCheckingSlug && slugMessage ? (
-                <Alert size="sm" status={slugMessage.type} mt="2">
-                  <AlertIcon />
-                  <Text ml="2">{slugMessage.message}</Text>
-                </Alert>
-              ) : null}
+              {isCheckingSlug
+                ? (
+                    <Alert status="info" mt="2">
+                      <Spinner size="sm" />
+                      <Text ml="2">Checking availability...</Text>
+                    </Alert>
+                  )
+                : !isCheckingSlug && slugMessage
+                    ? (
+                        <Alert size="sm" status={slugMessage.type} mt="2">
+                          <AlertIcon />
+                          <Text ml="2">{slugMessage.message}</Text>
+                        </Alert>
+                      )
+                    : null}
               <FormHelperText>
                 Must be unique to your restaurant.
               </FormHelperText>
@@ -253,7 +262,7 @@ const DetailsSection = ({
   )
 }
 
-const DeleteSection = ({ menu }: { menu: RouterOutputs['menu']['getById'], }) => {
+function DeleteSection({ menu }: { menu: RouterOutputs['menu']['getById'] }) {
   const router = useRouter()
 
   const dialogState = useDisclosure()
@@ -340,11 +349,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 
@@ -355,7 +364,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length === 0) {
+  }
+  else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',

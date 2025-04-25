@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
@@ -8,7 +8,7 @@ export const UserSchema = z.object({
   trialEndsAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  deletedAt: z.date().nullable()
+  deletedAt: z.date().nullable(),
 })
 
 export const DAYS_OF_WEEK = [
@@ -18,7 +18,7 @@ export const DAYS_OF_WEEK = [
   'Wednesday',
   'Thursday',
   'Friday',
-  'Saturday'
+  'Saturday',
 ] as const
 
 const HoursSchema = z.record(
@@ -27,7 +27,8 @@ const HoursSchema = z.record(
     isOpen: z.boolean(),
     openTime: z.string(),
     closeTime: z.string(),
-  }));
+  }),
+)
 
 export const CustomHostSchema = z.string().max(63)
 
@@ -36,7 +37,7 @@ export const ImageSchema = z.object({
   blurDataURL: z.string().optional(),
   height: z.number().optional(),
   width: z.number().optional(),
-  hexColor: z.string().optional()
+  hexColor: z.string().optional(),
 })
 
 export const RestaurantSchema = z.object({
@@ -48,7 +49,7 @@ export const RestaurantSchema = z.object({
     streetAddress: z.string(),
     zip: z.string(),
     city: z.string(),
-    state: z.string()
+    state: z.string(),
   }).optional().transform(val => val ?? undefined),
   phone: z.array(z.string()).optional().transform(val => val ?? undefined),
   email: z.array(z.string().email()).optional().transform(val => val ?? undefined),
@@ -81,7 +82,7 @@ export const SectionSchema = z.object({
   description: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  deletedAt: z.date().nullable()
+  deletedAt: z.date().nullable(),
 })
 
 export const MenuItemSchema = z.object({
@@ -96,7 +97,7 @@ export const MenuItemSchema = z.object({
   image: ImageSchema.optional().transform(val => val ?? undefined),
   createdAt: z.date(),
   updatedAt: z.date(),
-  deletedAt: z.date().nullable()
+  deletedAt: z.date().nullable(),
 })
 
 export const FeedbackSchema = z.object({
@@ -105,5 +106,5 @@ export const FeedbackSchema = z.object({
   comment: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  deletedAt: z.date().nullable()
+  deletedAt: z.date().nullable(),
 })

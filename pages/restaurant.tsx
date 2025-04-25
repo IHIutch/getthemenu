@@ -1,51 +1,53 @@
-import React, { useState } from 'react'
-import {
-  Grid,
-  GridItem,
-  HStack,
-  FormControl,
-  FormLabel,
-  Input,
-  Box,
-  Heading,
-  InputGroup,
-  InputRightAddon,
-  Switch,
-  Flex,
-  Text,
-  ButtonGroup,
-  Button,
-  Container,
-  AspectRatio,
-  Stack,
-  FormErrorMessage,
-} from '@chakra-ui/react'
-import Head from 'next/head'
+import type { RouterOutputs } from '@/server'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import type {
+  SubmitHandler,
+} from 'react-hook-form'
+import ImageDropzone from '@/components/common/ImageDropzone'
+import DashboardLayout from '@/layouts/Dashboard'
+import { appRouter } from '@/server'
+import { postUpload } from '@/utils/axios/uploads'
+import { getErrorMessage } from '@/utils/functions'
 import {
   useGetRestaurant,
   useUpdateRestaurant,
 } from '@/utils/react-query/restaurants'
+import { useGetAuthedUser } from '@/utils/react-query/users'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { DAYS_OF_WEEK } from '@/utils/zod'
+import {
+  AspectRatio,
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Grid,
+  GridItem,
+  Heading,
+  HStack,
+  Input,
+  InputGroup,
+  InputRightAddon,
+  Stack,
+  Switch,
+  Text,
+} from '@chakra-ui/react'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import Head from 'next/head'
+import React, { useState } from 'react'
 import {
   Controller,
-  SubmitHandler,
   useFieldArray,
   useForm,
   useFormState,
 } from 'react-hook-form'
-import DashboardLayout from '@/layouts/Dashboard'
-import ImageDropzone from '@/components/common/ImageDropzone'
-import { postUpload } from '@/utils/axios/uploads'
-import { useGetAuthedUser } from '@/utils/react-query/users'
-import { DAYS_OF_WEEK } from '@/utils/zod'
-import { RouterOutputs, appRouter } from '@/server'
-import { getErrorMessage } from '@/utils/functions'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { createServerSideHelpers } from '@trpc/react-query/server'
 import SuperJSON from 'superjson'
 
 export default function Restaurant({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-
   useGetAuthedUser({ initialData: user })
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
 
@@ -58,23 +60,23 @@ export default function Restaurant({ user }: InferGetServerSidePropsType<typeof 
       <Container maxW="container.md">
         <Stack spacing="6">
           <Box bg="white" rounded="md" shadow="base">
-            {restaurant ?
-              <Details restaurant={restaurant} />
+            {restaurant
+              ? <Details restaurant={restaurant} />
               : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            {restaurant ?
-              <Contact restaurant={restaurant} />
+            {restaurant
+              ? <Contact restaurant={restaurant} />
               : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            {restaurant ?
-              <Address restaurant={restaurant} />
+            {restaurant
+              ? <Address restaurant={restaurant} />
               : null}
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            {restaurant ?
-              <Hours restaurant={restaurant} />
+            {restaurant
+              ? <Hours restaurant={restaurant} />
               : null}
           </Box>
         </Stack>
@@ -87,28 +89,28 @@ Restaurant.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</Dashb
 
 type CoverImageType = {
   type: 'old'
-  src: string,
+  src: string
   blurDataURL?: string
 } | {
   type: 'new'
   file: File
-  src?: string,
+  src?: string
 }
 
-const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
+function Details({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant?.id)
 
   const defaultValues: {
-    name: string | null,
-    customHost: string | null,
+    name: string | null
+    customHost: string | null
     coverImage: CoverImageType
   } = {
     name: restaurant?.name,
     customHost: restaurant?.customHost,
     coverImage: {
       type: 'old',
-      src: restaurant.coverImage?.src || ''
+      src: restaurant.coverImage?.src || '',
     },
   }
 
@@ -134,14 +136,14 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
         const data = await postUpload(formData)
 
         imageData = {
-          coverImage: data
+          coverImage: data,
         }
       }
 
       const payload = {
         name: form.name,
         customHost: form.customHost,
-        ...imageData
+        ...imageData,
       }
 
       await handleUpdateRestaurant({
@@ -151,7 +153,8 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
         payload,
       })
       setIsSubmitting(false)
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -204,7 +207,7 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
                     name="coverImage"
                     control={control}
                     render={({ field: { onChange, value } }) => {
-                      return <ImageDropzone onChange={(val) => onChange({ type: 'new', file: val })} value={value.src || ''} />
+                      return <ImageDropzone onChange={val => onChange({ type: 'new', file: val })} value={value.src || ''} />
                     }}
                   />
                 </AspectRatio>
@@ -241,7 +244,7 @@ const Details = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   )
 }
 
-const Address = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
+function Address({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant.id)
 
@@ -282,7 +285,8 @@ const Address = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
         },
       })
       setIsSubmitting(false)
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -356,16 +360,16 @@ const Address = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   )
 }
 
-const Contact = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
+function Contact({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant?.id)
 
   const defaultValues = {
     phone: (Array.isArray(restaurant.phone) ? restaurant.phone : []).map(v => ({
-      value: v
+      value: v,
     })),
     email: (Array.isArray(restaurant.email) ? restaurant.email : []).map(v => ({
-      value: v
+      value: v,
     })),
   }
 
@@ -385,12 +389,12 @@ const Contact = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   const { fields: phoneFields } = useFieldArray({
     control,
     name: 'phone',
-  });
+  })
 
   const { fields: emailFields } = useFieldArray({
     control,
-    name: "email",
-  });
+    name: 'email',
+  })
 
   const onSubmit: SubmitHandler<typeof defaultValues> = async (form) => {
     try {
@@ -405,7 +409,8 @@ const Contact = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
         },
       })
       setIsSubmitting(false)
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -470,7 +475,7 @@ const Contact = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
   )
 }
 
-const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
+function Hours({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutateAsync: handleUpdateRestaurant } = useUpdateRestaurant(restaurant.id)
 
@@ -480,7 +485,7 @@ const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
       isOpen: restaurant?.hours?.[day]?.isOpen || false,
       openTime: restaurant?.hours?.[day]?.openTime || '',
       closeTime: restaurant?.hours?.[day]?.closeTime || '',
-    }))
+    })),
   }
 
   const {
@@ -489,7 +494,6 @@ const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
     reset,
     control,
     watch,
-    formState: { errors },
   } = useForm<typeof defaultValues>({
     defaultValues,
   })
@@ -524,7 +528,8 @@ const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
         },
       })
       setIsSubmitting(false)
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -579,7 +584,11 @@ const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
                   <GridItem colSpan={{ base: 12, lg: 6 }}>
                     <HStack align="center">
                       <FormControl>
-                        <FormLabel hidden>{field.label} Open Time</FormLabel>
+                        <FormLabel hidden>
+                          {field.label}
+                          {' '}
+                          Open Time
+                        </FormLabel>
                         <Input
                           {...register(`standardHours.${idx}.openTime`)}
                           isRequired
@@ -589,7 +598,11 @@ const Hours = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
                       </FormControl>
                       <Text as="span">to</Text>
                       <FormControl>
-                        <FormLabel hidden>{field.label} Close Time</FormLabel>
+                        <FormLabel hidden>
+                          {field.label}
+                          {' '}
+                          Close Time
+                        </FormLabel>
                         <Input
                           {...register(`standardHours.${idx}.closeTime`)}
                           // defaultValue={field.closeTime}
@@ -639,11 +652,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 
@@ -654,7 +667,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length === 0) {
+  }
+  else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',

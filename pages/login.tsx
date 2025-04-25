@@ -1,7 +1,15 @@
-import * as React from 'react'
+import type { GetServerSidePropsContext } from 'next'
+import type { SubmitHandler } from 'react-hook-form'
+
+import SEO from '@/components/global/SEO'
+import { getErrorMessage } from '@/utils/functions'
+import { createClientComponent } from '@/utils/supabase/component'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { createCaller } from '@/utils/trpc/server'
 import {
   Box,
   Button,
+  Container,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -10,22 +18,14 @@ import {
   GridItem,
   Heading,
   Input,
-  Container,
 } from '@chakra-ui/react'
-
 import Head from 'next/head'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import axios from 'redaxios'
-import { useRouter } from 'next/router'
 import NextLink from 'next/link'
-import { getErrorMessage } from '@/utils/functions'
-import SEO from '@/components/global/SEO'
-import { createClientComponent } from '@/utils/supabase/component'
-import { GetServerSidePropsContext } from 'next'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { createCaller } from '@/utils/trpc/server'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
 
-type FormValues = {
+interface FormValues {
   email: string
   password: string
 }
@@ -48,9 +48,11 @@ export default function Login() {
         email: form.email,
         password: form.password,
       })
-      if (error) throw new Error(error.message)
+      if (error)
+        throw new Error(error.message)
       router.push('/dashboard')
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -113,7 +115,7 @@ export default function Login() {
                     <Flex align="center">
                       <Button
                         as={NextLink}
-                        href={'/forgot-password'}
+                        href="/forgot-password"
                         variant="link"
                         fontWeight="semibold"
                         colorScheme="blue"
@@ -157,8 +159,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const caller = createCaller({
     session: {
-      user: data.user
-    }
+      user: data.user,
+    },
   })
 
   const user = await caller.user.getAuthedUser()
@@ -170,7 +172,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user && user.restaurants.length > 0) {
+  }
+  else if (user && user.restaurants.length > 0) {
     return {
       redirect: {
         destination: '/get-started',

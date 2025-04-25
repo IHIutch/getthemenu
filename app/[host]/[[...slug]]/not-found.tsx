@@ -1,9 +1,8 @@
-import { Box, Flex, Heading, Link, Text, VStack } from '@chakra-ui/react'
-import NextLink from 'next/link';
+import { Box, Heading, Link, Text, VStack } from '@chakra-ui/react'
+import NextLink from 'next/link'
 import React from 'react'
 
 export default function MenuNotFound() {
-
   return (
     <VStack w="full">
       <Box textAlign="center">
@@ -11,7 +10,11 @@ export default function MenuNotFound() {
         <Text>It may have been removed or renamed.</Text>
       </Box>
       <Box>
-        <Text textAlign="center">Let&apos;s take you back to the <Link as={NextLink} href='/' color="blue.500" textDecoration="underline">right place</Link>.</Text>
+        <Text textAlign="center">
+          Let&apos;s take you back to the
+          <Link as={NextLink} href="/" color="blue.500" textDecoration="underline">right place</Link>
+          .
+        </Text>
       </Box>
     </VStack>
   )

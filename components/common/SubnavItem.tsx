@@ -1,7 +1,7 @@
-import * as React from 'react'
-import NextLink from 'next/link'
 import { Link, useToken } from '@chakra-ui/react'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
+import * as React from 'react'
 
 export default function SubnavItem({ href, children }: { href: string, children: React.ReactNode }) {
   const { asPath } = useRouter()

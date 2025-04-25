@@ -1,16 +1,15 @@
-"use client"
+'use client'
 
-import { DAYS_OF_WEEK, RestaurantSchema } from '@/utils/zod'
-import { AspectRatio, Box, Button, Container, Flex, Heading, Icon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from '@chakra-ui/react'
-import React from 'react'
-import { z } from 'zod'
-import NextImage from 'next/image'
-import { ClockIcon, PhoneIcon } from 'lucide-react'
-import dayjs from 'dayjs'
+import type { z } from 'zod'
 import { formatTime } from '@/utils/functions'
-import { useRouter } from 'next/navigation'
+import { DAYS_OF_WEEK, RestaurantSchema } from '@/utils/zod'
+import { AspectRatio, Box, Button, Container, Flex, Heading, Icon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from '@chakra-ui/react'
+import dayjs from 'dayjs'
+import { ClockIcon, PhoneIcon } from 'lucide-react'
+import NextImage from 'next/image'
+import React from 'react'
 
-const Restaurant = RestaurantSchema.pick({
+const _Restaurant = RestaurantSchema.pick({
   name: true,
   hours: true,
   address: true,
@@ -21,7 +20,7 @@ const Restaurant = RestaurantSchema.pick({
   customDomain: true,
 })
 
-type RestaurantType = z.infer<typeof Restaurant>
+type RestaurantType = z.infer<typeof _Restaurant>
 
 export default function Header({ restaurant }: { restaurant: RestaurantType }) {
   const modalState = useDisclosure()
@@ -31,20 +30,22 @@ export default function Header({ restaurant }: { restaurant: RestaurantType }) {
     <>
       <AspectRatio ratio={{ base: 4 / 3, sm: 21 / 9 }}>
         <Box boxSize="full">
-          {restaurant?.coverImage?.src ? (
-            <NextImage
-              alt={restaurant?.name || ''}
-              src={restaurant?.coverImage?.src}
-              blurDataURL={restaurant?.coverImage?.blurDataURL}
-              fill={true}
-              priority={true}
-              sizes="100vw"
-              style={{ objectFit: 'cover', height: '100%', width: '100%' }}
-              placeholder={restaurant?.coverImage?.blurDataURL?.startsWith('data') ? "blur" : 'empty'}
-            />
-          ) : (
-            <Box boxSize="full" bg="gray.400" />
-          )}
+          {restaurant?.coverImage?.src
+            ? (
+                <NextImage
+                  alt={restaurant?.name || ''}
+                  src={restaurant?.coverImage?.src}
+                  blurDataURL={restaurant?.coverImage?.blurDataURL}
+                  fill={true}
+                  priority={true}
+                  sizes="100vw"
+                  style={{ objectFit: 'cover', height: '100%', width: '100%' }}
+                  placeholder={restaurant?.coverImage?.blurDataURL?.startsWith('data') ? 'blur' : 'empty'}
+                />
+              )
+            : (
+                <Box boxSize="full" bg="gray.400" />
+              )}
           <Flex
             position="absolute"
             bottom="0"
@@ -76,31 +77,39 @@ export default function Header({ restaurant }: { restaurant: RestaurantType }) {
                   )}
                   <Stack direction="row" align="center" py="1">
                     <Icon as={ClockIcon} />
-                    {restaurant?.hours?.[weekdayName]?.isOpen ? (
-                      <Text>
-                        {restaurant.hours?.[weekdayName]?.openTime ?
-                          formatTime(
-                            restaurant.hours?.[weekdayName]?.openTime || ''
-                          ) : null}{' '}
-                        -{' '}
-                        {restaurant.hours?.[weekdayName]?.closeTime ?
-                          formatTime(
-                            restaurant.hours?.[weekdayName]?.closeTime || ''
-                          ) : null}
-                      </Text>
-                    ) : (
-                      <Text>Closed Today</Text>
-                    )}
+                    {restaurant?.hours?.[weekdayName]?.isOpen
+                      ? (
+                          <Text>
+                            {restaurant.hours?.[weekdayName]?.openTime
+                              ? formatTime(
+                                  restaurant.hours?.[weekdayName]?.openTime || '',
+                                )
+                              : null}
+                            {' '}
+                            -
+                            {' '}
+                            {restaurant.hours?.[weekdayName]?.closeTime
+                              ? formatTime(
+                                  restaurant.hours?.[weekdayName]?.closeTime || '',
+                                )
+                              : null}
+                          </Text>
+                        )
+                      : (
+                          <Text>Closed Today</Text>
+                        )}
                   </Stack>
                 </Flex>
-                {restaurant.phone && restaurant.address ? (
-                  <Box display={{ lg: 'none' }} flexShrink="0">
-                    <Button onClick={modalState.onOpen}>
-                      View Details
-                    </Button>
-                  </Box>
+                {restaurant.phone && restaurant.address
+                  ? (
+                      <Box display={{ lg: 'none' }} flexShrink="0">
+                        <Button onClick={modalState.onOpen}>
+                          View Details
+                        </Button>
+                      </Box>
 
-                ) : null}
+                    )
+                  : null}
               </Flex>
             </Container>
           </Flex>
@@ -122,18 +131,20 @@ export default function Header({ restaurant }: { restaurant: RestaurantType }) {
               <TabPanels>
                 <TabPanel px="0">
                   <Stack spacing="4">
-                    {restaurant?.phone && restaurant.phone.length > 0 ? (
-                      <Box>
-                        <Text fontWeight="semibold">Phone</Text>
-                        <Stack as="ul" spacing="1">
-                          {restaurant.phone.map((phone, idx) => (
-                            <Text as="li" key={idx} listStyleType="none">
-                              {phone}
-                            </Text>
-                          ))}
-                        </Stack>
-                      </Box>
-                    ) : null}
+                    {restaurant?.phone && restaurant.phone.length > 0
+                      ? (
+                          <Box>
+                            <Text fontWeight="semibold">Phone</Text>
+                            <Stack as="ul" spacing="1">
+                              {restaurant.phone.map((phone, idx) => (
+                                <Text as="li" key={idx} listStyleType="none">
+                                  {phone}
+                                </Text>
+                              ))}
+                            </Stack>
+                          </Box>
+                        )
+                      : null}
 
                     {restaurant?.address && (
                       <Box>
@@ -141,50 +152,63 @@ export default function Header({ restaurant }: { restaurant: RestaurantType }) {
                           Address
                         </Text>
                         <Text as="dd">
-                          {restaurant.address?.streetAddress} <br />
-                          {restaurant.address?.city},{' '}
-                          {restaurant.address?.state} {restaurant.address?.zip}
+                          {restaurant.address?.streetAddress}
+                          {' '}
+                          <br />
+                          {restaurant.address?.city}
+                          ,
+                          {' '}
+                          {restaurant.address?.state}
+                          {' '}
+                          {restaurant.address?.zip}
                         </Text>
                       </Box>
                     )}
 
-                    {restaurant?.email && restaurant?.email?.length > 0 ? (
-                      <Box>
-                        <Text fontWeight="semibold">Email</Text>
-                        <Stack as="ul" spacing="1">
-                          {restaurant.email.map((email, idx) => (
-                            <Text as="li" key={idx} listStyleType="none">
-                              {email}
-                            </Text>
-                          ))}
-                        </Stack>
-                      </Box>
-                    ) : null}
+                    {restaurant?.email && restaurant?.email?.length > 0
+                      ? (
+                          <Box>
+                            <Text fontWeight="semibold">Email</Text>
+                            <Stack as="ul" spacing="1">
+                              {restaurant.email.map((email, idx) => (
+                                <Text as="li" key={idx} listStyleType="none">
+                                  {email}
+                                </Text>
+                              ))}
+                            </Stack>
+                          </Box>
+                        )
+                      : null}
                   </Stack>
                 </TabPanel>
                 <TabPanel px="0">
                   <Stack spacing="3">
-                    {DAYS_OF_WEEK.map((day) => (
+                    {DAYS_OF_WEEK.map(day => (
                       <Flex as="dl" key={day} justify="space-between" w="100%">
                         <Box>
                           <Text as="dt" fontWeight="semibold">
-                            {day}:
+                            {day}
+                            :
                           </Text>
                         </Box>
                         <Box>
-                          {restaurant?.hours?.[day]?.isOpen ? (
-                            <Text as="dd">
-                              {restaurant.hours?.[day]?.openTime &&
-                                formatTime(
-                                  restaurant.hours?.[day]?.openTime || ''
-                                )}{' '}
-                              -{' '}
-                              {restaurant.hours?.[day]?.closeTime &&
-                                formatTime(restaurant.hours?.[day]?.closeTime || '')}
-                            </Text>
-                          ) : (
-                            <Text as="dd">Closed</Text>
-                          )}
+                          {restaurant?.hours?.[day]?.isOpen
+                            ? (
+                                <Text as="dd">
+                                  {restaurant.hours?.[day]?.openTime
+                                    && formatTime(
+                                      restaurant.hours?.[day]?.openTime || '',
+                                    )}
+                                  {' '}
+                                  -
+                                  {' '}
+                                  {restaurant.hours?.[day]?.closeTime
+                                    && formatTime(restaurant.hours?.[day]?.closeTime || '')}
+                                </Text>
+                              )
+                            : (
+                                <Text as="dd">Closed</Text>
+                              )}
                         </Box>
                       </Flex>
                     ))}

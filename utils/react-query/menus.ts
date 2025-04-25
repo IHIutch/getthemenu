@@ -1,10 +1,10 @@
+import type { RouterInputs } from '@/server'
 import { trpc } from '../trpc/client'
-import { RouterInputs } from '@/server'
 
-export const useGetMenus = (restaurantId: RouterInputs['menu']['getAllByRestaurantId']['where']['restaurantId'] = '') => {
+export function useGetMenus(restaurantId: RouterInputs['menu']['getAllByRestaurantId']['where']['restaurantId'] = '') {
   const { isPending, isError, isSuccess, data, error } = trpc.menu.getAllByRestaurantId.useQuery(
     { where: { restaurantId } },
-    { enabled: restaurantId !== '' }
+    { enabled: restaurantId !== '' },
   )
   return {
     data,
@@ -15,10 +15,10 @@ export const useGetMenus = (restaurantId: RouterInputs['menu']['getAllByRestaura
   }
 }
 
-export const useGetMenu = (id: RouterInputs['menu']['getById']['where']['id'] = -1) => {
+export function useGetMenu(id: RouterInputs['menu']['getById']['where']['id'] = -1) {
   const { isLoading, isError, isSuccess, data, error } = trpc.menu.getById.useQuery(
     { where: { id } },
-    { enabled: id !== -1 }
+    { enabled: id !== -1 },
   )
 
   return {
@@ -30,7 +30,7 @@ export const useGetMenu = (id: RouterInputs['menu']['getById']['where']['id'] = 
   }
 }
 
-export const useUpdateMenu = (id: RouterInputs['menu']['getById']['where']['id']) => {
+export function useUpdateMenu(id: RouterInputs['menu']['getById']['where']['id']) {
   const { menu: menuUtils } = trpc.useUtils()
   const {
     mutateAsync,
@@ -44,33 +44,35 @@ export const useUpdateMenu = (id: RouterInputs['menu']['getById']['where']['id']
     onMutate: async ({ payload }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await menuUtils.getById.cancel({
-        where: { id }
+        where: { id },
       })
       const previous = menuUtils.getById.getData({
-        where: { id }
+        where: { id },
       })
       menuUtils.getById.setData({
-        where: { id }
+        where: { id },
       }, (old) => {
-        return old ? {
-          ...old,
-          ...payload,
-          updatedAt: new Date()
-        } : undefined
+        return old
+          ? {
+              ...old,
+              ...payload,
+              updatedAt: new Date(),
+            }
+          : undefined
       })
       return { previous, updated: payload }
     },
     // If the mutation fails, use the context we returned above
-    onError: (err, updated, context) => {
+    onError: (_err, _updated, context) => {
       menuUtils.getById.setData({ where: { id } }, context?.previous)
     },
     // Always refetch after error or success:
-    onSettled: (updated) => {
+    onSettled: (_updated) => {
       menuUtils.getById.invalidate({
-        where: { id }
+        where: { id },
       })
     },
-  }
+  },
   )
   return {
     mutateAsync,
@@ -82,7 +84,7 @@ export const useUpdateMenu = (id: RouterInputs['menu']['getById']['where']['id']
   }
 }
 
-export const useReorderMenus = (restaurantId: RouterInputs['menu']['getAllByRestaurantId']['where']['restaurantId']) => {
+export function useReorderMenus(restaurantId: RouterInputs['menu']['getAllByRestaurantId']['where']['restaurantId']) {
   const { menu: menuUtils } = trpc.useUtils()
 
   const {
@@ -98,36 +100,38 @@ export const useReorderMenus = (restaurantId: RouterInputs['menu']['getAllByRest
       onMutate: async ({ payload }) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await menuUtils.getAllByRestaurantId.cancel({
-          where: { restaurantId }
+          where: { restaurantId },
         })
         const previous = menuUtils.getAllByRestaurantId.getData({
-          where: { restaurantId }
+          where: { restaurantId },
         })
         menuUtils.getAllByRestaurantId.setData({
-          where: { restaurantId }
+          where: { restaurantId },
         }, (old) => {
-          return old ? old.map((o) => {
-            return {
-              ...o,
-              ...(payload.find((p) => p.id === o.id)),
-            }
-          }).sort((a, b) => (a.position || 0) - (b.position || 0)) : undefined
+          return old
+            ? old.map((o) => {
+                return {
+                  ...o,
+                  ...(payload.find(p => p.id === o.id)),
+                }
+              }).sort((a, b) => (a.position || 0) - (b.position || 0))
+            : undefined
         })
         return { previous, updated: payload }
       },
       // If the mutation fails, use the context we returned above
-      onError: (err, updated, context) => {
+      onError: (_err, _updated, context) => {
         menuUtils.getAllByRestaurantId.setData({
-          where: { restaurantId }
+          where: { restaurantId },
         }, context?.previous)
       },
       // Always refetch after error or success:
-      onSettled: (updated) => {
+      onSettled: (_updated) => {
         menuUtils.getAllByRestaurantId.invalidate({
-          where: { restaurantId }
+          where: { restaurantId },
         })
       },
-    }
+    },
   )
   return {
     mutateAsync,
@@ -139,7 +143,7 @@ export const useReorderMenus = (restaurantId: RouterInputs['menu']['getAllByRest
   }
 }
 
-export const useDeleteMenu = () => {
+export function useDeleteMenu() {
   const {
     mutateAsync,
     isPending,

@@ -1,15 +1,12 @@
-import {
-  type inferRouterInputs,
-  type inferRouterOutputs,
-} from '@trpc/server'
-import { router } from '@/utils/trpc'
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 import { menuRouter } from '@/server/routers/menu'
-import { userRouter } from './routers/user'
+import { router } from '@/utils/trpc'
+import { feedbackRouter } from './routers/feedback'
+import { menuItemRouter } from './routers/menuItems'
 import { restaurantRouter } from './routers/restaurant'
 import { sectionRouter } from './routers/sections'
-import { menuItemRouter } from './routers/menuItems'
+import { userRouter } from './routers/user'
 import { verifyRouter } from './routers/verify'
-import { feedbackRouter } from './routers/feedback'
 
 export const appRouter = router({
   menu: menuRouter,

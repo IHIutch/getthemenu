@@ -1,7 +1,16 @@
-import * as React from 'react'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import type { SubmitHandler } from 'react-hook-form'
+import { appRouter } from '@/server'
+import { getErrorMessage } from '@/utils/functions'
+
+import { createClientComponent } from '@/utils/supabase/component'
+import { createClientServer } from '@/utils/supabase/server-props'
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
+  Container,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -10,28 +19,20 @@ import {
   GridItem,
   Heading,
   Input,
-  Container,
-  Alert,
-  AlertIcon,
 } from '@chakra-ui/react'
+import { createServerSideHelpers } from '@trpc/react-query/server'
 import Head from 'next/head'
 import NextLink from 'next/link'
-
-import { SubmitHandler, useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { appRouter } from '@/server'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
 import SuperJSON from 'superjson'
-import { createClientComponent } from '@/utils/supabase/component'
-import { getErrorMessage } from '@/utils/functions'
 
-type FormData = {
+interface FormData {
   'new-password': string
 }
 
-export default function ResetPassword({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ResetPassword(_props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [success, setSuccess] = React.useState(false)
   const router = useRouter()
@@ -41,7 +42,7 @@ export default function ResetPassword({ user }: InferGetServerSidePropsType<type
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log({ event, session })
-      }
+      },
     )
 
     return () => {
@@ -55,8 +56,8 @@ export default function ResetPassword({ user }: InferGetServerSidePropsType<type
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      'new-password': ''
-    }
+      'new-password': '',
+    },
   })
 
   const onSubmit: SubmitHandler<FormData> = async (form) => {
@@ -65,12 +66,14 @@ export default function ResetPassword({ user }: InferGetServerSidePropsType<type
       const { error } = await supabase.auth.updateUser({
         password: form['new-password'],
       })
-      if (error) throw new Error(error.message)
+      if (error)
+        throw new Error(error.message)
       setIsSubmitting(false)
       setSuccess(true)
 
       router.replace('/dashboard')
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -156,11 +159,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 

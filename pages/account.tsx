@@ -1,54 +1,57 @@
-import * as React from 'react'
+import type { RouterOutputs } from '@/server'
+import type {
+  UseRadioProps,
+} from '@chakra-ui/react'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import type { SubmitHandler } from 'react-hook-form'
 import AccountLayout from '@/layouts/Account'
+import { appRouter } from '@/server'
+import { env } from '@/utils/env'
+import { useGetRestaurant } from '@/utils/react-query/restaurants'
+import { createClientServer } from '@/utils/supabase/server-props'
 import {
-  Container,
-  Heading,
-  Stack,
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
-  Text,
-  Alert,
-  useRadioGroup,
-  useRadio,
-  VStack,
-  AlertIcon,
-  AlertDescription,
-  Flex,
-  Circle,
+  ButtonGroup,
   Center,
+  Circle,
+  Container,
+  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
+  Heading,
   Input,
   InputGroup,
-  UseRadioProps,
-  FormErrorMessage,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
   ModalBody,
+  ModalCloseButton,
+  ModalContent,
   ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text,
   useDisclosure,
-  ButtonGroup,
+  useRadio,
+  useRadioGroup,
+  VStack,
 } from '@chakra-ui/react'
-import Head from 'next/head'
-import Stripe from 'stripe'
-import dayjs from 'dayjs'
-import axios from 'redaxios'
-import { useRouter } from 'next/router'
 import { loadStripe } from '@stripe/stripe-js'
-import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { env } from '@/utils/env'
-import { createClientServer } from '@/utils/supabase/server-props'
 import { createServerSideHelpers } from '@trpc/react-query/server'
-import { RouterOutputs, appRouter } from '@/server'
+import dayjs from 'dayjs'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
+import axios from 'redaxios'
+import Stripe from 'stripe'
 import SuperJSON from 'superjson'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { getErrorMessage } from '@/utils/functions'
-import { SubmitHandler, useForm } from 'react-hook-form'
 
-type PriceType = {
+interface PriceType {
   id: Stripe.Price['id']
   name: Stripe.Product['name']
   price: Stripe.Price['unit_amount']
@@ -86,7 +89,7 @@ export default function Account({ plans: prices, user }: InferGetServerSideProps
   )
 }
 
-const UserDetails = ({ user }: { user: RouterOutputs['user']['getAuthedUser'] }) => {
+function UserDetails({ user }: { user: RouterOutputs['user']['getAuthedUser'] }) {
   return (
     <>
       <Box p="6" borderBottomWidth="1px">
@@ -94,13 +97,15 @@ const UserDetails = ({ user }: { user: RouterOutputs['user']['getAuthedUser'] })
           User Details
         </Heading>
       </Box>
-      <Box p="6">Email: {user?.email}</Box>
+      <Box p="6">
+        Email:
+        {user?.email}
+      </Box>
     </>
   )
 }
 
-const SiteDetails = ({ children }: { children?: React.ReactNode }) => {
-
+function SiteDetails({ children }: { children?: React.ReactNode }) {
   // const handleCheckDomain = async (domain) => {
   // try {
   // const { data: checkData } = await axios
@@ -158,11 +163,11 @@ const SiteDetails = ({ children }: { children?: React.ReactNode }) => {
   )
 }
 
-const CustomHostForm = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
+function CustomHostForm({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const defaultValues = {
-    customHost: restaurant?.customHost || ''
+    customHost: restaurant?.customHost || '',
   }
 
   const {
@@ -210,8 +215,8 @@ const CustomHostForm = ({ restaurant }: { restaurant: RouterOutputs['restaurant'
 
             <ModalFooter>
               <ButtonGroup>
-                <Button variant='ghost' onClick={onClose}>Cancel</Button>
-                <Button colorScheme='blue' type="submit">
+                <Button variant="ghost" onClick={onClose}>Cancel</Button>
+                <Button colorScheme="blue" type="submit">
                   Save
                 </Button>
               </ButtonGroup>
@@ -223,11 +228,11 @@ const CustomHostForm = ({ restaurant }: { restaurant: RouterOutputs['restaurant'
   )
 }
 
-const CustomDomainForm = ({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) => {
+function CustomDomainForm({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const defaultValues = {
-    customDomain: restaurant?.customDomain || ''
+    customDomain: restaurant?.customDomain || '',
   }
 
   const {
@@ -275,8 +280,8 @@ const CustomDomainForm = ({ restaurant }: { restaurant: RouterOutputs['restauran
 
             <ModalFooter>
               <ButtonGroup>
-                <Button variant='ghost' onClick={onClose}>Cancel</Button>
-                <Button colorScheme='blue' type="submit">
+                <Button variant="ghost" onClick={onClose}>Cancel</Button>
+                <Button colorScheme="blue" type="submit">
                   Save
                 </Button>
               </ButtonGroup>
@@ -288,8 +293,7 @@ const CustomDomainForm = ({ restaurant }: { restaurant: RouterOutputs['restauran
   )
 }
 
-const Subscription = ({ prices, user }: { prices?: PriceType[], user: RouterOutputs['user']['getAuthedUser'] }) => {
-
+function Subscription({ prices, user }: { prices?: PriceType[], user: RouterOutputs['user']['getAuthedUser'] }) {
   const [selectedPrice, setSelectedPrice] = React.useState('')
 
   const router = useRouter()
@@ -301,16 +305,17 @@ const Subscription = ({ prices, user }: { prices?: PriceType[], user: RouterOutp
 
   const loadCheckout = async (priceId: Stripe.Price['id']) => {
     const { data } = await axios.get(
-      `/api/account/stripe/subscriptions/${priceId}`
+      `/api/account/stripe/subscriptions/${priceId}`,
     )
     const stripe = await loadStripe(
-      env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     )
     await stripe?.redirectToCheckout({ sessionId: data.id })
   }
 
   const trialCountdown = () => {
-    if (!user?.trialEndsAt) return null
+    if (!user?.trialEndsAt)
+      return null
     const numDays = dayjs(user.trialEndsAt).diff(dayjs(), 'day')
     return numDays === 0
       ? 'today'
@@ -333,52 +338,66 @@ const Subscription = ({ prices, user }: { prices?: PriceType[], user: RouterOutp
           Subscription
         </Heading>
       </Box>
-      {trialCountdown() ? (
-        <Alert mb="3" status="warning">
-          <AlertIcon />
-          <AlertDescription>
-            Your trial ends {trialCountdown()}
-          </AlertDescription>
-        </Alert>
-      ) : null}
+      {trialCountdown()
+        ? (
+            <Alert mb="3" status="warning">
+              <AlertIcon />
+              <AlertDescription>
+                Your trial ends
+                {' '}
+                {trialCountdown()}
+              </AlertDescription>
+            </Alert>
+          )
+        : null}
       <Box p="6">
-        {user?.stripeSubscriptionId ? (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              // console.log(e.target.priceId.value)
-              loadCheckout(selectedPrice)
-            }}
-          >
-            <VStack {...group} spacing="-1px" mb="3">
-              {(prices || []).map((price) => {
-                const radio = getRadioProps({ value: price.id })
-                return (
-                  <CompoundRadio {...radio} key={price.id} value={price.id} isRequired>
-                    <Text fontWeight="semibold" fontSize="lg">
-                      {price.label || price.name}
-                    </Text>
-                    {price.price ? <Text color="gray.600">
-                      ${price.price / 100} / {price.interval}
-                    </Text> : null}
-                  </CompoundRadio>
-                )
-              })}
-            </VStack>
-            <Flex>
-              <Button
-                ml="auto"
-                // isLoading={isSubmitting}
-                colorScheme="blue"
-                type="submit"
+        {user?.stripeSubscriptionId
+          ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  // console.log(e.target.priceId.value)
+                  loadCheckout(selectedPrice)
+                }}
               >
-                Checkout With Stripe
-              </Button>
-            </Flex>
-          </form>
-        ) : (
-          <Button onClick={loadCustomerPortal}>Payment Portal</Button>
-        )}
+                <VStack {...group} spacing="-1px" mb="3">
+                  {(prices || []).map((price) => {
+                    const radio = getRadioProps({ value: price.id })
+                    return (
+                      <CompoundRadio {...radio} key={price.id} value={price.id} isRequired>
+                        <Text fontWeight="semibold" fontSize="lg">
+                          {price.label || price.name}
+                        </Text>
+                        {price.price
+                          ? (
+                              <Text color="gray.600">
+                                $
+                                {price.price / 100}
+                                {' '}
+                                /
+                                {price.interval}
+                              </Text>
+                            )
+                          : null}
+                      </CompoundRadio>
+                    )
+                  })}
+                </VStack>
+                <Flex>
+                  <Button
+                    ml="auto"
+                    // isLoading={isSubmitting}
+                    colorScheme="blue"
+                    type="submit"
+                  >
+                    Checkout With Stripe
+                  </Button>
+                </Flex>
+              </form>
+            )
+          : (
+              <Button onClick={loadCustomerPortal}>Payment Portal</Button>
+            )}
       </Box>
     </>
   )
@@ -386,7 +405,7 @@ const Subscription = ({ prices, user }: { prices?: PriceType[], user: RouterOutp
 
 Account.getLayout = (page: React.ReactNode) => <AccountLayout>{page}</AccountLayout>
 
-const CompoundRadio = ({ children, ...props }: { children: React.ReactNode } & UseRadioProps) => {
+function CompoundRadio({ children, ...props }: { children: React.ReactNode } & UseRadioProps) {
   const { getInputProps, getRadioProps } = useRadio(props)
 
   const input = getInputProps()
@@ -430,13 +449,15 @@ const CompoundRadio = ({ children, ...props }: { children: React.ReactNode } & U
               borderColor={props.isChecked ? 'blue.500' : 'gray.200'}
               bg={props.isChecked ? 'blue.500' : 'gray.100'}
               _hover={
-                props.isChecked ? {
-                  borderColor: 'blue.600',
-                  bg: 'blue.600',
-                } : {
-                  borderColor: 'gray.200',
-                  bg: 'gray.100',
-                }
+                props.isChecked
+                  ? {
+                      borderColor: 'blue.600',
+                      bg: 'blue.600',
+                    }
+                  : {
+                      borderColor: 'gray.200',
+                      bg: 'gray.100',
+                    }
               }
             >
               <Circle
@@ -461,11 +482,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     router: appRouter,
     ctx: {
       session: {
-        user: data.user
-      }
+        user: data.user,
+      },
     },
     transformer: SuperJSON,
-  });
+  })
 
   const user = await helpers.user.getAuthedUser.fetch()
 
@@ -476,7 +497,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length === 0) {
+  }
+  else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',
@@ -502,7 +524,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         currency: price.currency,
         label: price.metadata?.label || '',
       }
-    })
+    }),
   )
 
   const sortedPlans = plans.sort((a, b) => (a.price || 0) - (b.price || 0))

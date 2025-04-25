@@ -1,8 +1,8 @@
+import type { Prisma } from '@prisma/client'
 import prisma from '@/utils/prisma'
 import { getErrorMessage } from '../functions'
-import { Prisma } from '@prisma/client'
 
-export const prismaGetUsers = async ({ where }: { where: Prisma.usersWhereInput }) => {
+export async function prismaGetUsers({ where }: { where: Prisma.usersWhereInput }) {
   try {
     return await prisma.users.findMany({
       where,
@@ -14,12 +14,13 @@ export const prismaGetUsers = async ({ where }: { where: Prisma.usersWhereInput 
         },
       },
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaGetUser = async ({ where }: { where: Prisma.usersWhereUniqueInput }) => {
+export async function prismaGetUser({ where }: { where: Prisma.usersWhereUniqueInput }) {
   try {
     return await prisma.users.findUnique({
       where,
@@ -31,38 +32,42 @@ export const prismaGetUser = async ({ where }: { where: Prisma.usersWhereUniqueI
         },
       },
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaCreateUser = async ({ payload }: { payload: Prisma.usersCreateInput }) => {
+export async function prismaCreateUser({ payload }: { payload: Prisma.usersCreateInput }) {
   try {
     return await prisma.users.create({
       data: payload,
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaUpdateUser = async ({ where, payload }: { where: Prisma.usersWhereUniqueInput, payload: Prisma.usersUpdateInput }) => {
+export async function prismaUpdateUser({ where, payload }: { where: Prisma.usersWhereUniqueInput, payload: Prisma.usersUpdateInput }) {
   try {
     return await prisma.users.update({
       data: payload,
       where,
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaDeleteUser = async ({ where }: { where: Prisma.usersWhereUniqueInput }) => {
+export async function prismaDeleteUser({ where }: { where: Prisma.usersWhereUniqueInput }) {
   try {
     return await prisma.users.delete({
       where,
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }

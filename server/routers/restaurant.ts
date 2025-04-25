@@ -1,14 +1,14 @@
-import { prismaCreateRestaurant, prismaGetRestaurant, prismaUpdateRestaurant } from "@/utils/prisma/restaurants";
-import { authedProcedure, router } from "@/utils/trpc";
-import { RestaurantSchema } from "@/utils/zod";
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { prismaCreateRestaurant, prismaGetRestaurant, prismaUpdateRestaurant } from '@/utils/prisma/restaurants'
+import { authedProcedure, router } from '@/utils/trpc'
+import { RestaurantSchema } from '@/utils/zod'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 export const restaurantRouter = router({
   getById: authedProcedure.input(
     z.object({
-      where: RestaurantSchema.pick({ id: true })
-    })
+      where: RestaurantSchema.pick({ id: true }),
+    }),
   ).query(async ({ input }) => {
     const { where } = input
     const data = await prismaGetRestaurant({ where })
@@ -20,7 +20,7 @@ export const restaurantRouter = router({
     }
 
     return RestaurantSchema.partial({
-      coverImage: true
+      coverImage: true,
     }).parse(data)
   }),
   create: authedProcedure.input(
@@ -29,9 +29,9 @@ export const restaurantRouter = router({
         id: true,
         createdAt: true,
         updatedAt: true,
-        deletedAt: true
-      })
-    })
+        deletedAt: true,
+      }),
+    }),
   ).mutation(async ({ input }) => {
     const { payload } = input
     const data = await prismaCreateRestaurant({
@@ -39,10 +39,10 @@ export const restaurantRouter = router({
         ...payload,
         users: {
           connect: {
-            id: payload.userId
-          }
-        }
-      }
+            id: payload.userId,
+          },
+        },
+      },
     })
     return data
   }),
@@ -54,15 +54,15 @@ export const restaurantRouter = router({
         userId: true,
         createdAt: true,
         updatedAt: true,
-        deletedAt: true
-      }).partial()
-    })
+        deletedAt: true,
+      }).partial(),
+    }),
   ).mutation(async ({ input }) => {
     const { where, payload } = input
     const data = prismaUpdateRestaurant({
       where,
-      payload
+      payload,
     })
     return data
-  })
+  }),
 })

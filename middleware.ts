@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { env } from '@/utils/env'
+import { NextResponse } from 'next/server'
 
 export const config = {
   matcher: [
@@ -10,32 +11,32 @@ export const config = {
      * 3. /_static (inside /public)
      * 4. all root files inside /public (e.g. /favicon.ico)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     // Sentry
-    "/((?!monitoring)$)"
+    '/((?!monitoring)$)',
   ],
-};
+}
 
 export default async function middleware(req: NextRequest) {
-  const url = req.nextUrl;
+  const url = req.nextUrl
 
   // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
   let host = req.headers
-    .get("host")!
-    .replace(".localhost:3000", "")
-    .replace(`.${env.NEXT_PUBLIC_ROOT_DOMAIN}`, "");
+    .get('host')!
+    .replace('.localhost:3000', '')
+    .replace(`.${env.NEXT_PUBLIC_ROOT_DOMAIN}`, '')
 
   // special case for Vercel preview deployment URLs
   if (
-    host.includes("---") &&
-    host.endsWith(".vercel.app")
+    host.includes('---')
+    && host.endsWith('.vercel.app')
   ) {
-    host = `${host.split("---")[0]}.${env.NEXT_PUBLIC_ROOT_DOMAIN}`;
+    host = `${host.split('---')[0]}.${env.NEXT_PUBLIC_ROOT_DOMAIN}`
   }
 
-  const searchParams = req.nextUrl.searchParams.toString();
+  const searchParams = req.nextUrl.searchParams.toString()
   // Get the pathname of the request (e.g. /, /about, /blog/first-post)
-  const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ""}`;
+  const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`
 
   // rewrites for app pages
   // if (host == `app.${env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
@@ -52,15 +53,15 @@ export default async function middleware(req: NextRequest) {
 
   // rewrite root application to `/home` folder
   if (
-    host === "localhost:3000" ||
-    host === env.NEXT_PUBLIC_ROOT_DOMAIN ||
-    url.pathname === '/monitoring'
+    host === 'localhost:3000'
+    || host === env.NEXT_PUBLIC_ROOT_DOMAIN
+    || url.pathname === '/monitoring'
   ) {
     return NextResponse.rewrite(
-      new URL(`${path === "/" ? "" : path}`, req.url),
-    );
+      new URL(`${path === '/' ? '' : path}`, req.url),
+    )
   }
 
   // rewrite everything else to `/[host]/[slug] dynamic route
-  return NextResponse.rewrite(new URL(`/${host}${path}`, req.url));
+  return NextResponse.rewrite(new URL(`/${host}${path}`, req.url))
 }

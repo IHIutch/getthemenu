@@ -1,8 +1,10 @@
 /* eslint-disable sort-keys */
-import { createEnv } from "@t3-oss/env-nextjs";
-import { ZodError, z } from 'zod'
+import type { ZodError } from 'zod'
+import process from 'node:process'
+import { createEnv } from '@t3-oss/env-nextjs'
+import { z } from 'zod'
 
-/*eslint sort-keys: "error"*/
+/* eslint sort-keys: "error" */
 export const env = createEnv({
   server: {
     // # Prisma
@@ -16,7 +18,7 @@ export const env = createEnv({
     VERCEL_ACCESS_TOKEN: z.string().min(1),
 
     // # Test
-    TEST_HOST: z.string().optional()
+    TEST_HOST: z.string().optional(),
   },
   client: {
     // # Supabase
@@ -31,7 +33,7 @@ export const env = createEnv({
   },
   shared: {
     NODE_ENV: z.enum(['development', 'test', 'production']),
-    BASE_URL: z.string().url()
+    BASE_URL: z.string().url(),
   },
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -46,15 +48,15 @@ export const env = createEnv({
   },
   onValidationError: (error: ZodError) => {
     console.error(
-      "❌ Invalid environment variables:",
-      error.flatten().fieldErrors
-    );
-    throw new Error("Invalid environment variables");
+      '❌ Invalid environment variables:',
+      error.flatten().fieldErrors,
+    )
+    throw new Error('Invalid environment variables')
   },
   // Called when server variables are accessed on the client.
   onInvalidAccess: () => {
     throw new Error(
-      "❌ Attempted to access a server-side environment variable on the client"
-    );
-  }
+      '❌ Attempted to access a server-side environment variable on the client',
+    )
+  },
 })

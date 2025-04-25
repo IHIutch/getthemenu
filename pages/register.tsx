@@ -1,9 +1,14 @@
-import * as React from 'react'
-import { useRouter } from 'next/router'
-import Head from 'next/head'
+import type { GetServerSidePropsContext } from 'next'
+import type { SubmitHandler } from 'react-hook-form'
+import { getErrorMessage } from '@/utils/functions'
+import { createClientComponent } from '@/utils/supabase/component'
+import { createClientServer } from '@/utils/supabase/server-props'
+import { trpc } from '@/utils/trpc/client'
+import { createCaller } from '@/utils/trpc/server'
 import {
   Box,
   Button,
+  Container,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -11,22 +16,17 @@ import {
   GridItem,
   Heading,
   Input,
-  Link,
-  Container,
 } from '@chakra-ui/react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import Head from 'next/head'
 import NextLink from 'next/link'
-import { createClientComponent } from '@/utils/supabase/component'
-import { getErrorMessage } from '@/utils/functions'
-import { trpc } from '@/utils/trpc/client'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { createCaller } from '@/utils/trpc/server'
-import { GetServerSidePropsContext } from 'next'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
 
-type FormValues = {
-  fullName: string,
-  email: string
-  'new-password': string,
+interface FormValues {
+  'fullName': string
+  'email': string
+  'new-password': string
   'confirm-password': string
 }
 
@@ -44,16 +44,15 @@ export default function Register() {
     formState: { errors },
   } = useForm<FormValues>()
 
-  const { data: authListener } = supabase.auth.onAuthStateChange(
-    async (event, session) => {
-      if (event === 'SIGNED_IN' && session && session.user.email) {
-        const fullName = getValues('fullName')
+  // const { data: authListener } = supabase.auth.onAuthStateChange(
+  // async (event, session) => {
+  //   // if (event === 'SIGNED_IN' && session && session.user.email) {
+  //   //   const fullName = getValues('fullName')
+  //   // }
+  // },
+  // )
 
-      }
-    }
-  )
-
-  authListener.subscription.unsubscribe()
+  // authListener.subscription.unsubscribe()
 
   const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
@@ -62,22 +61,24 @@ export default function Register() {
         email: form.email,
         password: form['new-password'],
       })
-      if (error) throw new Error(error.message)
+      if (error)
+        throw new Error(error.message)
 
       if (user) {
         await handleSetUpNewAccount({
           payload: {
             id: user.id,
             email: form.email,
-            fullName: form.fullName
-          }
+            fullName: form.fullName,
+          },
         }, {
           onSuccess() {
             router.replace('/get-started')
-          }
+          },
         })
       }
-    } catch (error) {
+    }
+    catch (error) {
       setIsSubmitting(false)
       alert(getErrorMessage(error))
     }
@@ -164,9 +165,9 @@ export default function Register() {
                       <Input
                         {...register('confirm-password', {
                           required: 'This field is required',
-                          validate: (value) =>
-                            value === getValues('new-password') ||
-                            'Passwords must match',
+                          validate: value =>
+                            value === getValues('new-password')
+                            || 'Passwords must match',
                         })}
                         type="password"
                         autoComplete="new-password"
@@ -215,8 +216,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const caller = createCaller({
     session: {
-      user: data.user
-    }
+      user: data.user,
+    },
   })
   const user = await caller.user.getAuthedUser()
 
@@ -227,14 +228,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  } else if (user.restaurants.length === 0) {
+  }
+  else if (user.restaurants.length === 0) {
     return {
       redirect: {
         destination: '/get-started',
         permanent: false,
       },
     }
-  } else if (user.restaurants.length > 0) {
+  }
+  else if (user.restaurants.length > 0) {
     return {
       redirect: {
         destination: '/dashboard',

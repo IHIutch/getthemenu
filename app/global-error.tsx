@@ -1,20 +1,20 @@
-"use client";
+'use client'
 
-import { env } from "@/utils/env";
-import * as Sentry from "@sentry/nextjs";
-import NextError from "next/error";
-import { useEffect } from "react";
+import { env } from '@/utils/env'
+import * as Sentry from '@sentry/nextjs'
+import NextError from 'next/error'
+import { useEffect } from 'react'
 
 export default function GlobalError({
   error,
 }: {
-  error: Error & { digest?: string };
+  error: Error & { digest?: string }
 }) {
   useEffect(() => {
     if (env.NODE_ENV === 'production') {
-      Sentry.captureException(error);
+      Sentry.captureException(error)
     }
-  }, [error]);
+  }, [error])
 
   return (
     <html>
@@ -23,5 +23,5 @@ export default function GlobalError({
         <NextError statusCode={undefined as any} />
       </body>
     </html>
-  );
+  )
 }

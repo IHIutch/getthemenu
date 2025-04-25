@@ -1,9 +1,9 @@
+import type { z } from 'zod'
 import { RestaurantSchema } from '@/utils/zod'
 import { Box, Heading, Stack, Text } from '@chakra-ui/react'
 import React from 'react'
-import { z } from 'zod'
 
-const Restaurant = RestaurantSchema.pick({
+const _Restaurant = RestaurantSchema.pick({
   name: true,
   hours: true,
   address: true,
@@ -14,7 +14,7 @@ const Restaurant = RestaurantSchema.pick({
   customDomain: true,
 })
 
-type RestaurantType = z.infer<typeof Restaurant>
+type RestaurantType = z.infer<typeof _Restaurant>
 
 export default function Contact({ restaurant }: { restaurant: RestaurantType }) {
   return (
@@ -28,51 +28,62 @@ export default function Contact({ restaurant }: { restaurant: RestaurantType }) 
         <Heading fontSize="lg">Contact</Heading>
       </Box>
       <Stack spacing="4" p="4" fontSize="sm">
-        {restaurant?.phone && restaurant.phone.length > 0 ? (
-          <Box>
-            <Text fontWeight="semibold">Phone</Text>
-            <Stack as="ul" spacing="1">
-              {restaurant.phone.map((phone, idx) => (
-                <Text
-                  as="li"
-                  key={idx}
-                  listStyleType="none"
-                >
-                  {phone}
+        {restaurant?.phone && restaurant.phone.length > 0
+          ? (
+              <Box>
+                <Text fontWeight="semibold">Phone</Text>
+                <Stack as="ul" spacing="1">
+                  {restaurant.phone.map((phone, idx) => (
+                    <Text
+                      as="li"
+                      key={idx}
+                      listStyleType="none"
+                    >
+                      {phone}
+                    </Text>
+                  ))}
+                </Stack>
+              </Box>
+            )
+          : null}
+        {restaurant?.address
+          ? (
+              <Box>
+                <Text as="dt" fontWeight="semibold">
+                  Address
                 </Text>
-              ))}
-            </Stack>
-          </Box>
-        ) : null}
-        {restaurant?.address ? (
-          <Box>
-            <Text as="dt" fontWeight="semibold">
-              Address
-            </Text>
-            <Text as="dd">
-              {restaurant.address?.streetAddress} <br />
-              {restaurant.address?.city},{' '}
-              {restaurant.address?.state}{' '}
-              {restaurant.address?.zip}
-            </Text>
-          </Box>
-        ) : null}
-        {restaurant?.email && restaurant.email.length > 0 ? (
-          <Box>
-            <Text fontWeight="semibold">Email</Text>
-            <Stack as="ul" spacing="1">
-              {restaurant.email.map((email, idx) => (
-                <Text
-                  as="li"
-                  key={idx}
-                  listStyleType="none"
-                >
-                  {email}
+                <Text as="dd">
+                  {restaurant.address?.streetAddress}
+                  {' '}
+                  <br />
+                  {restaurant.address?.city}
+                  ,
+                  {' '}
+                  {restaurant.address?.state}
+                  {' '}
+                  {restaurant.address?.zip}
                 </Text>
-              ))}
-            </Stack>
-          </Box>
-        ) : null}
+              </Box>
+            )
+          : null}
+        {restaurant?.email && restaurant.email.length > 0
+          ? (
+              <Box>
+                <Text fontWeight="semibold">Email</Text>
+                <Stack as="ul" spacing="1">
+                  {restaurant.email.map((email, idx) => (
+                    <Text
+                      as="li"
+                      key={idx}
+                      listStyleType="none"
+                    >
+                      {email}
+                    </Text>
+                  ))}
+                </Stack>
+              </Box>
+            )
+          : null}
       </Stack>
     </Box>
   )

@@ -1,8 +1,8 @@
-import React from 'react'
-import { Box, HStack } from '@chakra-ui/react'
 import Navbar from '@/components/common/Navbar'
 import SubnavItem from '@/components/common/SubnavItem'
+import { Box, HStack } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
+import React from 'react'
 
 export default function MenuLayout({ children }: { children?: React.ReactNode }) {
   const router = useRouter()

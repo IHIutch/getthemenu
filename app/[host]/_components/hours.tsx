@@ -1,10 +1,10 @@
+import type { z } from 'zod'
 import { formatTime } from '@/utils/functions'
 import { DAYS_OF_WEEK, RestaurantSchema } from '@/utils/zod'
 import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import React from 'react'
-import { z } from 'zod'
 
-const Restaurant = RestaurantSchema.pick({
+const _Restaurant = RestaurantSchema.pick({
   name: true,
   hours: true,
   address: true,
@@ -15,7 +15,7 @@ const Restaurant = RestaurantSchema.pick({
   customDomain: true,
 })
 
-type RestaurantType = z.infer<typeof Restaurant>
+type RestaurantType = z.infer<typeof _Restaurant>
 
 export default function Hours({ restaurant }: { restaurant: RestaurantType }) {
   return (
@@ -29,7 +29,7 @@ export default function Hours({ restaurant }: { restaurant: RestaurantType }) {
         <Heading fontSize="lg">Hours</Heading>
       </Box>
       <Stack spacing="3" py="3" fontSize="sm">
-        {DAYS_OF_WEEK.map((day) => (
+        {DAYS_OF_WEEK.map(day => (
           <Flex
             as="dl"
             key={day}
@@ -39,25 +39,30 @@ export default function Hours({ restaurant }: { restaurant: RestaurantType }) {
           >
             <Box>
               <Text as="dt" fontWeight="semibold">
-                {day}:
+                {day}
+                :
               </Text>
             </Box>
             <Box>
-              {restaurant?.hours?.[day]?.isOpen ? (
-                <Text as="dd">
-                  {restaurant.hours?.[day]?.openTime &&
-                    formatTime(
-                      restaurant.hours?.[day]?.openTime || ''
-                    )}{' '}
-                  -{' '}
-                  {restaurant.hours?.[day]?.closeTime &&
-                    formatTime(
-                      restaurant.hours?.[day]?.closeTime || ''
-                    )}
-                </Text>
-              ) : (
-                <Text as="dd">Closed</Text>
-              )}
+              {restaurant?.hours?.[day]?.isOpen
+                ? (
+                    <Text as="dd">
+                      {restaurant.hours?.[day]?.openTime
+                        && formatTime(
+                          restaurant.hours?.[day]?.openTime || '',
+                        )}
+                      {' '}
+                      -
+                      {' '}
+                      {restaurant.hours?.[day]?.closeTime
+                        && formatTime(
+                          restaurant.hours?.[day]?.closeTime || '',
+                        )}
+                    </Text>
+                  )
+                : (
+                    <Text as="dd">Closed</Text>
+                  )}
             </Box>
           </Flex>
         ))}

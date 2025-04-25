@@ -1,53 +1,51 @@
-import { getErrorMessage } from "@/utils/functions";
-import prisma from "@/utils/prisma";
-import { MenuSchema, RestaurantSchema } from "@/utils/zod";
-import { notFound } from "next/navigation";
-import { z } from "zod";
-import Header from "./_components/header";
-import Contact from "./_components/contact";
-import Content from "./_components/content";
-import { Box, Container, Flex, Grid, GridItem, Link, Stack, Text } from "@chakra-ui/react";
-import MenuSelector from "./_components/menu-selector";
-import Hours from "./_components/hours";
-import NextLink from "next/link"
-
-
+import { getErrorMessage } from '@/utils/functions'
+import prisma from '@/utils/prisma'
+import { MenuSchema, RestaurantSchema } from '@/utils/zod'
+import { Box, Container, Flex, Grid, GridItem, Link, Stack, Text } from '@chakra-ui/react'
+import NextLink from 'next/link'
+import { notFound } from 'next/navigation'
+import { z } from 'zod'
+import Contact from './_components/contact'
+import Content from './_components/content'
+import Header from './_components/header'
+import Hours from './_components/hours'
+import MenuSelector from './_components/menu-selector'
 
 export default async function HostLayout(
   props: {
-    params: Promise<{ host: string, slug: string | string[] | undefined }>;
-    children: React.ReactNode;
-  }
+    params: Promise<{ host: string, slug: string | string[] | undefined }>
+    children: React.ReactNode
+  },
 ) {
-  const params = await props.params;
+  const params = await props.params
 
   const {
-    children
-  } = props;
+    children,
+  } = props
 
-  const host = decodeURIComponent(params.host);
+  const host = decodeURIComponent(params.host)
 
   const data = await prisma.restaurants.findUnique({
     where: {
-      customHost: host
+      customHost: host,
     },
     include: {
       menuItems: {
         orderBy: {
-          position: 'asc'
-        }
+          position: 'asc',
+        },
       },
       menus: {
         orderBy: {
-          position: 'asc'
-        }
+          position: 'asc',
+        },
       },
       sections: {
         orderBy: {
-          position: 'asc'
-        }
-      }
-    }
+          position: 'asc',
+        },
+      },
+    },
   })
 
   if (!data) {
@@ -68,7 +66,7 @@ export default async function HostLayout(
   }).safeParse(data)
 
   if (!result.success) {
-    throw Error(getErrorMessage(result.error))
+    throw new Error(getErrorMessage(result.error))
   }
 
   return (
@@ -80,14 +78,15 @@ export default async function HostLayout(
       hours={<Hours restaurant={result.data} />}
       footer={<Footer host={host} />}
     />
-  );
+  )
 }
 
-const Footer = ({ host }: { host: string }) => {
+function Footer({ host }: { host: string }) {
   return (
     <Box as="footer" borderTopWidth="1px" py="6" mt="auto">
       <Text textAlign="center" fontWeight="medium" color="gray.600">
-        Powered by{' '}
+        Powered by
+        {' '}
         <Link as={NextLink} href={`https://getthemenu.io?ref=${host}`} color="blue.500" target="_blank">
           GetTheMenu
         </Link>
@@ -96,27 +95,27 @@ const Footer = ({ host }: { host: string }) => {
   )
 }
 
-const LayoutSkeleton = ({
+function LayoutSkeleton({
   header,
   menuSelector,
   contact,
   hours,
   content,
-  footer
+  footer,
 }: {
-  header: React.ReactNode,
-  menuSelector: React.ReactNode,
-  contact: React.ReactNode,
-  hours: React.ReactNode,
-  content: React.ReactNode,
-  footer: React.ReactNode,
-}) => {
+  header: React.ReactNode
+  menuSelector: React.ReactNode
+  contact: React.ReactNode
+  hours: React.ReactNode
+  content: React.ReactNode
+  footer: React.ReactNode
+}) {
   return (
     <Box position="fixed" boxSize="full" overflow="auto" bg="gray.50">
       <Flex minHeight="100vh" direction="column" w="full">
         {header}
         {menuSelector}
-        <Box >
+        <Box>
           <Container maxW="container.lg">
             <Grid templateColumns="repeat(12, 1fr)" gap="4" pb="8">
               <GridItem

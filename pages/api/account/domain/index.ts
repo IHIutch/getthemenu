@@ -1,3 +1,4 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { resStatusType } from '@/utils/apiResponseTypes'
 import {
   createCustomDomain,
@@ -5,9 +6,8 @@ import {
   updateCustomDomain,
 } from '@/utils/customDomain'
 import { getErrorMessage } from '@/utils/functions'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const restrictedDomains = [
     '*.getthemenu.io',
     'getthemenu.io',
@@ -25,12 +25,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         // Not sure if this will work with axios, might need to put in the catch block
         if (data.error?.code === 'forbidden') {
           res.status(resStatusType.FORBIDDEN).end()
-        } else if (data.error?.code === 'domain_taken') {
+        }
+        else if (data.error?.code === 'domain_taken') {
           res.status(resStatusType.CONFLICT).end()
         }
 
         res.status(resStatusType.SUCCESS).json(data)
-      } catch (error) {
+      }
+      catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
       break
@@ -47,7 +49,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const data = await updateCustomDomain(domain)
         res.status(resStatusType.SUCCESS).json(data)
-      } catch (error) {
+      }
+      catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
 
@@ -65,7 +68,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const data = await removeCustomDomain(domain)
         res.status(resStatusType.SUCCESS).json(data)
-      } catch (error) {
+      }
+      catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
       break

@@ -1,5 +1,6 @@
-import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
-import { type GetServerSidePropsContext } from 'next'
+import type { CookieOptions } from '@supabase/ssr'
+import type { GetServerSidePropsContext } from 'next'
+import { createServerClient, serialize } from '@supabase/ssr'
 import { env } from '../env'
 
 export function createClientServer(context: GetServerSidePropsContext) {
@@ -18,7 +19,7 @@ export function createClientServer(context: GetServerSidePropsContext) {
           context.res.setHeader('Set-Cookie', serialize(name, '', options))
         },
       },
-    }
+    },
   )
 
   return supabase

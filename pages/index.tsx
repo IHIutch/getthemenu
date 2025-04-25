@@ -1,5 +1,4 @@
-import * as React from 'react'
-import Head from 'next/head'
+import SEO from '@/components/global/SEO'
 import {
   Alert,
   AlertDescription,
@@ -19,9 +18,10 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react'
-import NextLink from 'next/link'
 import { Check, ExternalLink } from 'lucide-react'
-import SEO from '@/components/global/SEO'
+import Head from 'next/head'
+import NextLink from 'next/link'
+import * as React from 'react'
 
 export default function Homepage() {
   const features = [
@@ -37,10 +37,11 @@ export default function Homepage() {
     <>
       <Head>
         <SEO
-          title='GetTheMenu'
-          description='The platform built for both restaurants and their customers'
-          image='https://getthemenu.io/meta.png'
-          url='https://getthemenu.io' />
+          title="GetTheMenu"
+          description="The platform built for both restaurants and their customers"
+          image="https://getthemenu.io/meta.png"
+          url="https://getthemenu.io"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex h="full" direction="column">
@@ -83,7 +84,8 @@ export default function Homepage() {
                   </Heading>
                   <Text fontSize="3xl" color="gray.600" lineHeight="1.3">
                     The platform built for getting your menu into customers
-                    hands{' '}
+                    hands
+                    {' '}
                     <Text as="span" fontWeight="semibold" fontStyle="italic">
                       as fast as possible
                     </Text>
@@ -124,10 +126,12 @@ export default function Homepage() {
                   </Flex>
                   <Box textAlign="center" mt="8">
                     <Text color="gray.600">
-                      1 month{' '}
+                      1 month
+                      {' '}
                       <Text as="span" fontWeight="semibold">
                         FREE
-                      </Text>{' '}
+                      </Text>
+                      {' '}
                       trial, no credit card required!
                     </Text>
                   </Box>

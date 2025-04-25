@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { useRouter } from 'next/router'
-import { useQueryClient } from '@tanstack/react-query'
-import { createClientComponent } from '@/utils/supabase/component'
 import { getErrorMessage } from '@/utils/functions'
+import { createClientComponent } from '@/utils/supabase/component'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
+import * as React from 'react'
 
 export default function SignOut() {
   const router = useRouter()
@@ -13,9 +13,11 @@ export default function SignOut() {
     const handleLogout = async () => {
       try {
         const { error } = await supabase.auth.signOut()
-        if (error) throw new Error(error.message)
+        if (error)
+          throw new Error(error.message)
         queryClient.clear()
-      } catch (error) {
+      }
+      catch (error) {
         alert(getErrorMessage(error))
       }
     }
@@ -24,7 +26,6 @@ export default function SignOut() {
 
     router.replace('/login')
   }, [queryClient, router, supabase.auth])
-
 
   return <></>
 }

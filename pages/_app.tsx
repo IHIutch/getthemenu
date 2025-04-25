@@ -1,14 +1,14 @@
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ChakraProvider, extendTheme } from '@chakra-ui/react'
+import type { NextPage } from 'next'
+import type { AppProps } from 'next/app'
+import process from 'node:process'
 import customTheme from '@/customTheme'
-import * as React from 'react'
-import { Router } from 'next/router'
-import * as Fathom from 'fathom-client'
-import { withProse } from '@nikolovlazar/chakra-ui-prose'
-import { AppProps } from 'next/app'
 import { trpc } from '@/utils/trpc/client'
-import { NextPage } from 'next'
-
+import { ChakraProvider, extendTheme } from '@chakra-ui/react'
+import { withProse } from '@nikolovlazar/chakra-ui-prose'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import * as Fathom from 'fathom-client'
+import { Router } from 'next/router'
+import * as React from 'react'
 
 const theme = extendTheme(
   customTheme,
@@ -24,27 +24,27 @@ const theme = extendTheme(
         marginTop: '6',
       },
     },
-  })
+  }),
 )
 
 Router.events.on('routeChangeComplete', (as, routeProps) => {
   if (!routeProps.shallow) {
-    Fathom.trackPageview();
+    Fathom.trackPageview()
   }
-});
+})
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+export type NextPageWithLayout<P = Record<string, any>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode
 }
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
-};
+  Component: NextPageWithLayout
+}
 
-const App = ({ Component, pageProps, }: AppPropsWithLayout) => {
+function App({ Component, pageProps }: AppPropsWithLayout) {
   // Delete this when moving to app router
-  const getLayout =
-    Component.getLayout ?? ((page) => page);
+  const getLayout
+    = Component.getLayout ?? (page => page)
 
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -60,4 +60,4 @@ const App = ({ Component, pageProps, }: AppPropsWithLayout) => {
   )
 }
 
-export default trpc.withTRPC(App);
+export default trpc.withTRPC(App)

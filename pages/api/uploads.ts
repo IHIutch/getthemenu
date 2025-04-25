@@ -1,23 +1,22 @@
+import type { ImageSchema } from '@/utils/zod'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import type { z } from 'zod'
+import { readFile } from 'node:fs/promises'
 import { resStatusType } from '@/utils/apiResponseTypes'
-import formidable from 'formidable'
-import { v4 as uuidv4 } from 'uuid'
 import { getErrorMessage } from '@/utils/functions'
-import { getPlaiceholder } from 'plaiceholder'
-import mime from 'mime'
 import { createClientApi } from '@/utils/supabase/api'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { readFile } from 'fs/promises'
-import { z } from 'zod'
-import { ImageSchema } from '@/utils/zod'
-
+import formidable from 'formidable'
+import mime from 'mime'
+import { getPlaiceholder } from 'plaiceholder'
+import { v4 as uuidv4 } from 'uuid'
 
 export type UploadApiResponseType = z.infer<typeof ImageSchema>
 
 type ResponseData = UploadApiResponseType | {
-  error: string;
-};
+  error: string
+}
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
   const { method } = req
 
   switch (method) {
@@ -30,25 +29,27 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) 
             const form = formidable({
               maxFiles: 1,
               filename: (_name, _ext, part) => {
-                return `${uuidv4()}.${mime.getExtension(part.mimetype || "")}`
+                return `${uuidv4()}.${mime.getExtension(part.mimetype || '')}`
               },
               filter: (part) => {
-                return part.mimetype && part.mimetype?.includes("image") ? true : false;
+                return !!(part.mimetype && part.mimetype?.includes('image'))
               },
             })
 
             form.parse(req, (err, fields: formidable.Fields, files: formidable.Files) => {
               console.log({ files, fields })
-              if (err) reject(err);
-              else resolve({ files });
+              if (err)
+                reject(err)
+              else resolve({ files })
             })
           })
         }
 
         const { files } = await parseFile()
-        const file = files.file?.[0];
+        const file = files.file?.[0]
 
-        if (!file) throw new Error('File parse error')
+        if (!file)
+          throw new Error('File parse error')
 
         const filePath = file.newFilename
         const fileContents = await readFile(file.filepath)
@@ -57,8 +58,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) 
           .from('public')
           .upload(filePath, fileContents)
 
-        if (error) throw new Error(getErrorMessage(error))
-        if (!data) throw new Error('File upload failed')
+        if (error)
+          throw new Error(getErrorMessage(error))
+        if (!data)
+          throw new Error('File upload failed')
 
         const {
           base64: blurDataURL,
@@ -67,8 +70,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) 
             width,
           },
           color: {
-            hex
-          }
+            hex,
+          },
         } = await getPlaiceholder(fileContents, {
           size: 4,
         })
@@ -78,9 +81,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) 
           blurDataURL,
           height,
           width,
-          hexColor: hex
+          hexColor: hex,
         })
-      } catch (error) {
+      }
+      catch (error) {
         res.status(resStatusType.BAD_REQUEST).json({ error: getErrorMessage(error) })
       }
       break

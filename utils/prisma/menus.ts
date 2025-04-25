@@ -1,8 +1,8 @@
+import type { Prisma } from '@prisma/client'
 import prisma from '@/utils/prisma'
 import { getErrorMessage } from '../functions'
-import { Prisma } from '@prisma/client'
 
-export const prismaGetMenus = async ({ where }: { where: Prisma.menusWhereInput }) => {
+export async function prismaGetMenus({ where }: { where: Prisma.menusWhereInput }) {
   try {
     return await prisma.menus.findMany({
       where,
@@ -10,69 +10,75 @@ export const prismaGetMenus = async ({ where }: { where: Prisma.menusWhereInput 
         position: 'asc',
       },
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaGetMenu = async ({ where }: { where: Prisma.menusWhereUniqueInput }) => {
+export async function prismaGetMenu({ where }: { where: Prisma.menusWhereUniqueInput }) {
   try {
     return await prisma.menus.findUnique({
-      where: where,
+      where,
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaCreateMenu = async ({ payload }: { payload: Prisma.menusCreateInput }) => {
+export async function prismaCreateMenu({ payload }: { payload: Prisma.menusCreateInput }) {
   try {
     return await prisma.menus.create({
       data: payload,
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaUpdateMenu = async ({ where, payload }: { where: Prisma.menusWhereUniqueInput, payload: Prisma.menusUpdateInput }) => {
+export async function prismaUpdateMenu({ where, payload }: { where: Prisma.menusWhereUniqueInput, payload: Prisma.menusUpdateInput }) {
   try {
     return await prisma.menus.update({
       where,
       data: payload,
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
 type MenusUpdatePositionType = Pick<Prisma.Payload<typeof prisma.menus, 'update'>['scalars'], 'id' | 'position'>
 
-export const prismaUpdateMenus = async ({ payload }: { payload: MenusUpdatePositionType[] }) => {
+export async function prismaUpdateMenus({ payload }: { payload: MenusUpdatePositionType[] }) {
   try {
     return await prisma.$transaction(
-      payload.map((p) =>
+      payload.map(p =>
         prisma.menus.update({
           data: {
-            position: p.position
+            position: p.position,
           },
           where: {
             id: p.id,
           },
-        })
-      )
+        }),
+      ),
     )
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }
 
-export const prismaDeleteMenu = async ({ where }: { where: Prisma.menusWhereUniqueInput }) => {
+export async function prismaDeleteMenu({ where }: { where: Prisma.menusWhereUniqueInput }) {
   try {
     return await prisma.menus.delete({
       where,
     })
-  } catch (error) {
+  }
+  catch (error) {
     throw new Error(getErrorMessage(error))
   }
 }

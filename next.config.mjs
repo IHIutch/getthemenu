@@ -1,37 +1,38 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import process from 'node:process'
+import { withSentryConfig } from '@sentry/nextjs'
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
+import createJiti from 'jiti'
 
-import createJiti from "jiti";
-const jiti = createJiti(new URL(import.meta.url).pathname);
+const jiti = createJiti(new URL(import.meta.url).pathname)
 
 // Import env here to validate during build. Using jiti we can import .ts files :)
-jiti("./utils/env");
+jiti('./utils/env')
 
 const nextConfig = {
   experimental: {
-    swcPlugins: [["next-superjson-plugin", {}]],
+    swcPlugins: [['next-superjson-plugin', {}]],
   },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'kvmdzdprqsxytiuvpxzo.supabase.co',
-        port: ''
-      }
+        port: '',
+      },
     ],
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      config.resolve.fallback.fs = false;
-      config.resolve.fallback.child_process = false;
-      config.resolve.fallback.async_hooks = false;
+      config.resolve.fallback.fs = false
+      config.resolve.fallback.child_process = false
+      config.resolve.fallback.async_hooks = false
     }
-    return config;
-  }
+    return config
+  },
 }
 
 export default withSentryConfig(nextConfig, {
@@ -40,8 +41,8 @@ export default withSentryConfig(nextConfig, {
 // recommended:
 //   release, url, configFile, stripPrefix, urlPrefix, include, ignore
 
-  org: "jonathan-hutchison",
-  project: "getthemenu",
+  org: 'jonathan-hutchison',
+  project: 'getthemenu',
 
   // An auth token is required for uploading source maps.
   authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -61,7 +62,7 @@ export default withSentryConfig(nextConfig, {
   transpileClientSDK: true,
 
   // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-  tunnelRoute: "/monitoring",
+  tunnelRoute: '/monitoring',
 
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
@@ -69,9 +70,9 @@ export default withSentryConfig(nextConfig, {
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
 
-// Enables automatic instrumentation of Vercel Cron Monitors.
-// See the following for more information:
-// https://docs.sentry.io/product/crons/
-// https://vercel.com/docs/cron-jobs
-automaticVercelMonitors: true,
-});
+  // Enables automatic instrumentation of Vercel Cron Monitors.
+  // See the following for more information:
+  // https://docs.sentry.io/product/crons/
+  // https://vercel.com/docs/cron-jobs
+  automaticVercelMonitors: true,
+})

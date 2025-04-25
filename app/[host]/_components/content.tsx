@@ -13,9 +13,9 @@ export default function Content({ children }: { children: React.ReactNode }) {
       <AnimatePresence initial={false}>
         <motion.main
           key={key}
-          initial={'hidden'}
-          animate={'shown'}
-          exit={'hidden'}
+          initial="hidden"
+          animate="shown"
+          exit="hidden"
           variants={{
             hidden: {
               opacity: 0,

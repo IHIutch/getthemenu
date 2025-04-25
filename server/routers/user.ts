@@ -1,10 +1,10 @@
-import { prismaCreateUser, prismaGetUser } from "@/utils/prisma/users";
-import { authedProcedure, publicProcedure, router } from "@/utils/trpc";
-import { UserSchema } from "@/utils/zod";
-import { TRPCError } from "@trpc/server";
+import { prismaCreateUser, prismaGetUser } from '@/utils/prisma/users'
 import { createStripeCustomer } from '@/utils/stripe'
-import { z } from "zod";
-import dayjs from "dayjs";
+import { authedProcedure, publicProcedure, router } from '@/utils/trpc'
+import { UserSchema } from '@/utils/zod'
+import { TRPCError } from '@trpc/server'
+import dayjs from 'dayjs'
+import { z } from 'zod'
 
 export const userRouter = router({
   setUpNewAccount: authedProcedure.input(
@@ -13,10 +13,10 @@ export const userRouter = router({
         fullName: true,
         id: true,
       }).extend({
-        email: z.string().email()
-      })
-    })
-  ).mutation(async ({ input, ctx }) => {
+        email: z.string().email(),
+      }),
+    }),
+  ).mutation(async ({ input }) => {
     const { payload } = input
 
     // const supabase = ctx.supabase
@@ -33,7 +33,7 @@ export const userRouter = router({
         fullName: payload.fullName,
         stripeCustomerId: stripeCustomer.id,
         trialEndsAt: dayjs().add(30, 'day').endOf('day').toISOString(),
-      }
+      },
     })
   }),
   getAuthedUser: publicProcedure.query(async ({ ctx }) => {
@@ -50,9 +50,9 @@ export const userRouter = router({
 
       return {
         ...data,
-        email: authedUser.email
+        email: authedUser.email,
       }
     }
     return null
-  })
+  }),
 })
