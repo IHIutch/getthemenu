@@ -13,13 +13,17 @@ import NextLink from "next/link"
 
 
 
-export default async function HostLayout({
-  params,
-  children,
-}: {
-  params: { host: string, slug: string | string[] | undefined };
-  children: React.ReactNode;
-}) {
+export default async function HostLayout(
+  props: {
+    params: Promise<{ host: string, slug: string | string[] | undefined }>;
+    children: React.ReactNode;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
 
   const host = decodeURIComponent(params.host);
 

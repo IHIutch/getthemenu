@@ -9,11 +9,12 @@ import { Metadata } from 'next';
 import { getErrorMessage, getRestaurantDisplayData, getStructuredData } from '@/utils/functions';
 import { env } from '@/utils/env';
 
-export default async function MenuPage({
-  params,
-}: {
-  params: { host: string; slug: string | string[] | undefined };
-}) {
+export default async function MenuPage(
+  props: {
+    params: Promise<{ host: string; slug: string | string[] | undefined }>;
+  }
+) {
+  const params = await props.params;
 
   const host = decodeURIComponent(params.host);
   const slug = decodeURIComponent(params.slug?.toString() || '');
@@ -150,7 +151,10 @@ export default async function MenuPage({
   )
 }
 
-export async function generateMetadata({ params }: { params: { host: string, slug: string | string[] | undefined } }): Promise<Metadata | null> {
+export async function generateMetadata(
+  props: { params: Promise<{ host: string, slug: string | string[] | undefined }> }
+): Promise<Metadata | null> {
+  const params = await props.params;
   const host = decodeURIComponent(params.host);
   const slug = decodeURIComponent(params.slug?.toString() || '');
 

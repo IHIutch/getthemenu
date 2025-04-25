@@ -4,7 +4,7 @@ import { MetadataRoute } from "next"
 import { headers } from "next/headers";
 
 export default async function Sitemap(): Promise<MetadataRoute.Sitemap> {
-  const headersList = headers();
+  const headersList = await headers();
 
   const host =
     headersList
