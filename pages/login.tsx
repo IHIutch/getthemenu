@@ -149,11 +149,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
   const { data } = await supabase.auth.getUser()
 
+  if (!data.user) {
+    return {
+      props: {},
+    }
+  }
+
   const caller = createCaller({
     session: {
       user: data.user
     }
   })
+
   const user = await caller.user.getAuthedUser()
 
   if (user && user.restaurants.length === 0) {
@@ -170,9 +177,5 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     }
-  }
-
-  return {
-    props: {},
   }
 }
