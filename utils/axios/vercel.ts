@@ -1,4 +1,3 @@
-import process from 'node:process'
 import axios from 'redaxios'
 
 export async function postVercelDomain(domain: string) {

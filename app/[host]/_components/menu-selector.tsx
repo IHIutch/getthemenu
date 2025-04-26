@@ -1,9 +1,8 @@
 'use client'
 
 import { MenuSchema } from '@/utils/zod'
-import { Box, Container, FormControl, FormLabel, Grid, GridItem, Select, Stack } from '@chakra-ui/react'
+import { Box, Container, Field, Grid, GridItem, NativeSelect, Stack } from '@chakra-ui/react'
 import { usePathname, useRouter } from 'next/navigation'
-import React from 'react'
 import { z } from 'zod'
 
 const _Menus = z.array(MenuSchema)
@@ -30,9 +29,9 @@ export default function MenuSelector({ menus }: { menus: MenusType }) {
         <Grid templateColumns="repeat(12, 1fr)" gap="4">
           <GridItem colSpan={{ base: 12, lg: 7 }}>
             <Stack direction="row" align="flex-end">
-              <FormControl flexGrow="1" id="menu">
-                <FormLabel mb="1">Select a Menu</FormLabel>
-                <Select
+              <Field.Root flexGrow="1" id="menu">
+                <Field.Label mb="1">Select a Menu</Field.Label>
+                <NativeSelect.Field
                   bg="white"
                   value={slug}
                   onChange={(e) => {
@@ -44,8 +43,9 @@ export default function MenuSelector({ menus }: { menus: MenusType }) {
                       {m.title}
                     </option>
                   ))}
-                </Select>
-              </FormControl>
+                  <NativeSelect.Indicator />
+                </NativeSelect.Field>
+              </Field.Root>
             </Stack>
           </GridItem>
         </Grid>

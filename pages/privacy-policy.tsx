@@ -1,23 +1,15 @@
+import { Prose } from '@/components/ui/prose'
 import {
   Box,
   Container,
   Heading,
   Link,
-  ListItem,
   Table,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
-  UnorderedList,
   VStack,
 } from '@chakra-ui/react'
-import { Prose } from '@nikolovlazar/chakra-ui-prose'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import React from 'react'
 
 export default function PrivacyPolicy() {
   return (
@@ -68,20 +60,20 @@ export default function PrivacyPolicy() {
             </Text>
             &quot;), such as when you:
           </Text>
-          <UnorderedList spacing="4" mb="8">
-            <ListItem>
+          <Box as="ul" gap="4" mb="8">
+            <Box as="li">
               Visit our website at
               {' '}
               <Link as={NextLink} href="/" textDecoration="underline" fontWeight="semibold">
                 https://getthemenu.io
               </Link>
               , or any website of ours that links to this privacy notice
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               Engage with us in other related ways, including any sales,
               marketing, or events
-            </ListItem>
-          </UnorderedList>
+            </Box>
+          </Box>
           <Text>
             <Text as="span" fontWeight="semibold">
               Questions or concerns?
@@ -120,7 +112,7 @@ export default function PrivacyPolicy() {
           </Text>
         </Box>
         <Box mb="12">
-          <VStack as="dl" spacing="6" mb="8" alignItems="flex-start">
+          <VStack as="dl" gap="6" mb="8" alignItems="flex-start">
             <Box>
               <Text as="dt" fontWeight="semibold">
                 What personal information do we process?
@@ -204,7 +196,7 @@ export default function PrivacyPolicy() {
               <dd>
                 We have organizational and technical processes and procedures in
                 place to protect your personal information. However, no
-                electronic transmission over the internet or information storage
+                elecTable.Rowonic Table.Rowansmission over the internet or information storage
                 technology can be guaranteed to be 100% secure, so we cannot
                 promise or guarantee that hackers, cybercriminals, or other
                 unauthorized third parties will not be able to defeat our
@@ -275,104 +267,104 @@ export default function PrivacyPolicy() {
           <Heading id="toc" as="h2" fontSize="lg" fontWeight="bold" mb="2">
             Table Of Contents
           </Heading>
-          <UnorderedList spacing="2" styleType="none" m="0">
-            <ListItem>
+          <Box as="ul" gap="2" listStyle="none" m="0">
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#1-what-information-do-we-collect"
               >
                 1. What Information Do We Collect?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#2-how-do-we-process-your-information"
               >
                 2. How Do We Process Your Information?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#3-when-and-with-whom-do-we-share-your-personal-information"
               >
                 3. When And With Whom Do We Share Your Personal Information?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#4-how-do-we-handle-your-social-logins"
               >
                 4. How Do We Handle Your Social Logins?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#5-how-long-do-we-keep-your-information"
               >
                 5. How Long Do We Keep Your Information?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#6-how-do-we-keep-your-information-safe"
               >
                 6. How Do We Keep Your Information Safe?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#7-do-we-collect-information-from-minors"
               >
                 7. Do We Collect Information From Minors?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#8-what-are-your-privacy-rights"
               >
                 8. What Are Your Privacy Rights?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
-                href="#9-controls-for-do-not-track-feature"
+                href="#9-conTable.Rowols-for-do-not-Table.Rowack-feature"
               >
-                9. Controls For Do-Not-Track Features
+                9. ConTable.Rowols For Do-Not-Table.Rowack Features
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#10-do-california-residents-have-specific-privacy-rights"
               >
                 10. Do California Residents Have Specific Privacy Rights?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#11-do-we-make-updates-to-this-notice"
               >
                 11. Do We Make Updates To This Notice?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#12-how-can-you-contact-us-about-this-notice"
               >
                 12. How Can You Contact Us About This Notice?
               </Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box as="li">
               <Link
                 textDecoration="underline"
                 href="#13-how-can-you-review-update-or-delete-the-data-we-collect-from-you"
@@ -380,8 +372,8 @@ export default function PrivacyPolicy() {
                 13. How Can You Review, Update, Or Delete The Data We Collect
                 From You?
               </Link>
-            </ListItem>
-          </UnorderedList>
+            </Box>
+          </Box>
           <Prose>
             <Box>
               <Heading as="h2" id="1-what-information-do-we-collect">
@@ -405,7 +397,7 @@ export default function PrivacyPolicy() {
                   Services, when you participate in activities on the Services,
                   or otherwise when you contact us.
                 </Text>
-                <VStack as="dl" spacing="6" mb="8" alignItems="flex-start">
+                <VStack as="dl" gap="6" mb="8" alignItems="flex-start">
                   <Box>
                     <Text as="dt" fontWeight="semibold">
                       Personal Information Provided by You
@@ -416,14 +408,14 @@ export default function PrivacyPolicy() {
                       choices you make, and the products and features you use.
                       The personal information we collect may include the
                       following:
-                      <UnorderedList>
-                        <ListItem>email addresses</ListItem>
-                        <ListItem>usernames</ListItem>
-                        <ListItem>passwords</ListItem>
-                        <ListItem>contact preferences</ListItem>
-                        <ListItem>names</ListItem>
-                        <ListItem>contact or authentication data</ListItem>
-                      </UnorderedList>
+                      <Box as="ul">
+                        <Box as="li">email addresses</Box>
+                        <Box as="li">usernames</Box>
+                        <Box as="li">passwords</Box>
+                        <Box as="li">contact preferences</Box>
+                        <Box as="li">names</Box>
+                        <Box as="li">contact or authentication data</Box>
+                      </Box>
                     </dd>
                   </Box>
 
@@ -440,15 +432,16 @@ export default function PrivacyPolicy() {
                     </Text>
                     <dd>
                       We may collect data necessary to process your payment if
-                      you make purchases, such as your payment instrument number
+                      you make purchases, such as your payment insTable.Rowument number
                       (such as a credit card number), and the security code
-                      associated with your payment instrument. All payment data
+                      associated with your payment insTable.Rowument. All payment data
                       is stored by Paddle. You may find their privacy notice
                       link(s) here:
                       {' '}
                       <Link
                         href="https://www.paddle.com/legal/privacy"
-                        isExternal
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
                         https://www.paddle.com/legal/privacy
                       </Link>
@@ -476,7 +469,7 @@ export default function PrivacyPolicy() {
                   </Box>
                 </VStack>
                 <Text>
-                  All personal information that you provide to us must be true,
+                  All personal information that you provide to us must be Table.Rowue,
                   complete, and accurate, and you must notify us of any changes
                   to such personal information.
                 </Text>
@@ -499,14 +492,14 @@ export default function PrivacyPolicy() {
                   information) but may include device and usage information,
                   such as your IP address, browser and device characteristics,
                   operating system, language preferences, referring URLs, device
-                  name, country, location, information about how and when you
+                  name, counTable.Rowy, location, information about how and when you
                   use our Services, and other technical information. This
                   information is primarily needed to maintain the security and
                   operation of our Services, and for our internal analytics and
                   reporting purposes.
                 </Text>
                 <Text>The information we collect includes:</Text>
-                <VStack as="dl" spacing="6" mb="8" alignItems="flex-start">
+                <VStack as="dl" gap="6" mb="8" alignItems="flex-start">
                   <Box>
                     <Text as="dt" fontWeight="semibold">
                       Log and Usage Data
@@ -583,7 +576,7 @@ export default function PrivacyPolicy() {
                 We process your personal information for a variety of reasons,
                 depending on how you interact with our Services, including:
               </Text>
-              <VStack as="dl" spacing="6" mb="8" alignItems="flex-start">
+              <VStack as="dl" gap="6" mb="8" alignItems="flex-start">
                 <Box>
                   <Text as="dt" fontWeight="semibold">
                     To Facilitate Account Creation And Authentication And
@@ -598,7 +591,7 @@ export default function PrivacyPolicy() {
 
                 <Box>
                   <Text as="dt" fontWeight="semibold">
-                    To Identify Usage Trends
+                    To Identify Usage Table.Rowends
                   </Text>
                   <dd>
                     We may process information about how you use our Services to
@@ -650,13 +643,13 @@ export default function PrivacyPolicy() {
                 We may need to share your personal information in the following
                 situations:
               </Text>
-              <VStack as="dl" spacing="6" mb="8" alignItems="flex-start">
+              <VStack as="dl" gap="6" mb="8" alignItems="flex-start">
                 <Box>
                   <Text as="dt" fontWeight="semibold">
-                    Business Transfers
+                    Business Table.Rowansfers
                   </Text>
                   <dd>
-                    We may share or transfer your information in connection
+                    We may share or Table.Rowansfer your information in connection
                     with, or during negotiations of, any merger, sale of company
                     assets, financing, or acquisition of all or a portion of our
                     business to another company.
@@ -692,7 +685,7 @@ export default function PrivacyPolicy() {
                 We will use the information we receive only for the purposes
                 that are described in this privacy notice or that are otherwise
                 made clear to you on the relevant Services. Please note that we
-                do not control, and are not responsible for, other uses of your
+                do not conTable.Rowol, and are not responsible for, other uses of your
                 personal information by your third-party social media provider.
                 We recommend that you review their privacy notice to understand
                 how they collect, use, and share your personal information, and
@@ -749,13 +742,13 @@ export default function PrivacyPolicy() {
                 organizational security measures designed to protect the
                 security of any personal information we process. However,
                 despite our safeguards and efforts to secure your information,
-                no electronic transmission over the Internet or information
+                no elecTable.Rowonic Table.Rowansmission over the Internet or information
                 storage technology can be guaranteed to be 100% secure, so we
                 cannot promise or guarantee that hackers, cybercriminals, or
                 other unauthorized third parties will not be able to defeat our
                 security and improperly collect, access, steal, or modify your
                 information. Although we will do our best to protect your
-                personal information, transmission of personal information to
+                personal information, Table.Rowansmission of personal information to
                 and from our Services is at your own risk. You should only
                 access the Services within a secure environment.
               </Text>
@@ -810,7 +803,8 @@ export default function PrivacyPolicy() {
                 {' '}
                 <Link
                   href="https://ec.europa.eu/justice/data-protection/bodies/authorities/index_en.htm"
-                  isExternal
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   https://ec.europa.eu/justice/data-protection/bodies/authorities/index_en.htm
                 </Link>
@@ -822,7 +816,8 @@ export default function PrivacyPolicy() {
                 {' '}
                 <Link
                   href="https://www.edoeb.admin.ch/edoeb/en/home.html"
-                  isExternal
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   https://www.edoeb.admin.ch/edoeb/en/home.html
                 </Link>
@@ -869,7 +864,7 @@ export default function PrivacyPolicy() {
                   below. You will then be removed from the marketing lists.
                   However, we may still communicate with you — for example, to
                   send you service-related messages that are necessary for the
-                  administration and use of your account, to respond to service
+                  adminisTable.Rowation and use of your account, to respond to service
                   requests, or for other non-marketing purposes.
                 </Text>
               </Box>
@@ -883,7 +878,7 @@ export default function PrivacyPolicy() {
                   Upon your request to terminate your account, we will
                   deactivate or delete your account and information from our
                   active databases. However, we may retain some information in
-                  our files to prevent fraud, troubleshoot problems, assist with
+                  our files to prevent fraud, Table.Rowoubleshoot problems, assist with
                   any investigations, enforce our legal terms and/or comply with
                   applicable legal requirements. If you have questions or
                   comments about your privacy rights, you may email us at
@@ -896,19 +891,19 @@ export default function PrivacyPolicy() {
               </Box>
             </Box>
             <Box>
-              <Heading as="h2" id="9-controls-for-do-not-track-feature">
-                9. Controls For Do-Not-Track Features
+              <Heading as="h2" id="9-conTable.Rowols-for-do-not-Table.Rowack-feature">
+                9. ConTable.Rowols For Do-Not-Table.Rowack Features
               </Heading>
               <Text>
                 Most web browsers and some mobile operating systems and mobile
-                applications include a Do-Not-Track (&quot;DNT&quot;) feature or
+                applications include a Do-Not-Table.Rowack (&quot;DNT&quot;) feature or
                 setting you can activate to signal your privacy preference not
                 to have data about your online browsing activities monitored and
                 collected. At this stage no uniform technology standard for
                 recognizing and implementing DNT signals has been finalized. As
                 such, we do not currently respond to DNT browser signals or any
                 other mechanism that automatically communicates your choice not
-                to be tracked online. If a standard for online tracking is
+                to be Table.Rowacked online. If a standard for online Table.Rowacking is
                 adopted that we must follow in the future, we will inform you
                 about that practice in a revised version of this privacy notice.
               </Text>
@@ -959,17 +954,17 @@ export default function PrivacyPolicy() {
                 <Heading as="h3">CCPA Privacy Notice</Heading>
                 The California Code of Regulations defines a
                 &quot;resident&quot; as:
-                <UnorderedList>
-                  <ListItem>
+                <Box as="ul">
+                  <Box as="li">
                     (1) every individual who is in the State of California for
                     other than a temporary or transitory purpose and
-                  </ListItem>
-                  <ListItem>
+                  </Box>
+                  <Box as="li">
                     (2) every individual who is domiciled in the State of
                     California who is outside the State of California for a
                     temporary or transitory purpose
-                  </ListItem>
-                </UnorderedList>
+                  </Box>
+                </Box>
                 <Text>
                   <Text>
                     All other individuals are defined as
@@ -989,130 +984,131 @@ export default function PrivacyPolicy() {
                     information in the past twelve (12) months:
                   </Text>
                 </Text>
-                <Table>
-                  <Thead>
-                    <Tr>
-                      <Th>Category</Th>
+                <Table.Root>
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.ColumnHeader>Category</Table.ColumnHeader>
                       {' '}
-                      <Th>Examples</Th>
+                      <Table.ColumnHeader>Examples</Table.ColumnHeader>
                       {' '}
-                      <Th>Collected</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    <Tr>
-                      <Td>A. Identifiers</Td>
-                      <Td>
+                      <Table.ColumnHeader>Collected</Table.ColumnHeader>
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    <Table.Row>
+                      <Table.Cell>A. Identifiers</Table.Cell>
+                      <Table.Cell>
                         Contact details, such as real name, alias, postal
                         address, telephone or mobile contact number, unique
                         personal identifier, online identifier, Internet
                         Protocol address, email address, and account name
-                      </Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>
                         B. Personal information categories listed in the
                         California Customer Records statute
-                      </Td>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>
                         Name, contact information, education, employment,
                         employment history, and financial information
-                      </Td>
-                      <Td>YES</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>YES</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>
                         C. Protected classification characteristics under
                         California or federal law
-                      </Td>
-                      <Td>Gender and date of birth</Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>D. Commercial information</Td>
-                      <Td>
-                        Transaction information, purchase history, financial
+                      </Table.Cell>
+                      <Table.Cell>Gender and date of birth</Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>D. Commercial information</Table.Cell>
+                      <Table.Cell>
+                        Table.Rowansaction information, purchase history, financial
                         details, and payment information
-                      </Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>E. Biometric information</Td>
-                      <Td>Fingerprints and voiceprints</Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>F. Internet or other similar network activity</Td>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>E. BiomeTable.Rowic information</Table.Cell>
+                      <Table.Cell>Fingerprints and voiceprints</Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>F. Internet or other similar network activity</Table.Cell>
+                      <Table.Cell>
                         Browsing history, search history, online behavior,
                         interest data, and interactions with our and other
                         websites, applications, systems, and advertisements
-                      </Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>G. Geolocation data</Td>
-                      <Td>Device location</Td>
-                      <Td>YES</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>
-                        H. Audio, electronic, visual, thermal, olfactory, or
+                      </Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>G. Geolocation data</Table.Cell>
+                      <Table.Cell>Device location</Table.Cell>
+                      <Table.Cell>YES</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>
+                        H. Audio, elecTable.Rowonic, visual, thermal, olfactory, or
                         similar information
-                      </Td>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>
                         Images and audio, video or call recordings created in
                         connection with our business activities
-                      </Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>I. Professional or employment-related information</Td>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>I. Professional or employment-related information</Table.Cell>
+                      <Table.Cell>
                         Business contact details in order to provide you our
                         services at a business level or job title, work history,
                         and professional qualifications if you apply for a job
                         with us
-                      </Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>J. Education Information</Td>
-                      <Td>Student records and directory information</Td>
-                      <Td>NO</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>J. Education Information</Table.Cell>
+                      <Table.Cell>Student records and directory information</Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>
                         K. Inferences drawn from other personal information
-                      </Td>
-                      <Td>
+                      </Table.Cell>
+                      <Table.Cell>
                         Inferences drawn from any of the collected personal
                         information listed above to create a profile or summary
                         about, for example, an individual&apos;s preferences and
                         characteristics
-                      </Td>
-                      <Td>NO</Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
+                      </Table.Cell>
+                      <Table.Cell>NO</Table.Cell>
+                    </Table.Row>
+                  </Table.Body>
+                </Table.Root>
                 <Text>
                   We may also collect other personal information outside of
                   these categories instances where you interact with us in
                   person, online, or by phone or mail in the context of:
                 </Text>
-                <UnorderedList>
-                  <ListItem>
+                <Box as="ul">
+                  {' '}
+                  <Box as="li">
                     Receiving help through our customer support channels;
-                  </ListItem>
-                  <ListItem>
+                  </Box>
+                  <Box as="li">
                     Participation in customer surveys or contests; and
-                  </ListItem>
-                  <ListItem>
+                  </Box>
+                  <Box as="li">
                     Facilitation in the delivery of our Services and to respond
                     to your inquiries.
-                  </ListItem>
-                </UnorderedList>
+                  </Box>
+                </Box>
                 <Box>
                   <Heading as="h4">
                     How do we use and share your personal information?
@@ -1143,14 +1139,14 @@ export default function PrivacyPolicy() {
                   </Heading>
                   <Text>
                     We may disclose your personal information with our service
-                    providers pursuant to a written contract between us and each
+                    providers pursuant to a written conTable.Rowact between us and each
                     service provider. Each service provider is a for-profit
                     entity that processes the information on our behalf.
                   </Text>
                   <Text>
                     We may use your personal information for our own business
                     purposes, such as for undertaking internal research for
-                    technological development and demonstration. This is not
+                    technological development and demonsTable.Rowation. This is not
                     considered to be &quot;selling&quot; of your personal
                     information.
                   </Text>
@@ -1187,35 +1183,35 @@ export default function PrivacyPolicy() {
                   <Text>
                     Depending on the circumstances, you have a right to know:
                   </Text>
-                  <UnorderedList>
-                    <ListItem>
+                  <Box as="ul">
+                    <Box as="li">
                       whether we collect and use your personal information;
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       the categories of personal information that we collect;
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       the purposes for which the collected personal information
                       is used;
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       whether we sell your personal information to third
                       parties;
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       the categories of personal information that we sold or
                       disclosed for a business purpose;
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       the categories of third parties to whom the personal
                       information was sold or disclosed for a business purpose;
                       and
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       the business or commercial purpose for collecting or
                       selling personal information.
-                    </ListItem>
-                  </UnorderedList>
+                    </Box>
+                  </Box>
                   <Text>
                     In accordance with applicable law, we are not obligated to
                     provide or delete consumer information that is de-identified
@@ -1264,31 +1260,31 @@ export default function PrivacyPolicy() {
                 </Box>
                 <Box>
                   <Heading as="h5">Other privacy rights</Heading>
-                  <UnorderedList>
-                    <ListItem>
+                  <Box as="ul">
+                    <Box as="li">
                       You may object to the processing of your personal
                       information.
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       You may request correction of your personal data if it is
                       incorrect or no longer relevant, or ask to restrict the
                       processing of the information.
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       You can designate an authorized agent to make a request
                       under the CCPA on your behalf. We may deny a request from
                       an authorized agent that does not submit proof that they
                       have been validly authorized to act on your behalf in
                       accordance with the CCPA.
-                    </ListItem>
-                    <ListItem>
+                    </Box>
+                    <Box as="li">
                       You may request to opt out from future selling of your
                       personal information to third parties. Upon receiving an
                       opt-out request, we will act upon the request as soon as
                       feasibly possible, but no later than fifteen (15) days
                       from the date of the request submission.
-                    </ListItem>
-                  </UnorderedList>
+                    </Box>
+                  </Box>
                   <Text>
                     To exercise these rights, you can contact us by email at
                     {' '}
@@ -1345,7 +1341,7 @@ export default function PrivacyPolicy() {
                 From You?
               </Heading>
               <Text>
-                Based on the applicable laws of your country, you may have the
+                Based on the applicable laws of your counTable.Rowy, you may have the
                 right to request access to the personal information we collect
                 from you, change that information, or delete it. To request to
                 review, update, or delete your personal information, please

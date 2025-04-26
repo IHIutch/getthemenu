@@ -7,20 +7,15 @@ import { createClientServer } from '@/utils/supabase/server-props'
 import { trpc } from '@/utils/trpc/client'
 import {
   Alert,
-  AlertIcon,
   Box,
   Button,
   Container,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
+  Field,
   Grid,
   GridItem,
   Heading,
   Input,
   InputGroup,
-  InputRightAddon,
   Spinner,
   Text,
 } from '@chakra-ui/react'
@@ -174,11 +169,11 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl
+                    <Field.Root
                       id="restaurantName"
-                      isInvalid={!!errors.restaurantName}
+                      invalid={!!errors.restaurantName}
                     >
-                      <FormLabel>Restaurant Name</FormLabel>
+                      <Field.Label>Restaurant Name</Field.Label>
                       <Input
                         {...register('restaurantName', {
                           required: 'This field is required',
@@ -187,15 +182,15 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
                         type="text"
                         autoComplete="off"
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors.restaurantName?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="customHost" isInvalid={!!errors.customHost}>
-                      <FormLabel>Choose a Unique URL</FormLabel>
-                      <InputGroup>
+                    <Field.Root id="customHost" invalid={!!errors.customHost}>
+                      <Field.Label>Choose a Unique URL</Field.Label>
+                      <InputGroup endElement=".getthemenu.com">
                         <Input
                           {...register('customHost', {
                             required: 'This field is required',
@@ -204,46 +199,47 @@ export default function GetStarted({ user }: InferGetServerSidePropsType<typeof 
                           type="text"
                           autoComplete="off"
                         />
-                        <InputRightAddon>.getthemenu.io</InputRightAddon>
                       </InputGroup>
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors.customHost?.message}
-                      </FormErrorMessage>
+                      </Field.ErrorText>
                       {isChecking
                         ? (
-                            <Alert status="info" mt="2">
-                              <Spinner size="sm" />
-                              <Text ml="2">Checking availability...</Text>
-                            </Alert>
+                            <Alert.Root status="info" mt="2">
+                              <Alert.Indicator>
+                                <Spinner size="sm" />
+                              </Alert.Indicator>
+                              <Alert.Description ml="2">Checking availability...</Alert.Description>
+                            </Alert.Root>
                           )
                         : !isChecking && slugMessage
                             ? (
-                                <Alert status={slugMessage.type} mt="2">
-                                  <AlertIcon />
-                                  <Text ml="2">{slugMessage.message}</Text>
-                                </Alert>
+                                <Alert.Root status={slugMessage.type} mt="2">
+                                  <Alert.Indicator />
+                                  <Alert.Description ml="2">{slugMessage.message}</Alert.Description>
+                                </Alert.Root>
                               )
                             : null}
-                      <FormHelperText>
+                      <Field.HelperText>
                         This URL is where your restaurant will be publicly
                         accessible, it must be unique.
-                      </FormHelperText>
-                    </FormControl>
+                      </Field.HelperText>
+                    </Field.Root>
                   </GridItem>
                   {/* <GridItem>
-                    <FormControl id="domain" isInvalid={errors.domain}>
-                      <FormLabel>Custom Domain</FormLabel>
+                    <Field.Root id="domain" invalid={errors.domain}>
+                      <Field.Label>Custom Domain</Field.Label>
                       <Input {...register('domain')} type="url" />
-                      <FormErrorMessage>{errors.domain}</FormErrorMessage>
-                    </FormControl>
+                      <Field.ErrorText>{errors.domain}</Field.ErrorText>
+                    </Field.Root>
                   </GridItem> */}
                   <GridItem textAlign="right">
                     <Button
                       type="submit"
                       colorScheme="blue"
                       loadingText="Creating..."
-                      isDisabled={slugMessage?.type === 'error'}
-                      isLoading={isSubmitting}
+                      disabled={slugMessage?.type === 'error'}
+                      loading={isSubmitting}
                     >
                       Create Restaurant
                     </Button>

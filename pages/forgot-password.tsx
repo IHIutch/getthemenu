@@ -1,26 +1,24 @@
-import type { SubmitHandler } from 'react-hook-form'
 import { env } from '@/utils/env'
 import { getErrorMessage } from '@/utils/functions'
 import { createClientComponent } from '@/utils/supabase/component'
 import {
   Alert,
-  AlertIcon,
   Box,
   Button,
   Container,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
   Input,
-  Text,
+  Link,
+  Text
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import React, { useState } from 'react'
+import { useState } from 'react'
+import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
 interface FormData {
@@ -83,8 +81,8 @@ export default function ForgotPassword() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl id="email" isInvalid={!!errors.email}>
-                      <FormLabel>Your Email</FormLabel>
+                    <Field.Root id="email" invalid={!!errors.email}>
+                      <Field.Label>Your Email</Field.Label>
                       <Input
                         {...register('email', {
                           required: 'This field is required',
@@ -93,35 +91,34 @@ export default function ForgotPassword() {
                         autoComplete="email"
                         required
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors.email?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   {success && (
                     <GridItem>
-                      <Alert status="success">
-                        <AlertIcon />
+                      <Alert.Root status="success">
+                        <Alert.Indicator />
                         Instructions with how to create a new password have been
                         sent to your email.
-                      </Alert>
+                      </Alert.Root>
                     </GridItem>
                   )}
                   <GridItem display="flex">
                     <Flex align="center">
-                      <Button
-                        as={NextLink}
-                        href="/"
-                        variant="link"
-                        fontWeight="semibold"
-                        colorScheme="blue"
-                      >
-                        Back to Login
-                      </Button>
+                      <NextLink href="/login" passHref>
+                        <Link
+                          fontWeight="semibold"
+                          colorScheme="blue"
+                        >
+                          Back to Login
+                        </Link>
+                      </NextLink>
                     </Flex>
                     <Button
                       ml="auto"
-                      isLoading={isSubmitting}
+                      loading={isSubmitting}
                       colorScheme="blue"
                       type="submit"
                     >

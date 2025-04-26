@@ -3,7 +3,7 @@
 import type { z } from 'zod'
 import { formatTime } from '@/utils/functions'
 import { DAYS_OF_WEEK, RestaurantSchema } from '@/utils/zod'
-import { AspectRatio, Box, Button, Container, Flex, Heading, Icon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from '@chakra-ui/react'
+import { AspectRatio, Box, Button, Container, Dialog, Flex, Heading, Icon, Stack, Tabs, Text, useDisclosure } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import { ClockIcon, PhoneIcon } from 'lucide-react'
 import NextImage from 'next/image'
@@ -116,109 +116,106 @@ export default function Header({ restaurant }: { restaurant: RestaurantType }) {
         </Box>
       </AspectRatio>
 
-      <Modal isOpen={modalState.isOpen} onClose={modalState.onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Restaurant Details</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Tabs isFitted>
-              <TabList>
-                <Tab>Contact</Tab>
-                <Tab>Hours</Tab>
-              </TabList>
+      <Dialog.Root open={modalState.open} onOpenChange={modalState.onClose}>
+        <Dialog.Backdrop />
+        <Dialog.Content>
+          <Dialog.Header>Restaurant Details</Dialog.Header>
+          <Dialog.CloseTrigger />
+          <Dialog.Body>
+            <Tabs.Root fitted>
+              <Tabs.List>
+                <Tabs.Trigger value="contact">Contact</Tabs.Trigger>
+                <Tabs.Trigger value="hours">Hours</Tabs.Trigger>
+              </Tabs.List>
+              <Tabs.Content value="contact" px="0">
+                <Stack gap="4">
+                  {restaurant?.phone && restaurant.phone.length > 0
+                    ? (
+                        <Box>
+                          <Text fontWeight="semibold">Phone</Text>
+                          <Stack as="ul" gap="1">
+                            {restaurant.phone.map((phone, idx) => (
+                              <Text as="li" key={idx} listStyleType="none">
+                                {phone}
+                              </Text>
+                            ))}
+                          </Stack>
+                        </Box>
+                      )
+                    : null}
 
-              <TabPanels>
-                <TabPanel px="0">
-                  <Stack spacing="4">
-                    {restaurant?.phone && restaurant.phone.length > 0
-                      ? (
-                          <Box>
-                            <Text fontWeight="semibold">Phone</Text>
-                            <Stack as="ul" spacing="1">
-                              {restaurant.phone.map((phone, idx) => (
-                                <Text as="li" key={idx} listStyleType="none">
-                                  {phone}
-                                </Text>
-                              ))}
-                            </Stack>
-                          </Box>
-                        )
-                      : null}
+                  {restaurant?.address && (
+                    <Box>
+                      <Text as="dt" fontWeight="semibold">
+                        Address
+                      </Text>
+                      <Text as="dd">
+                        {restaurant.address?.streetAddress}
+                        {' '}
+                        <br />
+                        {restaurant.address?.city}
+                        ,
+                        {' '}
+                        {restaurant.address?.state}
+                        {' '}
+                        {restaurant.address?.zip}
+                      </Text>
+                    </Box>
+                  )}
 
-                    {restaurant?.address && (
+                  {restaurant?.email && restaurant?.email?.length > 0
+                    ? (
+                        <Box>
+                          <Text fontWeight="semibold">Email</Text>
+                          <Stack as="ul" gap="1">
+                            {restaurant.email.map((email, idx) => (
+                              <Text as="li" key={idx} listStyleType="none">
+                                {email}
+                              </Text>
+                            ))}
+                          </Stack>
+                        </Box>
+                      )
+                    : null}
+                </Stack>
+              </Tabs.Content>
+              <Tabs.Content value="hours" px="0">
+                <Stack gap="3">
+                  {DAYS_OF_WEEK.map(day => (
+                    <Flex as="dl" key={day} justify="space-between" w="100%">
                       <Box>
                         <Text as="dt" fontWeight="semibold">
-                          Address
-                        </Text>
-                        <Text as="dd">
-                          {restaurant.address?.streetAddress}
-                          {' '}
-                          <br />
-                          {restaurant.address?.city}
-                          ,
-                          {' '}
-                          {restaurant.address?.state}
-                          {' '}
-                          {restaurant.address?.zip}
+                          {day}
+                          :
                         </Text>
                       </Box>
-                    )}
-
-                    {restaurant?.email && restaurant?.email?.length > 0
-                      ? (
-                          <Box>
-                            <Text fontWeight="semibold">Email</Text>
-                            <Stack as="ul" spacing="1">
-                              {restaurant.email.map((email, idx) => (
-                                <Text as="li" key={idx} listStyleType="none">
-                                  {email}
-                                </Text>
-                              ))}
-                            </Stack>
-                          </Box>
-                        )
-                      : null}
-                  </Stack>
-                </TabPanel>
-                <TabPanel px="0">
-                  <Stack spacing="3">
-                    {DAYS_OF_WEEK.map(day => (
-                      <Flex as="dl" key={day} justify="space-between" w="100%">
-                        <Box>
-                          <Text as="dt" fontWeight="semibold">
-                            {day}
-                            :
-                          </Text>
-                        </Box>
-                        <Box>
-                          {restaurant?.hours?.[day]?.isOpen
-                            ? (
-                                <Text as="dd">
-                                  {restaurant.hours?.[day]?.openTime
-                                    && formatTime(
-                                      restaurant.hours?.[day]?.openTime || '',
-                                    )}
-                                  {' '}
-                                  -
-                                  {' '}
-                                  {restaurant.hours?.[day]?.closeTime
-                                    && formatTime(restaurant.hours?.[day]?.closeTime || '')}
-                                </Text>
-                              )
-                            : (
-                                <Text as="dd">Closed</Text>
-                              )}
-                        </Box>
-                      </Flex>
-                    ))}
-                  </Stack>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+                      <Box>
+                        {restaurant?.hours?.[day]?.isOpen
+                          ? (
+                              <Text as="dd">
+                                {restaurant.hours?.[day]?.openTime
+                                  && formatTime(
+                                    restaurant.hours?.[day]?.openTime || '',
+                                  )}
+                                {' '}
+                                -
+                                {' '}
+                                {restaurant.hours?.[day]?.closeTime
+                                  && formatTime(restaurant.hours?.[day]?.closeTime || '')}
+                              </Text>
+                            )
+                          : (
+                              <Text as="dd">Closed</Text>
+                            )}
+                      </Box>
+                    </Flex>
+                  ))}
+                </Stack>
+              </Tabs.Content>
+            </Tabs.Root>
+          </Dialog.Body>
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   )
 }

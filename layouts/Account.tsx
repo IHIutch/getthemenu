@@ -7,7 +7,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
   return (
     <>
       <Navbar>
-        <HStack spacing="6">
+        <HStack gap="6">
           <SubnavItem href="/account">Account Details</SubnavItem>
           <SubnavItem href="/reset-password">Manage Password</SubnavItem>
         </HStack>

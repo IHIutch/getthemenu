@@ -9,13 +9,12 @@ import {
   Box,
   Button,
   Container,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
+  Field,
   Grid,
   GridItem,
   Heading,
   Input,
+  Link,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
@@ -108,60 +107,60 @@ export default function Register() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl id="fullName" isInvalid={!!errors.email}>
-                      <FormLabel>Your Name</FormLabel>
+                    <Field.Root id="fullName" invalid={!!errors.email}>
+                      <Field.Label>Your Name</Field.Label>
                       <Input
                         {...register('fullName', {
                           required: 'This field is required',
                         })}
                         type="text"
                         autoComplete="name"
-                        isRequired
+                        required
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors.email?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="email" isInvalid={!!errors.email}>
-                      <FormLabel>Your Email</FormLabel>
+                    <Field.Root id="email" invalid={!!errors.email}>
+                      <Field.Label>Your Email</Field.Label>
                       <Input
                         {...register('email', {
                           required: 'This field is required',
                         })}
                         type="email"
                         autoComplete="email"
-                        isRequired
+                        required
                       />
-                      <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-                    </FormControl>
+                      <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   <GridItem>
-                    <FormControl
+                    <Field.Root
                       id="password"
-                      isInvalid={!!errors['new-password']}
+                      invalid={!!errors['new-password']}
                     >
-                      <FormLabel>Password</FormLabel>
+                      <Field.Label>Password</Field.Label>
                       <Input
                         {...register('new-password', {
                           required: 'This field is required',
                         })}
                         type="password"
                         autoComplete="new-password"
-                        isRequired
+                        required
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors['new-password']?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   <GridItem>
-                    <FormControl
+                    <Field.Root
                       id="confirmPassword"
-                      isInvalid={!!errors['confirm-password']}
+                      invalid={!!errors['confirm-password']}
                     >
-                      <FormLabel>Confirm Password</FormLabel>
+                      <Field.Label>Confirm Password</Field.Label>
                       <Input
                         {...register('confirm-password', {
                           required: 'This field is required',
@@ -171,12 +170,12 @@ export default function Register() {
                         })}
                         type="password"
                         autoComplete="new-password"
-                        isRequired
+                        required
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors['confirm-password']?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   <GridItem>
                     <Button
@@ -185,7 +184,7 @@ export default function Register() {
                       colorScheme="blue"
                       w="full"
                       loadingText="Registering..."
-                      isLoading={isSubmitting}
+                      loading={isSubmitting}
                     >
                       Register
                     </Button>
@@ -194,9 +193,11 @@ export default function Register() {
               </form>
             </Box>
             <Box textAlign="center" mt="6">
-              <Button as={NextLink} href="/" colorScheme="blue" variant="link">
-                Have an Account? Log In Here!
-              </Button>
+              <Link colorScheme="blue" asChild>
+                <NextLink href="/login">
+                  Have an Account? Log In Here!
+                </NextLink>
+              </Link>
             </Box>
           </GridItem>
         </Grid>

@@ -8,7 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { X } from 'lucide-react'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 
 export default function ImageDropzone({ onChange, value = '' }: {
@@ -50,13 +50,14 @@ export default function ImageDropzone({ onChange, value = '' }: {
             <Box position="relative" h="100%" w="100%">
               <IconButton
                 aria-label="Clear image"
-                icon={<Icon boxSize="5" as={X} />}
                 size="sm"
                 position="absolute"
                 top="2"
                 right="2"
                 onClick={handleClearImage}
-              />
+              >
+                <Icon boxSize="5" as={X} />
+              </IconButton>
               <Image h="100%" w="100%" src={preview} objectFit="cover" alt="" />
             </Box>
           )

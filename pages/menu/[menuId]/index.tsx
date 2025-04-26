@@ -10,28 +10,18 @@ import { useGetAuthedUser } from '@/utils/react-query/users'
 import { createClientServer } from '@/utils/supabase/server-props'
 import {
   Alert,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
-  AlertIcon,
   Box,
   Button,
   ButtonGroup,
   Container,
+  Dialog,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
   Input,
   InputGroup,
-  InputLeftAddon,
   Spinner,
   Stack,
   Text,
@@ -60,7 +50,7 @@ export default function MenuOverview({ user }: InferGetServerSidePropsType<typeo
         <title>Single Menu</title>
       </Head>
       <Container maxW="container.md">
-        <Stack spacing="6">
+        <Stack gap="6">
           <Box bg="white" rounded="md" shadow="base">
             {(menu && restaurant)
               ? <DetailsSection menu={menu} restaurant={restaurant} menus={menus} />
@@ -180,8 +170,8 @@ function DetailsSection({
       <Box p="6">
         <Grid w="100%" gap="4">
           <GridItem>
-            <FormControl id="title">
-              <FormLabel>Menu Title</FormLabel>
+            <Field.Root id="title">
+              <Field.Label>Menu Title</Field.Label>
               <Input
                 {...register('title', {
                   required: 'This field is required',
@@ -190,19 +180,17 @@ function DetailsSection({
                 type="text"
                 autoComplete="off"
               />
-            </FormControl>
+            </Field.Root>
           </GridItem>
           <GridItem>
-            <FormControl id="slug">
-              <FormLabel>Menu Slug</FormLabel>
-              <InputGroup>
-                {(restaurant?.customHost || restaurant?.customDomain) && (
-                  <InputLeftAddon>
-                    {restaurant?.customHost
-                      ? `${restaurant.customHost}.getthemenu.io/`
-                      : `${restaurant.customDomain}/`}
-                  </InputLeftAddon>
-                )}
+            <Field.Root id="slug">
+              <Field.Label>Menu Slug</Field.Label>
+              <InputGroup endElement={(restaurant?.customHost || restaurant?.customDomain) && (
+                restaurant?.customHost
+                  ? `${restaurant.customHost}.getthemenu.io/`
+                  : `${restaurant.customDomain}/`
+              )}
+              >
                 <Input
                   {...register('slug', {
                     required: 'This field is required',
@@ -212,26 +200,28 @@ function DetailsSection({
                   autoComplete="off"
                 />
               </InputGroup>
-              <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
+              <Field.ErrorText>{errors.slug?.message}</Field.ErrorText>
               {isCheckingSlug
                 ? (
-                    <Alert status="info" mt="2">
-                      <Spinner size="sm" />
-                      <Text ml="2">Checking availability...</Text>
-                    </Alert>
+                    <Alert.Root status="info" mt="2">
+                      <Alert.Indicator>
+                        <Spinner size="sm" />
+                      </Alert.Indicator>
+                      <Alert.Description ml="2">Checking availability...</Alert.Description>
+                    </Alert.Root>
                   )
                 : !isCheckingSlug && slugMessage
                     ? (
-                        <Alert size="sm" status={slugMessage.type} mt="2">
-                          <AlertIcon />
-                          <Text ml="2">{slugMessage.message}</Text>
-                        </Alert>
+                        <Alert.Root size="sm" status={slugMessage.type} mt="2">
+                          <Alert.Indicator />
+                          <Alert.Description ml="2">{slugMessage.message}</Alert.Description>
+                        </Alert.Root>
                       )
                     : null}
-              <FormHelperText>
+              <Field.HelperText>
                 Must be unique to your restaurant.
-              </FormHelperText>
-            </FormControl>
+              </Field.HelperText>
+            </Field.Root>
           </GridItem>
         </Grid>
       </Box>
@@ -241,17 +231,17 @@ function DetailsSection({
             onClick={() => {
               reset(defaultValues)
             }}
-            isDisabled={!isDirty}
+            disabled={!isDirty}
           >
             Reset
           </Button>
           <Button
             colorScheme="blue"
             type="submit"
-            isDisabled={
+            disabled={
               !isDirty || slugMessage?.type === 'error'
             }
-            isLoading={isPending}
+            loading={isPending}
             loadingText="Saving..."
           >
             Save
@@ -266,7 +256,7 @@ function DeleteSection({ menu }: { menu: RouterOutputs['menu']['getById'] }) {
   const router = useRouter()
 
   const dialogState = useDisclosure()
-  const leastDestructiveRef = React.useRef(null)
+  const leastDestructiveRef = React.useRef<HTMLButtonElement>(null)
 
   const { mutateAsync: handleDeleteMenu, isPending, isSuccess } = useDeleteMenu()
 
@@ -302,39 +292,38 @@ function DeleteSection({ menu }: { menu: RouterOutputs['menu']['getById'] }) {
           </Button>
         </Box>
       </Box>
-      <AlertDialog
-        isOpen={dialogState.isOpen}
-        onClose={dialogState.onClose}
-        leastDestructiveRef={leastDestructiveRef}
+      <Dialog.Root
+        open={dialogState.open}
+        onOpenChange={e => dialogState.setOpen(e.open)}
+        initialFocusEl={() => leastDestructiveRef.current}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Delete Menu
-            </AlertDialogHeader>
+        <Dialog.Backdrop />
+        <Dialog.Content>
+          <Dialog.Header fontSize="lg" fontWeight="bold">
+            Delete Menu
+          </Dialog.Header>
 
-            <AlertDialogBody>
-              <Text mb="4">Are you sure you want to delete this menu?</Text>
-              <Text>This action is permanent and cannot be undone.</Text>
-            </AlertDialogBody>
+          <Dialog.Body>
+            <Text mb="4">Are you sure you want to delete this menu?</Text>
+            <Text>This action is permanent and cannot be undone.</Text>
+          </Dialog.Body>
 
-            <AlertDialogFooter>
-              <ButtonGroup>
-                <Button ref={leastDestructiveRef} onClick={dialogState.onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={() => handleDeleteMenu({ where: { id: menu.id } })}
-                  isLoading={isPending}
-                >
-                  Delete
-                </Button>
-              </ButtonGroup>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+          <Dialog.Footer>
+            <ButtonGroup>
+              <Button ref={leastDestructiveRef} onClick={dialogState.onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => handleDeleteMenu({ where: { id: menu.id } })}
+                loading={isPending}
+              >
+                Delete
+              </Button>
+            </ButtonGroup>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   )
 }

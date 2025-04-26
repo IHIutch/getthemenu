@@ -5,7 +5,6 @@ import type {
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import type { DropResult } from 'react-beautiful-dnd'
 import type { SubmitHandler } from 'react-hook-form'
-import BlurImage from '@/components/common/BlurImage'
 import ImageDropzone from '@/components/common/ImageDropzone'
 import MenuLayout from '@/layouts/Menu'
 import { appRouter } from '@/server'
@@ -29,39 +28,24 @@ import {
 import { useGetAuthedUser } from '@/utils/react-query/users'
 import { createClientServer } from '@/utils/supabase/server-props'
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
   AspectRatio,
   Box,
   Button,
   ButtonGroup,
   Center,
   Container,
+  Dialog,
   Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
+  Field,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   Icon,
   IconButton,
+  Image,
   Input,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
   NumberInput,
-  NumberInputField,
-  NumberInputStepper,
   Stack,
-  StackDivider,
+  StackSeparator,
   Text,
   Textarea,
   useDisclosure,
@@ -70,6 +54,7 @@ import { createServerSideHelpers } from '@trpc/react-query/server'
 import groupBy from 'lodash/groupBy'
 import { Camera, GripHorizontal, MoreVertical, Trash2 } from 'lucide-react'
 import Head from 'next/head'
+import NextImage from 'next/image'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
@@ -194,7 +179,7 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
               >
                 <Droppable droppableId="sectionWrapper" type="SECTIONS">
                   {drop => (
-                    <Stack spacing="8" ref={drop.innerRef} {...drop.droppableProps}>
+                    <Stack gap="8" ref={drop.innerRef} {...drop.droppableProps}>
                       {sortedSections.map((s, idx) => (
                         <Draggable
                           key={`${s.id}`}
@@ -246,25 +231,24 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
                                       ml="2"
                                       size="xs"
                                       variant="outline"
-                                      icon={(
-                                        <Icon
-                                          boxSize="5"
-                                          as={MoreVertical}
-                                          onClick={() =>
-                                            menu
-                                              ? handleDrawerOpen(
-                                                  <SectionDrawer
-                                                    menu={menu}
-                                                    section={s}
-                                                    handleDrawerClose={
-                                                      drawerState.onClose
-                                                    }
-                                                  />,
-                                                )
-                                              : null}
-                                        />
-                                      )}
-                                    />
+                                    >
+                                      <Icon
+                                        boxSize="5"
+                                        as={MoreVertical}
+                                        onClick={() =>
+                                          menu
+                                            ? handleDrawerOpen(
+                                                <SectionDrawer
+                                                  menu={menu}
+                                                  section={s}
+                                                  handleDrawerClose={
+                                                    drawerState.onClose
+                                                  }
+                                                />,
+                                              )
+                                            : null}
+                                      />
+                                    </IconButton>
                                   </Box>
                                 </Flex>
                                 <Box>
@@ -346,14 +330,14 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
           </Button>
         </Box>
       </Container>
-      <Drawer
-        isOpen={drawerState.isOpen}
-        placement="right"
-        onClose={drawerState.onClose}
+      <Drawer.Root
+        open={drawerState.open}
+        placement="end"
+        onOpenChange={e => drawerState.setOpen(e.open)}
       >
-        <DrawerOverlay />
-        <DrawerContent>{drawerType}</DrawerContent>
-      </Drawer>
+        <Drawer.Backdrop />
+        <Drawer.Content>{drawerType}</Drawer.Content>
+      </Drawer.Root>
     </>
   )
 }
@@ -381,10 +365,10 @@ function MenuItemsContainer({
       {drop => (
         <Box>
           <Stack
-            spacing="0"
+            gap="0"
             ref={drop.innerRef}
             {...drop.droppableProps}
-            divider={<StackDivider />}
+            separator={<StackSeparator />}
           >
             {items?.length > 0
               ? (
@@ -466,13 +450,15 @@ function MenuItem({
       >
         {menuItem.image
           ? (
-              <BlurImage
-                alt={menuItem.title || 'Menu Item'}
-                src={menuItem.image.src}
-                blurDataURL={menuItem.image.blurDataURL}
-                fill={true}
-                placeholder={menuItem.image.blurDataURL ? 'blur' : 'empty'}
-              />
+              <Image asChild>
+                <NextImage
+                  alt={menuItem.title || 'Menu Item'}
+                  src={menuItem.image.src}
+                  blurDataURL={menuItem.image.blurDataURL}
+                  fill={true}
+                  placeholder={menuItem.image.blurDataURL ? 'blur' : 'empty'}
+                />
+              </Image>
             )
           : (
               <Box boxSize="100%" bg="gray.100">
@@ -504,23 +490,22 @@ function MenuItem({
               ml="2"
               size="xs"
               variant="outline"
-              icon={(
-                <Icon
-                  boxSize="5"
-                  as={MoreVertical}
-                  onClick={() =>
-                    menu
-                      ? handleDrawerOpen(
-                          <MenuItemDrawer
-                            menu={menu}
-                            menuItem={menuItem}
-                            handleDrawerClose={drawerState.onClose}
-                          />,
-                        )
-                      : null}
-                />
-              )}
-            />
+            >
+              <Icon
+                boxSize="5"
+                as={MoreVertical}
+                onClick={() =>
+                  menu
+                    ? handleDrawerOpen(
+                        <MenuItemDrawer
+                          menu={menu}
+                          menuItem={menuItem}
+                          handleDrawerClose={drawerState.onClose}
+                        />,
+                      )
+                    : null}
+              />
+            </IconButton>
           </Box>
         </Flex>
       </Box>
@@ -617,50 +602,51 @@ function SectionDrawer({
 
   return (
     <>
-      <DrawerCloseButton />
-      <DrawerHeader px="4">Edit Section</DrawerHeader>
+      <Drawer.CloseTrigger />
+      <Drawer.Header px="4">Edit Section</Drawer.Header>
 
-      <DrawerBody px="4">
-        <Stack spacing="6">
-          <FormControl id="title">
-            <FormLabel>Title</FormLabel>
+      <Drawer.Body px="4">
+        <Stack gap="6">
+          <Field.Root id="title">
+            <Field.Label>Title</Field.Label>
             <Input
               autoComplete="off"
               {...register('title', { required: true })}
             />
-          </FormControl>
-          <FormControl id="description">
-            <FormLabel>Description</FormLabel>
+          </Field.Root>
+          <Field.Root id="description">
+            <Field.Label>Description</Field.Label>
             <Textarea
               autoComplete="off"
               {...register('description')}
               resize="none"
               rows={6}
             />
-          </FormControl>
+          </Field.Root>
           {section && (
             <Box>
               <Button
                 colorScheme="red"
-                variant="link"
-                leftIcon={<Icon as={Trash2} />}
+                variant="plain"
                 onClick={dialogState.onOpen}
               >
+                <Icon as={Trash2} />
+                {' '}
                 Delete Section
               </Button>
             </Box>
           )}
         </Stack>
-      </DrawerBody>
+      </Drawer.Body>
 
-      <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
+      <Drawer.Footer px="4" borderTopWidth="1px" borderTopColor="gray.200">
         <ButtonGroup w="100%">
           <Button variant="outline" onClick={handleDrawerClose} w="100%">
             Cancel
           </Button>
           <Button
             loadingText={section ? 'Updating...' : 'Creating...'}
-            isLoading={isSubmitting}
+            loading={isSubmitting}
             colorScheme="blue"
             onClick={handleSubmit(onSubmit)}
             w="100%"
@@ -668,24 +654,23 @@ function SectionDrawer({
             {section ? 'Update' : 'Create'}
           </Button>
         </ButtonGroup>
-      </DrawerFooter>
+      </Drawer.Footer>
 
-      <AlertDialog
-        isOpen={dialogState.isOpen}
-        onClose={dialogState.onClose}
-        leastDestructiveRef={leastDestructiveRef}
+      <Dialog.Root
+        role="alertdialog"
+        open={dialogState.open}
+        onOpenChange={e => dialogState.setOpen(e.open)}
+        initialFocusEl={() => leastDestructiveRef.current}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <SectionDeleteDialog
-              leastDestructiveRef={leastDestructiveRef}
-              onClose={dialogState.onClose}
-              onDelete={onDelete}
-              isDeleting={isDeleting}
-            />
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+        <Dialog.Backdrop />
+        <Dialog.Content>
+          <SectionDeleteDialog
+            onClose={dialogState.onClose}
+            onDelete={onDelete}
+            isDeleting={isDeleting}
+          />
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   )
 }
@@ -815,14 +800,14 @@ function MenuItemDrawer({
 
   return (
     <>
-      <DrawerCloseButton />
-      <DrawerHeader px="4">Edit Item</DrawerHeader>
+      <Drawer.CloseTrigger />
+      <Drawer.Header px="4">Edit Item</Drawer.Header>
 
-      <DrawerBody px="4">
-        <Stack spacing="6">
+      <Drawer.Body px="4">
+        <Stack gap="6">
           <Box>
-            <FormControl id="image">
-              <FormLabel>Item Image</FormLabel>
+            <Field.Root id="image">
+              <Field.Label>Item Image</Field.Label>
               <AspectRatio ratio={16 / 9} display="block">
                 <Controller
                   name="image"
@@ -832,69 +817,73 @@ function MenuItemDrawer({
                   }}
                 />
               </AspectRatio>
-            </FormControl>
+            </Field.Root>
           </Box>
-          <FormControl id="title">
-            <FormLabel>Item Name</FormLabel>
+          <Field.Root id="title">
+            <Field.Label>Item Name</Field.Label>
             <Input
               autoComplete="off"
               {...register('title', { required: true })}
             />
-          </FormControl>
-          <FormControl id="price">
-            <FormLabel>Item Price</FormLabel>
+          </Field.Root>
+          <Field.Root id="price">
+            <Field.Label>Item Price</Field.Label>
             <Controller
               control={control}
               name="price"
               render={({ field: { value, ...field } }) => (
-                <NumberInput
+                <NumberInput.Root
                   {...field}
                   value={value ? `$${value}` : ''}
-                  precision={2}
+                  formatOptions={{
+                    currency: 'USD',
+                  }}
                   step={0.01}
                   min={0}
                 >
-                  <NumberInputField inputMode="decimal" />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
+                  <NumberInput.Control>
+                    <NumberInput.IncrementTrigger />
+                    <NumberInput.DecrementTrigger />
+                  </NumberInput.Control>
+                  <NumberInput.Scrubber />
+                  <NumberInput.Input inputMode="decimal" />
+                </NumberInput.Root>
               )}
             />
-          </FormControl>
-          <FormControl id="description">
-            <FormLabel>Item Description</FormLabel>
+          </Field.Root>
+          <Field.Root id="description">
+            <Field.Label>Item Description</Field.Label>
             <Textarea
               autoComplete="off"
               {...register('description')}
               resize="none"
               rows={6}
             />
-          </FormControl>
+          </Field.Root>
           {menuItem && (
             <Box>
               <Button
                 colorScheme="red"
-                variant="link"
-                leftIcon={<Icon as={Trash2} />}
+                variant="plain"
                 onClick={dialogState.onOpen}
               >
+                <Icon as={Trash2} />
+                {' '}
                 Delete Item
               </Button>
             </Box>
           )}
         </Stack>
-      </DrawerBody>
+      </Drawer.Body>
 
-      <DrawerFooter px="4" borderTopWidth="1px" borderTopColor="gray.200">
+      <Drawer.Footer px="4" borderTopWidth="1px" borderTopColor="gray.200">
         <ButtonGroup w="100%">
           <Button variant="outline" onClick={handleDrawerClose} w="100%">
             Cancel
           </Button>
           <Button
             loadingText={menuItem ? 'Updating...' : 'Creating...'}
-            isLoading={isSubmitting}
+            loading={isSubmitting}
             colorScheme="blue"
             onClick={handleSubmit(onSubmit)}
             w="100%"
@@ -902,82 +891,77 @@ function MenuItemDrawer({
             {menuItem ? 'Update' : 'Create'}
           </Button>
         </ButtonGroup>
-      </DrawerFooter>
+      </Drawer.Footer>
 
-      <AlertDialog
-        isOpen={dialogState.isOpen}
-        onClose={dialogState.onClose}
-        leastDestructiveRef={leastDestructiveRef}
+      <Dialog.Root
+        role="alertdialog"
+        open={dialogState.open}
+        onOpenChange={e => dialogState.setOpen(e.open)}
+        initialFocusEl={() => leastDestructiveRef.current}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <MenuItemDeleteDialog
-              onClose={dialogState.onClose}
-              leastDestructiveRef={leastDestructiveRef}
-              onDelete={onDelete}
-              isDeleting={isDeleting}
-            />
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+        <Dialog.Backdrop />
+        <Dialog.Content>
+          <MenuItemDeleteDialog
+            onClose={dialogState.onClose}
+            onDelete={onDelete}
+            isDeleting={isDeleting}
+          />
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   )
 }
 
 function MenuItemDeleteDialog({
-  leastDestructiveRef,
   onClose,
   onDelete,
   isDeleting,
 }: {
-  leastDestructiveRef: React.RefObject<HTMLButtonElement>
   onClose: UseDisclosureReturn['onClose']
   onDelete: () => void
   isDeleting: boolean
 }) {
   return (
     <>
-      <AlertDialogHeader fontSize="lg" fontWeight="bold">
+      <Dialog.Header fontSize="lg" fontWeight="bold">
         Delete Item
-      </AlertDialogHeader>
+      </Dialog.Header>
 
-      <AlertDialogBody>
+      <Dialog.Body>
         <Text mb="4">Are you sure you want to delete this item?</Text>
         <Text>This action is permanent and cannot be undone.</Text>
-      </AlertDialogBody>
+      </Dialog.Body>
 
-      <AlertDialogFooter>
+      <Dialog.Footer>
         <ButtonGroup>
-          <Button ref={leastDestructiveRef} onClick={onClose}>
+          <Button onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme="red" onClick={onDelete} isLoading={isDeleting}>
+          <Button colorScheme="red" onClick={onDelete} loading={isDeleting}>
             Delete
           </Button>
         </ButtonGroup>
-      </AlertDialogFooter>
+      </Dialog.Footer>
     </>
   )
 }
 
 function SectionDeleteDialog({
-  leastDestructiveRef,
   onClose,
   onDelete,
   isDeleting,
 }: {
-  leastDestructiveRef: React.RefObject<HTMLButtonElement>
   onClose: UseDisclosureReturn['onClose']
   onDelete: () => void
   isDeleting: boolean
 }) {
   return (
     <>
-      <AlertDialogHeader fontSize="lg" fontWeight="bold">
+      <Dialog.Header fontSize="lg" fontWeight="bold">
         Delete Section & Items
-      </AlertDialogHeader>
+      </Dialog.Header>
 
-      <AlertDialogBody>
+      <Dialog.Body>
         <Text mb="4">
           Are you sure you want to delete this section? Deleting a section also
           deletes
@@ -988,18 +972,18 @@ function SectionDeleteDialog({
           .
         </Text>
         <Text>This action is permanent and cannot be undone.</Text>
-      </AlertDialogBody>
+      </Dialog.Body>
 
-      <AlertDialogFooter>
+      <Dialog.Footer>
         <ButtonGroup>
-          <Button ref={leastDestructiveRef} onClick={onClose}>
+          <Button onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme="red" onClick={onDelete} isLoading={isDeleting}>
+          <Button colorScheme="red" onClick={onDelete} loading={isDeleting}>
             Delete
           </Button>
         </ButtonGroup>
-      </AlertDialogFooter>
+      </Dialog.Footer>
     </>
   )
 }

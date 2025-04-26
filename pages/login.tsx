@@ -10,14 +10,13 @@ import {
   Box,
   Button,
   Container,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
   Input,
+  Link,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
@@ -80,52 +79,52 @@ export default function Login() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl id="email" isInvalid={!!errors.email}>
-                      <FormLabel>Email address</FormLabel>
+                    <Field.Root id="email" invalid={!!errors.email}>
+                      <Field.Label>Email address</Field.Label>
                       <Input
                         {...register('email', {
                           required: 'This field is required',
                         })}
                         type="email"
                         autoComplete="email"
-                        isRequired
+                        required
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors.email?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   <GridItem>
-                    <FormControl id="password" isInvalid={!!errors.password}>
-                      <FormLabel>Password</FormLabel>
+                    <Field.Root id="password" invalid={!!errors.password}>
+                      <Field.Label>Password</Field.Label>
                       <Input
                         {...register('password', {
                           required: 'This field is required',
                         })}
                         type="password"
                         autoComplete="current-password"
-                        isRequired
+                        required
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors.password?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   <GridItem display="flex">
                     <Flex align="center">
-                      <Button
-                        as={NextLink}
-                        href="/forgot-password"
-                        variant="link"
+                      <Link
                         fontWeight="semibold"
                         colorScheme="blue"
+                        asChild
                       >
-                        Forgot Password?
-                      </Button>
+                        <NextLink href="/forgot-password">
+                          Forgot Password?
+                        </NextLink>
+                      </Link>
                     </Flex>
                     <Button
                       ml="auto"
-                      isLoading={isSubmitting}
+                      loading={isSubmitting}
                       colorScheme="blue"
                       type="submit"
                     >
@@ -136,9 +135,11 @@ export default function Login() {
               </form>
             </Box>
             <Box textAlign="center" mt="6">
-              <Button as={NextLink} href="/register" colorScheme="blue" variant="link">
-                Don&rsquo;t Have an Account? Register Now!
-              </Button>
+              <NextLink passHref href="/register">
+                <Link colorScheme="blue">
+                  Don&rsquo;t Have an Account? Register Now!
+                </Link>
+              </NextLink>
             </Box>
           </GridItem>
         </Grid>

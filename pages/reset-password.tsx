@@ -7,18 +7,16 @@ import { createClientComponent } from '@/utils/supabase/component'
 import { createClientServer } from '@/utils/supabase/server-props'
 import {
   Alert,
-  AlertIcon,
   Box,
   Button,
   Container,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
   Input,
+  Link,
 } from '@chakra-ui/react'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import Head from 'next/head'
@@ -95,11 +93,11 @@ export default function ResetPassword(_props: InferGetServerSidePropsType<typeof
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid gap="6">
                   <GridItem>
-                    <FormControl
+                    <Field.Root
                       id="password"
-                      isInvalid={!!errors['new-password']}
+                      invalid={!!errors['new-password']}
                     >
-                      <FormLabel>New Password</FormLabel>
+                      <Field.Label>New Password</Field.Label>
                       <Input
                         {...register('new-password', {
                           required: 'This field is required',
@@ -107,34 +105,34 @@ export default function ResetPassword(_props: InferGetServerSidePropsType<typeof
                         type="password"
                         autoComplete="new-password"
                       />
-                      <FormErrorMessage>
+                      <Field.ErrorText>
                         {errors['new-password']?.message}
-                      </FormErrorMessage>
-                    </FormControl>
+                      </Field.ErrorText>
+                    </Field.Root>
                   </GridItem>
                   {success && (
                     <GridItem>
-                      <Alert status="success">
-                        <AlertIcon />
-                        You have successfully updated your password.
-                      </Alert>
+                      <Alert.Root status="success">
+                        <Alert.Indicator />
+                        <Alert.Description>You have successfully updated your password.</Alert.Description>
+                      </Alert.Root>
                     </GridItem>
                   )}
                   <GridItem display="flex">
                     <Flex align="center">
-                      <Button
-                        as={NextLink}
-                        href="/"
-                        variant="link"
+                      <Link
                         fontWeight="semibold"
                         colorScheme="blue"
+                        asChild
                       >
-                        Back to Login
-                      </Button>
+                        <NextLink href="/login">
+                          Back to Login
+                        </NextLink>
+                      </Link>
                     </Flex>
                     <Button
                       ml="auto"
-                      isLoading={isSubmitting}
+                      loading={isSubmitting}
                       colorScheme="blue"
                       type="submit"
                     >

@@ -7,7 +7,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <>
       <Navbar>
-        <HStack spacing="6">
+        <HStack gap="6">
           <SubnavItem href="/dashboard">Dashboard</SubnavItem>
           <SubnavItem href="/restaurant">Restaurant</SubnavItem>
           <SubnavItem href="/analytics">Analytics</SubnavItem>

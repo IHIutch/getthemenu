@@ -21,17 +21,14 @@ import {
   Button,
   ButtonGroup,
   Container,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
   HStack,
   Input,
   InputGroup,
-  InputRightAddon,
   Stack,
   Switch,
   Text,
@@ -58,7 +55,7 @@ export default function Restaurant({ user }: InferGetServerSidePropsType<typeof 
       </Head>
 
       <Container maxW="container.md">
-        <Stack spacing="6">
+        <Stack gap="6">
           <Box bg="white" rounded="md" shadow="base">
             {restaurant
               ? <Details restaurant={restaurant} />
@@ -171,20 +168,20 @@ function Details({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
         <Box p="6">
           <Grid w="100%" gap="4">
             <GridItem>
-              <FormControl isInvalid={!!errors.name}>
-                <FormLabel>Name</FormLabel>
+              <Field.Root invalid={!!errors.name}>
+                <Field.Label>Name</Field.Label>
                 <Input
                   {...register('name', {
                     required: 'This field is required',
                   })}
                   type="text"
                 />
-              </FormControl>
+              </Field.Root>
             </GridItem>
             <GridItem>
-              <FormControl isInvalid={!!errors.customHost}>
-                <FormLabel>Unique URL</FormLabel>
-                <InputGroup>
+              <Field.Root invalid={!!errors.customHost}>
+                <Field.Label>Unique URL</Field.Label>
+                <InputGroup endElement="getthemenu.com">
                   <Input
                     {...register('customHost', {
                       required: 'This field is required',
@@ -192,16 +189,15 @@ function Details({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
                     type="text"
                     autoComplete="off"
                   />
-                  <InputRightAddon>.getthemenu.io</InputRightAddon>
                 </InputGroup>
-                <FormErrorMessage>
+                <Field.ErrorText>
                   {errors.customHost?.message}
-                </FormErrorMessage>
-              </FormControl>
+                </Field.ErrorText>
+              </Field.Root>
             </GridItem>
             <GridItem>
-              <FormControl id="coverImage" isInvalid={!!errors.coverImage}>
-                <FormLabel>Cover Image</FormLabel>
+              <Field.Root id="coverImage" invalid={!!errors.coverImage}>
+                <Field.Label>Cover Image</Field.Label>
                 <AspectRatio ratio={16 / 9} display="block">
                   <Controller
                     name="coverImage"
@@ -211,10 +207,10 @@ function Details({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
                     }}
                   />
                 </AspectRatio>
-                <FormErrorMessage>
+                <Field.ErrorText>
                   {errors.coverImage?.message}
-                </FormErrorMessage>
-              </FormControl>
+                </Field.ErrorText>
+              </Field.Root>
             </GridItem>
           </Grid>
         </Box>
@@ -224,15 +220,15 @@ function Details({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
               onClick={() => {
                 reset(defaultValues)
               }}
-              isDisabled={!isDirty}
+              disabled={!isDirty}
             >
               Reset
             </Button>
             <Button
               colorScheme="blue"
               type="submit"
-              isDisabled={!isDirty}
-              isLoading={isSubmitting}
+              disabled={!isDirty}
+              loading={isSubmitting}
               loadingText="Saving..."
             >
               Save
@@ -303,34 +299,34 @@ function Address({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
         <Box p="6">
           <Grid templateColumns={{ sm: 'repeat(12, 1fr)' }} gap="4">
             <GridItem colSpan={{ sm: 12 }}>
-              <FormControl isInvalid={!!errors.streetAddress}>
-                <FormLabel>Street Address</FormLabel>
+              <Field.Root invalid={!!errors.streetAddress}>
+                <Field.Label>Street Address</Field.Label>
                 <Input {...register('streetAddress')} type="text" />
-                <FormErrorMessage>
+                <Field.ErrorText>
                   {errors.streetAddress?.message}
-                </FormErrorMessage>
-              </FormControl>
+                </Field.ErrorText>
+              </Field.Root>
             </GridItem>
             <GridItem colSpan={{ sm: 12, md: 6 }}>
-              <FormControl isInvalid={!!errors.city}>
-                <FormLabel>City</FormLabel>
+              <Field.Root invalid={!!errors.city}>
+                <Field.Label>City</Field.Label>
                 <Input {...register('city')} type="text" />
-                <FormErrorMessage>{errors.city?.message}</FormErrorMessage>
-              </FormControl>
+                <Field.ErrorText>{errors.city?.message}</Field.ErrorText>
+              </Field.Root>
             </GridItem>
             <GridItem colSpan={{ sm: 6, md: 3 }}>
-              <FormControl isInvalid={!!errors.state}>
-                <FormLabel>State</FormLabel>
+              <Field.Root invalid={!!errors.state}>
+                <Field.Label>State</Field.Label>
                 <Input {...register('state')} type="text" />
-                <FormErrorMessage>{errors.state?.message}</FormErrorMessage>
-              </FormControl>
+                <Field.ErrorText>{errors.state?.message}</Field.ErrorText>
+              </Field.Root>
             </GridItem>
             <GridItem colSpan={{ sm: 6, md: 3 }}>
-              <FormControl isInvalid={!!errors.zip}>
-                <FormLabel>Postal Code</FormLabel>
+              <Field.Root invalid={!!errors.zip}>
+                <Field.Label>Postal Code</Field.Label>
                 <Input {...register('zip')} type="text" />
-                <FormErrorMessage>{errors.zip?.message}</FormErrorMessage>
-              </FormControl>
+                <Field.ErrorText>{errors.zip?.message}</Field.ErrorText>
+              </Field.Root>
             </GridItem>
           </Grid>
         </Box>
@@ -340,15 +336,15 @@ function Address({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
               onClick={() => {
                 reset(defaultValues)
               }}
-              isDisabled={!isDirty}
+              disabled={!isDirty}
             >
               Reset
             </Button>
             <Button
               colorScheme="blue"
               type="submit"
-              isDisabled={!isDirty}
-              isLoading={isSubmitting}
+              disabled={!isDirty}
+              loading={isSubmitting}
               loadingText="Saving..."
             >
               Save
@@ -428,22 +424,22 @@ function Contact({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
             <GridItem colSpan={{ sm: 6 }}>
               <Stack>
                 {phoneFields.map((field, idx) => (
-                  <FormControl key={field.id} isInvalid={!!errors.phone}>
-                    <FormLabel>Phone Number</FormLabel>
+                  <Field.Root key={field.id} invalid={!!errors.phone}>
+                    <Field.Label>Phone Number</Field.Label>
                     <Input {...register(`phone.${idx}.value` as const)} type="text" />
-                    <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
-                  </FormControl>
+                    <Field.ErrorText>{errors.phone?.message}</Field.ErrorText>
+                  </Field.Root>
                 ))}
               </Stack>
             </GridItem>
             <GridItem colSpan={{ sm: 6 }}>
               <Stack>
                 {emailFields.map((field, idx) => (
-                  <FormControl key={field.id} isInvalid={!!errors.email}>
-                    <FormLabel>Email</FormLabel>
+                  <Field.Root key={field.id} invalid={!!errors.email}>
+                    <Field.Label>Email</Field.Label>
                     <Input {...register(`email.${idx}.value` as const)} type="email" />
-                    <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-                  </FormControl>
+                    <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+                  </Field.Root>
                 ))}
               </Stack>
             </GridItem>
@@ -455,15 +451,15 @@ function Contact({ restaurant }: { restaurant: RouterOutputs['restaurant']['getB
               onClick={() => {
                 reset(defaultValues)
               }}
-              isDisabled={!isDirty}
+              disabled={!isDirty}
             >
               Reset
             </Button>
             <Button
               colorScheme="blue"
               type="submit"
-              isDisabled={!isDirty}
-              isLoading={isSubmitting}
+              disabled={!isDirty}
+              loading={isSubmitting}
               loadingText="Saving..."
             >
               Save
@@ -549,7 +545,7 @@ function Hours({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
           <Heading fontSize="lg" fontWeight="semibold" mb="2">
             Standard Hours
           </Heading>
-          <Stack spacing={{ base: '6', lg: '4' }}>
+          <Stack gap={{ base: '6', lg: '4' }}>
             {fields.map((field, idx) => (
               <Grid
                 key={field.id}
@@ -573,44 +569,47 @@ function Hours({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
                   alignItems="center"
                   h={{ lg: '10' }}
                 >
-                  <FormControl display="flex" alignItems="center">
-                    <Switch {...register(`standardHours.${idx}.isOpen`)} />
-                    <FormLabel ml="2" mb="0">
+                  <Switch.Root display="flex" alignItems="center" {...register(`standardHours.${idx}.isOpen`)}>
+                    <Switch.HiddenInput />
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                    <Switch.Label ml="2" mb="0">
                       {watchField(idx) ? 'Open' : 'Closed'}
-                    </FormLabel>
-                  </FormControl>
+                    </Switch.Label>
+                  </Switch.Root>
                 </GridItem>
                 {watchField(idx) && (
                   <GridItem colSpan={{ base: 12, lg: 6 }}>
                     <HStack align="center">
-                      <FormControl>
-                        <FormLabel hidden>
+                      <Field.Root>
+                        <Field.Label hidden>
                           {field.label}
                           {' '}
                           Open Time
-                        </FormLabel>
+                        </Field.Label>
                         <Input
                           {...register(`standardHours.${idx}.openTime`)}
-                          isRequired
+                          required
                           type="time"
                         // TODO: Add support for browsers that don't support time inputs
                         />
-                      </FormControl>
+                      </Field.Root>
                       <Text as="span">to</Text>
-                      <FormControl>
-                        <FormLabel hidden>
+                      <Field.Root>
+                        <Field.Label hidden>
                           {field.label}
                           {' '}
                           Close Time
-                        </FormLabel>
+                        </Field.Label>
                         <Input
                           {...register(`standardHours.${idx}.closeTime`)}
                           // defaultValue={field.closeTime}
-                          isRequired
+                          required
                           type="time"
                         // TODO: Add support for browsers that don't support time inputs
                         />
-                      </FormControl>
+                      </Field.Root>
                     </HStack>
                   </GridItem>
                 )}
@@ -624,15 +623,15 @@ function Hours({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
               onClick={() => {
                 reset(defaultValues)
               }}
-              isDisabled={!isDirty}
+              disabled={!isDirty}
             >
               Reset
             </Button>
             <Button
               colorScheme="blue"
               type="submit"
-              isDisabled={!isDirty}
-              isLoading={isSubmitting}
+              disabled={!isDirty}
+              loading={isSubmitting}
               loadingText="Saving..."
             >
               Save

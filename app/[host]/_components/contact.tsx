@@ -27,12 +27,12 @@ export default function Contact({ restaurant }: { restaurant: RestaurantType }) 
       <Box p="4" borderBottomWidth="1px">
         <Heading fontSize="lg">Contact</Heading>
       </Box>
-      <Stack spacing="4" p="4" fontSize="sm">
+      <Stack gap="4" p="4" fontSize="sm">
         {restaurant?.phone && restaurant.phone.length > 0
           ? (
               <Box>
                 <Text fontWeight="semibold">Phone</Text>
-                <Stack as="ul" spacing="1">
+                <Stack as="ul" gap="1">
                   {restaurant.phone.map((phone, idx) => (
                     <Text
                       as="li"
@@ -70,7 +70,7 @@ export default function Contact({ restaurant }: { restaurant: RestaurantType }) 
           ? (
               <Box>
                 <Text fontWeight="semibold">Email</Text>
-                <Stack as="ul" spacing="1">
+                <Stack as="ul" gap="1">
                   {restaurant.email.map((email, idx) => (
                     <Text
                       as="li"

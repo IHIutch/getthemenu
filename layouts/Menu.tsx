@@ -11,7 +11,7 @@ export default function MenuLayout({ children }: { children?: React.ReactNode })
   return (
     <>
       <Navbar>
-        <HStack spacing="6">
+        <HStack gap="6">
           {menuId && (
             <>
               <SubnavItem href={`/menu/${menuId}`}>Overview</SubnavItem>

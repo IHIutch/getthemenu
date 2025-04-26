@@ -130,7 +130,7 @@ function LayoutSkeleton({
                 colStart={{ lg: 9 }}
               >
                 <Box position="sticky" top="28">
-                  <Stack pt="4" spacing="8">
+                  <Stack pt="4" gap="8">
                     <Box>{contact}</Box>
                     <Box>{hours}</Box>
                   </Stack>

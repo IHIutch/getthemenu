@@ -1,7 +1,3 @@
-import type {
-  UseRadioGroupProps,
-  UseRadioProps,
-} from '@chakra-ui/react'
 import type { SubmitHandler } from 'react-hook-form'
 import { getErrorMessage } from '@/utils/functions'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
@@ -13,35 +9,24 @@ import {
   Button,
   ButtonGroup,
   Container,
+  // useRadio,
+  // useRadioGroup,
+  Dialog,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
   HStack,
   Link,
   Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
   Textarea,
   useDisclosure,
-  useRadio,
-  useRadioGroup,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import * as React from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 interface FormValues {
   userId: string
@@ -62,7 +47,7 @@ export default function Navbar({
 
   const {
     handleSubmit,
-    control,
+    _control,
     register,
     formState: { errors },
   } = useForm<FormValues>({
@@ -114,21 +99,36 @@ export default function Navbar({
               <Box ml="auto">
                 <HStack>
                   {restaurant?.customHost && (
-                    <Button size="sm" as={NextLink} href={`https://${restaurant.customHost}.getthemenu.io`} target="blank">
-                      View Site
-                    </Button>
+                    <NextLink href={`https://${restaurant.customHost}.getthemenu.io`} passHref target="blank">
+                      <Button size="sm">
+                        View Site
+                      </Button>
+                    </NextLink>
                   )}
-                  <Menu placement="bottom-end">
-                    <MenuButton>
-                      <Avatar size="sm" name={`${user && user.fullName}`} />
-                    </MenuButton>
-                    <MenuList boxShadow="lg">
-                      <MenuItem as={NextLink} href="/dashboard">Dashboard</MenuItem>
-                      <MenuItem as={NextLink} href="/account">Account Details</MenuItem>
-                      <MenuItem as="button" onClick={modalState.onOpen}>Feedback</MenuItem>
-                      <MenuItem as={NextLink} href="/logout">Log Out</MenuItem>
-                    </MenuList>
-                  </Menu>
+                  <Menu.Root positioning={{
+                    placement: 'bottom-end',
+                  }}
+                  >
+                    <Menu.Trigger>
+                      <Avatar.Root size="sm">
+                        <Avatar.Fallback name={`${user && user.fullName}`} />
+                      </Avatar.Root>
+                    </Menu.Trigger>
+                    <Menu.Positioner>
+                      <Menu.Content boxShadow="lg">
+                        <NextLink href="/dashboard" passHref>
+                          <Menu.Item value="dashboard">Dashboard</Menu.Item>
+                        </NextLink>
+                        <NextLink href="/account" passHref>
+                          <Menu.Item value="details">Account Details</Menu.Item>
+                        </NextLink>
+                        <Menu.Item value="feedback" onClick={modalState.onOpen}>Feedback</Menu.Item>
+                        <NextLink href="/logout" passHref>
+                          <Menu.Item value="logout">Log Out</Menu.Item>
+                        </NextLink>
+                      </Menu.Content>
+                    </Menu.Positioner>
+                  </Menu.Root>
                 </HStack>
               </Box>
             </Flex>
@@ -136,13 +136,13 @@ export default function Navbar({
           </Box>
         </Container>
       </Box>
-      <Modal isOpen={modalState.isOpen} onClose={modalState.onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Have Feedback?</ModalHeader>
-          <ModalCloseButton />
+      <Dialog.Root open={modalState.open} onOpenChange={e => modalState.setOpen(e.open)}>
+        <Dialog.Backdrop />
+        <Dialog.Content>
+          <Dialog.Header>Have Feedback?</Dialog.Header>
+          <Dialog.CloseTrigger />
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalBody>
+            <Dialog.Body>
               <Box mb="8">
                 <Text>
                   If you have any feedback, please let us know. We would love to
@@ -151,15 +151,15 @@ export default function Navbar({
               </Box>
               <Grid gap="4">
                 <GridItem w="100%" display="flex" alignItems="center">
-                  <Controller
+                  {/* <Controller
                     name="type"
                     control={control}
                     render={({ field }) => <FeedbackButtons {...field} />}
-                  />
+                  /> */}
                 </GridItem>
                 <GridItem w="100%">
-                  <FormControl id="comment">
-                    <FormLabel>Comment</FormLabel>
+                  <Field.Root id="comment">
+                    <Field.Label>Comment</Field.Label>
                     <Textarea
                       autoComplete="off"
                       {...register('comment', {
@@ -167,101 +167,101 @@ export default function Navbar({
                       })}
                       resize="none"
                     />
-                    <FormErrorMessage>
+                    <Field.ErrorText>
                       {errors.comment?.message}
-                    </FormErrorMessage>
-                  </FormControl>
+                    </Field.ErrorText>
+                  </Field.Root>
                 </GridItem>
               </Grid>
-            </ModalBody>
-            <ModalFooter>
+            </Dialog.Body>
+            <Dialog.Footer>
               <ButtonGroup>
                 <Button onClick={modalState.onClose}>Cancel</Button>
                 <Button
                   type="submit"
                   colorScheme="blue"
-                  isLoading={isSubmitting}
+                  loading={isSubmitting}
                 >
                   Submit
                 </Button>
               </ButtonGroup>
-            </ModalFooter>
+            </Dialog.Footer>
           </form>
-        </ModalContent>
-      </Modal>
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   )
 }
 
-function FeedbackButtons(props: UseRadioGroupProps) {
-  const options = [
-    {
-      value: 'idea',
-      label: 'Idea',
-      icon: '💡',
-    },
-    {
-      value: 'bug',
-      label: 'Bug',
-      icon: '🪲',
-    },
-    {
-      value: 'other',
-      label: 'Other',
-      icon: '🤔',
-    },
-  ]
+// function FeedbackButtons(props: UseRadioGroupProps) {
+//   const options = [
+//     {
+//       value: 'idea',
+//       label: 'Idea',
+//       icon: '💡',
+//     },
+//     {
+//       value: 'bug',
+//       label: 'Bug',
+//       icon: '🪲',
+//     },
+//     {
+//       value: 'other',
+//       label: 'Other',
+//       icon: '🤔',
+//     },
+//   ]
 
-  const { getRootProps, getRadioProps } = useRadioGroup(props)
-  const group = getRootProps()
+//   const { getRootProps, getRadioProps } = useRadioGroup(props)
+//   const group = getRootProps()
 
-  return (
-    <Box {...group} w="100%">
-      <HStack>
-        {options.map((option) => {
-          const radio = getRadioProps({ value: option.value })
-          return (
-            <FeedbackButton key={option.value} {...radio}>
-              <Box textAlign="center">
-                <Text fontSize="3xl">{option.icon}</Text>
-                <Text fontWeight="medium">{option.label}</Text>
-              </Box>
-            </FeedbackButton>
-          )
-        })}
-      </HStack>
-    </Box>
-  )
-}
+//   return (
+//     <Box {...group} w="100%">
+//       <HStack>
+//         {options.map((option) => {
+//           const radio = getRadioProps({ value: option.value })
+//           return (
+//             <FeedbackButton key={option.value} {...radio}>
+//               <Box textAlign="center">
+//                 <Text fontSize="3xl">{option.icon}</Text>
+//                 <Text fontWeight="medium">{option.label}</Text>
+//               </Box>
+//             </FeedbackButton>
+//           )
+//         })}
+//       </HStack>
+//     </Box>
+//   )
+// }
 
-function FeedbackButton({ children, ...props }: { children: React.ReactNode } & UseRadioProps) {
-  const { getInputProps, getRadioProps } = useRadio(props)
+// function FeedbackButton({ children, ...props }: { children: React.ReactNode } & UseRadioProps) {
+//   const { getInputProps, getRadioProps } = useRadio(props)
 
-  const input = getInputProps()
-  const radio = getRadioProps()
+//   const input = getInputProps()
+//   const radio = getRadioProps()
 
-  return (
-    <Box as="label" flexGrow="1" maxW="24">
-      <input {...input} />
-      <Box
-        {...radio}
-        cursor="pointer"
-        borderWidth="1px"
-        _checked={{
-          bg: 'blue.400',
-          color: 'white',
-          borderColor: 'blue.400',
-        }}
-        _focus={{
-          boxShadow: 'outline',
-        }}
-        px="3"
-        py="2"
-        width="100%"
-        rounded="md"
-      >
-        {children}
-      </Box>
-    </Box>
-  )
-}
+//   return (
+//     <Box as="label" flexGrow="1" maxW="24">
+//       <input {...input} />
+//       <Box
+//         {...radio}
+//         cursor="pointer"
+//         borderWidth="1px"
+//         _checked={{
+//           bg: 'blue.400',
+//           color: 'white',
+//           borderColor: 'blue.400',
+//         }}
+//         _focus={{
+//           boxShadow: 'outline',
+//         }}
+//         px="3"
+//         py="2"
+//         width="100%"
+//         rounded="md"
+//       >
+//         {children}
+//       </Box>
+//     </Box>
+//   )
+// }

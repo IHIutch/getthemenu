@@ -13,34 +13,23 @@ import { trpc } from '@/utils/trpc/client'
 import { MenuSchema } from '@/utils/zod'
 import {
   Alert,
-  AlertIcon,
   Box,
   Button,
   ButtonGroup,
   Center,
   Circle,
   Container,
+  Dialog,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
   Icon,
   Input,
   InputGroup,
-  InputLeftAddon,
   LinkBox,
   LinkOverlay,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Spinner,
   Stack,
   Text,
@@ -304,17 +293,17 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
               )}
         </Box>
       </Container>
-      <Modal isOpen={modalState.isOpen} onClose={modalState.onClose}>
-        <ModalOverlay />
+      <Dialog.Root open={modalState.open} onOpenChange={e => modalState.setOpen(e.open)}>
+        <Dialog.Backdrop />
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ModalContent>
-            <ModalHeader>Create a New Menu</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
+          <Dialog.Content>
+            <Dialog.Header>Create a New Menu</Dialog.Header>
+            <Dialog.CloseTrigger />
+            <Dialog.Body>
               <Grid w="100%" gap="4">
                 <GridItem>
-                  <FormControl id="title" isInvalid={!!errors.title}>
-                    <FormLabel>Menu Title</FormLabel>
+                  <Field.Root id="title" invalid={!!errors.title}>
+                    <Field.Label>Menu Title</Field.Label>
                     <Input
                       {...register('title', {
                         required: 'This field is required',
@@ -323,20 +312,19 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                       type="text"
                       autoComplete="off"
                     />
-                    <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
-                  </FormControl>
+                    <Field.ErrorText>{errors.title?.message}</Field.ErrorText>
+                  </Field.Root>
                 </GridItem>
                 <GridItem>
-                  <FormControl id="slug" isInvalid={!!errors.title}>
-                    <FormLabel>Menu Slug</FormLabel>
-                    <InputGroup>
-                      {(restaurant?.customHost || restaurant?.customDomain) && (
-                        <InputLeftAddon>
-                          {restaurant?.customHost
-                            ? `${restaurant.customHost}.getthemenu.io/`
-                            : `${restaurant.customDomain}/`}
-                        </InputLeftAddon>
-                      )}
+                  <Field.Root id="slug" invalid={!!errors.title}>
+                    <Field.Label>Menu Slug</Field.Label>
+                    <InputGroup startElement={
+                      (restaurant?.customHost || restaurant?.customDomain)
+                      && (restaurant?.customHost
+                        ? `${restaurant.customHost}.getthemenu.io/`
+                        : `${restaurant?.customDomain}/`)
+                    }
+                    >
                       <Input
                         {...register('slug', {
                           required: 'This field is required',
@@ -346,46 +334,48 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                         autoComplete="off"
                       />
                     </InputGroup>
-                    <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
+                    <Field.ErrorText>{errors.slug?.message}</Field.ErrorText>
                     {isCheckingSlug
                       ? (
-                          <Alert status="info" mt="2">
-                            <Spinner size="sm" />
-                            <Text ml="2">Checking availability...</Text>
-                          </Alert>
+                          <Alert.Root status="info" mt="2">
+                            <Alert.Indicator>
+                              <Spinner size="sm" />
+                            </Alert.Indicator>
+                            <Alert.Description ml="2">Checking availability...</Alert.Description>
+                          </Alert.Root>
                         )
                       : !isCheckingSlug && slugMessage
                           ? (
-                              <Alert size="sm" status={slugMessage.type} mt="2">
-                                <AlertIcon />
-                                <Text ml="2">{slugMessage.message}</Text>
-                              </Alert>
+                              <Alert.Root size="sm" status={slugMessage.type} mt="2">
+                                <Alert.Indicator />
+                                <Alert.Description ml="2">{slugMessage.message}</Alert.Description>
+                              </Alert.Root>
                             )
                           : null}
-                    <FormHelperText>
+                    <Field.HelperText>
                       Must be unique to your restaurant.
-                    </FormHelperText>
-                  </FormControl>
+                    </Field.HelperText>
+                  </Field.Root>
                 </GridItem>
               </Grid>
-            </ModalBody>
-            <ModalFooter>
+            </Dialog.Body>
+            <Dialog.Footer>
               <ButtonGroup>
                 <Button onClick={modalState.onClose}>Cancel</Button>
                 <Button
                   type="submit"
-                  isLoading={isPending}
+                  loading={isPending}
                   loadingText="Creating..."
                   colorScheme="blue"
-                  isDisabled={slugMessage?.type === 'error'}
+                  disabled={slugMessage?.type === 'error'}
                 >
                   Create
                 </Button>
               </ButtonGroup>
-            </ModalFooter>
-          </ModalContent>
+            </Dialog.Footer>
+          </Dialog.Content>
         </form>
-      </Modal>
+      </Dialog.Root>
     </>
   )
 }

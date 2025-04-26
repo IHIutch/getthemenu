@@ -28,7 +28,7 @@ export default function Hours({ restaurant }: { restaurant: RestaurantType }) {
       <Box p="4" borderBottomWidth="1px">
         <Heading fontSize="lg">Hours</Heading>
       </Box>
-      <Stack spacing="3" py="3" fontSize="sm">
+      <Stack gap="3" py="3" fontSize="sm">
         {DAYS_OF_WEEK.map(day => (
           <Flex
             as="dl"

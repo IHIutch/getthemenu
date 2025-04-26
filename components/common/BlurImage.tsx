@@ -1,30 +1,28 @@
 'use client'
 
 import type { ImageProps as NextImageProps } from 'next/image'
-import { Box, chakra, Img } from '@chakra-ui/react'
-import NextImage from 'next/image'
-import { useState } from 'react'
+import { Box } from '@chakra-ui/react'
 
-const MagicImage = chakra<typeof NextImage, NextImageProps>(NextImage, {
-  // ensure that you're forwarding all of the required props for your case
-  shouldForwardProp: prop => ['alt', 'src', 'blurDataURL', 'onLoad', 'fill'].includes(prop),
-})
+// const MagicImage = chakra<typeof NextImage, NextImageProps>(NextImage, {
+//   // ensure that you're forwarding all of the required props for your case
+//   shouldForwardProp: prop => ['alt', 'src', 'blurDataURL', 'onLoad', 'fill'].includes(prop),
+// })
 
 export default function BlurImage(props: NextImageProps) {
-  const [isLoaded, setIsLoaded] = useState(false)
+  // const [isLoaded, setIsLoaded] = useState(false)
 
   return (
     <Box boxSize="full" position="relative">
       {props.blurDataURL?.startsWith('data')
         ? (
             <>
-              <Img
+              {/* <Img
                 alt={props.alt}
                 src={props.blurDataURL}
                 objectFit="cover"
                 boxSize="full"
                 filter="auto"
-              />
+              /> */}
               <Box
                 position="absolute"
                 boxSize="full"
@@ -33,7 +31,7 @@ export default function BlurImage(props: NextImageProps) {
             </>
           )
         : null}
-      <MagicImage
+      {/* <MagicImage
         src={props.src}
         alt={props.alt}
         fill={true}
@@ -55,7 +53,7 @@ export default function BlurImage(props: NextImageProps) {
               transform: 'scale(1.03)',
               opacity: '0',
             }}
-      />
+      /> */}
     </Box>
   )
 }

@@ -1,8 +1,6 @@
 import SEO from '@/components/global/SEO'
 import {
   Alert,
-  AlertDescription,
-  AlertTitle,
   Box,
   Button,
   Center,
@@ -21,7 +19,6 @@ import {
 import { Check, ExternalLink } from 'lucide-react'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import * as React from 'react'
 
 export default function Homepage() {
   const features = [
@@ -45,27 +42,29 @@ export default function Homepage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex h="full" direction="column">
-        <Alert
+        <Alert.Root
           flexShrink="0"
           status="warning"
           display={{ base: 'block', lg: 'flex' }}
           justifyContent={{ lg: 'center' }}
           flexDirection={{ base: 'column', lg: 'row' }}
         >
-          <AlertTitle>Under Construction:</AlertTitle>
-          <AlertDescription>
+          <Alert.Title>Under Construction:</Alert.Title>
+          <Alert.Description>
             Pardon our dust, we&apos;re finishing up our marketing campaign to
             bring you an exciting new homepage. Coming soon!
-          </AlertDescription>
-        </Alert>
+          </Alert.Description>
+        </Alert.Root>
         <Container maxW="container.lg" mt="4">
           <Flex mt="2" align="center" justify="flex-end">
             <Text mr="2" fontWeight="medium">
               Have an account?
             </Text>
-            <Button as={NextLink} href="/login" colorScheme="blue" variant="outline">
-              Log In
-            </Button>
+            <NextLink href="/login" passHref>
+              <Button colorScheme="blue" variant="outline">
+                Log In
+              </Button>
+            </NextLink>
           </Flex>
           <Grid templateColumns={{ md: 'repeat(12, 1fr)' }} gap="6" mt="20">
             <GridItem colSpan={{ md: 7 }}>
@@ -135,9 +134,11 @@ export default function Homepage() {
                       trial, no credit card required!
                     </Text>
                   </Box>
-                  <Button as={NextLink} href="/register" colorScheme="blue" mt="4" w="full">
-                    Create Your First Menu
-                  </Button>
+                  <NextLink href="/register" passHref>
+                    <Button colorScheme="blue" mt="4" w="full">
+                      Create Your First Menu
+                    </Button>
+                  </NextLink>
                 </Box>
               </Box>
             </GridItem>
@@ -153,11 +154,9 @@ export default function Homepage() {
             </Text>
             <Button
               mt="8"
-              as={Link}
               size="lg"
               colorScheme="blue"
-              href="https://whereslloyd.getthemenu.io?ref=example"
-              isExternal
+              // href="https://whereslloyd.getthemenu.io?ref=example"
             >
               Check Out an Example
               <Icon ml="2" as={ExternalLink} />
@@ -186,7 +185,7 @@ export default function Homepage() {
             Make managing your website a breeze
           </Heading>
           <Flex justify="center" mt="12">
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4">
+            <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
               {features.map((feature, idx) => (
                 <GridItem
                   key={idx}
@@ -205,7 +204,7 @@ export default function Homepage() {
         </Container>
         <Box mt="auto" w="full">
           <Center mt="12" py="4" bg="gray.200">
-            <Stack direction="row" spacing="6">
+            <Stack direction="row" gap="6">
               <Link as={NextLink} href="/terms-of-use" fontWeight="medium" textDecor="underline">
                 Terms of Use
               </Link>

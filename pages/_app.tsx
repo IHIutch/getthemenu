@@ -1,31 +1,20 @@
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
-import process from 'node:process'
-import customTheme from '@/customTheme'
 import { trpc } from '@/utils/trpc/client'
-import { ChakraProvider, extendTheme } from '@chakra-ui/react'
-import { withProse } from '@nikolovlazar/chakra-ui-prose'
+import { ChakraProvider, createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import * as Fathom from 'fathom-client'
 import { Router } from 'next/router'
 import * as React from 'react'
 
-const theme = extendTheme(
-  customTheme,
-  withProse({
-    baseStyle: {
-      a: {
-        textDecoration: 'underline',
-        fontWeight: 'semibold',
-      },
-      h5: {
-        fontWeight: 'semibold',
-        fontSize: 'md',
-        marginTop: '6',
-      },
+const theme = createSystem(defaultConfig, defineConfig({
+  globalCss: {
+    'html, body, #__next': {
+      bg: 'gray.50',
+      height: '100%',
     },
-  }),
-)
+  },
+}))
 
 Router.events.on('routeChangeComplete', (as, routeProps) => {
   if (!routeProps.shallow) {
@@ -53,7 +42,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
   }, [])
 
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider value={theme}>
       {getLayout(<Component {...pageProps} />)}
       <ReactQueryDevtools initialIsOpen={false} />
     </ChakraProvider>

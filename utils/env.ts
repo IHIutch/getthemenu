@@ -1,6 +1,4 @@
 /* eslint-disable sort-keys */
-import type { ZodError } from 'zod'
-import process from 'node:process'
 import { createEnv } from '@t3-oss/env-nextjs'
 import { z } from 'zod'
 
@@ -46,10 +44,10 @@ export const env = createEnv({
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   },
-  onValidationError: (error: ZodError) => {
+  onValidationError: (issues) => {
     console.error(
       '❌ Invalid environment variables:',
-      error.flatten().fieldErrors,
+      issues,
     )
     throw new Error('Invalid environment variables')
   },

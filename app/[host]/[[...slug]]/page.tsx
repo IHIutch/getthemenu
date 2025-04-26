@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-import BlurImage from '@/components/common/BlurImage'
 import { env } from '@/utils/env'
 import { getRestaurantDisplayData, getStructuredData } from '@/utils/functions'
 import { MenuSchema } from '@/utils/zod'
-import { AspectRatio, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { AspectRatio, Box, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
+import NextImage from 'next/image'
 import { notFound } from 'next/navigation'
-import * as React from 'react'
 
 export default async function MenuPage(
   props: {
@@ -50,7 +49,7 @@ export default async function MenuPage(
         </Box>
         <Box>
           {sections && (
-            <Stack spacing="16">
+            <Stack gap="16">
               {sections
                 .filter(section => section.menuId === menu.id)
                 .map(section => (
@@ -72,7 +71,7 @@ export default async function MenuPage(
                       )}
                     </Box>
                     {menuItems && (
-                      <Stack spacing="4">
+                      <Stack gap="4">
                         {menuItems
                           .filter(item => item.sectionId === section.id)
                           .map(item => (
@@ -90,14 +89,16 @@ export default async function MenuPage(
                                   mb="2"
                                   borderBottomWidth="1px"
                                 >
-                                  <BlurImage
-                                    alt={item?.title || ''}
-                                    src={item?.image?.src}
-                                    blurDataURL={item?.image?.blurDataURL}
-                                    fill={true}
-                                    sizes="570px"
-                                    placeholder={item?.image?.blurDataURL ? 'blur' : 'empty'}
-                                  />
+                                  <Image asChild>
+                                    <NextImage
+                                      alt={item?.title || ''}
+                                      src={item?.image?.src}
+                                      blurDataURL={item?.image?.blurDataURL}
+                                      fill={true}
+                                      sizes="570px"
+                                      placeholder={item?.image?.blurDataURL ? 'blur' : 'empty'}
+                                    />
+                                  </Image>
                                 </AspectRatio>
                               )}
                               <Box p="4">

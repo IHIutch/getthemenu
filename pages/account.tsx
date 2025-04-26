@@ -1,7 +1,4 @@
 import type { RouterOutputs } from '@/server'
-import type {
-  UseRadioProps,
-} from '@chakra-ui/react'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import type { SubmitHandler } from 'react-hook-form'
 import AccountLayout from '@/layouts/Account'
@@ -10,44 +7,23 @@ import { env } from '@/utils/env'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
 import { createClientServer } from '@/utils/supabase/server-props'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   ButtonGroup,
-  Center,
-  Circle,
   Container,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
+  Dialog,
+  Field,
   Heading,
   Input,
   InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Stack,
   Text,
   useDisclosure,
-  useRadio,
-  useRadioGroup,
-  VStack,
 } from '@chakra-ui/react'
-import { loadStripe } from '@stripe/stripe-js'
 import { createServerSideHelpers } from '@trpc/react-query/server'
-import dayjs from 'dayjs'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import axios from 'redaxios'
 import Stripe from 'stripe'
 import SuperJSON from 'superjson'
 
@@ -60,7 +36,7 @@ interface PriceType {
   label: Stripe.Price['metadata']['label']
 }
 
-export default function Account({ plans: prices, user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Account({ plans: _prices, user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
 
   return (
@@ -70,7 +46,7 @@ export default function Account({ plans: prices, user }: InferGetServerSideProps
       </Head>
 
       <Container maxW="container.md">
-        <Stack spacing="6">
+        <Stack gap="6">
           <Box bg="white" rounded="md" shadow="base">
             <UserDetails user={user} />
           </Box>
@@ -81,7 +57,7 @@ export default function Account({ plans: prices, user }: InferGetServerSideProps
             </SiteDetails>
           </Box>
           <Box bg="white" rounded="md" shadow="base">
-            <Subscription prices={prices} user={user} />
+            {/* <Subscription prices={prices} user={user} /> */}
           </Box>
         </Stack>
       </Container>
@@ -155,7 +131,7 @@ function SiteDetails({ children }: { children?: React.ReactNode }) {
         </Heading>
       </Box>
       <Box p="6">
-        <Stack spacing="6">
+        <Stack gap="6">
           {children}
         </Stack>
       </Box>
@@ -164,7 +140,7 @@ function SiteDetails({ children }: { children?: React.ReactNode }) {
 }
 
 function CustomHostForm({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { open, onOpen, onClose, setOpen } = useDisclosure()
 
   const defaultValues = {
     customHost: restaurant?.customHost || '',
@@ -195,41 +171,41 @@ function CustomHostForm({ restaurant }: { restaurant: RouterOutputs['restaurant'
           </Box>
         </Box>
       </Box>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
+      <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>
+        <Dialog.Backdrop />
+        <Dialog.Content>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalHeader>Edit Custom Host</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl
-                isInvalid={!!errors.customHost}
+            <Dialog.Header>Edit Custom Host</Dialog.Header>
+            <Dialog.CloseTrigger />
+            <Dialog.Body>
+              <Field.Root
+                invalid={!!errors.customHost}
               >
-                <FormLabel>Custom Host</FormLabel>
+                <Field.Label>Custom Host</Field.Label>
                 <InputGroup>
                   <Input {...register('customHost')} type="text" />
                 </InputGroup>
-                <FormErrorMessage>{errors.customHost?.message}</FormErrorMessage>
-              </FormControl>
-            </ModalBody>
+                <Field.ErrorText>{errors.customHost?.message}</Field.ErrorText>
+              </Field.Root>
+            </Dialog.Body>
 
-            <ModalFooter>
+            <Dialog.Footer>
               <ButtonGroup>
                 <Button variant="ghost" onClick={onClose}>Cancel</Button>
                 <Button colorScheme="blue" type="submit">
                   Save
                 </Button>
               </ButtonGroup>
-            </ModalFooter>
+            </Dialog.Footer>
           </form>
-        </ModalContent>
-      </Modal>
+        </Dialog.Content>
+      </Dialog.Root>
     </Box>
   )
 }
 
 function CustomDomainForm({ restaurant }: { restaurant: RouterOutputs['restaurant']['getById'] }) {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { open, onOpen, onClose, setOpen } = useDisclosure()
 
   const defaultValues = {
     customDomain: restaurant?.customDomain || '',
@@ -260,219 +236,219 @@ function CustomDomainForm({ restaurant }: { restaurant: RouterOutputs['restauran
           </Box>
         </Box>
       </Box>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
+      <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>
+        <Dialog.Backdrop />
+        <Dialog.Content>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalHeader>Edit Custom Domain</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl
-                isInvalid={!!errors.customDomain}
+            <Dialog.Header>Edit Custom Domain</Dialog.Header>
+            <Dialog.CloseTrigger />
+            <Dialog.Body>
+              <Field.Root
+                invalid={!!errors.customDomain}
               >
-                <FormLabel>Custom Domain</FormLabel>
+                <Field.Label>Custom Domain</Field.Label>
                 <InputGroup>
                   <Input {...register('customDomain')} type="text" />
                 </InputGroup>
-                <FormErrorMessage>{errors.customDomain?.message}</FormErrorMessage>
-              </FormControl>
-            </ModalBody>
+                <Field.ErrorText>{errors.customDomain?.message}</Field.ErrorText>
+              </Field.Root>
+            </Dialog.Body>
 
-            <ModalFooter>
+            <Dialog.Footer>
               <ButtonGroup>
                 <Button variant="ghost" onClick={onClose}>Cancel</Button>
                 <Button colorScheme="blue" type="submit">
                   Save
                 </Button>
               </ButtonGroup>
-            </ModalFooter>
+            </Dialog.Footer>
           </form>
-        </ModalContent>
-      </Modal>
+        </Dialog.Content>
+      </Dialog.Root>
     </Box>
   )
 }
 
-function Subscription({ prices, user }: { prices?: PriceType[], user: RouterOutputs['user']['getAuthedUser'] }) {
-  const [selectedPrice, setSelectedPrice] = React.useState('')
+// function Subscription({ prices, user }: { prices?: PriceType[], user: RouterOutputs['user']['getAuthedUser'] }) {
+//   const [selectedPrice, setSelectedPrice] = React.useState('')
 
-  const router = useRouter()
+//   const router = useRouter()
 
-  const loadCustomerPortal = async () => {
-    const { data } = await axios.get('/api/account/stripe')
-    router.push(data.url)
-  }
+//   const loadCustomerPortal = async () => {
+//     const { data } = await axios.get('/api/account/stripe')
+//     router.push(data.url)
+//   }
 
-  const loadCheckout = async (priceId: Stripe.Price['id']) => {
-    const { data } = await axios.get(
-      `/api/account/stripe/subscriptions/${priceId}`,
-    )
-    const stripe = await loadStripe(
-      env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    )
-    await stripe?.redirectToCheckout({ sessionId: data.id })
-  }
+//   const loadCheckout = async (priceId: Stripe.Price['id']) => {
+//     const { data } = await axios.get(
+//       `/api/account/stripe/subscriptions/${priceId}`,
+//     )
+//     const stripe = await loadStripe(
+//       env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+//     )
+//     await stripe?.redirectToCheckout({ sessionId: data.id })
+//   }
 
-  const trialCountdown = () => {
-    if (!user?.trialEndsAt)
-      return null
-    const numDays = dayjs(user.trialEndsAt).diff(dayjs(), 'day')
-    return numDays === 0
-      ? 'today'
-      : numDays > 0
-        ? `in ${numDays} day${numDays === 1 ? '' : 's'}`
-        : null
-  }
+//   const trialCountdown = () => {
+//     if (!user?.trialEndsAt)
+//       return null
+//     const numDays = dayjs(user.trialEndsAt).diff(dayjs(), 'day')
+//     return numDays === 0
+//       ? 'today'
+//       : numDays > 0
+//         ? `in ${numDays} day${numDays === 1 ? '' : 's'}`
+//         : null
+//   }
 
-  const { getRootProps, getRadioProps } = useRadioGroup({
-    name: 'priceId',
-    // defaultValue: ,
-    onChange: setSelectedPrice,
-  })
-  const group = getRootProps()
+//   const { getRootProps, getRadioProps } = useRadioGroup({
+//     name: 'priceId',
+//     // defaultValue: ,
+//     onChange: setSelectedPrice,
+//   })
+//   const group = getRootProps()
 
-  return (
-    <>
-      <Box p="6" borderBottomWidth="1px">
-        <Heading fontSize="xl" fontWeight="semibold">
-          Subscription
-        </Heading>
-      </Box>
-      {trialCountdown()
-        ? (
-            <Alert mb="3" status="warning">
-              <AlertIcon />
-              <AlertDescription>
-                Your trial ends
-                {' '}
-                {trialCountdown()}
-              </AlertDescription>
-            </Alert>
-          )
-        : null}
-      <Box p="6">
-        {user?.stripeSubscriptionId
-          ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  // console.log(e.target.priceId.value)
-                  loadCheckout(selectedPrice)
-                }}
-              >
-                <VStack {...group} spacing="-1px" mb="3">
-                  {(prices || []).map((price) => {
-                    const radio = getRadioProps({ value: price.id })
-                    return (
-                      <CompoundRadio {...radio} key={price.id} value={price.id} isRequired>
-                        <Text fontWeight="semibold" fontSize="lg">
-                          {price.label || price.name}
-                        </Text>
-                        {price.price
-                          ? (
-                              <Text color="gray.600">
-                                $
-                                {price.price / 100}
-                                {' '}
-                                /
-                                {price.interval}
-                              </Text>
-                            )
-                          : null}
-                      </CompoundRadio>
-                    )
-                  })}
-                </VStack>
-                <Flex>
-                  <Button
-                    ml="auto"
-                    // isLoading={isSubmitting}
-                    colorScheme="blue"
-                    type="submit"
-                  >
-                    Checkout With Stripe
-                  </Button>
-                </Flex>
-              </form>
-            )
-          : (
-              <Button onClick={loadCustomerPortal}>Payment Portal</Button>
-            )}
-      </Box>
-    </>
-  )
-}
+//   return (
+//     <>
+//       <Box p="6" borderBottomWidth="1px">
+//         <Heading fontSize="xl" fontWeight="semibold">
+//           Subscription
+//         </Heading>
+//       </Box>
+//       {trialCountdown()
+//         ? (
+//             <Alert.Root mb="3" status="warning">
+//             <Alert.Indicator />
+//               <Alert.Description>
+//                 Your trial ends
+//                 {' '}
+//                 {trialCountdown()}
+//               </Alert.Description>
+//             </Alert.Root>
+//           )
+//         : null}
+//       <Box p="6">
+//         {user?.stripeSubscriptionId
+//           ? (
+//               <form
+//                 onSubmit={(e) => {
+//                   e.preventDefault()
+//                   // console.log(e.target.priceId.value)
+//                   loadCheckout(selectedPrice)
+//                 }}
+//               >
+//                 <VStack {...group} gap="-1px" mb="3">
+//                   {(prices || []).map((price) => {
+//                     const radio = getRadioProps({ value: price.id })
+//                     return (
+//                       // <CompoundRadio {...radio} key={price.id} value={price.id} required>
+//                       //   <Text fontWeight="semibold" fontSize="lg">
+//                       //     {price.label || price.name}
+//                       //   </Text>
+//                       //   {price.price
+//                       //     ? (
+//                       //         <Text color="gray.600">
+//                       //           $
+//                       //           {price.price / 100}
+//                       //           {' '}
+//                       //           /
+//                       //           {price.interval}
+//                       //         </Text>
+//                       //       )
+//                       //     : null}
+//                       // </CompoundRadio>
+//                     )
+//                   })}
+//                 </VStack>
+//                 <Flex>
+//                   <Button
+//                     ml="auto"
+//                     // loading={isSubmitting}
+//                     colorScheme="blue"
+//                     type="submit"
+//                   >
+//                     Checkout With Stripe
+//                   </Button>
+//                 </Flex>
+//               </form>
+//             )
+//           : (
+//               <Button onClick={loadCustomerPortal}>Payment Portal</Button>
+//             )}
+//       </Box>
+//     </>
+//   )
+// }
 
 Account.getLayout = (page: React.ReactNode) => <AccountLayout>{page}</AccountLayout>
 
-function CompoundRadio({ children, ...props }: { children: React.ReactNode } & UseRadioProps) {
-  const { getInputProps, getRadioProps } = useRadio(props)
+// function CompoundRadio({ children, ...props }: { children: React.ReactNode } & UseRadioProps) {
+//   const { getInputProps, getRadioProps } = useRadio(props)
 
-  const input = getInputProps()
-  const radio = getRadioProps()
+//   const input = getInputProps()
+//   const radio = getRadioProps()
 
-  return (
-    <Box
-      {...radio}
-      as="label"
-      width="full"
-      cursor="pointer"
-      _focus={{
-        boxShadow: 'outline',
-      }}
-      transition="all 0.2s ease-in-out"
-      p="4"
-      borderWidth="1px"
-      mt="-1px"
-      _first={{
-        borderTopRadius: 'md',
-      }}
-      _last={{
-        borderBottomRadius: 'md',
-      }}
-      _checked={{
-        zIndex: '1',
-        bg: 'blue.100',
-        borderColor: 'blue.500',
-      }}
-    >
-      <input {...input} />
-      <Box>
-        <Flex mb="1">
-          <Flex alignItems="">
-            <Circle
-              as={Center}
-              transition="all 0.2s ease-in-out"
-              mt="1.5"
-              boxSize="4"
-              borderWidth="2px"
-              borderColor={props.isChecked ? 'blue.500' : 'gray.200'}
-              bg={props.isChecked ? 'blue.500' : 'gray.100'}
-              _hover={
-                props.isChecked
-                  ? {
-                      borderColor: 'blue.600',
-                      bg: 'blue.600',
-                    }
-                  : {
-                      borderColor: 'gray.200',
-                      bg: 'gray.100',
-                    }
-              }
-            >
-              <Circle
-                transition="all 0.2s ease-in-out"
-                size={props.isChecked ? '50%' : '0'}
-                bg={props.isChecked ? 'white' : 'transparent'}
-              />
-            </Circle>
-          </Flex>
-          <Box ml="2">{children}</Box>
-        </Flex>
-      </Box>
-    </Box>
-  )
-}
+//   return (
+//     <Box
+//       {...radio}
+//       as="label"
+//       width="full"
+//       cursor="pointer"
+//       _focus={{
+//         boxShadow: 'outline',
+//       }}
+//       transition="all 0.2s ease-in-out"
+//       p="4"
+//       borderWidth="1px"
+//       mt="-1px"
+//       _first={{
+//         borderTopRadius: 'md',
+//       }}
+//       _last={{
+//         borderBottomRadius: 'md',
+//       }}
+//       _checked={{
+//         zIndex: '1',
+//         bg: 'blue.100',
+//         borderColor: 'blue.500',
+//       }}
+//     >
+//       <input {...input} />
+//       <Box>
+//         <Flex mb="1">
+//           <Flex alignItems="">
+//             <Circle
+//               as={Center}
+//               transition="all 0.2s ease-in-out"
+//               mt="1.5"
+//               boxSize="4"
+//               borderWidth="2px"
+//               borderColor={props.isChecked ? 'blue.500' : 'gray.200'}
+//               bg={props.isChecked ? 'blue.500' : 'gray.100'}
+//               _hover={
+//                 props.isChecked
+//                   ? {
+//                       borderColor: 'blue.600',
+//                       bg: 'blue.600',
+//                     }
+//                   : {
+//                       borderColor: 'gray.200',
+//                       bg: 'gray.100',
+//                     }
+//               }
+//             >
+//               <Circle
+//                 transition="all 0.2s ease-in-out"
+//                 size={props.isChecked ? '50%' : '0'}
+//                 bg={props.isChecked ? 'white' : 'transparent'}
+//               />
+//             </Circle>
+//           </Flex>
+//           <Box ml="2">{children}</Box>
+//         </Flex>
+//       </Box>
+//     </Box>
+//   )
+// }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClientServer(context)
