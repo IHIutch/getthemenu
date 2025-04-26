@@ -3,7 +3,6 @@ import { withSentryConfig } from '@sentry/nextjs'
 // with Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
 import { createJiti } from 'jiti'
 
 const jiti = createJiti(new URL(import.meta.url).pathname)

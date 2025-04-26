@@ -1,5 +1,7 @@
 import type { Prisma } from '@prisma/client'
+
 import prisma from '@/utils/prisma'
+
 import { getErrorMessage } from '../functions'
 
 export async function prismaGetSections({ where }: { where: Prisma.sectionsWhereInput }) {

@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { resStatusType } from '@/utils/apiResponseTypes'
 import { prismaGetUser } from '@/utils/prisma/users'
 import { createStripeCheckoutSession } from '@/utils/stripe'

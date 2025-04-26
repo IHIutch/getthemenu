@@ -1,4 +1,5 @@
 import type { RouterOutputs } from '@/server'
+
 import { trpc } from '../trpc/client'
 
 export function useGetAuthedUser({ initialData }: { initialData?: RouterOutputs['user']['getAuthedUser'] } = {}) {

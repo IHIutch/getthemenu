@@ -1,4 +1,5 @@
 import type { AppRouter } from '@/server'
+
 import { httpBatchLink, loggerLink } from '@trpc/client'
 import { createTRPCNext } from '@trpc/next'
 import SuperJSON from 'superjson'

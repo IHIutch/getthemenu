@@ -1,6 +1,7 @@
 import type { RouterOutputs } from '@/server'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import type { SubmitHandler } from 'react-hook-form'
+
 import MenuLayout from '@/layouts/Menu'
 import { appRouter } from '@/server'
 import { getErrorMessage } from '@/utils/functions'

@@ -1,4 +1,5 @@
 import type { RouterInputs } from '@/server'
+
 import { trpc } from '../trpc/client'
 
 export function useGetSections(menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId'] = -1) {

@@ -1,6 +1,7 @@
 'use client'
 
 import type { z } from 'zod'
+
 import { formatTime } from '@/utils/functions'
 import { DAYS_OF_WEEK, RestaurantSchema } from '@/utils/zod'
 import { AspectRatio, Box, Button, Container, Dialog, Flex, Heading, Icon, Stack, Tabs, Text, useDisclosure } from '@chakra-ui/react'

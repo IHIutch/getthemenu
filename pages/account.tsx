@@ -1,6 +1,7 @@
 import type { RouterOutputs } from '@/server'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import type { SubmitHandler } from 'react-hook-form'
+
 import AccountLayout from '@/layouts/Account'
 import { appRouter } from '@/server'
 import { env } from '@/utils/env'

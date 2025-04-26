@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { resStatusType } from '@/utils/apiResponseTypes'
 import { env } from '@/utils/env'
 import { getErrorMessage } from '@/utils/functions'

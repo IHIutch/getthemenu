@@ -1,3 +1,5 @@
+import type { SubmitHandler } from 'react-hook-form'
+
 import { env } from '@/utils/env'
 import { getErrorMessage } from '@/utils/functions'
 import { createClientComponent } from '@/utils/supabase/component'
@@ -13,12 +15,11 @@ import {
   Heading,
   Input,
   Link,
-  Text
+  Text,
 } from '@chakra-ui/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useState } from 'react'
-import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
 interface FormData {

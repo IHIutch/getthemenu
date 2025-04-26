@@ -1,4 +1,5 @@
 import type { RouterInputs } from '@/server'
+
 import { trpc } from '../trpc/client'
 
 // export const useGetRestaurants = (userId: RouterInputs['restaurant']['getAllByUserId']['where']['userId'] = '') => {

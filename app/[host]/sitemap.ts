@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+
 import { env } from '@/utils/env'
 import prisma from '@/utils/prisma'
 import { headers } from 'next/headers'

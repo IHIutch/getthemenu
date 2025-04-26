@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { resStatusType } from '@/utils/apiResponseTypes'
 import {
   createCustomDomain,

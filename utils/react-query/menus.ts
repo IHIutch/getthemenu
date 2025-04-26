@@ -1,4 +1,5 @@
 import type { RouterInputs } from '@/server'
+
 import { trpc } from '../trpc/client'
 
 export function useGetMenus(restaurantId: RouterInputs['menu']['getAllByRestaurantId']['where']['restaurantId'] = '') {

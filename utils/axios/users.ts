@@ -1,5 +1,6 @@
 import axios from 'redaxios'
 import { z } from 'zod'
+
 import { RestaurantSchema, UserSchema } from '../zod'
 
 const _UserPost = UserSchema.omit({

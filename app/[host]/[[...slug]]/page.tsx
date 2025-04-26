@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+
 import { env } from '@/utils/env'
 import { getRestaurantDisplayData, getStructuredData } from '@/utils/functions'
 import { MenuSchema } from '@/utils/zod'

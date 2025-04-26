@@ -1,8 +1,8 @@
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import type { SubmitHandler } from 'react-hook-form'
+
 import { appRouter } from '@/server'
 import { getErrorMessage } from '@/utils/functions'
-
 import { createClientComponent } from '@/utils/supabase/component'
 import { createClientServer } from '@/utils/supabase/server-props'
 import {

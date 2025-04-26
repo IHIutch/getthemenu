@@ -1,6 +1,7 @@
 'use client'
 
 import type { ImageProps as NextImageProps } from 'next/image'
+
 import { Box } from '@chakra-ui/react'
 
 // const MagicImage = chakra<typeof NextImage, NextImageProps>(NextImage, {

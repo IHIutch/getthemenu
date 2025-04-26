@@ -1,4 +1,5 @@
 import type { UploadApiResponseType } from '@/pages/api/uploads'
+
 import axios from 'redaxios'
 
 export async function postUpload(formData: FormData) {

@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import type { ErrorProps } from 'next/error'
+
 import * as Sentry from '@sentry/nextjs'
 import Error from 'next/error'
 

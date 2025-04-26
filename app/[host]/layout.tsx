@@ -5,6 +5,7 @@ import { Box, Container, Flex, Grid, GridItem, Link, Stack, Text } from '@chakra
 import NextLink from 'next/link'
 import { notFound } from 'next/navigation'
 import { z } from 'zod'
+
 import Contact from './_components/contact'
 import Content from './_components/content'
 import Header from './_components/header'

@@ -7,7 +7,9 @@ export default antfu({
     'no-console': 'warn',
     'no-alert': 'warn',
     'node/prefer-global/process': 'off',
-    'perfectionist/sort-imports': 'warn',
+    'perfectionist/sort-imports': ['error', {
+      type: 'natural',
+    }],
   },
   stylistic: {
     indent: 2,

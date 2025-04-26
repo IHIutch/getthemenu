@@ -1,4 +1,5 @@
 import type { GetServerSidePropsContext } from 'next'
+
 import DashboardLayout from '@/layouts/Dashboard'
 import { appRouter } from '@/server'
 import { createClientServer } from '@/utils/supabase/server-props'

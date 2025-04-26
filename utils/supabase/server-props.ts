@@ -1,6 +1,8 @@
 import type { CookieOptions } from '@supabase/ssr'
 import type { GetServerSidePropsContext } from 'next'
+
 import { createServerClient, serialize } from '@supabase/ssr'
+
 import { env } from '../env'
 
 export function createClientServer(context: GetServerSidePropsContext) {

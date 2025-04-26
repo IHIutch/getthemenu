@@ -1,5 +1,6 @@
 import type { User } from '@supabase/supabase-js'
 import type * as trpcNext from '@trpc/server/adapters/next'
+
 import { createClientApi } from '@/utils/supabase/api'
 
 interface CreateInnerContextOptions extends Partial<trpcNext.CreateNextContextOptions> {
