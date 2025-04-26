@@ -48,7 +48,7 @@ export default function Navbar({
 
   const {
     handleSubmit,
-    _control,
+    control: _control,
     register,
     formState: { errors },
   } = useForm<FormValues>({
