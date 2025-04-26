@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@types/formidable": "^3.4.5",
+    "@types/lodash": "^4.17.16",
     "@types/mime": "^3.0.4",
     "@types/node": "^20.17.6",
     "@types/react": "^18.3.12",
