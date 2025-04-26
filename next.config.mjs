@@ -15,7 +15,14 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    swcPlugins: [['next-superjson-plugin', {}]],
+    // swcPlugins: [
+    //   [
+    //     'next-superjson-plugin',
+    //     {
+    //       excluded: [],
+    //     },
+    //   ],
+    // ], // This doesnt seem to work with Next.js 15 which might make this version unusable
     optimizePackageImports: ['@chakra-ui/react'],
   },
   images: {
