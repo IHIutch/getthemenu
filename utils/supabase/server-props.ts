@@ -1,24 +1,23 @@
-import type { CookieOptions } from '@supabase/ssr'
 import type { GetServerSidePropsContext } from 'next'
 
-import { createServerClient, serialize } from '@supabase/ssr'
+import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 
-import { env } from '../env'
-
-export function createClientServer(context: GetServerSidePropsContext) {
+export function getSupabaseServerClient({ req, res }: GetServerSidePropsContext) {
   const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return context.req.cookies[name]
+        getAll() {
+          return Object.keys(req.cookies).map(name => ({ name, value: req.cookies[name] || '' }))
         },
-        set(name: string, value: string, options: CookieOptions) {
-          context.res.setHeader('Set-Cookie', serialize(name, value, options))
-        },
-        remove(name: string, options: CookieOptions) {
-          context.res.setHeader('Set-Cookie', serialize(name, '', options))
+        setAll(cookiesToSet) {
+          res.setHeader(
+            'Set-Cookie',
+            cookiesToSet.map(({ name, value, options }) =>
+              serializeCookieHeader(name, value, options),
+            ),
+          )
         },
       },
     },

@@ -1,7 +1,8 @@
 import { prismaCreateFeedback } from '@/utils/prisma/feedback'
-import { authedProcedure, router } from '@/utils/trpc'
 import { FeedbackSchema } from '@/utils/zod'
 import { z } from 'zod'
+
+import { authedProcedure, router } from '../init'
 
 export const feedbackRouter = router({
   create: authedProcedure.input(

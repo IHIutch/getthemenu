@@ -1,8 +1,8 @@
 import { prismaCreateMenuItem, prismaDeleteMenuItem, prismaGetMenuItem, prismaGetMenuItems, prismaUpdateMenuItem, prismaUpdateMenuItems } from '@/utils/prisma/menuItems'
-import { authedProcedure, router } from '@/utils/trpc'
 import { MenuItemSchema } from '@/utils/zod'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { authedProcedure, router } from '../init'
 
 export const menuItemRouter = router({
   getAllByMenuId: authedProcedure.input(

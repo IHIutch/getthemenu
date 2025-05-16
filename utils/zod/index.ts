@@ -55,7 +55,7 @@ export const RestaurantSchema = z.object({
   email: z.array(z.string().email()).optional().transform(val => val ?? undefined),
   coverImage: ImageSchema.optional().transform(val => val ?? undefined),
   customHost: CustomHostSchema.nullable(),
-  customDomain: z.string().url().nullable(),
+  customDomain: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable(),

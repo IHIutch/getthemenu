@@ -1,15 +1,13 @@
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import type { GetServerSidePropsContext } from 'next'
 import type { DropResult } from 'react-beautiful-dnd'
 import type { SubmitHandler } from 'react-hook-form'
 import type { z } from 'zod'
 
 import DashboardLayout from '@/layouts/Dashboard'
-import { appRouter } from '@/server'
 import { formatDate, getErrorMessage, reorderList } from '@/utils/functions'
-import { useGetMenus, useReorderMenus } from '@/utils/react-query/menus'
-import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { trpc } from '@/utils/trpc/client'
+import { useReorderMenus } from '@/utils/react-query/menus'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
+import { trpc } from '@/utils/trpc'
 import { MenuSchema } from '@/utils/zod'
 import {
   Alert,
@@ -36,7 +34,6 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createServerSideHelpers } from '@trpc/react-query/server'
 import { slug as slugify } from 'github-slugger'
 import { GripHorizontal } from 'lucide-react'
 import Head from 'next/head'
@@ -45,7 +42,6 @@ import { useRouter } from 'next/router'
 import * as React from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { useForm } from 'react-hook-form'
-import SuperJSON from 'superjson'
 
 type SlugMessage = {
   type: 'success' | 'error'
@@ -61,7 +57,7 @@ const FormPayload = MenuSchema.omit({
 
 type FormData = z.infer<typeof FormPayload>
 
-export default function Dashboard({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Dashboard() {
   const router = useRouter()
   const modalState = useDisclosure()
   const [isCheckingSlug, _setIsCheckingSlug] = React.useState(false)
@@ -77,8 +73,28 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
     resolver: zodResolver(FormPayload),
   })
 
-  const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
-  const { data: menus = [] } = useGetMenus(user?.restaurants[0]?.id)
+  const { data: user } = trpc.user.getAuthedUser.useQuery(undefined, {
+    refetchOnMount: false,
+  })
+
+  const { data: restaurant } = trpc.restaurant.getById.useQuery({
+    where: {
+      id: user?.restaurants[0]?.id || '',
+    },
+  }, {
+    refetchOnMount: false,
+    enabled: !!user?.restaurants[0]?.id,
+  })
+
+  const { data: menus = [] } = trpc.menu.getAllByRestaurantId.useQuery({
+    where: {
+      restaurantId: user?.restaurants[0]?.id || '',
+    },
+  }, {
+    refetchOnMount: false,
+    enabled: !!user?.restaurants[0]?.id,
+  })
+
   const { mutateAsync: handleReorderMenus } = useReorderMenus(user?.restaurants[0]?.id || '')
   const { mutateAsync: handleCreateMenu, isPending } = trpc.menu.create.useMutation()
 
@@ -186,111 +202,111 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
           </Flex>
           {menus.length > 0
             ? (
-                <>
-                  <Box mb="4">
-                    <Text fontSize="sm" color="gray.700">
-                      Your first ordered menu will automatically be set as your
-                      homepage.
-                    </Text>
-                  </Box>
-                  <DragDropContext
-                    onDragEnd={handleDragEnd}
-                    onDragStart={handleDragStart}
-                  >
-                    <Droppable droppableId="menuWrapper">
-                      {drop => (
-                        <Stack ref={drop.innerRef} {...drop.droppableProps}>
-                          {sortedMenus.map((menu, idx) => (
-                            <Draggable
-                              draggableId={`${menu.id}`}
-                              key={`${menu.id}`}
-                              index={idx}
-                            >
-                              {(drag, snapshot) => (
-                                <Box ref={drag.innerRef} {...drag.draggableProps}>
-                                  <Box
-                                    bg="white"
-                                    rounded="md"
-                                    shadow={snapshot.isDragging ? 'lg' : 'base'}
-                                    transform={
-                                      snapshot.isDragging ? 'scale(1.04)' : 'none'
-                                    }
-                                    transition="all 0.1s ease"
-                                  >
-                                    <Center {...drag.dragHandleProps}>
-                                      <Icon
-                                        color="gray.500"
-                                        boxSize="5"
-                                        as={GripHorizontal}
-                                      />
-                                    </Center>
-                                    <LinkBox>
-                                      <Box>
-                                        <Box pb="3" px="3" borderBottomWidth="1px">
-                                          <LinkOverlay as={NextLink} href={`/menu/${menu.id}`}>
-                                            <Heading
-                                              ml="2"
-                                              fontSize="2xl"
-                                              fontWeight="semibold"
-                                            >
-                                              {menu.title}
-                                            </Heading>
-                                          </LinkOverlay>
-                                        </Box>
-                                        <Flex p="3" justify="space-between">
-                                          <Flex align="center">
-                                            <Circle size={4} bg="green.100">
-                                              <Circle size={2} bg="green.500" />
-                                            </Circle>
-                                            <Text
-                                              ml="2"
-                                              lineHeight="1.2"
-                                              fontWeight="semibold"
-                                              color="green.600"
-                                            >
-                                              Live
-                                            </Text>
-                                          </Flex>
-                                          <Box>
-                                            <Text
-                                              fontWeight="semibold"
-                                              color="gray.600"
-                                              fontSize="sm"
-                                            >
-                                              Published:
-                                              {' '}
-                                              {formatDate(menu.createdAt)}
-                                            </Text>
-                                          </Box>
-                                        </Flex>
-                                      </Box>
-                                    </LinkBox>
-                                  </Box>
-                                </Box>
-                              )}
-                            </Draggable>
-                          ))}
-                          <Box bg="gray.50">{drop.placeholder}</Box>
-                        </Stack>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                </>
-              )
-            : (
-                <Center
-                  borderWidth="2px"
-                  borderColor="gray.200"
-                  bg="gray.100"
-                  py="8"
-                  px="4"
-                  rounded="lg"
-                >
-                  <Text fontSize="xl" fontWeight="medium" color="gray.600">
-                    Get started by creating your first menu.
+              <>
+                <Box mb="4">
+                  <Text fontSize="sm" color="gray.700">
+                    Your first ordered menu will automatically be set as your
+                    homepage.
                   </Text>
-                </Center>
-              )}
+                </Box>
+                <DragDropContext
+                  onDragEnd={handleDragEnd}
+                  onDragStart={handleDragStart}
+                >
+                  <Droppable droppableId="menuWrapper">
+                    {drop => (
+                      <Stack ref={drop.innerRef} {...drop.droppableProps}>
+                        {sortedMenus.map((menu, idx) => (
+                          <Draggable
+                            draggableId={`${menu.id}`}
+                            key={`${menu.id}`}
+                            index={idx}
+                          >
+                            {(drag, snapshot) => (
+                              <Box ref={drag.innerRef} {...drag.draggableProps}>
+                                <Box
+                                  bg="white"
+                                  rounded="md"
+                                  shadow={snapshot.isDragging ? 'lg' : 'base'}
+                                  transform={
+                                    snapshot.isDragging ? 'scale(1.04)' : 'none'
+                                  }
+                                  transition="all 0.1s ease"
+                                >
+                                  <Center {...drag.dragHandleProps}>
+                                    <Icon
+                                      color="gray.500"
+                                      boxSize="5"
+                                      as={GripHorizontal}
+                                    />
+                                  </Center>
+                                  <LinkBox>
+                                    <Box>
+                                      <Box pb="3" px="3" borderBottomWidth="1px">
+                                        <LinkOverlay as={NextLink} href={`/menu/${menu.id}`}>
+                                          <Heading
+                                            ml="2"
+                                            fontSize="2xl"
+                                            fontWeight="semibold"
+                                          >
+                                            {menu.title}
+                                          </Heading>
+                                        </LinkOverlay>
+                                      </Box>
+                                      <Flex p="3" justify="space-between">
+                                        <Flex align="center">
+                                          <Circle size={4} bg="green.100">
+                                            <Circle size={2} bg="green.500" />
+                                          </Circle>
+                                          <Text
+                                            ml="2"
+                                            lineHeight="1.2"
+                                            fontWeight="semibold"
+                                            color="green.600"
+                                          >
+                                            Live
+                                          </Text>
+                                        </Flex>
+                                        <Box>
+                                          <Text
+                                            fontWeight="semibold"
+                                            color="gray.600"
+                                            fontSize="sm"
+                                          >
+                                            Published:
+                                            {' '}
+                                            {formatDate(menu.createdAt)}
+                                          </Text>
+                                        </Box>
+                                      </Flex>
+                                    </Box>
+                                  </LinkBox>
+                                </Box>
+                              </Box>
+                            )}
+                          </Draggable>
+                        ))}
+                        <Box bg="gray.50">{drop.placeholder}</Box>
+                      </Stack>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </>
+            )
+            : (
+              <Center
+                borderWidth="2px"
+                borderColor="gray.200"
+                bg="gray.100"
+                py="8"
+                px="4"
+                rounded="lg"
+              >
+                <Text fontSize="xl" fontWeight="medium" color="gray.600">
+                  Get started by creating your first menu.
+                </Text>
+              </Center>
+            )}
         </Box>
       </Container>
       <Dialog.Root open={modalState.open} onOpenChange={e => modalState.setOpen(e.open)}>
@@ -337,21 +353,21 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
                     <Field.ErrorText>{errors.slug?.message}</Field.ErrorText>
                     {isCheckingSlug
                       ? (
-                          <Alert.Root status="info" mt="2">
-                            <Alert.Indicator>
-                              <Spinner size="sm" />
-                            </Alert.Indicator>
-                            <Alert.Description ml="2">Checking availability...</Alert.Description>
+                        <Alert.Root status="info" mt="2">
+                          <Alert.Indicator>
+                            <Spinner size="sm" />
+                          </Alert.Indicator>
+                          <Alert.Description ml="2">Checking availability...</Alert.Description>
+                        </Alert.Root>
+                      )
+                      : !isCheckingSlug && slugMessage
+                        ? (
+                          <Alert.Root size="sm" status={slugMessage.type} mt="2">
+                            <Alert.Indicator />
+                            <Alert.Description ml="2">{slugMessage.message}</Alert.Description>
                           </Alert.Root>
                         )
-                      : !isCheckingSlug && slugMessage
-                          ? (
-                              <Alert.Root size="sm" status={slugMessage.type} mt="2">
-                                <Alert.Indicator />
-                                <Alert.Description ml="2">{slugMessage.message}</Alert.Description>
-                              </Alert.Root>
-                            )
-                          : null}
+                        : null}
                     <Field.HelperText>
                       Must be unique to your restaurant.
                     </Field.HelperText>
@@ -383,22 +399,10 @@ export default function Dashboard({ user }: InferGetServerSidePropsType<typeof g
 Dashboard.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</DashboardLayout>
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: {
-      session: {
-        user: data.user,
-      },
-    },
-    transformer: SuperJSON,
-  })
-
-  const user = await helpers.user.getAuthedUser.fetch()
-
-  if (!user) {
+  if (!data.user) {
     return {
       redirect: {
         destination: '/login',
@@ -406,19 +410,39 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     }
   }
-  else if (user.restaurants.length === 0) {
-    return {
-      redirect: {
-        destination: '/get-started',
-        permanent: false,
-      },
-    }
-  }
+
+  // const helpers = await getServerSideHelpers({
+  //   user: data.user,
+  // })
+
+  // const user = await helpers.user.getAuthedUser.fetch()
+
+
+  // if (!user?.restaurants[0]?.id) {
+  //   return {
+  //     redirect: {
+  //       destination: '/onboarding/setup',
+  //       permanent: false,
+  //     },
+  //   }
+  // }
+
+  // await Promise.all([
+  //   helpers.restaurant.getById.prefetch({
+  //     where: {
+  //       id: user?.restaurants[0]?.id,
+  //     },
+  //   }),
+  //   helpers.menu.getAllByRestaurantId.prefetch({
+  //     where: {
+  //       restaurantId: user?.restaurants[0]?.id,
+  //     },
+  //   }),
+  // ])
 
   return {
     props: {
-      user,
-      trpcState: helpers.dehydrate(),
+      // trpcState: helpers.dehydrate(),
     },
   }
 }

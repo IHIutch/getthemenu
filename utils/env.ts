@@ -13,7 +13,7 @@ export const env = createEnv({
     STRIPE_SIGNING_SECRET: z.string().min(1),
     // # Vercel
     VERCEL_PROJECT_ID: z.string().min(1),
-    VERCEL_ACCESS_TOKEN: z.string().min(1),
+    VERCEL_SDK_TOKEN: z.string().min(1),
 
     // # Test
     TEST_HOST: z.string().optional(),

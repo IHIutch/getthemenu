@@ -3,9 +3,8 @@ import type { SubmitHandler } from 'react-hook-form'
 
 import SEO from '@/components/global/SEO'
 import { getErrorMessage } from '@/utils/functions'
-import { createClientComponent } from '@/utils/supabase/component'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { createCaller } from '@/utils/trpc/server'
+import { getSupabaseBrowserClient } from '@/utils/supabase/component'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
 import {
   Box,
   Button,
@@ -31,7 +30,7 @@ interface FormValues {
 
 export default function Login() {
   const router = useRouter()
-  const supabase = createClientComponent()
+  const supabase = getSupabaseBrowserClient()
 
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const {
@@ -49,6 +48,7 @@ export default function Login() {
       })
       if (error)
         throw new Error(error.message)
+      console.log('Logged in successfully')
       router.push('/dashboard')
     }
     catch (error) {
@@ -135,11 +135,11 @@ export default function Login() {
               </form>
             </Box>
             <Box textAlign="center" mt="6">
-              <NextLink passHref href="/register">
-                <Link colorScheme="blue">
+              <Link asChild colorScheme="blue">
+                <NextLink href="/register">
                   Don&rsquo;t Have an Account? Register Now!
-                </Link>
-              </NextLink>
+                </NextLink>
+              </Link>
             </Box>
           </GridItem>
         </Grid>
@@ -149,37 +149,19 @@ export default function Login() {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
-  if (!data.user) {
-    return {
-      props: {},
-    }
-  }
-
-  const caller = createCaller({
-    session: {
-      user: data.user,
-    },
-  })
-
-  const user = await caller.user.getAuthedUser()
-
-  if (user && user.restaurants.length === 0) {
+  if (data.user) {
     return {
       redirect: {
-        destination: '/get-started',
+        destination: '/dashboard',
         permanent: false,
       },
     }
   }
-  else if (user && user.restaurants.length > 0) {
-    return {
-      redirect: {
-        destination: '/get-started',
-        permanent: false,
-      },
-    }
+
+  return {
+    props: {},
   }
 }

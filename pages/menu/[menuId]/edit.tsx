@@ -27,7 +27,7 @@ import {
   useUpdateSection,
 } from '@/utils/react-query/sections'
 import { useGetAuthedUser } from '@/utils/react-query/users'
-import { createClientServer } from '@/utils/supabase/server-props'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
 import {
   AspectRatio,
   Box,
@@ -174,144 +174,144 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
       <Container maxW="container.md" px={{ base: '2', lg: '4' }}>
         {sections.length > 0 && groupedSectionItems
           ? (
-              <DragDropContext
-                onDragEnd={handleDragEnd}
-                onDragStart={handleDragStart}
-              >
-                <Droppable droppableId="sectionWrapper" type="SECTIONS">
-                  {drop => (
-                    <Stack gap="8" ref={drop.innerRef} {...drop.droppableProps}>
-                      {sortedSections.map((s, idx) => (
-                        <Draggable
-                          key={`${s.id}`}
-                          draggableId={`${s.id}`}
-                          index={idx}
-                        >
-                          {(drag, snapshot) => (
-                            <Box ref={drag.innerRef} {...drag.draggableProps}>
-                              <Box
-                                bg="white"
-                                rounded="md"
-                                shadow={snapshot.isDragging ? 'lg' : 'base'}
-                                transform={
-                                  snapshot.isDragging ? 'scale(1.04)' : 'none'
-                                }
-                                transition="all 0.1s ease"
+            <DragDropContext
+              onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
+            >
+              <Droppable droppableId="sectionWrapper" type="SECTIONS">
+                {drop => (
+                  <Stack gap="8" ref={drop.innerRef} {...drop.droppableProps}>
+                    {sortedSections.map((s, idx) => (
+                      <Draggable
+                        key={`${s.id}`}
+                        draggableId={`${s.id}`}
+                        index={idx}
+                      >
+                        {(drag, snapshot) => (
+                          <Box ref={drag.innerRef} {...drag.draggableProps}>
+                            <Box
+                              bg="white"
+                              rounded="md"
+                              shadow={snapshot.isDragging ? 'lg' : 'base'}
+                              transform={
+                                snapshot.isDragging ? 'scale(1.04)' : 'none'
+                              }
+                              transition="all 0.1s ease"
+                            >
+                              <Center {...drag.dragHandleProps}>
+                                <Icon
+                                  color="gray.500"
+                                  boxSize="5"
+                                  as={GripHorizontal}
+                                />
+                              </Center>
+                              <Flex
+                                pb="6"
+                                px="4"
+                                borderBottomWidth="1px"
+                                align="center"
+                                w="100%"
                               >
-                                <Center {...drag.dragHandleProps}>
-                                  <Icon
-                                    color="gray.500"
-                                    boxSize="5"
-                                    as={GripHorizontal}
-                                  />
-                                </Center>
-                                <Flex
-                                  pb="6"
-                                  px="4"
-                                  borderBottomWidth="1px"
-                                  align="center"
-                                  w="100%"
-                                >
-                                  <Box>
-                                    <Heading fontSize="2xl" fontWeight="semibold">
-                                      {s.title}
-                                    </Heading>
-                                    {s.description && (
-                                      <Text
-                                        color="gray.600"
-                                        mt="1"
-                                        whiteSpace="pre-line"
-                                      >
-                                        {s.description}
-                                      </Text>
-                                    )}
-                                  </Box>
-                                  <Box ml="auto">
-                                    <IconButton
-                                      aria-label="Edit section"
-                                      ml="2"
-                                      size="xs"
-                                      variant="outline"
-                                    >
-                                      <Icon
-                                        boxSize="5"
-                                        as={MoreVertical}
-                                        onClick={() =>
-                                          menu
-                                            ? handleDrawerOpen(
-                                                <SectionDrawer
-                                                  menu={menu}
-                                                  section={s}
-                                                  handleDrawerClose={
-                                                    drawerState.onClose
-                                                  }
-                                                />,
-                                              )
-                                            : null}
-                                      />
-                                    </IconButton>
-                                  </Box>
-                                </Flex>
                                 <Box>
-                                  <MenuItemsContainer
-                                    sectionId={s.id}
-                                    items={groupedSectionItems[s.id] || []}
-                                    handleDrawerOpen={handleDrawerOpen}
-                                    drawerState={drawerState}
-                                  />
+                                  <Heading fontSize="2xl" fontWeight="semibold">
+                                    {s.title}
+                                  </Heading>
+                                  {s.description && (
+                                    <Text
+                                      color="gray.600"
+                                      mt="1"
+                                      whiteSpace="pre-line"
+                                    >
+                                      {s.description}
+                                    </Text>
+                                  )}
                                 </Box>
-                                <Flex px="4" py="3" borderTopWidth="1px">
-                                  <Button
-                                    colorScheme="blue"
-                                    onClick={() =>
-                                      menu
-                                        ? handleDrawerOpen(
-                                            <MenuItemDrawer
+                                <Box ml="auto">
+                                  <IconButton
+                                    aria-label="Edit section"
+                                    ml="2"
+                                    size="xs"
+                                    variant="outline"
+                                  >
+                                    <Icon
+                                      boxSize="5"
+                                      as={MoreVertical}
+                                      onClick={() =>
+                                        menu
+                                          ? handleDrawerOpen(
+                                            <SectionDrawer
                                               menu={menu}
                                               section={s}
-                                              position={
-                                                groupedSectionItems?.[s.id]?.length || 0
+                                              handleDrawerClose={
+                                                drawerState.onClose
                                               }
-                                              handleDrawerClose={drawerState.onClose}
                                             />,
                                           )
-                                        : null}
-                                  >
-                                    Add Item
-                                  </Button>
-                                </Flex>
+                                          : null}
+                                    />
+                                  </IconButton>
+                                </Box>
+                              </Flex>
+                              <Box>
+                                <MenuItemsContainer
+                                  sectionId={s.id}
+                                  items={groupedSectionItems[s.id] || []}
+                                  handleDrawerOpen={handleDrawerOpen}
+                                  drawerState={drawerState}
+                                />
                               </Box>
+                              <Flex px="4" py="3" borderTopWidth="1px">
+                                <Button
+                                  colorScheme="blue"
+                                  onClick={() =>
+                                    menu
+                                      ? handleDrawerOpen(
+                                        <MenuItemDrawer
+                                          menu={menu}
+                                          section={s}
+                                          position={
+                                            groupedSectionItems?.[s.id]?.length || 0
+                                          }
+                                          handleDrawerClose={drawerState.onClose}
+                                        />,
+                                      )
+                                      : null}
+                                >
+                                  Add Item
+                                </Button>
+                              </Flex>
                             </Box>
-                          )}
-                        </Draggable>
-                      ))}
-                      <Box bg="gray.50">{drop.placeholder}</Box>
-                    </Stack>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            )
+                          </Box>
+                        )}
+                      </Draggable>
+                    ))}
+                    <Box bg="gray.50">{drop.placeholder}</Box>
+                  </Stack>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )
           : (
-              <Box>
-                <Center
-                  borderWidth="2px"
-                  borderColor="gray.200"
-                  bg="gray.100"
-                  py="8"
-                  px="4"
-                  rounded="lg"
+            <Box>
+              <Center
+                borderWidth="2px"
+                borderColor="gray.200"
+                bg="gray.100"
+                py="8"
+                px="4"
+                rounded="lg"
+              >
+                <Text
+                  fontSize="xl"
+                  fontWeight="medium"
+                  color="gray.600"
+                  textAlign="center"
                 >
-                  <Text
-                    fontSize="xl"
-                    fontWeight="medium"
-                    color="gray.600"
-                    textAlign="center"
-                  >
-                    Get started by adding a section to your menu.
-                  </Text>
-                </Center>
-              </Box>
-            )}
+                  Get started by adding a section to your menu.
+                </Text>
+              </Center>
+            </Box>
+          )}
         <Box py="8">
           <Button
             variant="outline"
@@ -319,12 +319,12 @@ export default function MenuEdit({ user }: InferGetServerSidePropsType<typeof ge
             onClick={() =>
               menu
                 ? handleDrawerOpen(
-                    <SectionDrawer
-                      menu={menu}
-                      position={sortedSections.length}
-                      handleDrawerClose={drawerState.onClose}
-                    />,
-                  )
+                  <SectionDrawer
+                    menu={menu}
+                    position={sortedSections.length}
+                    handleDrawerClose={drawerState.onClose}
+                  />,
+                )
                 : null}
           >
             Add Section
@@ -373,54 +373,54 @@ function MenuItemsContainer({
           >
             {items?.length > 0
               ? (
-                  items.map((menuItem, idx) => (
-                    <Box key={`${sectionId}-${menuItem.id}`}>
-                      <Draggable
-                        draggableId={`${sectionId}-${menuItem.id}`}
-                        index={idx}
-                      >
-                        {(drag, snapshot) => (
-                          <Box ref={drag.innerRef} {...drag.draggableProps}>
-                            <Box
-                              borderRadius="md"
-                              bg="white"
-                              shadow={snapshot.isDragging ? 'md' : 'none'}
-                              transform={
-                                snapshot.isDragging ? 'scale(1.02)' : 'none'
-                              }
-                              transition="all 0.1s ease"
-                            >
-                              <Center {...drag.dragHandleProps}>
-                                <Icon
-                                  color="gray.500"
-                                  boxSize="5"
-                                  as={GripHorizontal}
-                                />
-                              </Center>
-                              <Box pb="4" px="4">
-                                {menu
-                                  ? (
-                                      <MenuItem
-                                        menu={menu}
-                                        menuItem={menuItem}
-                                        handleDrawerOpen={handleDrawerOpen}
-                                        drawerState={drawerState}
-                                      />
-                                    )
-                                  : null}
-                              </Box>
+                items.map((menuItem, idx) => (
+                  <Box key={`${sectionId}-${menuItem.id}`}>
+                    <Draggable
+                      draggableId={`${sectionId}-${menuItem.id}`}
+                      index={idx}
+                    >
+                      {(drag, snapshot) => (
+                        <Box ref={drag.innerRef} {...drag.draggableProps}>
+                          <Box
+                            borderRadius="md"
+                            bg="white"
+                            shadow={snapshot.isDragging ? 'md' : 'none'}
+                            transform={
+                              snapshot.isDragging ? 'scale(1.02)' : 'none'
+                            }
+                            transition="all 0.1s ease"
+                          >
+                            <Center {...drag.dragHandleProps}>
+                              <Icon
+                                color="gray.500"
+                                boxSize="5"
+                                as={GripHorizontal}
+                              />
+                            </Center>
+                            <Box pb="4" px="4">
+                              {menu
+                                ? (
+                                  <MenuItem
+                                    menu={menu}
+                                    menuItem={menuItem}
+                                    handleDrawerOpen={handleDrawerOpen}
+                                    drawerState={drawerState}
+                                  />
+                                )
+                                : null}
                             </Box>
                           </Box>
-                        )}
-                      </Draggable>
-                    </Box>
-                  ))
-                )
+                        </Box>
+                      )}
+                    </Draggable>
+                  </Box>
+                ))
+              )
               : (
-                  <Center p="4">
-                    <Text color="gray.600">Add an item to this section</Text>
-                  </Center>
-                )}
+                <Center p="4">
+                  <Text color="gray.600">Add an item to this section</Text>
+                </Center>
+              )}
             {drop.placeholder}
           </Stack>
         </Box>
@@ -451,21 +451,21 @@ function MenuItem({
       >
         {menuItem.image
           ? (
-              <Image asChild>
-                <NextImage
-                  alt={menuItem.title || 'Menu Item'}
-                  src={menuItem.image.src}
-                  blurDataURL={menuItem.image.blurDataURL}
-                  fill={true}
-                  placeholder={menuItem.image.blurDataURL ? 'blur' : 'empty'}
-                />
-              </Image>
-            )
+            <Image asChild>
+              <NextImage
+                alt={menuItem.title || 'Menu Item'}
+                src={menuItem.image.src}
+                blurDataURL={menuItem.image.blurDataURL}
+                fill={true}
+                placeholder={menuItem.image.blurDataURL ? 'blur' : 'empty'}
+              />
+            </Image>
+          )
           : (
-              <Box boxSize="100%" bg="gray.100">
-                <Icon color="gray.400" boxSize="5" as={Camera} />
-              </Box>
-            )}
+            <Box boxSize="100%" bg="gray.100">
+              <Icon color="gray.400" boxSize="5" as={Camera} />
+            </Box>
+          )}
       </AspectRatio>
       <Box flexGrow="1" ml="4">
         <Flex>
@@ -498,12 +498,12 @@ function MenuItem({
                 onClick={() =>
                   menu
                     ? handleDrawerOpen(
-                        <MenuItemDrawer
-                          menu={menu}
-                          menuItem={menuItem}
-                          handleDrawerClose={drawerState.onClose}
-                        />,
-                      )
+                      <MenuItemDrawer
+                        menu={menu}
+                        menuItem={menuItem}
+                        handleDrawerClose={drawerState.onClose}
+                      />,
+                    )
                     : null}
               />
             </IconButton>
@@ -582,17 +582,17 @@ function SectionDrawer({
       setIsSubmitting(true)
       section
         ? handleUpdateSection({
-            where: { id: section.id },
-            payload: form,
-          })
+          where: { id: section.id },
+          payload: form,
+        })
         : handleCreateSection({
-            payload: {
-              ...form,
-              position,
-              menuId: menu?.id,
-              restaurantId: menu?.restaurantId,
-            },
-          })
+          payload: {
+            ...form,
+            position,
+            menuId: menu?.id,
+            restaurantId: menu?.restaurantId,
+          },
+        })
       setIsSubmitting(false)
     }
     catch (error) {
@@ -778,18 +778,18 @@ function MenuItemDrawer({
       }
       menuItem
         ? handleUpdateMenuItem({
-            where: { id: menuItem.id },
-            payload,
-          })
+          where: { id: menuItem.id },
+          payload,
+        })
         : handleCreateMenuItem({
-            payload: {
-              ...payload,
-              position,
-              sectionId: section.id,
-              menuId: section.menuId,
-              restaurantId: section.restaurantId,
-            },
-          })
+          payload: {
+            ...payload,
+            position,
+            sectionId: section.id,
+            menuId: section.menuId,
+            restaurantId: section.restaurantId,
+          },
+        })
 
       setIsSubmitting(false)
     }
@@ -990,7 +990,7 @@ function SectionDeleteDialog({
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
   const helpers = createServerSideHelpers({
@@ -1016,7 +1016,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   else if (user.restaurants.length === 0) {
     return {
       redirect: {
-        destination: '/get-started',
+        destination: '/onboarding/setup',
         permanent: false,
       },
     }

@@ -1,6 +1,5 @@
 import type { RouterInputs } from '@/server'
-
-import { trpc } from '../trpc/client'
+import { trpc } from '../trpc'
 
 // export const useGetRestaurants = (userId: RouterInputs['restaurant']['getAllByUserId']['where']['userId'] = '') => {
 //   const { isPending, isError, isSuccess, data, error } = trpc.restaurant.getAllByMenuId.useQuery(
@@ -57,10 +56,10 @@ export function useUpdateRestaurant(id: RouterInputs['restaurant']['getById']['w
       }, (old) => {
         return old
           ? {
-              ...old,
-              ...payload,
-              updatedAt: new Date(),
-            }
+            ...old,
+            ...payload,
+            updatedAt: new Date(),
+          }
           : undefined
       })
       return { previous, updated: payload }

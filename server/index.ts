@@ -1,9 +1,8 @@
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 
-import { menuRouter } from '@/server/routers/menu'
-import { router } from '@/utils/trpc'
-
+import { createCallerFactory, router } from './init'
 import { feedbackRouter } from './routers/feedback'
+import { menuRouter } from './routers/menu'
 import { menuItemRouter } from './routers/menuItems'
 import { restaurantRouter } from './routers/restaurant'
 import { sectionRouter } from './routers/sections'
@@ -19,6 +18,8 @@ export const appRouter = router({
   verify: verifyRouter,
   feedback: feedbackRouter,
 })
+
+export const createCaller = createCallerFactory(appRouter)
 
 // export type definition of API
 export type AppRouter = typeof appRouter

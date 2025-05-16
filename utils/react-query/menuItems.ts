@@ -1,6 +1,5 @@
 import type { RouterInputs } from '@/server'
-
-import { trpc } from '../trpc/client'
+import { trpc } from '../trpc'
 
 export function useGetMenuItems(menuId: RouterInputs['menuItem']['getAllByMenuId']['where']['menuId'] = -1) {
   const { isPending, isError, isSuccess, data, error } = trpc.menuItem.getAllByMenuId.useQuery(
@@ -55,12 +54,12 @@ export function useCreateMenuItem(menuId: RouterInputs['menuItem']['getAllByMenu
       }, (old) => {
         return old
           ? [...old, {
-              ...payload,
-              id: -1,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              deletedAt: null,
-            }]
+            ...payload,
+            id: -1,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null,
+          }]
           : undefined
       })
       return { previous, updated: payload }
@@ -114,14 +113,14 @@ export function useUpdateMenuItem(menuId: RouterInputs['menuItem']['getAllByMenu
         }, (old) => {
           return old
             ? old.map((o) => {
-                if (o.id === where.id) {
-                  return {
-                    ...o,
-                    ...payload,
-                  }
+              if (o.id === where.id) {
+                return {
+                  ...o,
+                  ...payload,
                 }
-                return o
-              })
+              }
+              return o
+            })
             : undefined
         })
         return { previous, updated: payload }
@@ -176,11 +175,11 @@ export function useReorderMenuItems(menuId: RouterInputs['menuItem']['getAllByMe
       }, (old) => {
         return old
           ? old.map((o) => {
-              return {
-                ...o,
-                ...(payload.find(p => p.id === o.id)),
-              }
-            }).sort((a, b) => (a.position || 0) - (b.position || 0))
+            return {
+              ...o,
+              ...(payload.find(p => p.id === o.id)),
+            }
+          }).sort((a, b) => (a.position || 0) - (b.position || 0))
           : undefined
       })
       return { previous, updated: payload }

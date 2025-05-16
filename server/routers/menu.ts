@@ -1,9 +1,9 @@
 import { getErrorMessage } from '@/utils/functions'
 import { prismaCreateMenu, prismaDeleteMenu, prismaGetMenu, prismaGetMenus, prismaUpdateMenu, prismaUpdateMenus } from '@/utils/prisma/menus'
-import { authedProcedure, router } from '@/utils/trpc'
 import { MenuSchema } from '@/utils/zod'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { authedProcedure, router } from '../init'
 
 export const menuRouter = router({
   getAllByRestaurantId: authedProcedure.input(

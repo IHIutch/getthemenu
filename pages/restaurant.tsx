@@ -14,7 +14,7 @@ import {
   useUpdateRestaurant,
 } from '@/utils/react-query/restaurants'
 import { useGetAuthedUser } from '@/utils/react-query/users'
-import { createClientServer } from '@/utils/supabase/server-props'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
 import { DAYS_OF_WEEK } from '@/utils/zod'
 import {
   AspectRatio,
@@ -645,7 +645,7 @@ function Hours({ restaurant }: { restaurant: RouterOutputs['restaurant']['getByI
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
   const helpers = createServerSideHelpers({
@@ -671,7 +671,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   else if (user.restaurants.length === 0) {
     return {
       redirect: {
-        destination: '/get-started',
+        destination: '/onboarding/setup',
         permanent: false,
       },
     }

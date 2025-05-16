@@ -2,7 +2,7 @@ import type { SubmitHandler } from 'react-hook-form'
 
 import { env } from '@/utils/env'
 import { getErrorMessage } from '@/utils/functions'
-import { createClientComponent } from '@/utils/supabase/component'
+import { getSupabaseBrowserClient } from '@/utils/supabase/component'
 import {
   Alert,
   Box,
@@ -29,7 +29,7 @@ interface FormData {
 export default function ForgotPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
-  const supabase = createClientComponent()
+  const supabase = getSupabaseBrowserClient()
 
   const {
     register,

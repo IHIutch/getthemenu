@@ -1,8 +1,8 @@
 import { prismaCreateSection, prismaDeleteSection, prismaGetSection, prismaGetSections, prismaUpdateSection, prismaUpdateSections } from '@/utils/prisma/sections'
-import { authedProcedure, router } from '@/utils/trpc'
 import { SectionSchema } from '@/utils/zod'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { authedProcedure, router } from '../init'
 
 export const sectionRouter = router({
   getAllByMenuId: authedProcedure.input(

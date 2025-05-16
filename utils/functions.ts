@@ -5,7 +5,7 @@ import { unstable_cache } from 'next/cache'
 import { z } from 'zod'
 
 import prisma from './prisma'
-import { createClientComponent } from './supabase/component'
+import { getSupabaseBrowserClient } from './supabase/component'
 import { MenuItemSchema, MenuSchema, RestaurantSchema, SectionSchema } from './zod'
 
 const _StructuredDataSchema = RestaurantSchema.omit({
@@ -134,7 +134,7 @@ export function isDateInputSupported() {
 
 export function getPublicURL(path: string) {
   try {
-    const supabase = createClientComponent()
+    const supabase = getSupabaseBrowserClient()
     const { data: publicUrl } = supabase.storage
       .from('public')
       .getPublicUrl(path)

@@ -2,7 +2,7 @@ import type { GetServerSidePropsContext } from 'next'
 
 import DashboardLayout from '@/layouts/Dashboard'
 import { appRouter } from '@/server'
-import { createClientServer } from '@/utils/supabase/server-props'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
 import { Container, Flex, Text } from '@chakra-ui/react'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import * as React from 'react'
@@ -28,7 +28,7 @@ export default function Analytics() {
 Analytics.getLayout = (page: React.ReactNode) => <DashboardLayout>{page}</DashboardLayout>
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
   const helpers = createServerSideHelpers({
@@ -54,7 +54,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   else if (user.restaurants.length === 0) {
     return {
       redirect: {
-        destination: '/get-started',
+        destination: '/onboarding/setup',
         permanent: false,
       },
     }

@@ -1,9 +1,7 @@
 import type { SubmitHandler } from 'react-hook-form'
 
 import { getErrorMessage } from '@/utils/functions'
-import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { useGetAuthedUser } from '@/utils/react-query/users'
-import { trpc } from '@/utils/trpc/client'
+import { trpc } from '@/utils/trpc'
 import {
   Avatar,
   Box,
@@ -40,8 +38,18 @@ export default function Navbar({
 }: {
   children: React.ReactNode
 }) {
-  const { data: user } = useGetAuthedUser()
-  const { data: restaurant } = useGetRestaurant(user?.restaurants[0]?.id)
+  const { data: user } = trpc.user.getAuthedUser.useQuery(undefined, {
+    refetchOnMount: false,
+  })
+
+  const { data: restaurant } = trpc.restaurant.getById.useQuery({
+    where: {
+      id: user?.restaurants[0]?.id || '',
+    },
+  }, {
+    refetchOnMount: false,
+    enabled: !!user?.restaurants[0]?.id,
+  })
   const { mutateAsync: handleCreateFeedback, isPending: isSubmitting } = trpc.feedback.create.useMutation()
 
   const modalState = useDisclosure()

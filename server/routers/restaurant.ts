@@ -1,8 +1,10 @@
-import { prismaCreateRestaurant, prismaGetRestaurant, prismaUpdateRestaurant } from '@/utils/prisma/restaurants'
-import { authedProcedure, router } from '@/utils/trpc'
+import prisma from '@/utils/prisma'
+import { prismaGetRestaurant, prismaUpdateRestaurant } from '@/utils/prisma/restaurants'
 import { RestaurantSchema } from '@/utils/zod'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+
+import { authedProcedure, router } from '../init'
 
 export const restaurantRouter = router({
   getById: authedProcedure.input(
@@ -10,6 +12,9 @@ export const restaurantRouter = router({
       where: RestaurantSchema.pick({ id: true }),
     }),
   ).query(async ({ input }) => {
+
+    console.log("HELLOOOO")
+
     const { where } = input
     const data = await prismaGetRestaurant({ where })
     if (!data) {
@@ -19,9 +24,18 @@ export const restaurantRouter = router({
       })
     }
 
-    return RestaurantSchema.partial({
-      coverImage: true,
-    }).parse(data)
+    return data
+  }),
+  getOne: authedProcedure.input(
+    z.object({
+      where: RestaurantSchema.pick({ userId: true }),
+    }),
+  ).query(async ({ input }) => {
+    const { where } = input
+    const data = await prisma.restaurants.findFirst({
+      where,
+    })
+    return data
   }),
   create: authedProcedure.input(
     z.object({
@@ -33,18 +47,18 @@ export const restaurantRouter = router({
       }),
     }),
   ).mutation(async ({ input }) => {
-    const { payload } = input
-    const data = await prismaCreateRestaurant({
-      payload: {
-        ...payload,
+    const { payload: { userId, ...rest } } = input
+    return await prisma.restaurants.create({
+      data: {
+        ...rest,
         users: {
           connect: {
-            id: payload.userId,
+            id: userId,
           },
-        },
-      },
+        }
+      }
     })
-    return data
+
   }),
   update: authedProcedure.input(
     z.object({

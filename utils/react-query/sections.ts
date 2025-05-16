@@ -1,6 +1,5 @@
 import type { RouterInputs } from '@/server'
-
-import { trpc } from '../trpc/client'
+import { trpc } from '../trpc'
 
 export function useGetSections(menuId: RouterInputs['section']['getAllByMenuId']['where']['menuId'] = -1) {
   const { isPending, isError, isSuccess, data, error } = trpc.section.getAllByMenuId.useQuery(
@@ -55,12 +54,12 @@ export function useCreateSection(menuId: RouterInputs['section']['getAllByMenuId
       }, (old) => {
         return old
           ? [...old, {
-              ...payload,
-              id: -1,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              deletedAt: null,
-            }]
+            ...payload,
+            id: -1,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null,
+          }]
           : undefined
       })
       return { previous, updated: payload }
@@ -113,14 +112,14 @@ export function useUpdateSection(menuId: RouterInputs['section']['getAllByMenuId
       }, (old) => {
         return old
           ? old.map((o) => {
-              if (o.id === where.id) {
-                return {
-                  ...o,
-                  ...payload,
-                }
+            if (o.id === where.id) {
+              return {
+                ...o,
+                ...payload,
               }
-              return o
-            })
+            }
+            return o
+          })
           : undefined
       })
       return { previous, updated: payload }
@@ -174,11 +173,11 @@ export function useReorderSections(menuId: RouterInputs['section']['getAllByMenu
       }, (old) => {
         return old
           ? old.map((o) => {
-              return {
-                ...o,
-                ...(payload.find(p => p.id === o.id) || {}),
-              }
-            })
+            return {
+              ...o,
+              ...(payload.find(p => p.id === o.id) || {}),
+            }
+          })
           : undefined
       })
       return { previous, updated: payload }

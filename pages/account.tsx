@@ -6,7 +6,7 @@ import AccountLayout from '@/layouts/Account'
 import { appRouter } from '@/server'
 import { env } from '@/utils/env'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
-import { createClientServer } from '@/utils/supabase/server-props'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
 import {
   Box,
   Button,
@@ -452,7 +452,7 @@ Account.getLayout = (page: React.ReactNode) => <AccountLayout>{page}</AccountLay
 // }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
   const helpers = createServerSideHelpers({
@@ -478,7 +478,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   else if (user.restaurants.length === 0) {
     return {
       redirect: {
-        destination: '/get-started',
+        destination: '/onboarding/setup',
         permanent: false,
       },
     }

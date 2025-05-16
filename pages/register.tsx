@@ -2,10 +2,9 @@ import type { GetServerSidePropsContext } from 'next'
 import type { SubmitHandler } from 'react-hook-form'
 
 import { getErrorMessage } from '@/utils/functions'
-import { createClientComponent } from '@/utils/supabase/component'
-import { createClientServer } from '@/utils/supabase/server-props'
-import { trpc } from '@/utils/trpc/client'
-import { createCaller } from '@/utils/trpc/server'
+import { getSupabaseBrowserClient } from '@/utils/supabase/component'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
+import { trpc } from '@/utils/trpc'
 import {
   Box,
   Button,
@@ -33,7 +32,7 @@ interface FormValues {
 export default function Register() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const supabase = createClientComponent()
+  const supabase = getSupabaseBrowserClient()
 
   const { mutateAsync: handleSetUpNewAccount } = trpc.user.setUpNewAccount.useMutation()
 
@@ -57,23 +56,22 @@ export default function Register() {
   const onSubmit: SubmitHandler<FormValues> = async (form) => {
     try {
       setIsSubmitting(true)
-      const { error, data: { user } } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email: form.email,
         password: form['new-password'],
       })
       if (error)
         throw new Error(error.message)
 
-      if (user) {
+      if (data.user) {
         await handleSetUpNewAccount({
           payload: {
-            id: user.id,
             email: form.email,
             fullName: form.fullName,
           },
         }, {
           onSuccess() {
-            router.replace('/get-started')
+            router.replace('/onboarding/setup')
           },
         })
       }
@@ -87,7 +85,7 @@ export default function Register() {
   return (
     <>
       <Head>
-        <title>Register</title>
+        <title>Create Your Restaurant</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container maxW="container.lg" py="24">
@@ -208,22 +206,10 @@ export default function Register() {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
   if (!data.user) {
-    return {
-      props: {},
-    }
-  }
-  const caller = createCaller({
-    session: {
-      user: data.user,
-    },
-  })
-  const user = await caller.user.getAuthedUser()
-
-  if (!user) {
     return {
       redirect: {
         destination: '/login',
@@ -231,22 +217,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     }
   }
-  else if (user.restaurants.length === 0) {
-    return {
-      redirect: {
-        destination: '/get-started',
-        permanent: false,
-      },
-    }
-  }
-  else if (user.restaurants.length > 0) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    }
-  }
+  // else if (user.restaurants.length === 0) {
+  //   return {
+  //     redirect: {
+  //       destination: '/onboarding/setup',
+  //       permanent: false,
+  //     },
+  //   }
+  // }
+  // else if (user.restaurants.length > 0) {
+  //   return {
+  //     redirect: {
+  //       destination: '/dashboard',
+  //       permanent: false,
+  //     },
+  //   }
+  // }
 
   return {
     props: {},

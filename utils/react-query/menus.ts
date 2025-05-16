@@ -1,6 +1,5 @@
 import type { RouterInputs } from '@/server'
-
-import { trpc } from '../trpc/client'
+import { trpc } from '../trpc'
 
 export function useGetMenus(restaurantId: RouterInputs['menu']['getAllByRestaurantId']['where']['restaurantId'] = '') {
   const { isPending, isError, isSuccess, data, error } = trpc.menu.getAllByRestaurantId.useQuery(
@@ -55,10 +54,10 @@ export function useUpdateMenu(id: RouterInputs['menu']['getById']['where']['id']
       }, (old) => {
         return old
           ? {
-              ...old,
-              ...payload,
-              updatedAt: new Date(),
-            }
+            ...old,
+            ...payload,
+            updatedAt: new Date(),
+          }
           : undefined
       })
       return { previous, updated: payload }
@@ -111,11 +110,11 @@ export function useReorderMenus(restaurantId: RouterInputs['menu']['getAllByRest
         }, (old) => {
           return old
             ? old.map((o) => {
-                return {
-                  ...o,
-                  ...(payload.find(p => p.id === o.id)),
-                }
-              }).sort((a, b) => (a.position || 0) - (b.position || 0))
+              return {
+                ...o,
+                ...(payload.find(p => p.id === o.id)),
+              }
+            }).sort((a, b) => (a.position || 0) - (b.position || 0))
             : undefined
         })
         return { previous, updated: payload }

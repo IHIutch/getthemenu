@@ -8,7 +8,7 @@ import { getErrorMessage } from '@/utils/functions'
 import { useDeleteMenu, useGetMenu, useGetMenus, useUpdateMenu } from '@/utils/react-query/menus'
 import { useGetRestaurant } from '@/utils/react-query/restaurants'
 import { useGetAuthedUser } from '@/utils/react-query/users'
-import { createClientServer } from '@/utils/supabase/server-props'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
 import {
   Alert,
   Box,
@@ -204,21 +204,21 @@ function DetailsSection({
               <Field.ErrorText>{errors.slug?.message}</Field.ErrorText>
               {isCheckingSlug
                 ? (
-                    <Alert.Root status="info" mt="2">
-                      <Alert.Indicator>
-                        <Spinner size="sm" />
-                      </Alert.Indicator>
-                      <Alert.Description ml="2">Checking availability...</Alert.Description>
+                  <Alert.Root status="info" mt="2">
+                    <Alert.Indicator>
+                      <Spinner size="sm" />
+                    </Alert.Indicator>
+                    <Alert.Description ml="2">Checking availability...</Alert.Description>
+                  </Alert.Root>
+                )
+                : !isCheckingSlug && slugMessage
+                  ? (
+                    <Alert.Root size="sm" status={slugMessage.type} mt="2">
+                      <Alert.Indicator />
+                      <Alert.Description ml="2">{slugMessage.message}</Alert.Description>
                     </Alert.Root>
                   )
-                : !isCheckingSlug && slugMessage
-                    ? (
-                        <Alert.Root size="sm" status={slugMessage.type} mt="2">
-                          <Alert.Indicator />
-                          <Alert.Description ml="2">{slugMessage.message}</Alert.Description>
-                        </Alert.Root>
-                      )
-                    : null}
+                  : null}
               <Field.HelperText>
                 Must be unique to your restaurant.
               </Field.HelperText>
@@ -332,7 +332,7 @@ function DeleteSection({ menu }: { menu: RouterOutputs['menu']['getById'] }) {
 MenuOverview.getLayout = (page: React.ReactNode) => <MenuLayout>{page}</MenuLayout>
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
   const helpers = createServerSideHelpers({
@@ -358,7 +358,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   else if (user.restaurants.length === 0) {
     return {
       redirect: {
-        destination: '/get-started',
+        destination: '/onboarding/setup',
         permanent: false,
       },
     }

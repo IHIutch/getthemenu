@@ -3,8 +3,8 @@ import type { SubmitHandler } from 'react-hook-form'
 
 import { appRouter } from '@/server'
 import { getErrorMessage } from '@/utils/functions'
-import { createClientComponent } from '@/utils/supabase/component'
-import { createClientServer } from '@/utils/supabase/server-props'
+import { getSupabaseBrowserClient } from '@/utils/supabase/component'
+import { getSupabaseServerClient } from '@/utils/supabase/server-props'
 import {
   Alert,
   Box,
@@ -34,7 +34,7 @@ export default function ResetPassword(_props: InferGetServerSidePropsType<typeof
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [success, setSuccess] = React.useState(false)
   const router = useRouter()
-  const supabase = createClientComponent()
+  const supabase = getSupabaseBrowserClient()
 
   React.useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -150,7 +150,7 @@ export default function ResetPassword(_props: InferGetServerSidePropsType<typeof
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClientServer(context)
+  const supabase = getSupabaseServerClient(context)
   const { data } = await supabase.auth.getUser()
 
   const helpers = createServerSideHelpers({
@@ -168,7 +168,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (user?.restaurants.length === 0) {
     return {
       redirect: {
-        destination: '/get-started',
+        destination: '/onboarding/setup',
         permanent: false,
       },
     }

@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 
-import { trpc } from '@/utils/trpc/client'
+import { trpc } from '@/utils/trpc'
 import { ChakraProvider, createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import * as Fathom from 'fathom-client'
