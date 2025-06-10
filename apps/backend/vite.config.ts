@@ -4,6 +4,11 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig(() => {
   return {
+    build: {
+      rollupOptions: {
+        external: "cloudflare:sockets"
+      }
+    },
     plugins: [
       tsconfigPaths({
         projects: ['./tsconfig.json'],
