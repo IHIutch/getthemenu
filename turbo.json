@@ -7,6 +7,19 @@
       ],
       "outputs": [
         "dist/**"
+      ],
+      "env": [
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "POSTGRES_PRISMA_URL",
+        "POSTGRES_URL_NON_POOLING",
+        "VITE_ROOT_DOMAIN",
+        "VITE_SENTRY_DSN",
+        "VITE_STRIPE_PUBLISHABLE_KEY",
+        "STRIPE_SECRET_KEY",
+        "STRIPE_SIGNING_SECRET",
+        "VERCEL_PROJECT_ID",
+        "VERCEL_SDK_TOKEN"
       ]
     },
     "dev": {
