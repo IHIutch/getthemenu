@@ -14,7 +14,7 @@ import * as React from 'react'
 
 import type { AppRouter } from '~/utils/trpc/routes'
 
-import { DefaultCatchBoundary } from '~/components/deafult-catch-boundary'
+import { DefaultCatchBoundary } from '~/components/default-catch-boundary'
 import { NotFound } from '~/components/not-found'
 
 export interface RouterAppContext {

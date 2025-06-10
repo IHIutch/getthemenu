@@ -2,8 +2,18 @@ import type { StandardSchemaV1 } from '@t3-oss/env-core'
 
 import { createEnv } from '@t3-oss/env-core'
 import { vercel } from '@t3-oss/env-core/presets-zod'
+import dotenv from 'dotenv'
 import process from 'node:process'
 import { z } from 'zod'
+
+if (typeof window === 'undefined') {
+  dotenv.config({ override: true })
+}
+
+process.env = {
+  ...import.meta.env,
+  ...process.env,
+}
 
 export const env = createEnv({
   isServer: typeof window === 'undefined',

@@ -1,15 +1,8 @@
-import { defineConfig, loadEnv } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import { isServer } from '@tanstack/react-query'
-import dotenv from "dotenv"
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
-
-export default defineConfig(({ mode }) => {
-  if (isServer) {
-    dotenv.config({ override: true })
-  }
-
+export default defineConfig(() => {
   return {
     plugins: [
       tsconfigPaths({
@@ -20,7 +13,7 @@ export default defineConfig(({ mode }) => {
         tsr: {
           srcDirectory: 'src',
         },
-      })
-    ]
+      }),
+    ],
   }
 })

@@ -1,15 +1,9 @@
-import { defineConfig, loadEnv } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import dotenv from "dotenv"
 import tailwindcss from '@tailwindcss/vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
-
-export default defineConfig(({ mode }) => {
-  if (typeof document === 'undefined') {
-    dotenv.config({ override: true })
-  }
-
+export default defineConfig(() => {
   return {
     plugins: [
       tsconfigPaths({
@@ -21,6 +15,6 @@ export default defineConfig(({ mode }) => {
         },
       }),
       tailwindcss(),
-    ]
+    ],
   }
 })

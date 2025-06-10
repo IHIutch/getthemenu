@@ -16,7 +16,8 @@
         "STRIPE_SECRET_KEY",
         "STRIPE_SIGNING_SECRET",
         "VERCEL_PROJECT_ID",
-        "VERCEL_SDK_TOKEN"
+        "VERCEL_SDK_TOKEN",
+        "TEST_HOST"
       ]
     },
     "dev": {
