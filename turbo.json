@@ -3,7 +3,8 @@
   "tasks": {
     "build": {
       "dependsOn": [
-        "^build"
+        "^build",
+        "^db:generate"
       ],
       "env": [
         "SUPABASE_URL",
@@ -21,12 +22,25 @@
       ]
     },
     "dev": {
-      "cache": false
+      "cache": false,
+      "dependsOn": [
+        "^db:generate"
+      ]
     },
     "lint": {
       "dependsOn": [
         "^lint"
       ]
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false,
+      "persistent": true
+    },
+    "db:deploy": {
+      "cache": false
     }
   }
 }
