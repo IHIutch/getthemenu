@@ -1,3 +1,5 @@
+import type { StandardSchemaV1 } from '@t3-oss/env-core'
+
 import { createEnv } from '@t3-oss/env-core'
 import { vercel } from '@t3-oss/env-core/presets-zod'
 import process from 'node:process'
@@ -14,12 +16,6 @@ export const env = createEnv({
     // # Prisma
     POSTGRES_PRISMA_URL: z.string().url(),
     POSTGRES_URL_NON_POOLING: z.string().url(),
-    // # Vercel
-    VERCEL_PROJECT_ID: z.string().min(1),
-    VERCEL_SDK_TOKEN: z.string().min(1),
-
-    SUPABASE_ANON_KEY: z.string().min(1),
-    SUPABASE_URL: z.string().min(1).url(),
   },
 
   client: {
@@ -50,5 +46,12 @@ export const env = createEnv({
    * In order to solve these issues, we recommend that all new projects
    * explicitly specify this option as true.
    */
-  emptyStringAsUndefined: true,
+  emptyStringAsUndefined: false,
+  onValidationError: (issues: readonly StandardSchemaV1.Issue[]) => {
+    console.error(
+      '❌ Invalid environment variables:',
+      issues,
+    )
+    throw new Error('Invalid environment variables')
+  },
 })

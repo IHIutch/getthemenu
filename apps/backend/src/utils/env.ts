@@ -1,3 +1,5 @@
+import type { StandardSchemaV1 } from '@t3-oss/env-core'
+
 import { createEnv } from '@t3-oss/env-core'
 import { vercel } from '@t3-oss/env-core/presets-zod'
 import { isServer } from '@tanstack/react-query'
@@ -59,5 +61,12 @@ export const env = createEnv({
    * In order to solve these issues, we recommend that all new projects
    * explicitly specify this option as true.
    */
-  emptyStringAsUndefined: true,
+  emptyStringAsUndefined: false,
+  onValidationError: (issues: readonly StandardSchemaV1.Issue[]) => {
+    console.error(
+      '❌ Invalid environment variables:',
+      issues,
+    )
+    throw new Error('Invalid environment variables')
+  },
 })
