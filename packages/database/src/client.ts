@@ -1,10 +1,14 @@
+import { PrismaPg } from '@prisma/adapter-pg'
 import process from 'node:process'
 
 import { PrismaClient } from '../generated/prisma'
+
 // import { withAccelerate } from '@prisma/extension-accelerate'
 
 function prismaClientSingleton() {
+  const adapter = new PrismaPg({ connectionString: process.env.POSTGRES_PRISMA_URL })
   return new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   })
   // .$extends(withAccelerate())
