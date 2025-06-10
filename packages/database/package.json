@@ -1,0 +1,23 @@
+{
+  "name": "@repo/db",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "index.ts",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@prisma/client": "6.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.23",
+    "prisma": "6.8.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

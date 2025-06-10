@@ -1,0 +1,141 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../generated/client"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model MenuItems {
+  id           Int       @id @default(autoincrement())
+  restaurantId Int
+  menuId       Int
+  sectionId    Int
+  title        String?
+  description  String?
+  position     Int
+  price        Int?
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt    DateTime? @db.Timestamptz(6)
+
+  image MenuItemImages[]
+
+  restaurants Restaurants @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menus       Menus       @relation(fields: [menuId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sections    Sections    @relation(fields: [sectionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Menus {
+  id           Int       @id @default(autoincrement())
+  restaurantId Int
+  publicId     String    @unique
+  title        String?
+  slug         String
+  position     Int
+  description  String?
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt    DateTime? @db.Timestamptz(6)
+
+  menuItems   MenuItems[]
+  sections    Sections[]
+  restaurants Restaurants @relation(fields: [restaurantId], references: [id])
+}
+
+model Restaurants {
+  id           Int       @id @default(autoincrement())
+  publicId     String    @unique
+  userId       Int
+  hours        Json?
+  name         String?
+  customHost   String?   @unique
+  customDomain String?   @unique
+  address      Json?
+  phone        Json?
+  email        Json?
+  createdAt    DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt    DateTime? @db.Timestamptz(6)
+
+  menuItems  MenuItems[]
+  menus      Menus[]
+  sections   Sections[]
+  coverImage CoverImages[]
+
+  user Users @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Sections {
+  id           Int       @id @default(autoincrement())
+  restaurantId Int
+  menuId       Int
+  title        String?
+  position     Int
+  description  String?
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt    DateTime? @db.Timestamptz(6)
+
+  menuItems  MenuItems[]
+  menus      Menus       @relation(fields: [menuId], references: [id])
+  restaurant Restaurants @relation(fields: [restaurantId], references: [id])
+}
+
+model Users {
+  id                   Int       @id @default(autoincrement())
+  uuid                 String    @unique @db.Uuid
+  fullName             String?
+  stripeSubscriptionId String?
+  stripeCustomerId     String?
+  createdAt            DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt            DateTime? @db.Timestamptz(6)
+  trialEndsAt          DateTime? @db.Timestamptz(6)
+
+  restaurants Restaurants[]
+}
+
+model Feedback {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  type      String?
+  comment   String?
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+}
+
+model MenuItemImages {
+  id          Int       @id @default(autoincrement())
+  menuItemId  Int
+  url         String
+  blurDataUrl String?
+  width       Int
+  height      Int
+  hex         String?
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  deletedAt   DateTime? @db.Timestamptz(6)
+
+  menuItem MenuItems @relation(fields: [menuItemId], references: [id])
+}
+
+model CoverImages {
+  id           Int       @id @default(autoincrement())
+  restaurantId Int
+  url          String
+  blurDataUrl  String?
+  width        Int
+  height       Int
+  hex          String?
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  deletedAt    DateTime? @db.Timestamptz(6)
+
+  restaurant Restaurants @relation(fields: [restaurantId], references: [id])
+}
