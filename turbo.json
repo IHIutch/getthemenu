@@ -5,9 +5,6 @@
       "dependsOn": [
         "^build"
       ],
-      "outputs": [
-        "dist/**"
-      ],
       "env": [
         "SUPABASE_URL",
         "SUPABASE_ANON_KEY",

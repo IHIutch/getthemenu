@@ -1,4 +1,4 @@
-import { notFound, useLoaderData } from '@tanstack/react-router'
+import { createFileRoute, notFound, useLoaderData } from '@tanstack/react-router'
 
 import { BlurImage } from '~/components/blur-image'
 
@@ -65,7 +65,7 @@ import { BlurImage } from '~/components/blur-image'
 //     return menu
 //   })
 
-export const Route = createFileRoute({
+export const Route = createFileRoute('/$')({
   component: RouteComponent,
   params: {
     stringify: (params: { slug?: string }) => {
