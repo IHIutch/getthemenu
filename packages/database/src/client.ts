@@ -1,7 +1,7 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import process from 'node:process'
 
-import { PrismaClient } from '../generated/prisma'
+import { PrismaClient } from "@prisma/client"
 
 // import { withAccelerate } from '@prisma/extension-accelerate'
 
