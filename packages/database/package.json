@@ -9,14 +9,15 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
+    "postinstall": "prisma generate",
     "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "6.8.2"
+    "@prisma/client": "catalog:"
   },
   "devDependencies": {
     "@types/node": "^22.15.23",
-    "prisma": "6.8.2",
+    "prisma": "catalog:",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
