@@ -21,7 +21,7 @@ const fetchMenuData = createServerFn({ method: 'GET' })
 
 export const Route = createFileRoute('/_authed/$publicId/menu/$menuId/')({
   loader: async ({
-    context: { trpc, queryClient },
+    // context: { trpc, queryClient },
     params: { menuId },
   }) => {
     const { menu } = await fetchMenuData({ data: menuId })

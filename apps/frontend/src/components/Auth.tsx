@@ -49,7 +49,7 @@ export function Auth({
           >
             {status === 'pending' ? '...' : actionText}
           </button>
-          {afterSubmit ? afterSubmit : null}
+          {afterSubmit || null}
         </form>
       </div>
     </div>

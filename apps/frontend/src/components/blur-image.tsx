@@ -1,6 +1,6 @@
 import * as React from 'react'
+
 import { cx } from '~/utils/cva.config'
-import { getPlaiceholder } from "plaiceholder";
 
 const isServer = typeof document === 'undefined'
 
@@ -55,13 +55,13 @@ export function BlurImage({
   // eslint-disable-next-line react/no-clone-element
   const jsImgEl = React.cloneElement(img, {
     // @ts-expect-error ref is populated once React hydrates
-    ref: jsImgElRef,
+    'ref': jsImgElRef,
     id,
-    suppressHydrationWarning: true,
-    "data-evt-onload": isServer
-      ? "this.classList.remove('opacity-0')"
+    'suppressHydrationWarning': true,
+    'data-evt-onload': isServer
+      ? 'this.classList.remove(\'opacity-0\')'
       : undefined,
-    className: cx(
+    'className': cx(
       'absolute size-full',
       img.props.className,
       'transition-all duration-500 ease-in-out',
@@ -75,15 +75,15 @@ export function BlurImage({
     <div className={cx(className, 'relative')} {...rest}>
       {blurDataUrl
         ? (
-          <>
-            <img
-              src={blurDataUrl}
-              className={cx(img.props.className, 'absolute')}
-              alt={img.props.alt}
-            />
-            <div className={cx(img.props.className, 'absolute backdrop-blur-xl')} />
-          </>
-        )
+            <>
+              <img
+                src={blurDataUrl}
+                className={cx(img.props.className, 'absolute')}
+                alt={img.props.alt}
+              />
+              <div className={cx(img.props.className, 'absolute backdrop-blur-xl')} />
+            </>
+          )
         : null}
       {jsImgEl}
       <noscript>{img}</noscript>

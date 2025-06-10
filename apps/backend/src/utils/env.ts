@@ -1,6 +1,7 @@
 import { createEnv } from '@t3-oss/env-core'
 import { vercel } from '@t3-oss/env-core/presets-zod'
 import { isServer } from '@tanstack/react-query'
+import process from 'node:process'
 import { z } from 'zod'
 
 export const env = createEnv({

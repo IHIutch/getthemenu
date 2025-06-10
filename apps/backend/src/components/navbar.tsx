@@ -14,11 +14,11 @@ import {
 import { Link } from '@tanstack/react-router'
 import * as React from 'react'
 
-interface FormValues {
-  userId: string
-  type: string
-  comment: string
-}
+// interface FormValues {
+//   userId: string
+//   type: string
+//   comment: string
+// }
 
 export default function Navbar({
   restaurant,
