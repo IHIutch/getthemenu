@@ -2,7 +2,6 @@ generator client {
   provider        = "prisma-client"
   output          = "../generated/prisma"
   previewFeatures = ["relationJoins", "queryCompiler", "driverAdapters"]
-  runtime         = "vercel"
 }
 
 datasource db {
