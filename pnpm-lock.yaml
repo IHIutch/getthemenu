@@ -13,7 +13,7 @@ catalogs:
       specifier: ^6.9.0
       version: 6.9.0
     '@prisma/client':
-      specifier: 6.9.0
+      specifier: ^6.9.0
       version: 6.9.0
     '@t3-oss/env-core':
       specifier: ^0.13.4
@@ -52,7 +52,7 @@ catalogs:
       specifier: ^0.4.20
       version: 0.4.20
     prisma:
-      specifier: 6.9.0
+      specifier: ^6.9.0
       version: 6.9.0
     react:
       specifier: ^19.1.0

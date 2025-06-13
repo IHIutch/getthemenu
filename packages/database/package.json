@@ -1,9 +1,8 @@
 {
   "name": "@repo/db",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/client.ts"
   },
-  "main": "index.ts",
   "scripts": {
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

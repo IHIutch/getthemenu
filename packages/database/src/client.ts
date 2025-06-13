@@ -1,27 +1,13 @@
-import { PrismaPg } from '@prisma/adapter-pg'
 import process from 'node:process'
 
 import { PrismaClient } from '../generated/prisma'
 
-// import { withAccelerate } from '@prisma/extension-accelerate'
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
-function prismaClientSingleton() {
-  const adapter = new PrismaPg({ connectionString: process.env.POSTGRES_PRISMA_URL })
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  })
-  // .$extends(withAccelerate())
-}
+export const prisma
+  = globalForPrisma.prisma || new PrismaClient()
 
-type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>
-
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClientSingleton | undefined
-}
-
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
-
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production')
   globalForPrisma.prisma = prisma
-}
+
+export * from '../generated/prisma'
