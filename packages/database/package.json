@@ -13,9 +13,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "catalog:"
-  },
-  "devDependencies": {
+    "@prisma/client": "catalog:",
     "@types/node": "^22.15.23",
     "prisma": "catalog:",
     "tsx": "^4.19.4",

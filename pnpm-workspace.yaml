@@ -4,6 +4,7 @@ packages:
 
 catalog:
   '@eslint-react/eslint-plugin': ^1.51.3
+  '@prisma/client': 6.9.0
   '@t3-oss/env-core': ^0.13.4
   '@tanstack/react-query': ^5.76.1
   '@tanstack/react-query-devtools': ^5.76.1
@@ -17,20 +18,18 @@ catalog:
   dotenv: ^16.5.0
   eslint-plugin-react-hooks: ^5.2.0
   eslint-plugin-react-refresh: ^0.4.20
+  prisma: 6.9.0
   react: ^19.1.0
   react-dom: ^19.1.0
   typescript: ^5.7.2
   vite: ^6.3.5
   vite-tsconfig-paths: ^5.1.4
   zod: ^3.24.4
-  prisma: 6.9.0
-  '@prisma/client': 6.9.0
 
 catalogMode: prefer
 
 onlyBuiltDependencies:
   - '@parcel/watcher'
-  - '@prisma/client'
   - '@prisma/engines'
   - '@tailwindcss/oxide'
   - esbuild
