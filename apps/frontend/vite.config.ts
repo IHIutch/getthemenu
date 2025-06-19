@@ -10,6 +10,7 @@ export default defineConfig(() => {
         projects: ['./tsconfig.json'],
       }),
       tanstackStart({
+        target: 'vercel',
         tsr: {
           srcDirectory: 'src',
         },

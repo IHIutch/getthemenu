@@ -10,6 +10,7 @@ export default defineConfig(() => {
       }),
       // tailwindcss(), sentry(), ...
       tanstackStart({
+        target: 'vercel',
         tsr: {
           srcDirectory: 'src',
         },
