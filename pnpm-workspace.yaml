@@ -30,6 +30,7 @@ catalogMode: prefer
 
 onlyBuiltDependencies:
   - '@parcel/watcher'
+  - '@prisma/client'
   - '@prisma/engines'
   - '@tailwindcss/oxide'
   - esbuild
