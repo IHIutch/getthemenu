@@ -39,9 +39,9 @@ export const menuItemRouter = router({
         restaurantId: z.string(),
         sectionId: z.number().optional(),
         position: z.number(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        price: z.number().optional(),
+        title: z.string().nullable(),
+        description: z.string().nullable(),
+        price: z.number().nullable(),
         image: z.object({
           url: z.url(),
           width: z.number().min(1),
@@ -85,7 +85,7 @@ export const menuItemRouter = router({
             restaurantId: restaurant.id,
           },
         })
-    
+
     if (!section) {
       throw new Error('Section not found')
     }
@@ -108,7 +108,6 @@ export const menuItemRouter = router({
           : undefined,
       },
     })
-
   }),
   update: authedProcedure.input(
     z.object({
@@ -116,7 +115,7 @@ export const menuItemRouter = router({
       payload: z.object({
         title: z.string(),
         description: z.string(),
-        price: z.number(),
+        price: z.number().nullable(),
         image: z.object({
           id: z.number().optional(),
           menuItemId: z.number(),

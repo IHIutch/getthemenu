@@ -15,28 +15,62 @@ export const sectionRouter = router({
       where: {
         menus: {
           publicId: menuPublicId,
-        }
+        },
       },
       orderBy: {
         position: 'asc',
       },
     })
   }),
+  create: authedProcedure.input(
+    z.object({
+      payload: z.object({
+        restaurantPublicId: z.string(),
+        menuPublicId: z.string(),
+        title: z.string(),
+        description: z.string().optional(),
+        position: z.number(),
+      }),
+    }),
+  ).mutation(async ({ input }) => {
+    const { payload } = input
+
+    return await prisma.sections.create({
+      data: {
+        title: payload.title,
+        description: payload.description,
+        position: payload.position,
+        restaurant: {
+          connect: {
+            publicId: payload.restaurantPublicId,
+          },
+        },
+        menus: {
+          connect: {
+            publicId: payload.menuPublicId,
+          },
+        },
+      },
+    })
+  }),
   update: authedProcedure.input(
     z.object({
       id: z.number(),
-      data: z.object({
+      payload: z.object({
         title: z.string(),
         description: z.string(),
       }).partial(),
     }),
   ).mutation(async ({ input }) => {
-    const { id, data } = input
+    const { id, payload } = input
     return await prisma.sections.update({
       where: {
         id,
       },
-      data,
+      data: {
+        title: payload.title,
+        description: payload.description,
+      },
     })
   }),
 })

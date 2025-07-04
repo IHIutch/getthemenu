@@ -68,10 +68,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
     return {
       ENV: {
         VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-        VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY
-      }
+        VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      },
     }
-  }
+  },
 })
 
 function RootComponent() {
@@ -93,39 +93,18 @@ const theme = createSystem(defaultConfig, defineConfig({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <ChakraProvider value={theme}>
-      <html>
-        <head>
-          <HeadContent />
-        </head>
-        <body>
-          <div className="p-2 flex gap-2 text-lg">
-            {/* <Link
-              to="/"
-              activeProps={{
-                className: 'font-bold',
-              }}
-              activeOptions={{ exact: true }}
-            >
-              Home
-            </Link>{' '}
-            <Link
-              to="/$publicId/dashboard"
-              activeProps={{
-                className: 'font-bold',
-              }}
-            >
-              Dashboard
-            </Link> */}
-
-          </div>
-          <hr />
+    <html>
+      <head>
+        <HeadContent />
+      </head>
+      <body suppressHydrationWarning={true}>
+        <ChakraProvider value={theme}>
           {children}
           <TanStackRouterDevtools position="bottom-left" />
           <ReactQueryDevtools buttonPosition="bottom-right" />
           <Scripts />
-        </body>
-      </html>
-    </ChakraProvider>
+        </ChakraProvider>
+      </body>
+    </html>
   )
 }

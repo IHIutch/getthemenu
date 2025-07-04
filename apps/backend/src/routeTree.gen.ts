@@ -27,9 +27,9 @@ import { Route as AuthedOnboardingDomainRouteImport } from './routes/_authed/onb
 import { Route as AuthedPublicIdRestaurantRouteImport } from './routes/_authed/$publicId.restaurant'
 import { Route as AuthedPublicIdDashboardRouteImport } from './routes/_authed/$publicId.dashboard'
 import { Route as AuthedPublicIdDashboardIndexRouteImport } from './routes/_authed/$publicId.dashboard.index'
-import { Route as AuthedPublicIdMenuMenuIdRouteImport } from './routes/_authed/$publicId.menu.$menuId'
-import { Route as AuthedPublicIdMenuMenuIdIndexRouteImport } from './routes/_authed/$publicId.menu.$menuId.index'
-import { Route as AuthedPublicIdMenuMenuIdEditRouteImport } from './routes/_authed/$publicId.menu.$menuId.edit'
+import { Route as AuthedPublicIdMenuMenuPublicIdRouteImport } from './routes/_authed/$publicId.menu.$menuPublicId'
+import { Route as AuthedPublicIdMenuMenuPublicIdIndexRouteImport } from './routes/_authed/$publicId.menu.$menuPublicId.index'
+import { Route as AuthedPublicIdMenuMenuPublicIdEditRouteImport } from './routes/_authed/$publicId.menu.$menuPublicId.edit'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc.$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -115,23 +115,23 @@ const AuthedPublicIdDashboardIndexRoute =
     path: '/',
     getParentRoute: () => AuthedPublicIdDashboardRoute,
   } as any)
-const AuthedPublicIdMenuMenuIdRoute =
-  AuthedPublicIdMenuMenuIdRouteImport.update({
-    id: '/menu/$menuId',
-    path: '/menu/$menuId',
+const AuthedPublicIdMenuMenuPublicIdRoute =
+  AuthedPublicIdMenuMenuPublicIdRouteImport.update({
+    id: '/menu/$menuPublicId',
+    path: '/menu/$menuPublicId',
     getParentRoute: () => AuthedPublicIdRoute,
   } as any)
-const AuthedPublicIdMenuMenuIdIndexRoute =
-  AuthedPublicIdMenuMenuIdIndexRouteImport.update({
+const AuthedPublicIdMenuMenuPublicIdIndexRoute =
+  AuthedPublicIdMenuMenuPublicIdIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthedPublicIdMenuMenuIdRoute,
+    getParentRoute: () => AuthedPublicIdMenuMenuPublicIdRoute,
   } as any)
-const AuthedPublicIdMenuMenuIdEditRoute =
-  AuthedPublicIdMenuMenuIdEditRouteImport.update({
+const AuthedPublicIdMenuMenuPublicIdEditRoute =
+  AuthedPublicIdMenuMenuPublicIdEditRouteImport.update({
     id: '/edit',
     path: '/edit',
-    getParentRoute: () => AuthedPublicIdMenuMenuIdRoute,
+    getParentRoute: () => AuthedPublicIdMenuMenuPublicIdRoute,
   } as any)
 const ApiTrpcSplatServerRoute = ApiTrpcSplatServerRouteImport.update({
   id: '/api/trpc/$',
@@ -141,7 +141,6 @@ const ApiTrpcSplatServerRoute = ApiTrpcSplatServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -155,14 +154,13 @@ export interface FileRoutesByFullPath {
   '/$publicId/restaurant': typeof AuthedPublicIdRestaurantRoute
   '/onboarding/domain': typeof AuthedOnboardingDomainRoute
   '/onboarding/setup': typeof AuthedOnboardingSetupRoute
-  '/$publicId/menu/$menuId': typeof AuthedPublicIdMenuMenuIdRouteWithChildren
+  '/$publicId/menu/$menuPublicId': typeof AuthedPublicIdMenuMenuPublicIdRouteWithChildren
   '/$publicId/dashboard/': typeof AuthedPublicIdDashboardIndexRoute
-  '/$publicId/menu/$menuId/edit': typeof AuthedPublicIdMenuMenuIdEditRoute
-  '/$publicId/menu/$menuId/': typeof AuthedPublicIdMenuMenuIdIndexRoute
+  '/$publicId/menu/$menuPublicId/edit': typeof AuthedPublicIdMenuMenuPublicIdEditRoute
+  '/$publicId/menu/$menuPublicId/': typeof AuthedPublicIdMenuMenuPublicIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -176,8 +174,8 @@ export interface FileRoutesByTo {
   '/onboarding/domain': typeof AuthedOnboardingDomainRoute
   '/onboarding/setup': typeof AuthedOnboardingSetupRoute
   '/$publicId/dashboard': typeof AuthedPublicIdDashboardIndexRoute
-  '/$publicId/menu/$menuId/edit': typeof AuthedPublicIdMenuMenuIdEditRoute
-  '/$publicId/menu/$menuId': typeof AuthedPublicIdMenuMenuIdIndexRoute
+  '/$publicId/menu/$menuPublicId/edit': typeof AuthedPublicIdMenuMenuPublicIdEditRoute
+  '/$publicId/menu/$menuPublicId': typeof AuthedPublicIdMenuMenuPublicIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -196,16 +194,15 @@ export interface FileRoutesById {
   '/_authed/$publicId/restaurant': typeof AuthedPublicIdRestaurantRoute
   '/_authed/onboarding/domain': typeof AuthedOnboardingDomainRoute
   '/_authed/onboarding/setup': typeof AuthedOnboardingSetupRoute
-  '/_authed/$publicId/menu/$menuId': typeof AuthedPublicIdMenuMenuIdRouteWithChildren
+  '/_authed/$publicId/menu/$menuPublicId': typeof AuthedPublicIdMenuMenuPublicIdRouteWithChildren
   '/_authed/$publicId/dashboard/': typeof AuthedPublicIdDashboardIndexRoute
-  '/_authed/$publicId/menu/$menuId/edit': typeof AuthedPublicIdMenuMenuIdEditRoute
-  '/_authed/$publicId/menu/$menuId/': typeof AuthedPublicIdMenuMenuIdIndexRoute
+  '/_authed/$publicId/menu/$menuPublicId/edit': typeof AuthedPublicIdMenuMenuPublicIdEditRoute
+  '/_authed/$publicId/menu/$menuPublicId/': typeof AuthedPublicIdMenuMenuPublicIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | ''
     | '/login'
     | '/logout'
     | '/privacy-policy'
@@ -219,14 +216,13 @@ export interface FileRouteTypes {
     | '/$publicId/restaurant'
     | '/onboarding/domain'
     | '/onboarding/setup'
-    | '/$publicId/menu/$menuId'
+    | '/$publicId/menu/$menuPublicId'
     | '/$publicId/dashboard/'
-    | '/$publicId/menu/$menuId/edit'
-    | '/$publicId/menu/$menuId/'
+    | '/$publicId/menu/$menuPublicId/edit'
+    | '/$publicId/menu/$menuPublicId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | ''
     | '/login'
     | '/logout'
     | '/privacy-policy'
@@ -240,8 +236,8 @@ export interface FileRouteTypes {
     | '/onboarding/domain'
     | '/onboarding/setup'
     | '/$publicId/dashboard'
-    | '/$publicId/menu/$menuId/edit'
-    | '/$publicId/menu/$menuId'
+    | '/$publicId/menu/$menuPublicId/edit'
+    | '/$publicId/menu/$menuPublicId'
   id:
     | '__root__'
     | '/'
@@ -259,10 +255,10 @@ export interface FileRouteTypes {
     | '/_authed/$publicId/restaurant'
     | '/_authed/onboarding/domain'
     | '/_authed/onboarding/setup'
-    | '/_authed/$publicId/menu/$menuId'
+    | '/_authed/$publicId/menu/$menuPublicId'
     | '/_authed/$publicId/dashboard/'
-    | '/_authed/$publicId/menu/$menuId/edit'
-    | '/_authed/$publicId/menu/$menuId/'
+    | '/_authed/$publicId/menu/$menuPublicId/edit'
+    | '/_authed/$publicId/menu/$menuPublicId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -300,46 +296,11 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authed': {
-      id: '/_authed'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/logout': {
-      id: '/logout'
-      path: '/logout'
-      fullPath: '/logout'
-      preLoaderRoute: typeof LogoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
+    '/terms-of-use': {
+      id: '/terms-of-use'
+      path: '/terms-of-use'
+      fullPath: '/terms-of-use'
+      preLoaderRoute: typeof TermsOfUseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -349,26 +310,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/terms-of-use': {
-      id: '/terms-of-use'
-      path: '/terms-of-use'
-      fullPath: '/terms-of-use'
-      preLoaderRoute: typeof TermsOfUseRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/$publicId': {
-      id: '/_authed/$publicId'
-      path: '/$publicId'
-      fullPath: '/$publicId'
-      preLoaderRoute: typeof AuthedPublicIdRouteImport
-      parentRoute: typeof AuthedRoute
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authed/account': {
-      id: '/_authed/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AuthedAccountRouteImport
-      parentRoute: typeof AuthedRoute
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/login': {
       id: '/auth/login'
@@ -377,25 +359,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/$publicId/dashboard': {
-      id: '/_authed/$publicId/dashboard'
-      path: '/dashboard'
-      fullPath: '/$publicId/dashboard'
-      preLoaderRoute: typeof AuthedPublicIdDashboardRouteImport
-      parentRoute: typeof AuthedPublicIdRoute
+    '/_authed/account': {
+      id: '/_authed/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthedAccountRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/_authed/$publicId/restaurant': {
-      id: '/_authed/$publicId/restaurant'
-      path: '/restaurant'
-      fullPath: '/$publicId/restaurant'
-      preLoaderRoute: typeof AuthedPublicIdRestaurantRouteImport
-      parentRoute: typeof AuthedPublicIdRoute
-    }
-    '/_authed/onboarding/domain': {
-      id: '/_authed/onboarding/domain'
-      path: '/onboarding/domain'
-      fullPath: '/onboarding/domain'
-      preLoaderRoute: typeof AuthedOnboardingDomainRouteImport
+    '/_authed/$publicId': {
+      id: '/_authed/$publicId'
+      path: '/$publicId'
+      fullPath: '/$publicId'
+      preLoaderRoute: typeof AuthedPublicIdRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/onboarding/setup': {
@@ -405,18 +380,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOnboardingSetupRouteImport
       parentRoute: typeof AuthedRoute
     }
-    '/api/trpc/$': {
-      id: '/api/trpc/$'
-      path: ''
-      fullPath: '/api/trpc/$'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootRouteImport
+    '/_authed/onboarding/domain': {
+      id: '/_authed/onboarding/domain'
+      path: '/onboarding/domain'
+      fullPath: '/onboarding/domain'
+      preLoaderRoute: typeof AuthedOnboardingDomainRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/_authed/$publicId/menu/$menuId': {
-      id: '/_authed/$publicId/menu/$menuId'
-      path: '/menu/$menuId'
-      fullPath: '/$publicId/menu/$menuId'
-      preLoaderRoute: typeof AuthedPublicIdMenuMenuIdRouteImport
+    '/_authed/$publicId/restaurant': {
+      id: '/_authed/$publicId/restaurant'
+      path: '/restaurant'
+      fullPath: '/$publicId/restaurant'
+      preLoaderRoute: typeof AuthedPublicIdRestaurantRouteImport
+      parentRoute: typeof AuthedPublicIdRoute
+    }
+    '/_authed/$publicId/dashboard': {
+      id: '/_authed/$publicId/dashboard'
+      path: '/dashboard'
+      fullPath: '/$publicId/dashboard'
+      preLoaderRoute: typeof AuthedPublicIdDashboardRouteImport
       parentRoute: typeof AuthedPublicIdRoute
     }
     '/_authed/$publicId/dashboard/': {
@@ -426,162 +408,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedPublicIdDashboardIndexRouteImport
       parentRoute: typeof AuthedPublicIdDashboardRoute
     }
-    '/_authed/$publicId/menu/$menuId/edit': {
-      id: '/_authed/$publicId/menu/$menuId/edit'
-      path: '/edit'
-      fullPath: '/$publicId/menu/$menuId/edit'
-      preLoaderRoute: typeof AuthedPublicIdMenuMenuIdEditRouteImport
-      parentRoute: typeof AuthedPublicIdMenuMenuIdRoute
+    '/_authed/$publicId/menu/$menuPublicId': {
+      id: '/_authed/$publicId/menu/$menuPublicId'
+      path: '/menu/$menuPublicId'
+      fullPath: '/$publicId/menu/$menuPublicId'
+      preLoaderRoute: typeof AuthedPublicIdMenuMenuPublicIdRouteImport
+      parentRoute: typeof AuthedPublicIdRoute
     }
-    '/_authed/$publicId/menu/$menuId/': {
-      id: '/_authed/$publicId/menu/$menuId/'
+    '/_authed/$publicId/menu/$menuPublicId/': {
+      id: '/_authed/$publicId/menu/$menuPublicId/'
       path: '/'
-      fullPath: '/$publicId/menu/$menuId/'
-      preLoaderRoute: typeof AuthedPublicIdMenuMenuIdIndexRouteImport
-      parentRoute: typeof AuthedPublicIdMenuMenuIdRoute
+      fullPath: '/$publicId/menu/$menuPublicId/'
+      preLoaderRoute: typeof AuthedPublicIdMenuMenuPublicIdIndexRouteImport
+      parentRoute: typeof AuthedPublicIdMenuMenuPublicIdRoute
+    }
+    '/_authed/$publicId/menu/$menuPublicId/edit': {
+      id: '/_authed/$publicId/menu/$menuPublicId/edit'
+      path: '/edit'
+      fullPath: '/$publicId/menu/$menuPublicId/edit'
+      preLoaderRoute: typeof AuthedPublicIdMenuMenuPublicIdEditRouteImport
+      parentRoute: typeof AuthedPublicIdMenuMenuPublicIdRoute
     }
   }
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed': {
-      id: '/_authed'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/logout': {
-      id: '/logout'
-      path: '/logout'
-      fullPath: '/logout'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/terms-of-use': {
-      id: '/terms-of-use'
-      path: '/terms-of-use'
-      fullPath: '/terms-of-use'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/$publicId': {
-      id: '/_authed/$publicId'
-      path: '/$publicId'
-      fullPath: '/$publicId'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/account': {
-      id: '/_authed/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/$publicId/dashboard': {
-      id: '/_authed/$publicId/dashboard'
-      path: '/dashboard'
-      fullPath: '/$publicId/dashboard'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/$publicId/restaurant': {
-      id: '/_authed/$publicId/restaurant'
-      path: '/restaurant'
-      fullPath: '/$publicId/restaurant'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/onboarding/domain': {
-      id: '/_authed/onboarding/domain'
-      path: '/onboarding/domain'
-      fullPath: '/onboarding/domain'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/onboarding/setup': {
-      id: '/_authed/onboarding/setup'
-      path: '/onboarding/setup'
-      fullPath: '/onboarding/setup'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
     '/api/trpc/$': {
       id: '/api/trpc/$'
       path: '/api/trpc/$'
       fullPath: '/api/trpc/$'
       preLoaderRoute: typeof ApiTrpcSplatServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/$publicId/menu/$menuId': {
-      id: '/_authed/$publicId/menu/$menuId'
-      path: '/menu/$menuId'
-      fullPath: '/$publicId/menu/$menuId'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/$publicId/dashboard/': {
-      id: '/_authed/$publicId/dashboard/'
-      path: '/'
-      fullPath: '/$publicId/dashboard/'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/$publicId/menu/$menuId/edit': {
-      id: '/_authed/$publicId/menu/$menuId/edit'
-      path: '/edit'
-      fullPath: '/$publicId/menu/$menuId/edit'
-      preLoaderRoute: unknown
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/_authed/$publicId/menu/$menuId/': {
-      id: '/_authed/$publicId/menu/$menuId/'
-      path: '/'
-      fullPath: '/$publicId/menu/$menuId/'
-      preLoaderRoute: unknown
       parentRoute: typeof rootServerRouteImport
     }
   }
@@ -601,32 +457,35 @@ const AuthedPublicIdDashboardRouteWithChildren =
     AuthedPublicIdDashboardRouteChildren,
   )
 
-interface AuthedPublicIdMenuMenuIdRouteChildren {
-  AuthedPublicIdMenuMenuIdEditRoute: typeof AuthedPublicIdMenuMenuIdEditRoute
-  AuthedPublicIdMenuMenuIdIndexRoute: typeof AuthedPublicIdMenuMenuIdIndexRoute
+interface AuthedPublicIdMenuMenuPublicIdRouteChildren {
+  AuthedPublicIdMenuMenuPublicIdEditRoute: typeof AuthedPublicIdMenuMenuPublicIdEditRoute
+  AuthedPublicIdMenuMenuPublicIdIndexRoute: typeof AuthedPublicIdMenuMenuPublicIdIndexRoute
 }
 
-const AuthedPublicIdMenuMenuIdRouteChildren: AuthedPublicIdMenuMenuIdRouteChildren =
+const AuthedPublicIdMenuMenuPublicIdRouteChildren: AuthedPublicIdMenuMenuPublicIdRouteChildren =
   {
-    AuthedPublicIdMenuMenuIdEditRoute: AuthedPublicIdMenuMenuIdEditRoute,
-    AuthedPublicIdMenuMenuIdIndexRoute: AuthedPublicIdMenuMenuIdIndexRoute,
+    AuthedPublicIdMenuMenuPublicIdEditRoute:
+      AuthedPublicIdMenuMenuPublicIdEditRoute,
+    AuthedPublicIdMenuMenuPublicIdIndexRoute:
+      AuthedPublicIdMenuMenuPublicIdIndexRoute,
   }
 
-const AuthedPublicIdMenuMenuIdRouteWithChildren =
-  AuthedPublicIdMenuMenuIdRoute._addFileChildren(
-    AuthedPublicIdMenuMenuIdRouteChildren,
+const AuthedPublicIdMenuMenuPublicIdRouteWithChildren =
+  AuthedPublicIdMenuMenuPublicIdRoute._addFileChildren(
+    AuthedPublicIdMenuMenuPublicIdRouteChildren,
   )
 
 interface AuthedPublicIdRouteChildren {
   AuthedPublicIdDashboardRoute: typeof AuthedPublicIdDashboardRouteWithChildren
   AuthedPublicIdRestaurantRoute: typeof AuthedPublicIdRestaurantRoute
-  AuthedPublicIdMenuMenuIdRoute: typeof AuthedPublicIdMenuMenuIdRouteWithChildren
+  AuthedPublicIdMenuMenuPublicIdRoute: typeof AuthedPublicIdMenuMenuPublicIdRouteWithChildren
 }
 
 const AuthedPublicIdRouteChildren: AuthedPublicIdRouteChildren = {
   AuthedPublicIdDashboardRoute: AuthedPublicIdDashboardRouteWithChildren,
   AuthedPublicIdRestaurantRoute: AuthedPublicIdRestaurantRoute,
-  AuthedPublicIdMenuMenuIdRoute: AuthedPublicIdMenuMenuIdRouteWithChildren,
+  AuthedPublicIdMenuMenuPublicIdRoute:
+    AuthedPublicIdMenuMenuPublicIdRouteWithChildren,
 }
 
 const AuthedPublicIdRouteWithChildren = AuthedPublicIdRoute._addFileChildren(

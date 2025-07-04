@@ -1,4 +1,4 @@
-import { Box, Button, CloseButton, createOverlay, Drawer, Field, FileUpload, Flex, Float, FormatNumber, Heading, Icon, IconButton, Image, Input, NumberInput, Square, Stack, Text, Textarea, useFileUploadContext, VStack } from '@chakra-ui/react'
+import { Box, Button, CloseButton, createOverlay, Drawer, Field, FileUpload, Flex, Float, FormatNumber, Heading, HStack, Icon, IconButton, Image, Input, NumberInput, Square, Stack, StackSeparator, Text, Textarea, useFileUploadContext, VStack } from '@chakra-ui/react'
 import { prisma } from '@repo/db'
 import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -6,7 +6,6 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import mime from 'mime'
 import { getPlaiceholder } from 'plaiceholder'
-import * as React from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod/v4'
 import IconAddAPhoto from '~icons/material-symbols/add-a-photo'
@@ -116,11 +115,11 @@ const fetchMenuData = createServerFn({ method: 'GET' })
     }
   })
 
-export const Route = createFileRoute('/_authed/$publicId/menu/$menuId/edit')({
+export const Route = createFileRoute('/_authed/$publicId/menu/$menuPublicId/edit')({
   loader: async ({
-    params: { menuId },
+    params: { menuPublicId },
   }) => {
-    const data = await fetchMenuData({ data: menuId })
+    const data = await fetchMenuData({ data: menuPublicId })
     return data
   },
   component: RouteComponent,
@@ -162,7 +161,6 @@ function RouteComponent() {
               onClick={() => {
                 menuItemDrawer.open('a', {
                   id: 'a',
-                  menuPublicId: menu.publicId,
                 })
               }}
             >
@@ -176,90 +174,28 @@ function RouteComponent() {
   }
 
   return (
-    <VStack gap={8} w="full" py={4}>
-      {sectionsWithItems.map(section => (
-        <Box key={section.id} w="full">
-          <Flex mb={4}>
-            <Box>
-              { section.title
-                ? <Heading>{section.title}</Heading>
-                : <Heading fontStyle="italic" color="gray.500">Untitled Section</Heading>}
-              { section.description
-                ? <Text>{section.description}</Text>
-                : <Text fontStyle="italic" color="gray.500">No description</Text>}
-            </Box>
-            <Box ml="auto">
-              <SectionDrawer section={section} menuPublicId={menu.publicId} />
-            </Box>
-          </Flex>
-          <Box>
-            {section.menuItems.map(item => (
-              <Flex key={item.id} borderWidth={1} borderColor="gray.200" borderRadius="md" p={4} mb={4} bg="white" shadow="sm" gap={4}>
-                <Flex flex="1" gap={4}>
-                  {item.image[0]
-                    ? (
-                        <Image
-                          src={item.image[0].url}
-                          width={16}
-                          height={16}
-                          objectFit="cover"
-                          borderRadius="md"
-                        />
-                      )
-                    : null}
-                  <Stack direction="row" gap={4}>
-                    <Box>
-                      {item.image[0]?.url
-                        ? (
-                            <Image
-                              src={item.image[0]?.url || ''}
-                              width={16}
-                              height={16}
-                              objectFit="cover"
-                              borderRadius="md"
-                              alt={item.title || 'Menu Item Image'}
-                            // fallbackSrc="https://via.placeholder.com/64"
-                            />
-                          )
-                        : (
-                            <Square size={16} bg="gray.100" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
-                              <Icon size="md" color="fg.muted">
-                                <IconAddAPhoto />
-                              </Icon>
-                            </Square>
-                          )}
-                    </Box>
-                    <Box>
-                      <Heading>{item.title}</Heading>
-                      {item.price
-                        ? (
-                            <Text>
-                              <FormatNumber
-                                value={item.price / 100}
-                                style="currency"
-                                currency="USD"
-                              />
-                            </Text>
-                          )
-                        : <Text fontStyle="italic" color="gray.500">No price</Text>}
-                      {item.description
-                        ? <Text>{item.description}</Text>
-                        : <Text fontStyle="italic" color="gray.500">No description</Text>}
-                    </Box>
-                  </Stack>
-                </Flex>
+    <Box py={4}>
+      <VStack gap={4} w="full">
+        {sectionsWithItems.map(section => (
+          <Box key={section.id} w="full" borderWidth={1} borderColor="gray.100" borderRadius="md" bg="white" shadow="sm">
+            <Flex mb={4} p={3}>
+              <Box>
+                { section.title
+                  ? <Heading>{section.title}</Heading>
+                  : <Heading fontStyle="italic" color="gray.500">Untitled Section</Heading>}
+                { section.description
+                  ? <Text>{section.description}</Text>
+                  : <Text fontStyle="italic" color="gray.500">No description</Text>}
+              </Box>
+              <Box ml="auto">
                 <IconButton
-                  aria-label="Edit menu item"
+                  aria-label="Edit section"
                   variant="subtle"
                   size="sm"
                   onClick={() => {
-                    menuItemDrawer.open(item.id.toString(), {
-                      id: item.id.toString(),
-                      menuPublicId: menu.publicId,
-                      menuItem: {
-                        ...item,
-                        image: item.image[0],
-                      },
+                    sectionDrawer.open(section.id.toString(), {
+                      id: section.id.toString(),
+                      section,
                     })
                   }}
                 >
@@ -267,68 +203,170 @@ function RouteComponent() {
                     <IconMoreVert />
                   </Icon>
                 </IconButton>
-                <menuItemDrawer.Viewport />
-                {/* <MenuItemDrawer
-                  menuItem={{
-                    ...item,
-                    image: item.image[0],
+                <sectionDrawer.Viewport />
+              </Box>
+            </Flex>
+            <Box>
+              <VStack separator={<StackSeparator borderColor="gray.200" />} gap={3}>
+                {section.menuItems.map(item => (
+                  <Box key={item.id} w="full" px={3}>
+                    <HStack gap={2}>
+                      <Box>
+                        <Square size={16} bg="gray.100" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
+                          {item.image[0]?.url
+                            ? (
+                                <Image
+                                  src={item.image[0]?.url || ''}
+                                  height="full"
+                                  width="full"
+                                  objectFit="cover"
+                                  borderRadius="md"
+                                  alt={item.title || 'Menu Item Image'}
+                                  // fallbackSrc="https://via.placeholder.com/64"
+                                />
+                              )
+                            : (
+                                <Icon size="md" color="fg.muted">
+                                  <IconAddAPhoto />
+                                </Icon>
+                              )}
+                        </Square>
+                      </Box>
+                      <Box flex="1">
+                        {item.title
+                          ? <Heading>{item.title}</Heading>
+                          : <Heading fontStyle="italic" color="gray.500">Untitled Item</Heading>}
+                        {item.price
+                          ? (
+                              <Text>
+                                <FormatNumber
+                                  value={item.price / 100}
+                                  style="currency"
+                                  currency="USD"
+                                />
+                              </Text>
+                            )
+                          : <Text fontStyle="italic" color="gray.500">No price</Text>}
+                      </Box>
+                      <IconButton
+                        aria-label="Edit menu item"
+                        variant="subtle"
+                        size="sm"
+                        onClick={() => {
+                          menuItemDrawer.open(item.id.toString(), {
+                            id: item.id.toString(),
+                            menuItem: {
+                              ...item,
+                              image: item.image[0],
+                            },
+                          })
+                        }}
+                      >
+                        <Icon size="lg">
+                          <IconMoreVert />
+                        </Icon>
+                      </IconButton>
+                      <menuItemDrawer.Viewport />
+                    </HStack>
+                    <Box mt={2}>
+                      {item.description
+                        ? <Text>{item.description}</Text>
+                        : <Text fontStyle="italic" color="gray.500">No description</Text>}
+                    </Box>
+                  </Box>
+                ))}
+              </VStack>
+              <Box borderTop="1px solid" borderColor="gray.200" p={3} mt={2}>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    menuItemDrawer.open('a', {
+                      id: 'a',
+                      sectionId: section.id,
+                    })
                   }}
-                  menuId={menu.id}
-                  isOpen={isOpen}
-                  onOpenChange={onOpenChange}
-                /> */}
-              </Flex>
-            ))}
+                >
+                  Add Item
+                </Button>
+              </Box>
+            </Box>
           </Box>
-        </Box>
-      ))}
-    </VStack>
+        ))}
+      </VStack>
+      <Box mt={4}>
+        <Button
+          size="sm"
+          onClick={() => {
+            sectionDrawer.open('a', {
+              id: 'a',
+            })
+          }}
+        >
+          Add Section
+        </Button>
+      </Box>
+    </Box>
   )
 }
 
-function SectionDrawer({ section, menuPublicId }: {
-  section: {
+interface SectionDrawerProps {
+  id: string
+  section?: {
     id: number
     title: string | null
     description: string | null
   }
-  menuPublicId: string
-}) {
-  const [open, setOpen] = React.useState(false)
+}
+
+const sectionDrawer = createOverlay<SectionDrawerProps>(({ id, section, ...rest }) => {
+  const { publicId, menuPublicId } = Route.useParams()
   const updateSectionMutation = useMutation(trpc.section.update.mutationOptions())
+  const createSectionMutation = useMutation(trpc.section.create.mutationOptions())
   const queryClient = useQueryClient()
+  const { sections } = Route.useLoaderData()
 
   const form = useForm({
     defaultValues: {
-      title: section.title || '',
-      description: section.description || '',
+      title: section?.title || '',
+      description: section?.description || '',
     },
     onSubmit: async ({ value }) => {
-      await updateSectionMutation.mutateAsync({
-        id: section.id,
-        data: {
-          title: value.title,
-          description: value.description,
-        },
-      }, {
-        onSuccess: () => {
-          queryClient.invalidateQueries(trpc.section.getByMenuPublicId.queryFilter({ menuPublicId }))
-          setOpen(false)
-        },
-      })
+      if (section?.id) {
+        await updateSectionMutation.mutateAsync({
+          id: section.id,
+          payload: {
+            title: value.title,
+            description: value.description,
+          },
+        }, {
+          onSuccess: () => {
+            queryClient.invalidateQueries(trpc.section.getByMenuPublicId.queryFilter({ menuPublicId }))
+            sectionDrawer.close(id)
+          },
+        })
+      }
+      else {
+        await createSectionMutation.mutateAsync({
+          payload: {
+            restaurantPublicId: publicId,
+            menuPublicId,
+            title: value.title,
+            description: value.description,
+            position: sections.length + 1,
+          },
+        }, {
+          onSuccess: () => {
+            queryClient.invalidateQueries(trpc.section.getByMenuPublicId.queryFilter({ menuPublicId }))
+            sectionDrawer.close(id)
+          },
+        })
+      }
     },
   })
 
   return (
-    <Drawer.Root open={open} onOpenChange={e => setOpen(e.open)}>
+    <Drawer.Root {...rest}>
       <Drawer.Backdrop />
-      <Drawer.Trigger asChild>
-        <IconButton aria-label="Edit section" variant="subtle" size="sm">
-          <Icon size="lg">
-            <IconMoreVert />
-          </Icon>
-        </IconButton>
-      </Drawer.Trigger>
       <Drawer.Positioner>
         <Drawer.Content asChild>
           <form
@@ -340,7 +378,11 @@ function SectionDrawer({ section, menuPublicId }: {
           >
             <Drawer.CloseTrigger />
             <Drawer.Header>
-              <Drawer.Title>Edit Section</Drawer.Title>
+              <Drawer.Title>
+                { section?.id
+                  ? 'Edit Section'
+                  : 'Add Section' }
+              </Drawer.Title>
             </Drawer.Header>
             <Drawer.Body>
               <VStack gap={4}>
@@ -379,11 +421,10 @@ function SectionDrawer({ section, menuPublicId }: {
                     </Field.Root>
                   )}
                 />
-                {/* Section edit form goes here */}
               </VStack>
             </Drawer.Body>
             <Drawer.Footer>
-              <Button onClick={() => setOpen(false)} variant="outline">Cancel</Button>
+              <Button onClick={() => sectionDrawer.close(id)} variant="outline">Cancel</Button>
               <form.Subscribe
                 selector={state => ({ isSubmitting: state.isSubmitting })}
                 children={({ isSubmitting }) => (
@@ -404,7 +445,7 @@ function SectionDrawer({ section, menuPublicId }: {
       </Drawer.Positioner>
     </Drawer.Root>
   )
-}
+})
 
 interface MenuItemDrawerProps {
   id: string
@@ -420,15 +461,16 @@ interface MenuItemDrawerProps {
       height: number | null
     } | null
   }
-  menuPublicId: string
-  // isOpen: boolean
-  // onOpenChange: (open: boolean) => void
+  sectionId?: number
 }
 
-const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuPublicId, menuItem, ...rest }) => {
+const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuItem, sectionId, ...rest }) => {
+  const { menuPublicId } = Route.useParams()
   const updateMenuItemMutation = useMutation(trpc.menuItem.update.mutationOptions())
   const createMenuItemMutation = useMutation(trpc.menuItem.create.mutationOptions())
   const queryClient = useQueryClient()
+  const { menuItems } = Route.useLoaderData()
+  const itemsInSection = menuItems.filter(item => item.sectionId === sectionId)
 
   const { publicId } = Route.useParams()
 
@@ -453,7 +495,7 @@ const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuPublicId, m
           payload: {
             title: value.title,
             description: value.description,
-            price: value.price ? Number(value.price) * 100 : undefined,
+            price: value.price ? Number(value.price) * 100 : null,
             image: newImage
               ? {
                   ...newImage,
@@ -472,12 +514,12 @@ const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuPublicId, m
         await createMenuItemMutation.mutateAsync({
           payload: {
             menuPublicId,
-            sectionId: 0, // Default to 0 or handle as needed
-            position: 0, // Default to 0 or handle as needed
+            sectionId,
+            position: itemsInSection.length + 1,
             restaurantId: publicId,
             title: value.title,
             description: value.description,
-            price: value.price ? Number(value.price) * 100 : undefined,
+            price: value.price ? Number(value.price) * 100 : null,
             image: newImage,
           },
         }, {

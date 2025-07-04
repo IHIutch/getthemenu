@@ -2,12 +2,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
-
+import SuperJSON from 'superjson'
 
 import type { AppRouter } from './utils/trpc/routes'
 
 import { routeTree } from './routeTree.gen'
-import SuperJSON from 'superjson'
 import { TRPCProvider } from './utils/trpc/react'
 
 export const queryClient = new QueryClient()
@@ -25,8 +24,6 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 })
 
 export function createRouter() {
-  
-
   const router = createTanStackRouter({
     routeTree,
     scrollRestoration: true,

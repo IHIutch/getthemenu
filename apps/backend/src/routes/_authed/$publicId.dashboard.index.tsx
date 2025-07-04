@@ -1,4 +1,4 @@
-import { Box, Button, Link as ChakraLink, Flex, Icon, IconButton, Tag, VStack } from '@chakra-ui/react'
+import { Box, Link as ChakraLink, Flex, Icon, IconButton, Tag, VStack } from '@chakra-ui/react'
 import { Icon as Iconify } from '@iconify/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
@@ -25,14 +25,6 @@ export const Route = createFileRoute('/_authed/$publicId/dashboard/')({
 function RouteComponent() {
   const { menus } = Route.useLoaderData()
   const { publicId } = Route.useParams()
-  // const { data: menus = [] } = useQuery(trpc.menu.getAll.queryOptions({
-  //   publicId
-  // }, {
-  //   refetchOnMount: false,
-  //   gcTime: 1000 * 30,
-  //   staleTime: 1000 * 30,
-  //   initialData: initialData
-  // }))
 
   return (
     <VStack gap={4}>
@@ -41,10 +33,10 @@ function RouteComponent() {
           <Box flex="1">
             <ChakraLink fontWeight="bold" fontSize="xl" asChild>
               <Link
-                to="/$publicId/menu/$menuId/edit"
+                to="/$publicId/menu/$menuPublicId/edit"
                 params={{
                   publicId,
-                  menuId: menu.publicId,
+                  menuPublicId: menu.publicId,
                 }}
               >
                 {menu.title}

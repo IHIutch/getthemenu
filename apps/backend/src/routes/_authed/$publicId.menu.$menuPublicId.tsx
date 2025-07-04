@@ -1,7 +1,7 @@
 import { chakra, Link as ChakraLink, Container, Flex, HStack } from '@chakra-ui/react'
 import { createFileRoute, createLink, Outlet } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_authed/$publicId/menu/$menuId')({
+export const Route = createFileRoute('/_authed/$publicId/menu/$menuPublicId')({
   component: RouteComponent,
 })
 
@@ -31,27 +31,27 @@ const CustomLink = chakra(ChakraLink, {
 const TabLink = createLink(CustomLink)
 
 function RouteComponent() {
-  const { publicId, menuId } = Route.useParams()
+  const { publicId, menuPublicId } = Route.useParams()
   return (
     <Flex direction="column" h="full" minH={0}>
-      <Flex bg="white" h="12" boxShadow="sm" align="center">
+      <Flex bg="white" h="12" boxShadow="sm" align="center" zIndex={1}>
         <Container maxW="8xl">
           <HStack gap={6}>
             <TabLink
-              to="/$publicId/menu/$menuId/edit"
+              to="/$publicId/menu/$menuPublicId/edit"
               params={{
                 publicId,
-                menuId,
+                menuPublicId,
               }}
               activeOptions={{ exact: true }}
             >
               Edit
             </TabLink>
             <TabLink
-              to="/$publicId/menu/$menuId"
+              to="/$publicId/menu/$menuPublicId"
               params={{
                 publicId,
-                menuId,
+                menuPublicId,
               }}
               activeOptions={{ exact: true }}
             >
