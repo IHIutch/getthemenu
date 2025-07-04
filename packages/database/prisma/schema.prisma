@@ -21,7 +21,7 @@ model MenuItems {
   position     Int
   price        Int?
   createdAt    DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt    DateTime? @db.Timestamptz(6)
 
   image MenuItemImages[]
@@ -34,13 +34,13 @@ model MenuItems {
 model Menus {
   id           Int       @id @default(autoincrement())
   restaurantId Int
-  publicId     String    @unique
+  publicId     String    @default(nanoid(8)) @unique
   title        String?
   slug         String
   position     Int
   description  String?
   createdAt    DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt    DateTime? @db.Timestamptz(6)
 
   menuItems   MenuItems[]
@@ -50,17 +50,17 @@ model Menus {
 
 model Restaurants {
   id           Int       @id @default(autoincrement())
-  publicId     String    @unique
+  publicId     String    @default(nanoid(6)) @unique
   userId       Int
   hours        Json?
   name         String?
-  customHost   String?   @unique
-  customDomain String?   @unique
+  customHost   String?   
+  customDomain String?  
   address      Json?
   phone        Json?
   email        Json?
   createdAt    DateTime? @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt    DateTime? @db.Timestamptz(6)
 
   menuItems  MenuItems[]
@@ -79,7 +79,7 @@ model Sections {
   position     Int
   description  String?
   createdAt    DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt    DateTime? @db.Timestamptz(6)
 
   menuItems  MenuItems[]
@@ -94,7 +94,7 @@ model Users {
   stripeSubscriptionId String?
   stripeCustomerId     String?
   createdAt            DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt            DateTime? @db.Timestamptz(6)
   trialEndsAt          DateTime? @db.Timestamptz(6)
 
@@ -107,7 +107,7 @@ model Feedback {
   type      String?
   comment   String?
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt DateTime? @db.Timestamptz(6)
 }
 
@@ -120,7 +120,7 @@ model MenuItemImages {
   height      Int
   hex         String?
   createdAt   DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt   DateTime? @db.Timestamptz(6)
 
   menuItem MenuItems @relation(fields: [menuItemId], references: [id])
@@ -135,7 +135,7 @@ model CoverImages {
   height       Int
   hex          String?
   createdAt    DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt    DateTime? @db.Timestamptz(6)
 
   restaurant Restaurants @relation(fields: [restaurantId], references: [id])

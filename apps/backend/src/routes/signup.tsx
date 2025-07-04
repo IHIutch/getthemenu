@@ -3,7 +3,7 @@ import { createServerFn, useServerFn } from '@tanstack/react-start'
 
 import { Auth } from '../components/Auth'
 import { useMutation } from '../hooks/use-mutation'
-import { getSupabaseServerClient } from '../utils/supabase'
+import getSupabaseServerClient from '../utils/supabase/server'
 
 export const signupFn = createServerFn({ method: 'POST' })
   .validator(

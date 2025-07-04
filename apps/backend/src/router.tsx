@@ -1,25 +1,31 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-// src/router.tsx
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
 
+
 import type { AppRouter } from './utils/trpc/routes'
 
 import { routeTree } from './routeTree.gen'
+import SuperJSON from 'superjson'
+import { TRPCProvider } from './utils/trpc/react'
+
+export const queryClient = new QueryClient()
+export const trpcClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: '/api/trpc',
+      transformer: SuperJSON,
+    }),
+  ],
+})
+export const trpc = createTRPCOptionsProxy<AppRouter>({
+  client: trpcClient,
+  queryClient,
+})
 
 export function createRouter() {
-  const queryClient = new QueryClient()
-  const trpc = createTRPCOptionsProxy<AppRouter>({
-    client: createTRPCClient({
-      links: [
-        httpBatchLink({
-          url: '/api/trpc',
-        }),
-      ],
-    }),
-    queryClient,
-  })
+  
 
   const router = createTanStackRouter({
     routeTree,
@@ -31,7 +37,9 @@ export function createRouter() {
     Wrap: function WrapComponent({ children }) {
       return (
         <QueryClientProvider client={queryClient}>
-          {children}
+          <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+            {children}
+          </TRPCProvider>
         </QueryClientProvider>
       )
     },

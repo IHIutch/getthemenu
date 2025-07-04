@@ -4,7 +4,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 
 import { Login } from '../components/Login'
-import { getSupabaseServerClient } from '../utils/supabase'
+import getSupabaseServerClient from '../utils/supabase/server'
 
 export const fetchUser = createServerFn({ method: 'GET' }).handler(async () => {
   const supabase = getSupabaseServerClient()

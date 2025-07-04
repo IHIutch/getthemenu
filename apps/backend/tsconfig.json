@@ -26,6 +26,9 @@
         "src/*"
       ]
     },
-    "noEmit": true
+    "noEmit": true,
+    "types": [
+      "unplugin-icons/types/react",
+    ]
   }
 }

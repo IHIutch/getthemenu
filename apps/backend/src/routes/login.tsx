@@ -1,3 +1,5 @@
+import { Box, Button, Field, Heading, Input, VStack } from '@chakra-ui/react'
+import { useForm } from '@tanstack/react-form'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 
 import { useMutation } from '~/hooks/use-mutation'
@@ -26,56 +28,82 @@ function LoginComp() {
     },
   })
 
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      await loginMutation.mutate({
+        data: {
+          email: value.email,
+          password: value.password,
+        },
+      })
+    },
+  })
+
   return (
-    <div className="fixed inset-0 bg-white dark:bg-black flex items-start justify-center p-8">
-      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">Login</h1>
+    <div>
+      <Box maxW="md" mx="auto" mt={8} p={4} borderWidth={1} rounded="sm" shadow="sm">
+        <Box mb={4}>
+          <Heading as="h1" size="xl">Login</Heading>
+        </Box>
         <form
           onSubmit={(e) => {
             e.preventDefault()
-
-            const formData = new FormData(e.target as HTMLFormElement)
-
-            loginMutation.mutate({
-              data: {
-                email: formData.get('email') as string,
-                password: formData.get('password') as string,
-              },
-            })
+            e.stopPropagation()
+            form.handleSubmit()
           }}
-          className="space-y-4"
         >
-          <div>
-            <label htmlFor="email" className="block text-xs">
-              Username
-            </label>
-            <input
-              type="email"
+          <VStack gap={4}>
+            <form.Field
               name="email"
-              id="email"
-              className="px-2 py-1 w-full rounded border border-gray-500/20 bg-white dark:bg-gray-800"
+              children={field => (
+                <Field.Root invalid={!!field.state.meta.errors.length} required>
+                  <Field.Label>
+                    Email
+                  </Field.Label>
+                  <Input
+                    type="text"
+                    name={field.name}
+                    onChange={e => field.handleChange(e.target.value)}
+                  />
+                  <Field.ErrorText>{field.state.meta.errors?.[0]}</Field.ErrorText>
+                </Field.Root>
+              )}
             />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-xs">
-              Password
-            </label>
-            <input
-              type="password"
+
+            <form.Field
               name="password"
-              id="password"
-              className="px-2 py-1 w-full rounded border border-gray-500/20 bg-white dark:bg-gray-800"
+              children={field => (
+                <Field.Root invalid={!!field.state.meta.errors.length} required>
+                  <Field.Label>
+                    Password
+                  </Field.Label>
+                  <Input
+                    type="password"
+                    name={field.name}
+                    onChange={e => field.handleChange(e.target.value)}
+                  />
+                  <Field.ErrorText>{field.state.meta.errors?.[0]}</Field.ErrorText>
+                </Field.Root>
+              )}
             />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-cyan-600 text-white rounded py-2 font-black uppercase"
-            disabled={loginMutation.status === 'pending'}
-          >
-            {loginMutation.status === 'pending' ? '...' : 'Login'}
-          </button>
+            <form.Subscribe
+              selector={state => ({ isSubmitting: state.isSubmitting })}
+              children={({ isSubmitting }) => (
+                <Button
+                  type="submit"
+                  loading={isSubmitting}
+                >
+                  Login
+                </Button>
+              )}
+            />
+          </VStack>
         </form>
-      </div>
+      </Box>
     </div>
   )
 }

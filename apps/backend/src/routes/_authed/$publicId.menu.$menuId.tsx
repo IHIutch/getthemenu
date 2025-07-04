@@ -1,14 +1,68 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { Box, chakra, Link as ChakraLink, Container, Flex, HStack, Stack } from '@chakra-ui/react'
+import { createFileRoute, createLink, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authed/$publicId/menu/$menuId')({
   component: RouteComponent,
 })
 
-function RouteComponent() {
-  return (
-    <div>
+const CustomLink = chakra(ChakraLink, {
+  base: {
+    h: 12,
+    display: 'flex',
+    alignItems: 'center',
+    fontWeight: 'medium',
+    borderBottomWidth: '2px',
+    borderRadius: 0,
+    borderColor: 'transparent',
+    transition: 'border-color 0.2s',
+    _hover: {
+      borderColor: 'gray.400',
+      textDecoration: 'none',
+    },
+    _currentPage: {
+      borderColor: 'black',
+      _hover: {
+        borderColor: 'black',
+      },
+    },
+  },
+})
 
-      <Outlet />
-    </div>
+const TabLink = createLink(CustomLink)
+
+function RouteComponent() {
+  const { publicId, menuId } = Route.useParams()
+  return (
+    <Flex direction="column" h="full" minH={0}>
+      <Flex bg="white" h="12" boxShadow="sm" align="center">
+        <Container maxW="8xl">
+          <HStack gap={6}>
+            <TabLink
+              to="/$publicId/menu/$menuId/edit"
+              params={{
+                publicId,
+                menuId,
+              }}
+              activeOptions={{ exact: true }}
+            >
+              Edit
+            </TabLink>
+            <TabLink
+              to="/$publicId/menu/$menuId"
+              params={{
+                publicId,
+                menuId,
+              }}
+              activeOptions={{ exact: true }}
+            >
+              Settings
+            </TabLink>
+          </HStack>
+        </Container>
+      </Flex>
+      <Container h="full" minH={0} flex="1" maxW="8xl" overflow="auto">
+        <Outlet />
+      </Container>
+    </Flex>
   )
 }

@@ -88,75 +88,64 @@ export default function Navbar({
 
   return (
     <>
-      <Box
-        as="nav"
-        bg="white"
-        borderBottom="1px"
-        borderColor="gray.200"
-        position="fixed"
-        top="0"
-        w="100%"
-        zIndex="1"
-      >
-        <Container maxW="container.md">
-          <Box>
-            <Flex align="center">
-              <Flex align="center" h="14">
-                <Heading as="h1" fontSize="lg">
-                  <Link
-                    to="/$publicId/dashboard"
-                    params={{
-                      publicId: restaurant.publicId,
-                    }}
-                  >
-                    GetTheMenu
-                  </Link>
-                </Heading>
-              </Flex>
-              <Box ml="auto">
-                <HStack>
-                  {restaurant?.customHost && (
-                    <Button size="sm" asChild>
-                      <ChakraLink href={`https://${restaurant.customHost}.getthemenu.io`} target="blank">
-                        View Site
-                      </ChakraLink>
-                    </Button>
-                  )}
-                  <Menu.Root positioning={{
-                    placement: 'bottom-end',
+      <Container maxW="8xl">
+        <Box>
+          <Flex align="center">
+            <Flex align="center" h="14">
+              <Heading as="h1" fontSize="lg">
+                <Link
+                  to="/$publicId/dashboard"
+                  params={{
+                    publicId: restaurant.publicId,
                   }}
-                  >
-                    <Menu.Trigger>
-                      <Avatar.Root size="sm">
-                        <Avatar.Fallback name={`${user && user.fullName}`} />
-                      </Avatar.Root>
-                    </Menu.Trigger>
-                    <Menu.Positioner>
-                      <Menu.Content boxShadow="lg">
-                        <Menu.Item value="dashboard" asChild>
-                          <Link
-                            to="/$publicId/dashboard"
-                            params={{ publicId: restaurant.publicId }}
-                          >
-                            Dashboard
-                          </Link>
-                        </Menu.Item>
-                        <Menu.Item value="details" asChild>
-                          <Link to="/account">Account Details</Link>
-                        </Menu.Item>
-                        <Menu.Item value="feedback" onClick={modalState.onOpen}>Feedback</Menu.Item>
-                        <Menu.Item value="logout" asChild>
-                          <Link to="/logout">Log Out</Link>
-                        </Menu.Item>
-                      </Menu.Content>
-                    </Menu.Positioner>
-                  </Menu.Root>
-                </HStack>
-              </Box>
+                >
+                  GetTheMenu
+                </Link>
+              </Heading>
             </Flex>
-          </Box>
-        </Container>
-      </Box>
+            <Box ml="auto">
+              <HStack>
+                {restaurant?.customHost && (
+                  <Button size="sm" asChild>
+                    <ChakraLink href={`https://${restaurant.customHost}.getthemenu.io`} target="blank">
+                      View Site
+                    </ChakraLink>
+                  </Button>
+                )}
+                <Menu.Root positioning={{
+                  placement: 'bottom-end',
+                }}
+                >
+                  <Menu.Trigger>
+                    <Avatar.Root size="sm">
+                      <Avatar.Fallback name={`${user && user.fullName}`} />
+                    </Avatar.Root>
+                  </Menu.Trigger>
+                  <Menu.Positioner>
+                    <Menu.Content boxShadow="lg">
+                      <Menu.Item value="dashboard" asChild>
+                        <Link
+                          to="/$publicId/dashboard"
+                          params={{ publicId: restaurant.publicId }}
+                        >
+                          Dashboard
+                        </Link>
+                      </Menu.Item>
+                      <Menu.Item value="details" asChild>
+                        <Link to="/account">Account Details</Link>
+                      </Menu.Item>
+                      <Menu.Item value="feedback" onClick={modalState.onOpen}>Feedback</Menu.Item>
+                      <Menu.Item value="logout" asChild>
+                        <Link to="/logout">Log Out</Link>
+                      </Menu.Item>
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Menu.Root>
+              </HStack>
+            </Box>
+          </Flex>
+        </Box>
+      </Container>
       {/* <Dialog.Root open={modalState.open} onOpenChange={e => modalState.setOpen(e.open)}>
         <Dialog.Backdrop />
         <Dialog.Content>

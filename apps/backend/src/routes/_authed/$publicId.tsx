@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 import { prisma } from '@repo/db'
 import { createFileRoute, notFound, Outlet } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
@@ -54,18 +54,29 @@ export const Route = createFileRoute('/_authed/$publicId')({
 function RouteComponent() {
   const { user, restaurant } = Route.useLoaderData()
   return (
-    <Box pt="14">
-      <Navbar
-        restaurant={{
-          customHost: restaurant?.customHost || '',
-          publicId: restaurant?.publicId || '',
-        }}
-        user={{
-          fullName: user?.fullName || '',
-        }}
+    <Flex position="fixed" inset="0" flexDirection="column" bg="gray.50" overflow="hidden">
+      <Box
+        as="nav"
+        bg="white"
+        borderColor="gray.200"
+        zIndex="1"
+        borderBottomWidth={1}
       >
-      </Navbar>
+        <Box>
+          <Navbar
+            restaurant={{
+              customHost: restaurant?.customHost || '',
+              publicId: restaurant?.publicId || '',
+            }}
+            user={{
+              fullName: user?.fullName || '',
+            }}
+          />
+        </Box>
+      </Box>
+      {/* <Box h="full" minH={0}> */}
       <Outlet />
-    </Box>
+      {/* </Box> */}
+    </Flex>
   )
 }

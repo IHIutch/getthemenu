@@ -1,6 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 
-import { getSupabaseServerClient } from '../supabase'
+import getSupabaseServerClient  from '../supabase/server'
+import SuperJSON from 'superjson'
 
 export async function createContext() {
   const supabaseClient = getSupabaseServerClient()
@@ -14,7 +15,9 @@ export async function createContext() {
 
 export type Context = Awaited<ReturnType<typeof createContext>>
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({
+  transformer: SuperJSON
+})
 
 export const router = t.router
 export const publicProcedure = t.procedure

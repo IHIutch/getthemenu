@@ -1,4 +1,5 @@
-import { Box, Link as ChakraLink, VStack } from '@chakra-ui/react'
+import { Box, Button, Link as ChakraLink, Flex, Icon, IconButton, Tag, VStack } from '@chakra-ui/react'
+import { Icon as Iconify } from '@iconify/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authed/$publicId/dashboard/')({
@@ -34,21 +35,42 @@ function RouteComponent() {
   // }))
 
   return (
-    <VStack className="p-2 gap-2" spaceX={4}>
+    <VStack gap={4}>
       {menus.map(menu => (
-        <Box key={menu.id} p={4} borderWidth={1} borderRadius="md">
-          <ChakraLink asChild>
-            <Link
-              to="/$publicId/menu/$menuId/edit"
-              params={{
-                publicId,
-                menuId: menu.publicId,
-              }}
-            >
-              {menu.title}
-            </Link>
-          </ChakraLink>
-        </Box>
+        <Flex key={menu.id} p={4} borderWidth={1} borderRadius="md" w="full" bg="white" shadow="xs" gap={4}>
+          <Box flex="1">
+            <ChakraLink fontWeight="bold" fontSize="xl" asChild>
+              <Link
+                to="/$publicId/menu/$menuId/edit"
+                params={{
+                  publicId,
+                  menuId: menu.publicId,
+                }}
+              >
+                {menu.title}
+              </Link>
+            </ChakraLink>
+            <Box color="gray.600">
+              {menu.description || 'No description provided.'}
+            </Box>
+            {true
+              ? (
+                  <Tag.Root colorPalette="yellow" mt={2} fontWeight="bold">
+                    <Tag.Label>Draft</Tag.Label>
+                  </Tag.Root>
+                )
+              : (
+                  <Tag.Root colorPalette="green" mt={2} fontWeight="bold">
+                    <Tag.Label>Published</Tag.Label>
+                  </Tag.Root>
+                )}
+          </Box>
+          <IconButton aria-label="Edit menu" variant="subtle" size="sm" position="relative" top={-2} right={-2}>
+            <Icon size="lg">
+              <Iconify icon="material-symbols:more-vert" />
+            </Icon>
+          </IconButton>
+        </Flex>
       ))}
     </VStack>
   )

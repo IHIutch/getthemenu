@@ -7,13 +7,13 @@ import dotenv from 'dotenv'
 import process from 'node:process'
 import { z } from 'zod'
 
-if (isServer) {
-  dotenv.config({ override: true })
-}
+// if (isServer) {
+//   dotenv.config({ override: true })
+// }
 
 process.env = {
-  ...import.meta.env,
   ...process.env,
+  ...import.meta.env,
 }
 
 export const env = createEnv({
@@ -36,11 +36,8 @@ export const env = createEnv({
 
     // # Test
     TEST_HOST: z.string().optional(),
-
-    SUPABASE_ANON_KEY: z.string().min(1),
-    SUPABASE_URL: z.string().min(1).url(),
   },
-
+  
   client: {
     // # Misc
     VITE_ROOT_DOMAIN: z.string().min(1),
@@ -48,6 +45,9 @@ export const env = createEnv({
     VITE_SENTRY_DSN: z.string().min(1),
     // # Stripe
     VITE_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
+    
+    VITE_SUPABASE_ANON_KEY: z.string().min(1),
+    VITE_SUPABASE_URL: z.string().min(1).url(),
   },
 
   extends: [vercel()],
