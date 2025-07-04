@@ -1,4 +1,4 @@
-import { Box, chakra, Link as ChakraLink, Container, Flex, HStack, Stack } from '@chakra-ui/react'
+import { chakra, Link as ChakraLink, Container, Flex, HStack } from '@chakra-ui/react'
 import { createFileRoute, createLink, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authed/$publicId/menu/$menuId')({

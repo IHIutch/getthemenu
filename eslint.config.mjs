@@ -13,6 +13,7 @@ export default antfu({
     'perfectionist/sort-imports': ['error', {
       type: 'natural',
     }],
+    '@typescript-eslint/no-use-before-define': 'off',
     'no-console': 'warn',
   },
 },

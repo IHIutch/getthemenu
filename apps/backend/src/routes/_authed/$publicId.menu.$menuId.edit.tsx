@@ -1,4 +1,4 @@
-import { Box, Button, CloseButton, createOverlay, Drawer, Field, FileUpload, Flex, Float, Heading, Icon, IconButton, Image, Input, NumberInput, Text, Textarea, useFileUploadContext, VStack } from '@chakra-ui/react'
+import { Box, Button, CloseButton, createOverlay, Drawer, Field, FileUpload, Flex, Float, FormatNumber, Heading, Icon, IconButton, Image, Input, NumberInput, Square, Stack, Text, Textarea, useFileUploadContext, VStack } from '@chakra-ui/react'
 import { prisma } from '@repo/db'
 import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -9,6 +9,7 @@ import { getPlaiceholder } from 'plaiceholder'
 import * as React from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod/v4'
+import IconAddAPhoto from '~icons/material-symbols/add-a-photo'
 import IconMoreVert from '~icons/material-symbols/more-vert'
 import IconUpload from '~icons/material-symbols/upload'
 
@@ -42,6 +43,7 @@ export const uploadFile = createServerFn({ method: 'POST' })
       throw new Error(error.message)
     }
 
+    // eslint-disable-next-line node/prefer-global/buffer
     const buffer = Buffer.from(await file.arrayBuffer())
 
     const {
@@ -149,14 +151,6 @@ function RouteComponent() {
     }
   })
 
-  const formatMoney = (value: number) => {
-    const dollars = value / 100
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(dollars)
-  }
-
   if (!sectionsWithItems.length) {
     return (
       <Box py={12} h="full">
@@ -166,9 +160,9 @@ function RouteComponent() {
             <Button
               mt={4}
               onClick={() => {
-                menuItemDrawer.open("a", {
-                  id: "a",
-                  menuPublicId: menu.publicId
+                menuItemDrawer.open('a', {
+                  id: 'a',
+                  menuPublicId: menu.publicId,
                 })
               }}
             >
@@ -187,10 +181,9 @@ function RouteComponent() {
         <Box key={section.id} w="full">
           <Flex mb={4}>
             <Box>
-              { section.title ? 
-                <Heading>{section.title}</Heading>
-                : <Heading fontStyle="italic" color="gray.500">Untitled Section</Heading>
-              }
+              { section.title
+                ? <Heading>{section.title}</Heading>
+                : <Heading fontStyle="italic" color="gray.500">Untitled Section</Heading>}
               { section.description
                 ? <Text>{section.description}</Text>
                 : <Text fontStyle="italic" color="gray.500">No description</Text>}
@@ -214,11 +207,46 @@ function RouteComponent() {
                         />
                       )
                     : null}
-                  <Box>
-                    <Heading>{item.title}</Heading>
-                    <Text>{item.description}</Text>
-                    <Text>{item.price ? formatMoney(item.price) : ''}</Text>
-                  </Box>
+                  <Stack direction="row" gap={4}>
+                    <Box>
+                      {item.image[0]?.url
+                        ? (
+                            <Image
+                              src={item.image[0]?.url || ''}
+                              width={16}
+                              height={16}
+                              objectFit="cover"
+                              borderRadius="md"
+                              alt={item.title || 'Menu Item Image'}
+                            // fallbackSrc="https://via.placeholder.com/64"
+                            />
+                          )
+                        : (
+                            <Square size={16} bg="gray.100" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
+                              <Icon size="md" color="fg.muted">
+                                <IconAddAPhoto />
+                              </Icon>
+                            </Square>
+                          )}
+                    </Box>
+                    <Box>
+                      <Heading>{item.title}</Heading>
+                      {item.price
+                        ? (
+                            <Text>
+                              <FormatNumber
+                                value={item.price / 100}
+                                style="currency"
+                                currency="USD"
+                              />
+                            </Text>
+                          )
+                        : <Text fontStyle="italic" color="gray.500">No price</Text>}
+                      {item.description
+                        ? <Text>{item.description}</Text>
+                        : <Text fontStyle="italic" color="gray.500">No description</Text>}
+                    </Box>
+                  </Stack>
                 </Flex>
                 <IconButton
                   aria-label="Edit menu item"
@@ -226,14 +254,15 @@ function RouteComponent() {
                   size="sm"
                   onClick={() => {
                     menuItemDrawer.open(item.id.toString(), {
-                    id: item.id.toString(),
-                    menuPublicId: menu.publicId,
-                    menuItem: {
-                      ...item,
-                      image: item.image[0]
-                    }
-                  })
-                }}>
+                      id: item.id.toString(),
+                      menuPublicId: menu.publicId,
+                      menuItem: {
+                        ...item,
+                        image: item.image[0],
+                      },
+                    })
+                  }}
+                >
                   <Icon size="lg">
                     <IconMoreVert />
                   </Icon>
@@ -377,7 +406,7 @@ function SectionDrawer({ section, menuPublicId }: {
   )
 }
 
-type MenuItemDrawerProps = {
+interface MenuItemDrawerProps {
   id: string
   menuItem?: {
     id: number
@@ -396,7 +425,7 @@ type MenuItemDrawerProps = {
   // onOpenChange: (open: boolean) => void
 }
 
-const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({id, menuPublicId, menuItem, ...rest}) =>  {
+const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuPublicId, menuItem, ...rest }) => {
   const updateMenuItemMutation = useMutation(trpc.menuItem.update.mutationOptions())
   const createMenuItemMutation = useMutation(trpc.menuItem.create.mutationOptions())
   const queryClient = useQueryClient()
