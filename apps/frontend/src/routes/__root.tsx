@@ -50,7 +50,7 @@ const getRestaurant = createServerFn({ method: 'GET' }).handler(async () => {
     throw notFound()
   }
 
-  const restaurant = await prisma.restaurants.findUnique({
+  const restaurant = await prisma.restaurants.findFirst({
     where: {
       customHost: tenant,
     },
