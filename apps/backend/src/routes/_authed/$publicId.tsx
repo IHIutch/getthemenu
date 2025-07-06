@@ -1,5 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react'
-import { prisma } from '@repo/db'
+import prisma from '~/utils/db'
 import { createFileRoute, notFound, Outlet } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'

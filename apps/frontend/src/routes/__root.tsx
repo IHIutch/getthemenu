@@ -1,4 +1,3 @@
-import { prisma } from '@repo/db'
 import {
   createRootRoute,
   HeadContent,
@@ -16,6 +15,7 @@ import { parse } from 'tldts'
 import { z } from 'zod'
 
 import { BlurImage } from '~/components/blur-image'
+import prisma from '~/utils/db'
 import { formatTime } from '~/utils/format-time'
 
 import { DefaultCatchBoundary } from '../components/DefaultCatchBoundary'

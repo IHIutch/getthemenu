@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react'
-import { prisma } from '@repo/db'
+import prisma from '~/utils/db'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 

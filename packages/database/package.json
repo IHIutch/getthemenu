@@ -1,20 +1,38 @@
 {
   "name": "@repo/db",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": {
+        "@prisma/source": "./src/index.ts",
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      }
+    },
+    "./enums": {
+      "import": {
+        "types": "./dist/enums.d.ts",
+        "import": "./dist/enums.js",
+        "default": "./dist/enums.js"
+      }
+    }
   },
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "clean": "rm -rf dist && rm -rf ./src/.generated",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build": "tsc"
   },
   "dependencies": {
     "@prisma/client": "catalog:",
     "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "prisma": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"

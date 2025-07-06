@@ -1,5 +1,4 @@
 import { Box, Button, CloseButton, createOverlay, Drawer, Field, FileUpload, Flex, Float, FormatNumber, Heading, HStack, Icon, IconButton, Image, Input, NumberInput, Square, Stack, StackSeparator, Text, Textarea, useFileUploadContext, VStack } from '@chakra-ui/react'
-import { prisma } from '@repo/db'
 import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, notFound } from '@tanstack/react-router'
@@ -13,6 +12,7 @@ import IconMoreVert from '~icons/material-symbols/more-vert'
 import IconUpload from '~icons/material-symbols/upload'
 
 import { trpc } from '~/router'
+import prisma from '~/utils/db'
 import getSupabaseServerClient from '~/utils/supabase/server'
 
 export const uploadFile = createServerFn({ method: 'POST' })

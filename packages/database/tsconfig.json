@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    // See: https://github.com/egoist/tsup/issues/571#issuecomment-1760052931
+    "composite": false,
+    // Only output d.ts files and not JavaScript files.
+    "emitDeclarationOnly": false,
+    // Specify an output folder for all emitted files.
+    "outDir": "dist"
+  },
+  "include": [
+    "src"
+  ]
+}

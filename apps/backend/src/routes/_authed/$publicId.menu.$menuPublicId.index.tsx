@@ -1,8 +1,9 @@
 import { Box } from '@chakra-ui/react'
-import { prisma } from '@repo/db'
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+
+import prisma from '~/utils/db'
 
 const fetchMenuData = createServerFn({ method: 'GET' })
   .validator((publicId: unknown) => {
