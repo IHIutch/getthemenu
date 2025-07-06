@@ -1,5 +1,6 @@
-import prisma from '~/utils/db'
 import * as z from 'zod/v4'
+
+import prisma from '~/utils/db'
 
 import { authedProcedure, router } from '../server'
 
@@ -120,7 +121,7 @@ export const menuItemRouter = router({
         title: z.string(),
         description: z.string(),
         price: z.number().nullable(),
-        image: z.object({
+        newImage: z.object({
           id: z.number().optional(),
           menuItemId: z.number(),
           url: z.url(),
@@ -134,62 +135,50 @@ export const menuItemRouter = router({
   ).mutation(async ({ input }) => {
     const { id, payload } = input
 
-    const existingImage = await prisma.menuItemImages.findFirst({
-      where: { menuItemId: id },
-    })
-
-    if (payload.image) {
-      return await prisma.menuItems.update({
-        where: {
-          id,
-        },
+    if (payload.newImage) {
+      await prisma.menuItemImages.updateMany({
+        where: { menuItemId: id },
         data: {
-          title: payload.title,
-          description: payload.description,
-          price: payload.price,
-          image: {
-            create: {
-              url: payload.image.url,
-              width: payload.image.width,
-              height: payload.image.height,
-              hex: payload.image.hex,
-              blurDataUrl: payload.image.blurDataUrl,
-            },
-          }
+          deletedAt: new Date(),
         },
-        include: {
-          image: {
-            select: {
-              id: true,
-              url: true,
-              width: true,
-              height: true,
-              hex: true,
-              blurDataUrl: true,
-            },
+      })
+
+      await prisma.menuItemImages.create({
+        data: {
+          menuItemId: id,
+          url: payload.newImage.url,
+          width: payload.newImage.width,
+          height: payload.newImage.height,
+          hex: payload.newImage.hex,
+          blurDataUrl: payload.newImage.blurDataUrl,
+        },
+      })
+    }
+
+    return await prisma.menuItems.update({
+      where: {
+        id,
+      },
+      data: {
+        title: payload.title,
+        description: payload.description,
+        price: payload.price,
+      },
+      include: {
+        image: {
+          select: {
+            id: true,
+            url: true,
+            width: true,
+            height: true,
+            hex: true,
+            blurDataUrl: true,
+          },
+          where: {
+            deletedAt: null,
           },
         },
-      })
-    }
-    else {
-      return await prisma.menuItems.update({
-        where: {
-          id,
-        },
-        data: {
-          title: payload.title,
-          description: payload.description,
-          price: payload.price,
-          image: {
-            update: existingImage ? {
-              where: { id: existingImage.id },
-              data: {
-               deletedAt: new Date(),
-              },
-            } : undefined,
-          }
-        },
-      })
-    }
+      },
+    })
   }),
 })

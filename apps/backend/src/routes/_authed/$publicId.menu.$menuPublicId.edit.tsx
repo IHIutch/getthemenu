@@ -14,8 +14,8 @@ import IconUpload from '~icons/material-symbols/upload'
 
 import { trpc } from '~/router'
 import prisma from '~/utils/db'
-import getSupabaseServerClient from '~/utils/supabase/server'
 import { resizeImage } from '~/utils/resize-image'
+import getSupabaseServerClient from '~/utils/supabase/server'
 
 export const uploadFile = createServerFn({ method: 'POST' })
   .validator((data) => {
@@ -28,12 +28,15 @@ export const uploadFile = createServerFn({ method: 'POST' })
     }
   })
   .handler(async ({ data }) => {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseServerClient()
     const file = data.file
 
     if (!file) {
       throw new Error('No file provided')
     }
+
+    // eslint-disable-next-line node/prefer-global/buffer
+    const buffer = Buffer.from(await file.arrayBuffer())
 
     const fileName = `${uuidv4()}.${mime.getExtension(file.type)}`
     const { data: uploadData, error } = await supabase.storage
@@ -43,9 +46,6 @@ export const uploadFile = createServerFn({ method: 'POST' })
     if (error) {
       throw new Error(error.message)
     }
-
-    // eslint-disable-next-line node/prefer-global/buffer
-    const buffer = Buffer.from(await file.arrayBuffer())
 
     const {
       base64: blurDataUrl,
@@ -101,7 +101,7 @@ const fetchMenuData = createServerFn({ method: 'GET' })
               },
               where: {
                 deletedAt: null,
-              }
+              },
             },
           },
           orderBy: {
@@ -513,7 +513,7 @@ const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuItem, secti
             title: value.title,
             description: value.description,
             price: value.price ? Number(value.price) * 100 : null,
-            image: newImage
+            newImage: newImage
               ? {
                   ...newImage,
                   menuItemId: menuItem.id,
@@ -574,79 +574,79 @@ const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuItem, secti
                     selector={state => ({
                       image: state.values.image,
                     })}
-                    children={({ image }) =>
+                    children={({ image }) => (
                       <AspectRatio ratio={16 / 9} w="full">
                         {image
                           ? (
-                            <Box
+                              <Box
                               // position="relative"
-                              rounded="md"
-                              borderColor="gray.200"
-                              borderWidth={1}
-                              overflow="hidden"
-                              width="full"
-                              height="full"
-                            >
-                              <Image
-                                src={image || ''}
+                                rounded="md"
+                                borderColor="gray.200"
+                                borderWidth={1}
+                                overflow="hidden"
                                 width="full"
                                 height="full"
-                                objectFit="cover"
-                                borderRadius="md"
-                              />
-                              <Float placement="top-end" offset={6}>
-                                <IconButton
-                                  aria-label="Remove file"
-                                  variant="subtle"
-                                  size="sm"
-                                  colorScheme="red"
-                                  onClick={() => {
-                                    form.setFieldValue('image', '')
-                                  }}
-                                >
-                                  <IconClose />
-                                </IconButton>
-                              </Float>
-                            </Box>
-                          )
+                              >
+                                <Image
+                                  src={image || ''}
+                                  width="full"
+                                  height="full"
+                                  objectFit="cover"
+                                  borderRadius="md"
+                                />
+                                <Float placement="top-end" offset={6}>
+                                  <IconButton
+                                    aria-label="Remove file"
+                                    variant="subtle"
+                                    size="sm"
+                                    colorScheme="red"
+                                    onClick={() => {
+                                      form.setFieldValue('image', '')
+                                    }}
+                                  >
+                                    <IconClose />
+                                  </IconButton>
+                                </Float>
+                              </Box>
+                            )
                           : (
-                            <form.Field
-                              name="pendingImage"
-                              children={field => (
-                                <FileUpload.Root
-                                  maxW="xl"
-                                  alignItems="stretch"
-                                  maxFiles={1}
-                                  accept={['image/*']}
-                                  onFileAccept={async ({ files }) => {
+                              <form.Field
+                                name="pendingImage"
+                                children={field => (
+                                  <FileUpload.Root
+                                    maxW="xl"
+                                    alignItems="stretch"
+                                    maxFiles={1}
+                                    accept={['image/*']}
+                                    onFileAccept={async ({ files }) => {
                                     // Handle file accept logic here
-                                    const resized = await resizeImage(files[0])
-                                    field.handleChange(resized)
-                                  }}
-                                >
-                                  <FileUpload.HiddenInput />
-                                  {field.state.value
-                                    ? (
-                                      <FileUploadPreview />
-                                    )
-                                    : (
-                                      <FileUpload.Dropzone minH="0" width="full" aspectRatio={16/9}>
-                                        <Icon size="md" color="fg.muted">
-                                          <IconUpload />
-                                        </Icon>
-                                        <FileUpload.DropzoneContent>
-                                          <Box>Drag and drop files here</Box>
-                                          <Box color="fg.muted">.png, .jpg up to 5MB</Box>
-                                        </FileUpload.DropzoneContent>
-                                      </FileUpload.Dropzone>
-                                    )}
-                                  {/* <FileUpload.List /> */}
-                                </FileUpload.Root>
-                              )}
-                            />
-                          )}
+                                      const resized = await resizeImage(files[0])
+                                      field.handleChange(resized)
+                                    }}
+                                  >
+                                    <FileUpload.HiddenInput />
+                                    {field.state.value
+                                      ? (
+                                          <FileUploadPreview />
+                                        )
+                                      : (
+                                          <FileUpload.Dropzone minH="0" width="full" aspectRatio={16 / 9}>
+                                            <Icon size="md" color="fg.muted">
+                                              <IconUpload />
+                                            </Icon>
+                                            <FileUpload.DropzoneContent>
+                                              <Box>Drag and drop files here</Box>
+                                              <Box color="fg.muted">.png, .jpg up to 5MB</Box>
+                                            </FileUpload.DropzoneContent>
+                                          </FileUpload.Dropzone>
+                                        )}
+                                    {/* <FileUpload.List /> */}
+                                  </FileUpload.Root>
+                                )}
+                              />
+                            )}
                       </AspectRatio>
-                    }
+                    )}
                   />
                 </Box>
 
