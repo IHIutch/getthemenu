@@ -6,8 +6,8 @@
         "^build"
       ],
       "env": [
-        "SUPABASE_URL",
-        "SUPABASE_ANON_KEY",
+        "VITE_SUPABASE_URL",
+        "VITE_SUPABASE_ANON_KEY",
         "POSTGRES_PRISMA_URL",
         "POSTGRES_URL_NON_POOLING",
         "VITE_ROOT_DOMAIN",
