@@ -29,7 +29,6 @@ catalog:
   '@trpc/tanstack-react-query': ^11.4.3
   '@types/node': ^22.16.0
   '@types/pg': ^8.15.4
-
   '@types/react': ^19.1.8
   '@types/react-dom': ^19.1.6
   '@vitejs/plugin-react': ^4.6.0
@@ -59,6 +58,8 @@ catalog:
   vite: ^7.0.2
   vite-tsconfig-paths: ^5.1.4
   zod: ^3.25.74
+  compressorjs: 1.2.1
+
 catalogMode: prefer
 
 onlyBuiltDependencies:

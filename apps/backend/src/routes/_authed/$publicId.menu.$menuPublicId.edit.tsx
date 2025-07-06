@@ -1,4 +1,4 @@
-import { Box, Button, CloseButton, createOverlay, Drawer, Field, FileUpload, Flex, Float, FormatNumber, Heading, HStack, Icon, IconButton, Image, Input, NumberInput, Square, Stack, StackSeparator, Text, Textarea, useFileUploadContext, VStack } from '@chakra-ui/react'
+import { AspectRatio, Box, Button, CloseButton, createOverlay, Drawer, Field, FileUpload, Flex, Float, FormatNumber, Heading, HStack, Icon, IconButton, Image, Input, NumberInput, Square, Stack, StackSeparator, Text, Textarea, useFileUploadContext, VStack } from '@chakra-ui/react'
 import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, notFound } from '@tanstack/react-router'
@@ -7,13 +7,15 @@ import mime from 'mime'
 import { getPlaiceholder } from 'plaiceholder'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod/v4'
-import IconAddAPhoto from '~icons/material-symbols/add-a-photo'
+import IconClose from '~icons/material-symbols/close'
+import IconImage from '~icons/material-symbols/imagesmode'
 import IconMoreVert from '~icons/material-symbols/more-vert'
 import IconUpload from '~icons/material-symbols/upload'
 
 import { trpc } from '~/router'
 import prisma from '~/utils/db'
 import getSupabaseServerClient from '~/utils/supabase/server'
+import { resizeImage } from '~/utils/resize-image'
 
 export const uploadFile = createServerFn({ method: 'POST' })
   .validator((data) => {
@@ -211,27 +213,32 @@ function RouteComponent() {
                 {section.menuItems.map(item => (
                   <Box key={item.id} w="full" px={3}>
                     <HStack gap={2}>
-                      <Box>
-                        <Square size={16} bg="gray.100" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
-                          {item.image[0]?.url
-                            ? (
-                                <Image
-                                  src={item.image[0]?.url || ''}
-                                  height="full"
-                                  width="full"
-                                  objectFit="cover"
-                                  borderRadius="md"
-                                  alt={item.title || 'Menu Item Image'}
-                                  // fallbackSrc="https://via.placeholder.com/64"
-                                />
-                              )
-                            : (
-                                <Icon size="md" color="fg.muted">
-                                  <IconAddAPhoto />
-                                </Icon>
-                              )}
-                        </Square>
-                      </Box>
+                      {item.image[0]?.url
+                        ? (
+                            <Image
+                              src={item.image[0]?.url || ''}
+                              height={16}
+                              width={16}
+                              objectFit="cover"
+                              alt={item.title || 'Menu Item Image'}
+                              rounded="sm"
+                              // fallbackSrc="https://via.placeholder.com/64"
+                            />
+                          )
+                        : (
+                            <Square
+                              size={16}
+                              bg="gray.100"
+                              borderRadius="md"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              <Icon size="md" color="fg.muted">
+                                <IconImage />
+                              </Icon>
+                            </Square>
+                          )}
                       <Box flex="1">
                         {item.title
                           ? <Heading>{item.title}</Heading>
@@ -552,35 +559,87 @@ const menuItemDrawer = createOverlay<MenuItemDrawerProps>(({ id, menuItem, secti
             </Drawer.Header>
             <Drawer.Body>
               <VStack gap={4}>
-                <form.Field
-                  name="pendingImage"
-                  children={field => (
-                    <FileUpload.Root
-                      maxW="xl"
-                      alignItems="stretch"
-                      maxFiles={1}
-                      defaultValue={field.state.value?.toString() || []}
-                      onFileAccept={({ files }) => {
-                        // Handle file accept logic here
-                        field.handleChange(files[0])
-                        console.log('Files accepted:', files[0])
-                      }}
-                    >
-                      <FileUpload.HiddenInput />
-                      <FileUpload.Dropzone minH={0} aspectRatio={16 / 9}>
-                        <Icon size="md" color="fg.muted">
-                          <IconUpload />
-                        </Icon>
-                        <FileUpload.DropzoneContent>
-                          <Box>Drag and drop files here</Box>
-                          <Box color="fg.muted">.png, .jpg up to 5MB</Box>
-                        </FileUpload.DropzoneContent>
-                      </FileUpload.Dropzone>
-                      <FileUploadPreview />
-                      {/* <FileUpload.List /> */}
-                    </FileUpload.Root>
-                  )}
-                />
+                <Box w="full">
+                  <form.Subscribe
+                    selector={state => ({
+                      image: state.values.image,
+                    })}
+                    children={({ image }) =>
+                      <AspectRatio ratio={16 / 9} w="full">
+                        {image
+                          ? (
+                            <Box
+                              // position="relative"
+                              rounded="md"
+                              borderColor="gray.200"
+                              borderWidth={1}
+                              overflow="hidden"
+                              width="full"
+                              height="full"
+                            >
+                              <Image
+                                src={image || ''}
+                                width="full"
+                                height="full"
+                                objectFit="cover"
+                                borderRadius="md"
+                              />
+                              <Float placement="top-end" offset={6}>
+                                <IconButton
+                                  aria-label="Remove file"
+                                  variant="subtle"
+                                  size="sm"
+                                  colorScheme="red"
+                                  onClick={() => {
+                                    form.setFieldValue('image', '')
+                                  }}
+                                >
+                                  <IconClose />
+                                </IconButton>
+                              </Float>
+                            </Box>
+                          )
+                          : (
+                            <form.Field
+                              name="pendingImage"
+                              children={field => (
+                                <FileUpload.Root
+                                  maxW="xl"
+                                  alignItems="stretch"
+                                  maxFiles={1}
+                                  accept={['image/*']}
+                                  onFileAccept={async ({ files }) => {
+                                    // Handle file accept logic here
+                                    const resized = await resizeImage(files[0])
+                                    field.handleChange(resized)
+                                  }}
+                                >
+                                  <FileUpload.HiddenInput />
+                                  {field.state.value
+                                    ? (
+                                      <FileUploadPreview />
+                                    )
+                                    : (
+                                      <FileUpload.Dropzone minH="0" width="full" aspectRatio={16/9}>
+                                        <Icon size="md" color="fg.muted">
+                                          <IconUpload />
+                                        </Icon>
+                                        <FileUpload.DropzoneContent>
+                                          <Box>Drag and drop files here</Box>
+                                          <Box color="fg.muted">.png, .jpg up to 5MB</Box>
+                                        </FileUpload.DropzoneContent>
+                                      </FileUpload.Dropzone>
+                                    )}
+                                  {/* <FileUpload.List /> */}
+                                </FileUpload.Root>
+                              )}
+                            />
+                          )}
+                      </AspectRatio>
+                    }
+                  />
+                </Box>
+
                 <form.Field
                   name="title"
                   children={field => (
@@ -687,16 +746,29 @@ function FileUploadPreview() {
     <FileUpload.ItemGroup>
 
       <FileUpload.Item
-        w="auto"
-        boxSize="20"
-        p="2"
+        w="full"
+        h="auto"
         file={file}
+        p={0}
+        overflow="hidden"
+        rounded="md"
       >
-        <FileUpload.ItemPreviewImage />
-        <Float placement="top-end">
-          <FileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
-            {/* <LuX /> */}
-          </FileUpload.ItemDeleteTrigger>
+        <FileUpload.ItemPreviewImage
+          aspectRatio={16 / 9}
+          objectFit="cover"
+        />
+        <Float placement="top-end" offset={6}>
+          <IconButton
+            aria-label="Remove file"
+            variant="subtle"
+            size="sm"
+            colorScheme="red"
+            asChild
+          >
+            <FileUpload.ItemDeleteTrigger>
+              <IconClose />
+            </FileUpload.ItemDeleteTrigger>
+          </IconButton>
         </Float>
       </FileUpload.Item>
     </FileUpload.ItemGroup>
