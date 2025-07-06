@@ -79,11 +79,15 @@ const fetchMenuData = createServerFn({ method: 'GET' })
     const menu = await prisma.menus.findUnique({
       where: {
         publicId: data.publicId,
+        deletedAt: null,
       },
       include: {
         sections: {
           orderBy: {
             position: 'asc',
+          },
+          where: {
+            deletedAt: null,
           },
         },
         menuItems: {
@@ -95,10 +99,16 @@ const fetchMenuData = createServerFn({ method: 'GET' })
                 width: true,
                 height: true,
               },
+              where: {
+                deletedAt: null,
+              }
             },
           },
           orderBy: {
             position: 'asc',
+          },
+          where: {
+            deletedAt: null,
           },
         },
       },

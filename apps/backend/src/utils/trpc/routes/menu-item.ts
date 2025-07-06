@@ -16,6 +16,7 @@ export const menuItemRouter = router({
         menus: {
           publicId: menuPublicId,
         },
+        deletedAt: null,
       },
       include: {
         image: {
@@ -24,6 +25,9 @@ export const menuItemRouter = router({
             url: true,
             width: true,
             height: true,
+          },
+          where: {
+            deletedAt: null,
           },
         },
       },
@@ -130,11 +134,11 @@ export const menuItemRouter = router({
   ).mutation(async ({ input }) => {
     const { id, payload } = input
 
-    if (payload.image) {
-      const existingImage = await prisma.menuItemImages.findFirst({
-        where: { menuItemId: id },
-      })
+    const existingImage = await prisma.menuItemImages.findFirst({
+      where: { menuItemId: id },
+    })
 
+    if (payload.image) {
       return await prisma.menuItems.update({
         where: {
           id,
@@ -143,28 +147,15 @@ export const menuItemRouter = router({
           title: payload.title,
           description: payload.description,
           price: payload.price,
-          image: existingImage
-            ? {
-                update: {
-                  where: { id: existingImage.id },
-                  data: {
-                    url: payload.image.url,
-                    width: payload.image.width,
-                    height: payload.image.height,
-                    hex: payload.image.hex,
-                    blurDataUrl: payload.image.blurDataUrl,
-                  },
-                },
-              }
-            : {
-                create: {
-                  url: payload.image.url,
-                  width: payload.image.width,
-                  height: payload.image.height,
-                  hex: payload.image.hex,
-                  blurDataUrl: payload.image.blurDataUrl,
-                },
-              },
+          image: {
+            create: {
+              url: payload.image.url,
+              width: payload.image.width,
+              height: payload.image.height,
+              hex: payload.image.hex,
+              blurDataUrl: payload.image.blurDataUrl,
+            },
+          }
         },
         include: {
           image: {
@@ -189,6 +180,14 @@ export const menuItemRouter = router({
           title: payload.title,
           description: payload.description,
           price: payload.price,
+          image: {
+            update: existingImage ? {
+              where: { id: existingImage.id },
+              data: {
+               deletedAt: new Date(),
+              },
+            } : undefined,
+          }
         },
       })
     }
