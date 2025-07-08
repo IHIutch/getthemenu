@@ -1,7 +1,6 @@
 import * as z from 'zod/v4'
 
-import prisma from '~/utils/db'
-
+import prisma from '../../db'
 import { authedProcedure, router } from '../server'
 
 export const menuItemRouter = router({

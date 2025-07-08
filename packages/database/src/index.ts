@@ -1,5 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import process from 'node:process'
+
+import { PrismaClient } from './generated/prisma/client'
 
 export interface GetDbParams {
   connectionString: string

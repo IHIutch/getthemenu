@@ -1,11 +1,11 @@
 import { Box, Flex } from '@chakra-ui/react'
-import prisma from '~/utils/db'
 import { createFileRoute, notFound, Outlet } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import Navbar from '~/components/navbar'
-import { NotFound } from '~/components/not-found'
+import Navbar from '../../components/navbar'
+import { NotFound } from '../../components/not-found'
+import prisma from '../../utils/db'
 
 const validatorSchema = z.object({
   publicId: z.string(),

@@ -12,10 +12,10 @@ import IconImage from '~icons/material-symbols/imagesmode'
 import IconMoreVert from '~icons/material-symbols/more-vert'
 import IconUpload from '~icons/material-symbols/upload'
 
-import { trpc } from '~/router'
-import prisma from '~/utils/db'
-import { resizeImage } from '~/utils/resize-image'
-import getSupabaseServerClient from '~/utils/supabase/server'
+import { trpc } from '../../router'
+import prisma from '../../utils/db'
+import { resizeImage } from '../../utils/resize-image'
+import getSupabaseServerClient from '../../utils/supabase/server'
 
 export const uploadFile = createServerFn({ method: 'POST' })
   .validator((data) => {

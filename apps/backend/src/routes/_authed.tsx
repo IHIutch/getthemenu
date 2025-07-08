@@ -1,9 +1,9 @@
 import { Box } from '@chakra-ui/react'
-import prisma from '~/utils/db'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 
 import { Login } from '../components/Login'
+import prisma from '../utils/db'
 import getSupabaseServerClient from '../utils/supabase/server'
 
 export const fetchUser = createServerFn({ method: 'GET' }).handler(async () => {

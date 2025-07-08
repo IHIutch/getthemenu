@@ -2,8 +2,7 @@ import { Box, Button, Field, Heading, Input, VStack } from '@chakra-ui/react'
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 
-import { useMutation } from '~/hooks/use-mutation'
-
+import { useMutation } from '../hooks/use-mutation'
 import { loginFn } from './_authed'
 
 export const Route = createFileRoute('/login')({

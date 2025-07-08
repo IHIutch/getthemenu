@@ -12,10 +12,10 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
 
-import type { AppRouter } from '~/utils/trpc/routes'
+import type { AppRouter } from '../utils/trpc/routes'
 
-import { DefaultCatchBoundary } from '~/components/default-catch-boundary'
-import { NotFound } from '~/components/not-found'
+import { DefaultCatchBoundary } from '../components/default-catch-boundary'
+import { NotFound } from '../components/not-found'
 
 export interface RouterAppContext {
   trpc: TRPCOptionsProxy<AppRouter>

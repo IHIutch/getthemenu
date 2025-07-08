@@ -1,4 +1,4 @@
-import prisma from '~/utils/db'
+import prisma from '../../db'
 import * as z from 'zod/v4'
 
 import { authedProcedure, router } from '../server'

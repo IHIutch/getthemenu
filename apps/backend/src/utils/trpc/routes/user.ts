@@ -1,4 +1,4 @@
-import prisma from '~/utils/db'
+import prisma from '../../db'
 
 import { authedProcedure, router } from '../server'
 
